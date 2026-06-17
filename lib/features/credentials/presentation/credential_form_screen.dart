@@ -3,17 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
-
-import '../../../shared/extensions/color_extensions.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_colors.dart';
 import '../application/credentials_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/entities/credential.dart';
-import '../../folders/domain/entities/folder.dart';
 import 'qr_scanner_screen.dart';
-import 'widgets/password_generator_widget.dart';
+import 'widgets/form_section.dart';
+import 'widgets/save_button.dart';
+import 'widgets/type_selector_premium.dart';
+import 'widgets/password_row_widget.dart';
+import 'widgets/favorite_toggle.dart';
+import 'widgets/folder_picker_sheet.dart';
 
 class CredentialFormScreen extends ConsumerStatefulWidget {
   const CredentialFormScreen({super.key, this.existingId});
@@ -171,8 +173,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           updatedAt: now,
         );
 
-      // Passkeys are registered via the platform FIDO2 API, not via this form.
-      // Existing passkey credentials are read-only here.
       case CredentialType.passkey:
         return _existing!.copyWith(updatedAt: now);
     }
@@ -330,8 +330,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
           children: [
-            // ── Type selector (premium horizontal scroll) ──────────────
-            _TypeSelectorPremium(
+            TypeSelectorPremium(
               selected: _type,
               isEditing: isEdit,
               onChanged: (t) => setState(() {
@@ -341,8 +340,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             ),
             const SizedBox(height: 24),
 
-            // ── Header section: Title + Favorite ──────────────────────
-            _FormSection(
+            FormSection(
               icon: Icons.badge_rounded,
               accentColor: typeColor,
               title: 'Identificación',
@@ -360,7 +358,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 12),
-                _FavoriteToggle(
+                FavoriteToggle(
                   value: _isFavorite,
                   onChanged: (v) {
                     HapticFeedback.selectionClick();
@@ -371,13 +369,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             ),
             const SizedBox(height: 16),
 
-            // ── Type-specific fields ───────────────────────────────────
             _buildFieldsByType(),
 
-            // ── Notes (common except TOTP) ─────────────────────────────
             if (_type != CredentialType.totp) ...[
               const SizedBox(height: 16),
-              _FormSection(
+              FormSection(
                 icon: Icons.notes_rounded,
                 accentColor: typeColor,
                 title: _type == CredentialType.secureNote ? 'Contenido' : 'Notas',
@@ -405,9 +401,8 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               ),
             ],
 
-            // ── Folder Picker ───────────────────────────────────────────
             const SizedBox(height: 16),
-            _FormSection(
+            FormSection(
               icon: Icons.folder_rounded,
               accentColor: AppColors.textMuted,
               title: 'Organización',
@@ -425,7 +420,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                           isScrollControlled: true,
                           backgroundColor: AppColors.drawer,
                           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                          builder: (_) => _FolderPickerSheet(selectedFolderId: _folderId),
+                          builder: (_) => FolderPickerSheet(selectedFolderId: _folderId),
                         );
                         if (selection != null) {
                           setState(() => _folderId = selection.first);
@@ -461,14 +456,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
             const SizedBox(height: 32),
 
-            // ── Save button ─────────────────────────────────────────────
             ScaleTransition(
               scale: _saveScale,
               child: _isLoading
                   ? const Center(
                       child: CircularProgressIndicator(color: AppColors.accent),
                     )
-                  : _SaveButton(
+                  : SaveButton(
                       label: isEdit ? 'Guardar cambios' : 'Crear credencial',
                       color: typeColor,
                       onPressed: _save,
@@ -534,7 +528,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildPasswordFields() {
-    return _FormSection(
+    return FormSection(
       icon: Icons.lock_rounded,
       accentColor: AppColors.typePassword,
       title: 'Credenciales de acceso',
@@ -550,7 +544,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 14),
-        _PasswordRow(
+        PasswordRowWidget(
           ctrl: _passwordCtrl,
           label: 'Contraseña',
           showGenerator: _showGenerator,
@@ -572,7 +566,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildApiKeyFields() {
-    return _FormSection(
+    return FormSection(
       icon: Icons.key_rounded,
       accentColor: AppColors.typeApiKey,
       title: 'Detalles de la API',
@@ -589,7 +583,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               v == null || v.trim().isEmpty ? 'Campo requerido' : null,
         ),
         const SizedBox(height: 14),
-        _PasswordRow(
+        PasswordRowWidget(
           ctrl: _apiKeyCtrl,
           label: 'API Key / Token',
           showGenerator: _showGenerator,
@@ -623,12 +617,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildTotpFields() {
-    return _FormSection(
+    return FormSection(
       icon: Icons.access_time_rounded,
       accentColor: AppColors.typeTotp,
       title: 'Configuración 2FA',
       children: [
-        // Info banner
         Container(
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
@@ -660,7 +653,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         ),
         const SizedBox(height: 16),
 
-        // QR scan button — prominent
         Material(
           color: AppColors.typeTotp.withValues(alpha: 0.08),
           borderRadius: BorderRadius.circular(14),
@@ -695,7 +687,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         ),
 
         const SizedBox(height: 16),
-        // Divider with "o"
         Row(
           children: [
             Expanded(child: Divider(color: AppColors.divider.withValues(alpha: 0.5))),
@@ -729,7 +720,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildPasskeyInfo() {
-    return _FormSection(
+    return FormSection(
       icon: Icons.fingerprint_rounded,
       accentColor: AppColors.typePasskey,
       title: 'Passkey (FIDO2)',
@@ -763,476 +754,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           ),
         ),
       ],
-    );
-  }
-}
-
-// ── Form Section wrapper — groups fields with visual identity ─────────────────
-
-class _FormSection extends StatelessWidget {
-  const _FormSection({
-    required this.icon,
-    required this.accentColor,
-    required this.title,
-    required this.children,
-  });
-
-  final IconData icon;
-  final Color accentColor;
-  final String title;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: AppColors.card,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: accentColor.withValues(alpha: 0.12),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          // Section header
-          Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: accentColor, size: 14),
-              ),
-              const SizedBox(width: 10),
-              Text(
-                title.toUpperCase(),
-                style: TextStyle(
-                  color: accentColor.withValues(alpha: 0.8),
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 1.0,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          ...children,
-        ],
-      ),
-    );
-  }
-}
-
-// ── Save button with gradient ────────────────────────────────────────────────
-
-class _SaveButton extends StatelessWidget {
-  const _SaveButton({
-    required this.label,
-    required this.color,
-    required this.onPressed,
-    required this.icon,
-  });
-
-  final String label;
-  final Color color;
-  final VoidCallback onPressed;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(14),
-        gradient: LinearGradient(
-          colors: [color, color.withValues(alpha: 0.7)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: color.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        borderRadius: BorderRadius.circular(14),
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(14),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(icon, color: Colors.white, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// ── Premium Type Selector ──────────────────────────────────────────────────────
-
-class _TypeSelectorPremium extends StatelessWidget {
-  const _TypeSelectorPremium({
-    required this.selected,
-    required this.onChanged,
-    this.isEditing = false,
-  });
-
-  final CredentialType selected;
-  final ValueChanged<CredentialType> onChanged;
-  final bool isEditing;
-
-  static const _items = [
-    (type: CredentialType.password,   label: 'Contraseña', icon: Icons.lock_rounded,          color: AppColors.typePassword),
-    (type: CredentialType.apiKey,     label: 'API Key',    icon: Icons.key_rounded,           color: AppColors.typeApiKey),
-    (type: CredentialType.secureNote, label: 'Nota',       icon: Icons.note_rounded,          color: AppColors.typeNote),
-    (type: CredentialType.totp,       label: 'TOTP',       icon: Icons.access_time_rounded,   color: AppColors.typeTotp),
-    (type: CredentialType.passkey,    label: 'Passkey',    icon: Icons.fingerprint_rounded,   color: AppColors.typePasskey),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      height: 80,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: _items.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (_, i) {
-          final item = _items[i];
-          final isSelected = item.type == selected;
-          final isDisabled = isEditing && item.type != selected;
-
-          return GestureDetector(
-            onTap: isDisabled ? null : () {
-              HapticFeedback.selectionClick();
-              onChanged(item.type);
-            },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              width: isSelected ? 100 : 72,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? item.color.withValues(alpha: 0.15)
-                    : isDisabled
-                        ? AppColors.card.withValues(alpha: 0.5)
-                        : AppColors.card,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSelected ? item.color : Colors.transparent,
-                  width: isSelected ? 1.5 : 1,
-                ),
-                boxShadow: isSelected
-                    ? [BoxShadow(color: item.color.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 2))]
-                    : null,
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedScale(
-                    scale: isSelected ? 1.15 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      item.icon,
-                      color: isSelected ? item.color : isDisabled ? AppColors.textDisabled : AppColors.textMuted,
-                      size: 22,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    item.label,
-                    style: TextStyle(
-                      color: isSelected ? item.color : isDisabled ? AppColors.textDisabled : AppColors.textMuted,
-                      fontSize: 10,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-          );
-        },
-      ),
-    );
-  }
-}
-
-// ── Password row with embedded generator ─────────────────────────────────────
-
-class _PasswordRow extends StatelessWidget {
-  const _PasswordRow({
-    required this.ctrl,
-    required this.label,
-    required this.showGenerator,
-    required this.onToggleGenerator,
-    this.validator,
-  });
-
-  final TextEditingController ctrl;
-  final String label;
-  final bool showGenerator;
-  final ValueChanged<bool> onToggleGenerator;
-  final String? Function(String?)? validator;
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Expanded(
-              child: SecureTextField(
-                controller: ctrl,
-                label: label,
-                validator: validator,
-              ),
-            ),
-            const SizedBox(width: 8),
-            Container(
-              margin: const EdgeInsets.only(top: 8),
-              decoration: BoxDecoration(
-                color: showGenerator
-                    ? AppColors.accent.withValues(alpha: 0.2)
-                    : AppColors.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: showGenerator
-                      ? AppColors.accent.withValues(alpha: 0.5)
-                      : Colors.transparent,
-                ),
-              ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.auto_fix_high_rounded,
-                  color: showGenerator
-                      ? AppColors.accent
-                      : AppColors.textMuted,
-                ),
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  FocusScope.of(context).unfocus();
-                  onToggleGenerator(!showGenerator);
-                },
-                tooltip: 'Generador de claves',
-              ),
-            ),
-          ],
-        ),
-        AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.fastOutSlowIn,
-          alignment: Alignment.topCenter,
-          child: showGenerator
-              ? PasswordGeneratorWidget(
-                  onApplyPassword: (pass) {
-                    ctrl.text = pass;
-                    HapticFeedback.mediumImpact();
-                    onToggleGenerator(false);
-                  },
-                )
-              : const SizedBox.shrink(),
-        ),
-      ],
-    );
-  }
-}
-
-// ── Favorite toggle ───────────────────────────────────────────────────────────
-
-class _FavoriteToggle extends StatelessWidget {
-  const _FavoriteToggle({required this.value, required this.onChanged});
-  final bool value;
-  final ValueChanged<bool> onChanged;
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () => onChanged(!value),
-      borderRadius: BorderRadius.circular(10),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
-        child: Row(
-          children: [
-            AnimatedScale(
-              scale: value ? 1.2 : 1.0,
-              duration: const Duration(milliseconds: 200),
-              child: Icon(
-                value ? Icons.star_rounded : Icons.star_border_rounded,
-                color: value ? AppColors.warning : AppColors.textMuted,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 10),
-            const Text(
-              'Marcar como favorita',
-              style: TextStyle(color: Colors.white, fontSize: 13),
-            ),
-            const Spacer(),
-            Switch(
-              value: value,
-              onChanged: onChanged,
-              activeTrackColor: AppColors.warning,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Folder picker bottom sheet ────────────────────────────────────────────────
-
-class _FolderPickerSheet extends ConsumerWidget {
-  const _FolderPickerSheet({this.selectedFolderId});
-  final String? selectedFolderId;
-
-  Future<void> _createNewFolder(BuildContext context, WidgetRef ref, String? parentId) async {
-    final ctrl = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: AppColors.drawer,
-        title: const Text('Nueva carpeta', style: TextStyle(color: Colors.white)),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(labelText: 'Nombre de la carpeta'),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
-        ],
-      ),
-    );
-    if (name != null && name.isNotEmpty) {
-      final newFolder = await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: parentId);
-      if (context.mounted) Navigator.pop(context, <String?>[newFolder.id]);
-    }
-  }
-
-  Widget _buildNode(BuildContext context, WidgetRef ref, List<Folder> all, Folder f, int depth) {
-    final sub = all.where((sub) => sub.parentId == f.id).toList();
-    final isSelected = selectedFolderId == f.id;
-    return Theme(
-      data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
-      child: ExpansionTile(
-        tilePadding: EdgeInsets.only(left: 16 + depth * 16.0, right: 16),
-        title: GestureDetector(
-          onTap: () => Navigator.pop(context, <String?>[f.id]),
-          child: Row(
-            children: [
-              Icon(f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, color: f.colorHex.toColor()),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  f.name,
-                  style: TextStyle(
-                    color: isSelected ? AppColors.accent : Colors.white,
-                    fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  ),
-                ),
-              ),
-              if (isSelected) ...[
-                const SizedBox(width: 8),
-                const Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 16),
-              ]
-            ],
-          ),
-        ),
-        childrenPadding: EdgeInsets.zero,
-        trailing: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            IconButton(
-              icon: const Icon(Icons.create_new_folder_outlined, color: AppColors.textMuted),
-              onPressed: () => _createNewFolder(context, ref, f.id),
-              tooltip: 'Añadir subcarpeta',
-            ),
-            if (sub.isNotEmpty)
-              const Icon(Icons.expand_more, color: AppColors.textDisabled)
-            else
-              const SizedBox(width: 24),
-          ],
-        ),
-        children: sub.map((sf) => _buildNode(context, ref, all, sf, depth + 1)).toList(),
-      ),
-    );
-  }
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
-    final roots = folders.where((f) => f.parentId == null).toList();
-
-    return Container(
-      padding: const EdgeInsets.only(top: 16),
-      constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.8),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Seleccionar Carpeta', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                TextButton.icon(
-                  onPressed: () => _createNewFolder(context, ref, null),
-                  icon: const Icon(Icons.create_new_folder_rounded, color: AppColors.accent),
-                  label: const Text('Nueva raíz', style: TextStyle(color: AppColors.accent)),
-                ),
-              ],
-            ),
-          ),
-          const Divider(color: AppColors.divider),
-          Expanded(
-            child: ListView(
-              children: [
-                ListTile(
-                  leading: const Icon(Icons.inventory_2_outlined, color: AppColors.textMuted),
-                  title: Text(
-                    'Ninguna (Bóveda principal)',
-                    style: TextStyle(
-                      color: selectedFolderId == null ? AppColors.accent : Colors.white,
-                      fontWeight: selectedFolderId == null ? FontWeight.bold : FontWeight.normal,
-                    ),
-                  ),
-                  trailing: selectedFolderId == null ? const Icon(Icons.check_circle_rounded, color: AppColors.accent) : null,
-                  onTap: () => Navigator.pop(context, <String?>[null]),
-                ),
-                ...roots.map((r) => _buildNode(context, ref, folders, r, 0)),
-              ],
-            ),
-          )
-        ],
-      ),
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -217,7 +218,7 @@ class CredentialCard extends ConsumerWidget {
       key: Key(credential.id),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
-        HapticFeedback.warningImpact();
+        HapticFeedback.heavyImpact();
         final confirm = await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(

@@ -604,7 +604,7 @@ class _RadioTile<T> extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   title,
-                  if (subtitle != null) subtitle,
+                  if (subtitle != null) subtitle!,
                 ],
               ),
             ),
