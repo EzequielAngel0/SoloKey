@@ -158,10 +158,12 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 ## 3. Móvil — Acciones de notificación + Autofill
 
-- ⬜ **Acciones de notificación de rotación** (cierra el gap con `password_rotation_reminders.md`):
-  - Botón **[Cambiar contraseña]** → abre el detalle/edición de la credencial (deep-link ya existe vía `rootNavigatorKey`).
-  - Botón **[Posponer 3 días]** → escribe `lastRotationPromptedAt = now + 3d` (o un campo `snoozeUntil`) para silenciar.
-  - `AndroidNotificationDetails(actions: [...])` + manejar `notificationResponse.actionId` en `_onMobileTap` y en el isolate de fondo.
+- ✅ **Acciones de notificación de rotación (2026-06-17)**: `AndroidNotificationDetails(actions: [...])`
+  con **[Cambiar contraseña]** (`showsUserInterface` → deep-link al detalle) y **[Posponer 3 días]**
+  (snooze: `markRotationPrompted(id, now+3d)`). Manejado en `_onMobileTap` (foreground, cancela el
+  banner), en `notificationActionBackground` (`@pragma('vm:entry-point')`, app cerrada, abre su DB)
+  y en el cold-start (`getNotificationAppLaunchDetails` con `actionId`). _(Requiere validar en
+  dispositivo Android real.)_
 - ⬜ **Autofill inline (Android 11+)**: `inlinePresentation` en `SoloKeyAutofillService` para sugerencias dentro del teclado.
 - ⬜ **Biometría antes de inyectar**: `AuthHelper.requireAuth()` previo a entregar credenciales al campo destino.
 
@@ -169,8 +171,12 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 ## 4. Escritorio (lote posterior)
 
-- ⬜ **Autostart al tray**: `launch_at_startup` + arranque minimizado; toggle en Settings. Es lo que hace ÚTILES las notificaciones de rotación en desktop (hoy solo corren si la app está abierta).
-- ⬜ **Hotkey global tipo spotlight**: `hotkey_manager` para buscar/copiar sin abrir la ventana.
+- ✅ **Autostart al tray (2026-06-17)**: `launch_at_startup` (registro HKCU\…\Run en Windows).
+  `main()` lee el arg `--minimized` que pasa el autostart para **arrancar oculto en la bandeja**.
+  Toggle "Iniciar con el sistema" (solo escritorio) en Ajustes con side-effect `enable/disable`.
+- ✅ **Hotkey global (2026-06-17)**: `hotkey_manager` registra **Ctrl+Shift+K** a nivel sistema
+  → trae la ventana de SoloKey al frente desde cualquier app. (Versión show+focus; un overlay
+  spotlight con ventana aparte queda como mejora futura.)
 - ✅ **Instalador de escritorio (2026-06-17):** se evaluó MSIX vs Inno Setup y se eligió
   **Inno Setup** para SoloKey. MSIX exige firma obligatoria (fricción de sideload) y
   **virtualiza el almacenamiento** (la bóveda quedaría en el contenedor del paquete, en
@@ -196,8 +202,21 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
   + `secureStorage.deleteAll()`). UI: banner de lockout con cuenta regresiva en `UnlockScreen` +
   selector "Borrar bóveda tras N intentos" (Off/5/10/15/20) en Ajustes (`AppSecuritySettings.wipeAfterFailedAttempts`).
   Lógica del backoff cubierta con unit tests (7).
-- ⬜ **Backup cifrado programado**: export `.skvault` automático al almacenamiento elegido por el usuario (no servidor propio), con `share_plus`/`file_picker` ya presentes.
-- ⬜ **Endurecer sync WiFi-unlock**: dejar de enviar la master password al escritorio; enviar un **token de desbloqueo de un solo uso**. Opcional: `wss://` con TLS autofirmado para ocultar metadata.
+- ✅ **Backup cifrado programado (2026-06-17)**: `ScheduledBackupService` exporta un `.skvault`
+  cifrado a la **carpeta elegida** por el usuario cada N días (Diario/Semanal/Mensual). Se dispara
+  al desbloquear (`ref.listen(vaultNotifierProvider)` en `App`) si está vencido y la bóveda
+  desbloqueada (necesita leer+cifrar los datos). `VaultExportService.exportVaultToDirectory`
+  escribe directo a la ruta; la contraseña del backup vive en Keystore (no en settings). Config
+  (frecuencia + carpeta vía `file_picker` + contraseña) en Ajustes › Gestión de datos.
+- ✅ **Endurecer sync WiFi-unlock (2026-06-17)**: se reemplazó el envío de la master
+  password por un **token DUK** (Device Unlock Key). Al emparejar con la bóveda
+  desbloqueada, el escritorio genera un DUK aleatorio, **cifra su master key con él**
+  (`encrypt(masterKey, DUK)`), guarda SOLO la key envuelta y entrega el DUK al móvil
+  (no lo conserva). Para desbloquear, el móvil envía el DUK por el canal E2EE; el
+  escritorio descifra su propia master key y la usa (`UnlockVaultUseCase.executeWithRawKey`,
+  verificada contra `verificationData`). **La contraseña ya no viaja ni se almacena en
+  texto plano** (se eliminó el `master_password` de Keystore). Pendiente opcional: `wss://`
+  con TLS autofirmado para ocultar metadata.
 
 ---
 
@@ -233,14 +252,14 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 3 | Temas: 4 variantes + sistema + selector | 🔴 | Temas L3 | ✅ |
 | 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ✅ |
 | 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ✅ |
-| 6 | Móvil: acciones de notificación | 🔴 | Features B | ⬜ |
+| 6 | Móvil: acciones de notificación | 🔴 | Features B | ✅ |
 | 7 | Móvil: autofill inline + biometría | 🔴 | Features B | ⬜ |
-| 8 | Escritorio: autostart al tray | 🔴 | Features C | ⬜ |
-| 9 | Escritorio: hotkey global | 🔴 | Features C | ⬜ |
+| 8 | Escritorio: autostart al tray | 🔴 | Features C | ✅ |
+| 9 | Escritorio: hotkey global | 🔴 | Features C | ✅ |
 | 10 | Escritorio: instalador (Inno Setup, no MSIX) | 🔴 | Features C | ✅ |
 | 11 | Seguridad: anti-fuerza bruta | 🟡 | Features D | ✅ |
-| 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ⬜ |
-| 13 | Sync: endurecer WiFi-unlock (+wss) | 🟢 | Features D | ⬜ |
+| 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ✅ |
+| 13 | Sync: endurecer WiFi-unlock (token DUK) | 🟢 | Features D | ✅ |
 | 14 | i18n (es/en) | 🟡 | Final | ⬜ |
 
 ---
