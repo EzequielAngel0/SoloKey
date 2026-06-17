@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
@@ -51,6 +52,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
     final foldersAsync = ref.watch(foldersNotifierProvider);
 
@@ -69,7 +71,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         actions: [
           IconButton(
             icon: Icon(Icons.lock_rounded, color: palette.danger),
-            tooltip: 'Bloquear',
+            tooltip: l10n.homeLockTooltip,
             onPressed: () {
               HapticFeedback.heavyImpact();
               ref.read(vaultNotifierProvider.notifier).lock();
@@ -90,7 +92,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                   children: [
                     Icon(Icons.security_rounded, color: palette.textPrimary, size: 20),
                     const SizedBox(width: 12),
-                    Text('Auditoría', style: TextStyle(color: palette.textPrimary)),
+                    Text(l10n.navAudit, style: TextStyle(color: palette.textPrimary)),
                   ],
                 ),
               ),
@@ -100,7 +102,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                   children: [
                     Icon(Icons.settings_rounded, color: palette.textPrimary, size: 20),
                     const SizedBox(width: 12),
-                    Text('Ajustes', style: TextStyle(color: palette.textPrimary)),
+                    Text(l10n.navSettings, style: TextStyle(color: palette.textPrimary)),
                   ],
                 ),
               ),
@@ -116,7 +118,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
               onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
               style: TextStyle(color: palette.textPrimary),
               decoration: InputDecoration(
-                hintText: 'Buscar credenciales…',
+                hintText: l10n.homeSearchHint,
                 prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted),
                 suffixIcon: _searchCtrl.text.isNotEmpty
                     ? IconButton(
@@ -151,7 +153,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                 color: palette.onPrimary,
               ),
               label: Text(
-                _currentIndex == 1 ? 'Carpeta' : 'Nueva',
+                _currentIndex == 1 ? l10n.homeFabFolder : l10n.homeFabNew,
                 style: TextStyle(color: palette.onPrimary, fontWeight: FontWeight.w600),
               ),
             ),
@@ -161,10 +163,15 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         unselectedItemColor: palette.textDisabled,
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.all_inbox_rounded), label: 'Credenciales'),
-          BottomNavigationBarItem(icon: Icon(Icons.account_tree_rounded), label: 'Carpetas'),
-          BottomNavigationBarItem(icon: Icon(Icons.star_rounded), label: 'Favoritas'),
+        items: [
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.all_inbox_rounded),
+              label: l10n.navCredentials),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.account_tree_rounded),
+              label: l10n.navFolders),
+          BottomNavigationBarItem(
+              icon: const Icon(Icons.star_rounded), label: l10n.navFavorites),
         ],
       ),
       body: RefreshIndicator(
@@ -179,7 +186,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
             : credentialsAsync.hasError
                 ? Center(
                     child: Text(
-                      'Error: ${credentialsAsync.error}',
+                      l10n.homeLoadError('${credentialsAsync.error}'),
                       style: TextStyle(color: palette.danger),
                     ),
                   )
@@ -195,7 +202,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                           )
                         : filtered.isEmpty
                             ? EmptyStateWidget(
-                                message: 'Tu bóveda está vacía',
+                                message: l10n.homeEmptyVault,
                                 onAdd: () => context.push(AppRoutes.credentialCreate),
                               )
                             : CredentialListWidget(credentials: filtered),
@@ -205,24 +212,30 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
 
   Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Carpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderDialogTitle,
+            style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(
-            labelText: 'Nombre de la carpeta',
-            hintText: 'ej. Trabajo, Sociales…',
+          decoration: InputDecoration(
+            labelText: l10n.folderNameLabel,
+            hintText: l10n.folderNameHint,
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
+          TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(l10n.commonCancel)),
+          TextButton(
+              onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+              child: Text(l10n.commonCreate)),
         ],
       ),
     );

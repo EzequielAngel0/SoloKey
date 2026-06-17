@@ -180,4 +180,57 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get setupReqSymbol => 'Símbolo';
+
+  @override
+  String get commonCreate => 'Crear';
+
+  @override
+  String get navAudit => 'Auditoría';
+
+  @override
+  String get navSettings => 'Ajustes';
+
+  @override
+  String get navCredentials => 'Credenciales';
+
+  @override
+  String get navFolders => 'Carpetas';
+
+  @override
+  String get navFavorites => 'Favoritas';
+
+  @override
+  String get homeSearchHint => 'Buscar credenciales…';
+
+  @override
+  String get homeLockTooltip => 'Bloquear';
+
+  @override
+  String get homeFabNew => 'Nueva';
+
+  @override
+  String get homeFabFolder => 'Carpeta';
+
+  @override
+  String homeLoadError(String msg) {
+    return 'Error: $msg';
+  }
+
+  @override
+  String get homeEmptyVault => 'Tu bóveda está vacía';
+
+  @override
+  String get emptyAddFirst => 'Añade tu primera credencial';
+
+  @override
+  String get emptyAddCredential => 'Añadir credencial';
+
+  @override
+  String get folderDialogTitle => 'Carpeta';
+
+  @override
+  String get folderNameLabel => 'Nombre de la carpeta';
+
+  @override
+  String get folderNameHint => 'ej. Trabajo, Sociales…';
 }

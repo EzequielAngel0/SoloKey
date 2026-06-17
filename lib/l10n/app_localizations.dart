@@ -415,6 +415,108 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Symbol'**
   String get setupReqSymbol;
+
+  /// No description provided for @commonCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get commonCreate;
+
+  /// No description provided for @navAudit.
+  ///
+  /// In en, this message translates to:
+  /// **'Audit'**
+  String get navAudit;
+
+  /// No description provided for @navSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get navSettings;
+
+  /// No description provided for @navCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get navCredentials;
+
+  /// No description provided for @navFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get navFolders;
+
+  /// No description provided for @navFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourites'**
+  String get navFavorites;
+
+  /// No description provided for @homeSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search credentials…'**
+  String get homeSearchHint;
+
+  /// No description provided for @homeLockTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock'**
+  String get homeLockTooltip;
+
+  /// No description provided for @homeFabNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New'**
+  String get homeFabNew;
+
+  /// No description provided for @homeFabFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get homeFabFolder;
+
+  /// No description provided for @homeLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {msg}'**
+  String homeLoadError(String msg);
+
+  /// No description provided for @homeEmptyVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Your vault is empty'**
+  String get homeEmptyVault;
+
+  /// No description provided for @emptyAddFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Add your first credential'**
+  String get emptyAddFirst;
+
+  /// No description provided for @emptyAddCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'Add credential'**
+  String get emptyAddCredential;
+
+  /// No description provided for @folderDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get folderDialogTitle;
+
+  /// No description provided for @folderNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder name'**
+  String get folderNameLabel;
+
+  /// No description provided for @folderNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Work, Social…'**
+  String get folderNameHint;
 }
 
 class _AppLocalizationsDelegate

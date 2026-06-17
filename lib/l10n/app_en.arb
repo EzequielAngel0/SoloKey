@@ -74,5 +74,30 @@
   "setupReqChars": "12+ characters",
   "setupReqUppercase": "Uppercase",
   "setupReqNumber": "Number",
-  "setupReqSymbol": "Symbol"
+  "setupReqSymbol": "Symbol",
+
+  "commonCreate": "Create",
+
+  "navAudit": "Audit",
+  "navSettings": "Settings",
+  "navCredentials": "Credentials",
+  "navFolders": "Folders",
+  "navFavorites": "Favourites",
+
+  "homeSearchHint": "Search credentials…",
+  "homeLockTooltip": "Lock",
+  "homeFabNew": "New",
+  "homeFabFolder": "Folder",
+  "homeLoadError": "Error: {msg}",
+  "@homeLoadError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
+  "homeEmptyVault": "Your vault is empty",
+
+  "emptyAddFirst": "Add your first credential",
+  "emptyAddCredential": "Add credential",
+
+  "folderDialogTitle": "Folder",
+  "folderNameLabel": "Folder name",
+  "folderNameHint": "e.g. Work, Social…"
 }

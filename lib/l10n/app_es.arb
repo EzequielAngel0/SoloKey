@@ -59,5 +59,27 @@
   "setupReqChars": "12+ caracteres",
   "setupReqUppercase": "Mayúscula",
   "setupReqNumber": "Número",
-  "setupReqSymbol": "Símbolo"
+  "setupReqSymbol": "Símbolo",
+
+  "commonCreate": "Crear",
+
+  "navAudit": "Auditoría",
+  "navSettings": "Ajustes",
+  "navCredentials": "Credenciales",
+  "navFolders": "Carpetas",
+  "navFavorites": "Favoritas",
+
+  "homeSearchHint": "Buscar credenciales…",
+  "homeLockTooltip": "Bloquear",
+  "homeFabNew": "Nueva",
+  "homeFabFolder": "Carpeta",
+  "homeLoadError": "Error: {msg}",
+  "homeEmptyVault": "Tu bóveda está vacía",
+
+  "emptyAddFirst": "Añade tu primera credencial",
+  "emptyAddCredential": "Añadir credencial",
+
+  "folderDialogTitle": "Carpeta",
+  "folderNameLabel": "Nombre de la carpeta",
+  "folderNameHint": "ej. Trabajo, Sociales…"
 }

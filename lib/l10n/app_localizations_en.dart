@@ -180,4 +180,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupReqSymbol => 'Symbol';
+
+  @override
+  String get commonCreate => 'Create';
+
+  @override
+  String get navAudit => 'Audit';
+
+  @override
+  String get navSettings => 'Settings';
+
+  @override
+  String get navCredentials => 'Credentials';
+
+  @override
+  String get navFolders => 'Folders';
+
+  @override
+  String get navFavorites => 'Favourites';
+
+  @override
+  String get homeSearchHint => 'Search credentials…';
+
+  @override
+  String get homeLockTooltip => 'Lock';
+
+  @override
+  String get homeFabNew => 'New';
+
+  @override
+  String get homeFabFolder => 'Folder';
+
+  @override
+  String homeLoadError(String msg) {
+    return 'Error: $msg';
+  }
+
+  @override
+  String get homeEmptyVault => 'Your vault is empty';
+
+  @override
+  String get emptyAddFirst => 'Add your first credential';
+
+  @override
+  String get emptyAddCredential => 'Add credential';
+
+  @override
+  String get folderDialogTitle => 'Folder';
+
+  @override
+  String get folderNameLabel => 'Folder name';
+
+  @override
+  String get folderNameHint => 'e.g. Work, Social…';
 }

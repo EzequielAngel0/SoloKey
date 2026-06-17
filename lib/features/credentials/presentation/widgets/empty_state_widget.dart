@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 
 class EmptyStateWidget extends StatelessWidget {
@@ -14,6 +15,7 @@ class EmptyStateWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -35,14 +37,14 @@ class EmptyStateWidget extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Añade tu primera credencial',
+            l10n.emptyAddFirst,
             style: TextStyle(color: palette.textMuted, fontSize: 14),
           ),
           const SizedBox(height: 28),
           ElevatedButton.icon(
             onPressed: onAdd,
             icon: const Icon(Icons.add_rounded),
-            label: const Text('Añadir credencial'),
+            label: Text(l10n.emptyAddCredential),
           ),
         ],
       ),
