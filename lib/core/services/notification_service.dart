@@ -98,6 +98,11 @@ Future<void> _ensureAndroidChannel(FlutterLocalNotificationsPlugin plugin) async
 
 /// Pushes a single mobile rotation notification. Shared by foreground and the
 /// background isolate. Payload carries the credential id for deep-linking.
+// Action ids for the rotation notification buttons.
+const String _kActionChangePassword = 'change_password';
+const String _kActionSnooze3d = 'snooze_3d';
+const Duration _kSnoozeDuration = Duration(days: 3);
+
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
   DueRotation item,
@@ -109,6 +114,14 @@ Future<void> _showMobileRotation(
       channelDescription: _kChannelDesc,
       importance: Importance.high,
       priority: Priority.high,
+      actions: <AndroidNotificationAction>[
+        AndroidNotificationAction(
+          _kActionChangePassword,
+          'Cambiar contraseña',
+          showsUserInterface: true,
+        ),
+        AndroidNotificationAction(_kActionSnooze3d, 'Posponer 3 días'),
+      ],
     ),
     iOS: DarwinNotificationDetails(),
   );
@@ -119,6 +132,25 @@ Future<void> _showMobileRotation(
     notificationDetails: details,
     payload: item.id,
   );
+}
+
+/// Handles a notification ACTION tapped while the app is in the background or
+/// terminated (runs in its own isolate). Opens a fresh DB handle for the snooze.
+/// `change_password` from a closed app launches the app; the cold-start path in
+/// [NotificationService.initialize] then deep-links to the credential.
+@pragma('vm:entry-point')
+Future<void> notificationActionBackground(NotificationResponse response) async {
+  if (response.actionId == _kActionSnooze3d && response.payload != null) {
+    final db = AppDatabase();
+    try {
+      final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+      await db.credentialDao.markRotationPrompted(response.payload!, until);
+    } catch (_) {
+      // Silent — background work must not throw.
+    } finally {
+      await db.close();
+    }
+  }
 }
 
 /// Top-level routine executed inside the WorkManager background isolate (no
@@ -177,6 +209,8 @@ class NotificationService {
         await _mobilePlugin.initialize(
           settings: init,
           onDidReceiveNotificationResponse: _onMobileTap,
+          onDidReceiveBackgroundNotificationResponse:
+              notificationActionBackground,
         );
         await _ensureAndroidChannel(_mobilePlugin);
 
@@ -188,13 +222,20 @@ class NotificationService {
             IOSFlutterLocalNotificationsPlugin>();
         await ios?.requestPermissions(alert: true, badge: true, sound: true);
 
-        // Handle a cold start triggered by tapping a notification.
+        // Handle a cold start triggered by tapping a notification (or action).
         final launch = await _mobilePlugin.getNotificationAppLaunchDetails();
-        final payload = launch?.notificationResponse?.payload;
+        final resp = launch?.notificationResponse;
+        final payload = resp?.payload;
         if ((launch?.didNotificationLaunchApp ?? false) && payload != null) {
-          WidgetsBinding.instance.addPostFrameCallback(
-            (_) => NotificationNavigation.openCredential(payload),
-          );
+          if (resp!.actionId == _kActionSnooze3d) {
+            final until =
+                DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+            await _db.credentialDao.markRotationPrompted(payload, until);
+          } else {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => NotificationNavigation.openCredential(payload),
+            );
+          }
         }
       }
       // Desktop: `local_notifier` is set up once in main() before runApp.
@@ -252,7 +293,16 @@ class NotificationService {
 
   void _onMobileTap(NotificationResponse response) {
     final id = response.payload;
-    if (id != null) NotificationNavigation.openCredential(id);
+    if (id == null) return;
+    if (response.actionId == _kActionSnooze3d) {
+      // Posponer 3 dias: empuja lastRotationPromptedAt al futuro para silenciar.
+      final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+      unawaited(_db.credentialDao.markRotationPrompted(id, until));
+      unawaited(_mobilePlugin.cancel(id: id.hashCode));
+      return;
+    }
+    // Toque normal o [Cambiar contraseña] → abre el detalle de la credencial.
+    NotificationNavigation.openCredential(id);
   }
 
   @disposeMethod
