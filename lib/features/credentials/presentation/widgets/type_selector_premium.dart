@@ -20,7 +20,7 @@ class TypeSelectorPremium extends StatelessWidget {
     (type: CredentialType.apiKey, label: 'API Key', icon: Icons.key_rounded),
     (type: CredentialType.secureNote, label: 'Nota', icon: Icons.note_rounded),
     (type: CredentialType.totp, label: 'TOTP', icon: Icons.access_time_rounded),
-    (type: CredentialType.passkey, label: 'Passkey', icon: Icons.fingerprint_rounded),
+    (type: CredentialType.passkey, label: 'Resp. Passkey', icon: Icons.fingerprint_rounded),
     (type: CredentialType.sshKey, label: 'Llave SSH', icon: Icons.terminal_rounded),
   ];
 

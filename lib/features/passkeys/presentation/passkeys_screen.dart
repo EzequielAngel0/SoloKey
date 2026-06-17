@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 import '../../credentials/application/credentials_provider.dart';
 import '../../credentials/domain/entities/credential.dart';
 import '../../../core/utils/auth_helper.dart';
@@ -17,17 +18,18 @@ class PasskeysScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final credsAsync = ref.watch(credentialsNotifierProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF0F0E1A),
-      appBar: const VaultAppBar(title: 'Mis Passkeys'),
+      backgroundColor: palette.background,
+      appBar: const VaultAppBar(title: 'Respaldos de Passkey'),
       body: credsAsync.when(
-        loading: () => const Center(
-          child: CircularProgressIndicator(color: Color(0xFF4CAF50)),
+        loading: () => Center(
+          child: CircularProgressIndicator(color: palette.typePasskey),
         ),
         error: (e, _) => Center(
-          child: Text('Error: $e', style: const TextStyle(color: Colors.red)),
+          child: Text('Error: $e', style: TextStyle(color: palette.error)),
         ),
         data: (creds) {
           final passkeys = creds
@@ -50,7 +52,7 @@ class PasskeysScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddPasskeyInfo(context),
-        backgroundColor: const Color(0xFF4CAF50),
+        backgroundColor: palette.typePasskey,
         icon: const Icon(Icons.add_rounded),
         label: const Text('Añadir Passkey'),
       ),
@@ -58,9 +60,10 @@ class PasskeysScreen extends ConsumerWidget {
   }
 
   void _showAddPasskeyInfo(BuildContext context) {
+    final palette = context.palette;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: palette.drawer,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -85,19 +88,19 @@ class PasskeysScreen extends ConsumerWidget {
                 ),
               ),
               const SizedBox(height: 24),
-              const Icon(Icons.fingerprint_rounded,
-                  size: 56, color: Color(0xFF4CAF50)),
+              Icon(Icons.fingerprint_rounded,
+                  size: 56, color: palette.typePasskey),
               const SizedBox(height: 16),
-              const Text(
+              Text(
                 '¿Cómo registrar una Passkey?',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: palette.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Las Passkeys se registran directamente en cada servicio web '
                 '(ej. Google, GitHub, Apple). \n\n'
                 '1. Ve al sitio web del servicio\n'
@@ -106,7 +109,7 @@ class PasskeysScreen extends ConsumerWidget {
                 'SoloKey almacenará la información de la passkey en tu bóveda '
                 'de forma cifrada para que puedas gestionarla.',
                 style: TextStyle(
-                  color: Color(0xFF9E9EBF),
+                  color: palette.textMuted,
                   fontSize: 13,
                   height: 1.6,
                 ),
@@ -118,7 +121,7 @@ class PasskeysScreen extends ConsumerWidget {
                 child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF4CAF50),
+                    backgroundColor: palette.typePasskey,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                   child: const Text('Entendido'),
@@ -137,6 +140,7 @@ class PasskeysScreen extends ConsumerWidget {
 class _EmptyPasskeysView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -146,60 +150,60 @@ class _EmptyPasskeysView extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+                color: palette.typePasskey.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                  color: palette.typePasskey.withValues(alpha: 0.3),
                   width: 1.5,
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.fingerprint_rounded,
                 size: 56,
-                color: Color(0xFF4CAF50),
+                color: palette.typePasskey,
               ),
             ),
             const SizedBox(height: 28),
-            const Text(
-              'No tienes Passkeys',
+            Text(
+              'Sin respaldos de passkey',
               style: TextStyle(
-                color: Colors.white,
+                color: palette.textPrimary,
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 12),
-            const Text(
+            Text(
               'Las Passkeys son el futuro de la autenticación: '
               'sin contraseñas, más seguras y más rápidas. '
               'Regístralas en tus servicios favoritos y '
-              'SoloKey las guardará aquí.',
+              'SoloKey guardará aquí un respaldo cifrado.',
               textAlign: TextAlign.center,
               style: TextStyle(
-                color: Color(0xFF9E9EBF),
+                color: palette.textMuted,
                 fontSize: 13,
                 height: 1.6,
               ),
             ),
             const SizedBox(height: 32),
-            // FIDO2 standards badge
+            // Backup storage badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: palette.card,
                 borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF2A2B4A)),
+                border: Border.all(color: palette.divider),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(Icons.verified_rounded,
-                      color: Color(0xFF4CAF50), size: 16),
-                  SizedBox(width: 8),
+                      color: palette.typePasskey, size: 16),
+                  const SizedBox(width: 8),
                   Text(
-                    'FIDO2 / WebAuthn Compatible',
+                    'Respaldo cifrado en tu bóveda',
                     style: TextStyle(
-                      color: Color(0xFF9E9EBF),
+                      color: palette.textMuted,
                       fontSize: 12,
                     ),
                   ),
@@ -221,12 +225,13 @@ class _PasskeyCard extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final meta = credential.passkeyMetadata;
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: palette.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF2A2B4A)),
+        border: Border.all(color: palette.divider),
       ),
       child: ListTile(
         contentPadding:
@@ -235,19 +240,19 @@ class _PasskeyCard extends ConsumerWidget {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: const Color(0xFF4CAF50).withValues(alpha: 0.1),
+            color: palette.typePasskey.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+              color: palette.typePasskey.withValues(alpha: 0.3),
             ),
           ),
-          child: const Icon(Icons.fingerprint_rounded,
-              color: Color(0xFF4CAF50), size: 24),
+          child: Icon(Icons.fingerprint_rounded,
+              color: palette.typePasskey, size: 24),
         ),
         title: Text(
           credential.title,
-          style: const TextStyle(
-              color: Colors.white, fontWeight: FontWeight.w600),
+          style: TextStyle(
+              color: palette.textPrimary, fontWeight: FontWeight.w600),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -256,48 +261,48 @@ class _PasskeyCard extends ConsumerWidget {
               const SizedBox(height: 4),
               Text(
                 meta.rpId,
-                style: const TextStyle(
-                    color: Color(0xFF9E9EBF), fontSize: 12),
+                style: TextStyle(
+                    color: palette.textMuted, fontSize: 12),
               ),
               if (meta.userDisplayName != null)
                 Text(
                   meta.userDisplayName!,
-                  style: const TextStyle(
-                      color: Color(0xFF5C5C7A), fontSize: 11),
+                  style: TextStyle(
+                      color: palette.textDisabled, fontSize: 11),
                 ),
             ],
             const SizedBox(height: 4),
             Text(
               'Actualizado: ${_formatDate(credential.updatedAt)}',
-              style: const TextStyle(
-                  color: Color(0xFF5C5C7A), fontSize: 10),
+              style: TextStyle(
+                  color: palette.textDisabled, fontSize: 10),
             ),
           ],
         ),
         trailing: PopupMenuButton<String>(
-          icon: const Icon(Icons.more_vert_rounded,
-              color: Color(0xFF9E9EBF)),
-          color: const Color(0xFF1A1A2E),
+          icon: Icon(Icons.more_vert_rounded,
+              color: palette.textMuted),
+          color: palette.drawer,
           onSelected: (action) => _handleAction(context, ref, action),
           itemBuilder: (_) => [
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'details',
               child: ListTile(
                 leading: Icon(Icons.info_outline_rounded,
-                    color: Colors.white70, size: 20),
+                    color: palette.textMuted, size: 20),
                 title: Text('Ver detalles',
-                    style: TextStyle(color: Colors.white, fontSize: 13)),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 13)),
                 contentPadding: EdgeInsets.zero,
               ),
             ),
-            const PopupMenuItem(
+            PopupMenuItem(
               value: 'delete',
               child: ListTile(
                 leading: Icon(Icons.delete_outline_rounded,
-                    color: Color(0xFFCF6679), size: 20),
+                    color: palette.danger, size: 20),
                 title: Text('Eliminar',
                     style: TextStyle(
-                        color: Color(0xFFCF6679), fontSize: 13)),
+                        color: palette.danger, fontSize: 13)),
                 contentPadding: EdgeInsets.zero,
               ),
             ),
@@ -317,10 +322,11 @@ class _PasskeyCard extends ConsumerWidget {
   }
 
   void _showDetails(BuildContext context) {
+    final palette = context.palette;
     final meta = credential.passkeyMetadata;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: palette.drawer,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -343,8 +349,8 @@ class _PasskeyCard extends ConsumerWidget {
             const SizedBox(height: 20),
             Text(
               credential.title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: palette.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -388,22 +394,22 @@ class _PasskeyCard extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.07),
+                color: palette.typePasskey.withValues(alpha: 0.07),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                    color: const Color(0xFF4CAF50).withValues(alpha: 0.2)),
+                    color: palette.typePasskey.withValues(alpha: 0.2)),
               ),
-              child: const Row(
+              child: Row(
                 children: [
                   Icon(Icons.lock_rounded,
-                      color: Color(0xFF4CAF50), size: 14),
-                  SizedBox(width: 8),
+                      color: palette.typePasskey, size: 14),
+                  const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       'La clave privada nunca sale del dispositivo. '
                       'Solo la información de identificación está almacenada.',
                       style: TextStyle(
-                          color: Color(0xFF4CAF50), fontSize: 11),
+                          color: palette.typePasskey, fontSize: 11),
                     ),
                   ),
                 ],
@@ -416,17 +422,18 @@ class _PasskeyCard extends ConsumerWidget {
   }
 
   void _confirmDelete(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Eliminar Passkey',
-            style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Eliminar Passkey',
+            style: TextStyle(color: palette.textPrimary)),
         content: Text(
           '¿Eliminar la passkey "${credential.title}"?\n\n'
           'Nota: también deberás eliminarla del servicio web correspondiente '
           '(${credential.passkeyMetadata?.rpId ?? credential.website ?? "el sitio"}).',
-          style: const TextStyle(color: Color(0xFF9E9EBF)),
+          style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(
@@ -441,13 +448,13 @@ class _PasskeyCard extends ConsumerWidget {
               if (context.mounted) {
                 Navigator.pop(context);
               }
-              
+
               ref
                   .read(credentialsNotifierProvider.notifier)
                   .delete(credential.id);
             },
             style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFFCF6679)),
+                foregroundColor: palette.danger),
             child: const Text('Eliminar'),
           ),
         ],
@@ -476,21 +483,22 @@ class _DetailRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         children: [
-          Icon(icon, size: 16, color: const Color(0xFF9E9EBF)),
+          Icon(icon, size: 16, color: palette.textMuted),
           const SizedBox(width: 10),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: const TextStyle(
-                      color: Color(0xFF5C5C7A), fontSize: 10)),
+                  style: TextStyle(
+                      color: palette.textDisabled, fontSize: 10)),
               Text(value,
-                  style: const TextStyle(
-                      color: Colors.white, fontSize: 13)),
+                  style: TextStyle(
+                      color: palette.textPrimary, fontSize: 13)),
             ],
           ),
         ],
