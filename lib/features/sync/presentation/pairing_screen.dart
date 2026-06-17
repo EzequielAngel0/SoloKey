@@ -41,12 +41,74 @@ class _DesktopPairingView extends ConsumerStatefulWidget {
 }
 
 class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
+  bool _hasPairingKey = false;
+  String? _serverStatusMessage;
+  StreamSubscription<String>? _serverEventsSubscription;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPairingKey();
+    _subscribeToServerEvents();
+    Future.microtask(() {
+      final syncService = getIt<SyncService>();
+      if (!syncService.isServerRunning) {
+        ref.read(pairingNotifierProvider.notifier).startDesktopServer();
+      } else {
+        setState(() {
+          _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...';
+        });
+      }
+    });
+  }
+
+  Future<void> _checkPairingKey() async {
+    final hasPairing = await getIt<SyncService>().hasPairingKey();
+    if (mounted) setState(() => _hasPairingKey = hasPairing);
+  }
+
+  void _subscribeToServerEvents() {
+    _serverEventsSubscription = getIt<SyncService>().serverEvents.listen((event) {
+      if (mounted) {
+        setState(() {
+          if (event == 'server_started') {
+            _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...';
+          } else if (event == 'server_stopped') {
+            _serverStatusMessage = 'Servidor apagado.';
+          } else if (event == 'client_connecting') {
+            _serverStatusMessage = 'Celular conectándose...';
+          } else if (event == 'client_disconnected') {
+            _serverStatusMessage = 'Celular desconectado. Servidor en espera...';
+          } else if (event == 'paired') {
+            _hasPairingKey = true;
+            _serverStatusMessage = '¡Vinculación completada con éxito!';
+          } else if (event == 'sync_manifest_processed') {
+            _serverStatusMessage = 'Comparando datos locales con celular...';
+          } else if (event == 'sync_completed') {
+            _serverStatusMessage = '¡Sincronización bidireccional exitosa!';
+            Future.delayed(const Duration(seconds: 4), () {
+              if (mounted && _serverStatusMessage == '¡Sincronización bidireccional exitosa!') {
+                setState(() => _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...');
+              }
+            });
+          } else if (event == 'sync_error') {
+            _serverStatusMessage = 'Error durante la sincronización.';
+          } else if (event.startsWith('remote_unlock')) {
+            _serverStatusMessage = 'Recibida solicitud de desbloqueo remoto.';
+            Future.delayed(const Duration(seconds: 4), () {
+              if (mounted && _serverStatusMessage == 'Recibida solicitud de desbloqueo remoto.') {
+                setState(() => _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...');
+              }
+            });
+          }
+        });
+      }
+    });
+  }
+
   @override
   void dispose() {
-    // Stop the server when leaving the screen to clean up resources
-    Future.microtask(() {
-      ref.read(pairingNotifierProvider.notifier).stopDesktopServer();
-    });
+    _serverEventsSubscription?.cancel();
     super.dispose();
   }
 
@@ -68,24 +130,28 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           mainAxisSize: MainAxisSize.min,
           children: [
             if (state.status == PairingStatus.idle) ...[
-              const Icon(Icons.sync_rounded, size: 64, color: Color(0xFF39FF14)),
-              const SizedBox(height: 20),
-              const Text(
-                'Vincular con App Móvil',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 12),
-              const Text(
-                'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13, height: 1.4),
-              ),
-              const SizedBox(height: 28),
-              ElevatedButton.icon(
-                onPressed: () => ref.read(pairingNotifierProvider.notifier).startDesktopServer(),
-                icon: const Icon(Icons.qr_code_rounded),
-                label: const Text('Generar Código QR'),
-              ),
+              if (_hasPairingKey) ...[
+                _buildDesktopConnectedSection(state),
+              ] else ...[
+                const Icon(Icons.sync_rounded, size: 64, color: Color(0xFF39FF14)),
+                const SizedBox(height: 20),
+                const Text(
+                  'Vincular con App Móvil',
+                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13, height: 1.4),
+                ),
+                const SizedBox(height: 28),
+                ElevatedButton.icon(
+                  onPressed: () => ref.read(pairingNotifierProvider.notifier).startDesktopServer(),
+                  icon: const Icon(Icons.qr_code_rounded),
+                  label: const Text('Generar Código QR'),
+                ),
+              ],
             ] else if (state.status == PairingStatus.loading) ...[
               const CircularProgressIndicator(color: Color(0xFF39FF14)),
               const SizedBox(height: 20),
@@ -174,6 +240,109 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildDesktopConnectedSection(PairingState state) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const Icon(Icons.check_circle_rounded, size: 64, color: Color(0xFF39FF14)),
+        const SizedBox(height: 20),
+        const Text(
+          'Computadora Vinculada',
+          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 12),
+        const Text(
+          'Esta computadora está emparejada de forma segura con tu dispositivo móvil.',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13, height: 1.4),
+        ),
+        const SizedBox(height: 24),
+
+        // Server status box
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF1F1F30),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: const Color(0xFF2A2A40)),
+          ),
+          child: Column(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 10,
+                    height: 10,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF39FF14),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Color(0xFF39FF14),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        )
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  const Text(
+                    'Servidor local E2EE Activo',
+                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                  ),
+                ],
+              ),
+              if (_serverStatusMessage != null) ...[
+                const SizedBox(height: 12),
+                Text(
+                  _serverStatusMessage!,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(color: Color(0xFF39FF14), fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ],
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            OutlinedButton.icon(
+              onPressed: () async {
+                await getIt<SyncService>().removePairingKey();
+                await getIt<SyncService>().stopServer();
+                setState(() {
+                  _hasPairingKey = false;
+                  _serverStatusMessage = null;
+                });
+                ref.read(pairingNotifierProvider.notifier).reset();
+              },
+              icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF3366)),
+              label: const Text('Eliminar Vínculo', style: TextStyle(color: Color(0xFFFF3366))),
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFFF3366)),
+              ),
+            ),
+            const SizedBox(width: 16),
+            ElevatedButton.icon(
+              onPressed: () {
+                ref.read(pairingNotifierProvider.notifier).startDesktopServer();
+              },
+              icon: const Icon(Icons.qr_code_rounded),
+              label: const Text('Mostrar QR'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF39FF14),
+                foregroundColor: const Color(0xFF0C0C14),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
