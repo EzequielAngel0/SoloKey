@@ -95,10 +95,16 @@ class VaultExportService {
       parallelism: _exportParallelism,
     );
 
-    final encrypted = await _security.encrypt(
-      Uint8List.fromList(utf8.encode(payload)),
-      exportKey,
-    );
+    late Uint8List encrypted;
+    try {
+      encrypted = await _security.encrypt(
+        Uint8List.fromList(utf8.encode(payload)),
+        exportKey,
+      );
+    } finally {
+      // Zero the derived key to minimize memory exposure window.
+      exportKey.fillRange(0, exportKey.length, 0);
+    }
 
     // Build file: magic(8) | salt(32) | encrypted blob
     final magic = utf8.encode(_magicV2);
@@ -196,11 +202,16 @@ class VaultExportService {
         parallelism: _exportParallelism,
       );
 
-      return _decryptAndSave(
-        encrypted: encrypted,
-        keyBytes: exportKey,
-        mode: mode,
-      );
+      try {
+        return await _decryptAndSave(
+          encrypted: encrypted,
+          keyBytes: exportKey,
+          mode: mode,
+        );
+      } finally {
+        // Zero the derived key to minimize memory exposure window.
+        exportKey.fillRange(0, exportKey.length, 0);
+      }
     } else if (headerStr == _magicV1 || headerStr == _magicLegacyVG) {
       // Legacy v1: same-device only — use session key
       final sessionKey = _session.getKeyCopy();
