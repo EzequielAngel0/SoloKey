@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:crypto/crypto.dart';
 import 'package:injectable/injectable.dart';
 
 import '../../features/credentials/domain/entities/credential.dart';
@@ -24,7 +27,7 @@ class SecurityAuditService {
 
   final ICredentialRepository _credRepo;
 
-  Future<List<AuditIssue>> runAudit() async {
+  Future<List<AuditIssue>> runAudit({bool checkBreaches = false}) async {
     final credentials = await _credRepo.getAll();
     final issues = <AuditIssue>[];
 
@@ -35,6 +38,8 @@ class SecurityAuditService {
         passwordCount[c.password!] = (passwordCount[c.password!] ?? 0) + 1;
       }
     }
+
+    final breachChecks = <Future<void>>[];
 
     for (final c in credentials) {
       if (c.type == CredentialType.secureNote || c.type == CredentialType.totp) {
@@ -77,6 +82,21 @@ class SecurityAuditService {
             description: 'Esta contraseña está usada en múltiples cuentas.',
           ));
         }
+
+        // HaveIBeenPwned check
+        if (checkBreaches) {
+          breachChecks.add(() async {
+            final count = await checkBreachCount(pwd);
+            if (count > 0) {
+              issues.add(AuditIssue(
+                credential: c,
+                severity: AuditSeverity.critical,
+                title: 'Contraseña filtrada',
+                description: 'Esta contraseña aparece en $count filtraciones de datos en internet. ¡Cámbiala de inmediato!',
+              ));
+            }
+          }());
+        }
       } else if (c.type == CredentialType.password) {
         // Without password
         issues.add(AuditIssue(
@@ -100,9 +120,41 @@ class SecurityAuditService {
       }
     }
 
+    if (breachChecks.isNotEmpty) {
+      await Future.wait(breachChecks);
+    }
+
     // Sort: critical → warning → info
     issues.sort((a, b) => a.severity.index.compareTo(b.severity.index));
     return issues;
+  }
+
+  Future<int> checkBreachCount(String password) async {
+    try {
+      final bytes = utf8.encode(password);
+      final digest = sha1.convert(bytes).toString().toUpperCase();
+      final prefix = digest.substring(0, 5);
+      final suffix = digest.substring(5);
+
+      final client = HttpClient();
+      client.connectionTimeout = const Duration(seconds: 5);
+      final request = await client.getUrl(Uri.parse('https://api.pwnedpasswords.com/range/$prefix'));
+      final response = await request.close();
+      if (response.statusCode != 200) {
+        return 0;
+      }
+      final responseBody = await response.transform(utf8.decoder).join();
+      final lines = LineSplitter.split(responseBody);
+      for (final line in lines) {
+        final parts = line.split(':');
+        if (parts.length == 2 && parts[0] == suffix) {
+          return int.tryParse(parts[1]) ?? 0;
+        }
+      }
+    } catch (_) {
+      // Return 0 if network is offline or fails
+    }
+    return 0;
   }
 
   bool _isOnlyLetters(String s) => RegExp(r'^[a-zA-Z]+$').hasMatch(s);
