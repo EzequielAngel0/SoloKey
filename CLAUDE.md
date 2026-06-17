@@ -150,7 +150,7 @@ Para desarrollar este **Local-First Password Manager en Flutter/Dart**, el avanc
 
 ---
 
-### ✅ Fase 8.6: Pulido Integral — Seguridad, UX Premium y Calidad de Codigo — COMPLETADA (2026-06-16)
+### ✅ Fase 8.6: Pulido Integral — Seguridad, UX Premium y Calidad de Codigo — COMPLETADA (2026-06-17)
 - **Agentes Principales:** Mezcla de 🛡️ `Auditor_Seguridad_Mobile`, 🧑‍💻 `Desarrollador_Flutter_Core` y 🏗️ `Arquitecto_Mobile_Sec`.
 - **Entregables completados:**
   1. **Seguridad:** Zeroing de `exportKey` (Argon2id) tras uso en export/import (`vault_export_service.dart`) para minimizar ventana de exposicion en RAM.
@@ -161,6 +161,13 @@ Para desarrollar este **Local-First Password Manager en Flutter/Dart**, el avanc
   6. **Error handling global:** `FlutterError.onError` + `PlatformDispatcher.onError` + `runZonedGuarded` en `main.dart`.
   7. **Lint estricto:** `avoid_print: true` (Zero-Print Policy), `prefer_const_constructors`, `prefer_final_locals`, `annotate_overrides` en `analysis_options.yaml`.
   8. **Formulario premium:** Rediseno completo de `CredentialFormScreen` con secciones agrupadas por tipo con bordes acentuados, selector horizontal animado con scale, boton gradient con sombra, transiciones slide+fade entre tipos, haptic feedback y hints contextuales.
+  9. **HaveIBeenPwned:** Integracion opt-in de verificacion de breaches usando k-Anonymity (SHA-1 prefix) en `SecurityAuditService` y switch en `SecurityAuditScreen`.
+  10. **Auth Biometrico en Copiado:** Requerir validacion biometrica con `AuthHelper.requireAuth()` antes de copiar credenciales desde el BottomSheet de HomeScreen.
+  11. **Importacion CSV:** Servicio `CsvImportService` para parsear e importar formatos de Bitwarden, 1Password y Google Chrome.
+  12. **Iconos de Marca (Favicons):** Widget `CredentialIcon` para visualizacion automatica de favicons de marcas desde URL con fallback local.
+  13. **Refactorizacion de Pantallas:** Extraccion de subwidgets de `HomeScreen` y `CredentialFormScreen` a archivos individuales en `widgets/`, reduciendo la complejidad.
+  14. **Shimmer Loader:** Widget `ShimmerLoader` custom animado integrado como esqueleto de carga en `HomeScreen`.
+  15. **Bugfix de Recuperacion:** Solucion a excepcion en decodificacion de recovery codes cambiando de `base64Url` a `base64` estandar para evitar colision de guiones.
 
 ---
 
