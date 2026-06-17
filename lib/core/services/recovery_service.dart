@@ -55,7 +55,7 @@ class RecoveryService {
     );
 
     // Return human-friendly grouped code
-    final raw = base64Url.encode(recoveryKeyBytes);
+    final raw = base64.encode(recoveryKeyBytes);
     return _groupCode(raw);
   }
 
@@ -79,7 +79,7 @@ class RecoveryService {
 
     late Uint8List recoveryKeyBytes;
     try {
-      recoveryKeyBytes = Uint8List.fromList(base64Url.decode(normalized));
+      recoveryKeyBytes = Uint8List.fromList(base64.decode(normalized));
     } catch (_) {
       return false;
     }
