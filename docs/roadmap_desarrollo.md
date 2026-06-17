@@ -97,17 +97,21 @@ Uso en widgets: `context.palette.card`, `context.palette.textMuted`, etc.
 
 ### 1.5 Plan por lotes (cada uno compila y se ve igual hasta el Lote 3)
 
-- **Lote 1 — Infraestructura** ⬜
+- **Lote 1 — Infraestructura** ✅ (2026-06-17)
   - Crear `lib/theme/app_palette.dart` (`AppPalette` ThemeExtension + `context.palette`).
   - Instancia `AppPalette.dark` con los **valores actuales exactos** (look idéntico).
   - Registrar la extensión en `AppTheme.dark()`. Verificar `analyze` + tests.
-- **Lote 2 — Migración (sin cambiar el look)** ⬜
+- **Lote 2 — Migración (sin cambiar el look)** ✅ (2026-06-17)
   - Reemplazar `AppColors.X` → `context.palette.X` (8 archivos).
   - Mapear los 518 literales `Color(0x…)` → `context.palette.<rol>` por hex (31 archivos), en sub-tandas por carpeta:
     1. `lib/shared/widgets/**` y `lib/theme/**`
     2. `lib/features/credentials/**`
     3. `lib/features/vault_access/**` + `settings` + `sync` + `folders` + `passkeys`
   - Casos sin contexto (constructores `const`, helpers estáticos): quitar `const` o pasar el color por parámetro.
+  - **Cierre:** solo quedan literales en `app_palette/app_colors/app_theme` (fuente
+    de verdad) y el fondo blanco del QR (debe ser blanco real para escanear).
+    `flutter analyze` 0 errores; 33/33 tests verde. Passkeys reetiquetadas a
+    "respaldo de passkey" (item #4) hechas junto con esta migración.
 - **Lote 3 — Activación** ⬜
   - `enum AppThemeMode { system, light, dark, dim, oled }`.
   - `AppPalette.light/.dim/.oled` + `AppTheme.build(mode)` → 4 `ThemeData` con `ColorScheme` y temas de componentes coherentes (de-neon aquí).
@@ -176,10 +180,10 @@ Estado actual: `applicationId/namespace = com.vaultguard` (Android). Pasos:
 
 | # | Item | Prioridad | Lote | Estado |
 | --: | :--- | :--- | :--- | :--- |
-| 1 | Temas: infraestructura `AppPalette` | 🔴 | Temas L1 | ⬜ |
-| 2 | Temas: migrar ~820 refs a la paleta | 🔴 | Temas L2 | ⬜ |
+| 1 | Temas: infraestructura `AppPalette` | 🔴 | Temas L1 | ✅ |
+| 2 | Temas: migrar ~820 refs a la paleta | 🔴 | Temas L2 | ✅ |
 | 3 | Temas: 4 variantes + sistema + selector | 🔴 | Temas L3 | ⬜ |
-| 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ⬜ |
+| 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ✅ |
 | 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ⬜ |
 | 6 | Móvil: acciones de notificación | 🔴 | Features B | ⬜ |
 | 7 | Móvil: autofill inline + biometría | 🔴 | Features B | ⬜ |
