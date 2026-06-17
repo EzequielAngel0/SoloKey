@@ -26,6 +26,8 @@ mixin _$AppSecuritySettings {
   bool get biometricEnabled => throw _privateConstructorUsedError;
   bool get obscureOnBackground => throw _privateConstructorUsedError;
   String get themeMode =>
+      throw _privateConstructorUsedError; // Idioma de la interfaz: 'system' | 'es' | 'en'. 'system' sigue el SO.
+  String get locale =>
       throw _privateConstructorUsedError; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   int get wipeAfterFailedAttempts =>
       throw _privateConstructorUsedError; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
@@ -57,6 +59,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     bool biometricEnabled,
     bool obscureOnBackground,
     String themeMode,
+    String locale,
     int wipeAfterFailedAttempts,
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
@@ -84,6 +87,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
     Object? themeMode = null,
+    Object? locale = null,
     Object? wipeAfterFailedAttempts = null,
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
@@ -110,6 +114,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
             themeMode: null == themeMode
                 ? _value.themeMode
                 : themeMode // ignore: cast_nullable_to_non_nullable
+                      as String,
+            locale: null == locale
+                ? _value.locale
+                : locale // ignore: cast_nullable_to_non_nullable
                       as String,
             wipeAfterFailedAttempts: null == wipeAfterFailedAttempts
                 ? _value.wipeAfterFailedAttempts
@@ -148,6 +156,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     bool biometricEnabled,
     bool obscureOnBackground,
     String themeMode,
+    String locale,
     int wipeAfterFailedAttempts,
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
@@ -174,6 +183,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
     Object? themeMode = null,
+    Object? locale = null,
     Object? wipeAfterFailedAttempts = null,
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
@@ -200,6 +210,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
         themeMode: null == themeMode
             ? _value.themeMode
             : themeMode // ignore: cast_nullable_to_non_nullable
+                  as String,
+        locale: null == locale
+            ? _value.locale
+            : locale // ignore: cast_nullable_to_non_nullable
                   as String,
         wipeAfterFailedAttempts: null == wipeAfterFailedAttempts
             ? _value.wipeAfterFailedAttempts
@@ -231,6 +245,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.biometricEnabled = false,
     this.obscureOnBackground = true,
     this.themeMode = 'system',
+    this.locale = 'system',
     this.wipeAfterFailedAttempts = 0,
     this.autostartEnabled = false,
     this.scheduledBackupIntervalDays = 0,
@@ -255,6 +270,10 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final String themeMode;
+  // Idioma de la interfaz: 'system' | 'es' | 'en'. 'system' sigue el SO.
+  @override
+  @JsonKey()
+  final String locale;
   // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   @override
   @JsonKey()
@@ -272,7 +291,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory)';
   }
 
   @override
@@ -290,6 +309,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
                 other.obscureOnBackground == obscureOnBackground) &&
             (identical(other.themeMode, themeMode) ||
                 other.themeMode == themeMode) &&
+            (identical(other.locale, locale) || other.locale == locale) &&
             (identical(
                   other.wipeAfterFailedAttempts,
                   wipeAfterFailedAttempts,
@@ -316,6 +336,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     biometricEnabled,
     obscureOnBackground,
     themeMode,
+    locale,
     wipeAfterFailedAttempts,
     autostartEnabled,
     scheduledBackupIntervalDays,
@@ -346,6 +367,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final bool biometricEnabled,
     final bool obscureOnBackground,
     final String themeMode,
+    final String locale,
     final int wipeAfterFailedAttempts,
     final bool autostartEnabled,
     final int scheduledBackupIntervalDays,
@@ -364,7 +386,9 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   bool get obscureOnBackground;
   @override
-  String get themeMode; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
+  String get themeMode; // Idioma de la interfaz: 'system' | 'es' | 'en'. 'system' sigue el SO.
+  @override
+  String get locale; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   @override
   int get wipeAfterFailedAttempts; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
   @override

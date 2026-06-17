@@ -14,6 +14,7 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   biometricEnabled: json['biometricEnabled'] as bool? ?? false,
   obscureOnBackground: json['obscureOnBackground'] as bool? ?? true,
   themeMode: json['themeMode'] as String? ?? 'system',
+  locale: json['locale'] as String? ?? 'system',
   wipeAfterFailedAttempts:
       (json['wipeAfterFailedAttempts'] as num?)?.toInt() ?? 0,
   autostartEnabled: json['autostartEnabled'] as bool? ?? false,
@@ -30,6 +31,7 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'biometricEnabled': instance.biometricEnabled,
   'obscureOnBackground': instance.obscureOnBackground,
   'themeMode': instance.themeMode,
+  'locale': instance.locale,
   'wipeAfterFailedAttempts': instance.wipeAfterFailedAttempts,
   'autostartEnabled': instance.autostartEnabled,
   'scheduledBackupIntervalDays': instance.scheduledBackupIntervalDays,

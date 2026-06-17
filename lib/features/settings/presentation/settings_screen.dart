@@ -14,6 +14,8 @@ import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
 import '../../../core/services/scheduled_backup_service.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../l10n/language_mode.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../vault_access/application/vault_state_provider.dart';
@@ -121,12 +123,13 @@ class _SettingsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isDesktop = !kIsWeb &&
         (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        const _SectionHeader(label: 'Apariencia'),
+        _SectionHeader(label: l10n.settingsSectionAppearance),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
@@ -137,14 +140,25 @@ class _SettingsBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const _SectionHeader(label: 'Bloqueo automático'),
+        _SectionHeader(label: l10n.settingsSectionLanguage),
+        const SizedBox(height: 8),
+        _SettingsCard(
+          children: [
+            _LanguageModeTile(
+              current: settings.locale,
+              onChanged: (key) => onUpdate(settings.copyWith(locale: key)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
+        _SectionHeader(label: l10n.settingsSectionAutoLock),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
             _SliderTile(
               icon: Icons.timer_rounded,
-              label: 'Bloqueo por inactividad',
-              valueLabel: '${settings.autoLockMinutes} min',
+              label: l10n.settingsAutoLockLabel,
+              valueLabel: l10n.settingsAutoLockValue(settings.autoLockMinutes),
               value: settings.autoLockMinutes.toDouble(),
               min: 1,
               max: 60,
@@ -156,14 +170,15 @@ class _SettingsBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const _SectionHeader(label: 'Portapapeles'),
+        _SectionHeader(label: l10n.settingsSectionClipboard),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
             _SliderTile(
               icon: Icons.content_paste_off_rounded,
-              label: 'Limpiar portapapeles',
-              valueLabel: '${settings.clearClipboardSeconds}s',
+              label: l10n.settingsClearClipboardLabel,
+              valueLabel:
+                  l10n.settingsClearClipboardValue(settings.clearClipboardSeconds),
               value: settings.clearClipboardSeconds.toDouble(),
               min: 10,
               max: 120,
@@ -175,14 +190,14 @@ class _SettingsBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        const _SectionHeader(label: 'Privacidad'),
+        _SectionHeader(label: l10n.settingsSectionPrivacy),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
             _ToggleTile(
               icon: Icons.fingerprint_rounded,
-              label: 'Desbloqueo biométrico',
-              subtitle: 'Usa huella dactilar o rostro',
+              label: l10n.settingsBiometricLabel,
+              subtitle: l10n.settingsBiometricSubtitle,
               value: settings.biometricEnabled,
               onChanged: (v) => onUpdate(
                 settings.copyWith(biometricEnabled: v),
@@ -191,8 +206,8 @@ class _SettingsBody extends StatelessWidget {
             const _Divider(),
             _ToggleTile(
               icon: Icons.visibility_off_rounded,
-              label: 'Ocultar en segundo plano',
-              subtitle: 'Aplica pantalla de privacidad al cambiar de app',
+              label: l10n.settingsObscureLabel,
+              subtitle: l10n.settingsObscureSubtitle,
               value: settings.obscureOnBackground,
               onChanged: (v) => onUpdate(
                 settings.copyWith(obscureOnBackground: v),
@@ -202,8 +217,8 @@ class _SettingsBody extends StatelessWidget {
               const _Divider(),
               _ToggleTile(
                 icon: Icons.rocket_launch_rounded,
-                label: 'Iniciar con el sistema',
-                subtitle: 'Arranca minimizado en la bandeja al encender el equipo',
+                label: l10n.settingsAutostartLabel,
+                subtitle: l10n.settingsAutostartSubtitle,
                 value: settings.autostartEnabled,
                 onChanged: (v) => onUpdate(
                   settings.copyWith(autostartEnabled: v),
@@ -220,7 +235,7 @@ class _SettingsBody extends StatelessWidget {
         ),
         if (isDesktop) ...[
           const SizedBox(height: 24),
-          const _SectionHeader(label: 'Autocompletado rápido'),
+          _SectionHeader(label: l10n.settingsSectionQuickFill),
           const SizedBox(height: 8),
           const _SettingsCard(
             children: [_QuickFillInfoTile()],
@@ -243,6 +258,7 @@ class _QuickFillInfoTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Column(
@@ -254,8 +270,7 @@ class _QuickFillInfoTile extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Pulsa el atajo desde cualquier app para abrir SoloKey y copiar '
-                  'usuario/contraseña al portapapeles (se limpia solo).',
+                  l10n.settingsQuickFillDescription,
                   style: TextStyle(color: palette.textMuted, fontSize: 13),
                 ),
               ),
@@ -286,10 +301,88 @@ class _QuickFillInfoTile extends StatelessWidget {
               TextButton.icon(
                 onPressed: () => context.push(AppRoutes.quickFill),
                 icon: const Icon(Icons.open_in_new_rounded, size: 16),
-                label: const Text('Probar ahora'),
+                label: Text(l10n.settingsQuickFillTryNow),
                 style: TextButton.styleFrom(foregroundColor: palette.accent),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Language selector: three pills (system / Spanish / English) persisted in
+/// `AppSecuritySettings.locale`. Mirrors the visual weight of [_ThemeModeTile].
+class _LanguageModeTile extends StatelessWidget {
+  const _LanguageModeTile({required this.current, required this.onChanged});
+
+  final String current;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    String labelFor(LanguageMode m) => switch (m) {
+          LanguageMode.system => l10n.languageSystem,
+          LanguageMode.spanish => l10n.languageSpanish,
+          LanguageMode.english => l10n.languageEnglish,
+        };
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.translate_rounded, color: palette.accent, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                l10n.settingsSectionLanguage,
+                style: TextStyle(
+                  color: palette.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: LanguageMode.values.map((m) {
+              final selected = m.key == current;
+              return GestureDetector(
+                onTap: () => onChanged(m.key),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? palette.accent.withValues(alpha: 0.15)
+                        : palette.cardDark,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selected ? palette.accent : palette.divider,
+                      width: selected ? 2 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    labelFor(m),
+                    style: TextStyle(
+                      color: selected ? palette.accent : palette.textMuted,
+                      fontSize: 13,
+                      fontWeight:
+                          selected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
           ),
         ],
       ),

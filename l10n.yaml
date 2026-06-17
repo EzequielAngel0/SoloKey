@@ -1,0 +1,9 @@
+# Configuración de gen-l10n (flutter gen-l10n).
+# Los ARB viven en lib/l10n; la clase generada AppLocalizations se emite junto
+# a ellos (lib/l10n/app_localizations.dart). En Flutter 3.38+ el paquete
+# sintético ya no existe, así que los .dart generados se versionan en el repo.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false

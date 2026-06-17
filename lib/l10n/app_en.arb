@@ -1,0 +1,62 @@
+{
+  "@@locale": "en",
+
+  "commonCancel": "Cancel",
+  "commonSave": "Save",
+  "commonClose": "Close",
+  "commonDelete": "Delete",
+  "commonRetry": "Retry",
+
+  "unlockSubtitle": "Enter your master password",
+  "unlockMasterPasswordHint": "Master password",
+  "unlockButton": "Unlock",
+  "unlockLockedFor": "Locked ({time})",
+  "@unlockLockedFor": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "unlockUseBiometrics": "Use biometrics",
+  "unlockWifiAvailable": "WiFi unlock available",
+  "unlockForgotPassword": "Forgot your master password?",
+  "unlockFromMobile": "Unlocking from mobile device…",
+  "unlockTooManyAttempts": "Too many attempts. Retry in {time}.",
+  "@unlockTooManyAttempts": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "unlockTapToEnter": "Tap to enter your password",
+  "unlockRemoteFailed": "Remote unlock failed: {msg}",
+  "@unlockRemoteFailed": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
+  "unlockRemoteError": "Remote unlock error",
+  "unlockBiometricReason": "Unlock your vault",
+
+  "settingsSectionAppearance": "Appearance",
+  "settingsSectionLanguage": "Language",
+  "settingsSectionAutoLock": "Auto-lock",
+  "settingsSectionClipboard": "Clipboard",
+  "settingsSectionPrivacy": "Privacy",
+  "settingsSectionQuickFill": "Quick-Fill",
+
+  "settingsAutoLockLabel": "Lock on inactivity",
+  "settingsAutoLockValue": "{minutes} min",
+  "@settingsAutoLockValue": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
+  "settingsClearClipboardLabel": "Clear clipboard",
+  "settingsClearClipboardValue": "{seconds}s",
+  "@settingsClearClipboardValue": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "settingsBiometricLabel": "Biometric unlock",
+  "settingsBiometricSubtitle": "Use fingerprint or face",
+  "settingsObscureLabel": "Hide in background",
+  "settingsObscureSubtitle": "Apply a privacy screen when switching apps",
+  "settingsAutostartLabel": "Start with the system",
+  "settingsAutostartSubtitle": "Starts minimised in the tray when the device boots",
+  "settingsQuickFillDescription": "Press the shortcut from any app to open SoloKey and copy the username/password to the clipboard (it clears itself).",
+  "settingsQuickFillTryNow": "Try now",
+
+  "languageSystem": "Follow system",
+  "languageSpanish": "Spanish",
+  "languageEnglish": "English"
+}

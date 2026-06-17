@@ -10,6 +10,8 @@ import '../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../core/services/scheduled_backup_service.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
+import '../l10n/app_localizations.dart';
+import '../l10n/language_mode.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_transitions.dart';
@@ -165,6 +167,11 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
         ? AppThemeMode.dark
         : AppThemeMode.fromKey(settings.themeMode);
 
+    // Active locale; null = follow the system language.
+    final locale = settings == null
+        ? null
+        : LanguageMode.fromKey(settings.locale).locale;
+
     final ThemeData theme;
     ThemeData? darkTheme;
     final ThemeMode themeMode;
@@ -197,6 +204,9 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
         theme: theme,
         darkTheme: darkTheme,
         themeMode: themeMode,
+        locale: locale,
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
         routerConfig: router,
       ),
     );

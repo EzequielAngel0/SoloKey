@@ -9,6 +9,7 @@ import 'package:local_auth/local_auth.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/brute_force_guard.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
@@ -126,7 +127,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
             unlocked: (_) => _navigateHome(),
             error: (msg) {
               setState(() => _isRemoteUnlocking = false);
-              _showError('Desbloqueo remoto fallido: $msg');
+              _showError(AppLocalizations.of(context).unlockRemoteFailed(msg));
             },
             orElse: () {
               setState(() => _isRemoteUnlocking = false);
@@ -135,7 +136,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     } catch (e) {
       if (mounted) {
         setState(() => _isRemoteUnlocking = false);
-        _showError('Error en desbloqueo remoto');
+        _showError(AppLocalizations.of(context).unlockRemoteError);
       }
     }
   }
@@ -158,7 +159,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   Future<void> _tryBiometric() async {
     try {
       final authenticated = await _localAuth.authenticate(
-        localizedReason: 'Desbloquea tu bóveda',
+        localizedReason: AppLocalizations.of(context).unlockBiometricReason,
         options: const AuthenticationOptions(biometricOnly: true),
       );
       if (!authenticated || !mounted) return;
@@ -179,11 +180,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   /// Opens the SecureKeyboard overlay and uses the result to unlock.
   Future<void> _openSecureKeyboard() async {
     if (_lockout > Duration.zero) return; // bloqueado por intentos fallidos
+    final l10n = AppLocalizations.of(context);
     final password = await SecureKeyboardOverlay.show(
       context,
       mode: SecureKeyboardMode.password,
-      hintText: 'Contraseña maestra',
-      confirmLabel: 'Desbloquear',
+      hintText: l10n.unlockMasterPasswordHint,
+      confirmLabel: l10n.unlockButton,
     );
     if (password == null || password.isEmpty || !mounted) return;
 
@@ -218,6 +220,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final isLoading = ref.watch(vaultNotifierProvider).maybeWhen(
           loading: () => true,
           orElse: () => false,
@@ -280,7 +283,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                     const SizedBox(height: 8),
                     Center(
                       child: Text(
-                        'Introduce tu contraseña maestra',
+                        l10n.unlockSubtitle,
                         style:
                             TextStyle(color: palette.textMuted, fontSize: 14),
                       ),
@@ -321,8 +324,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                                   ? null
                                   : _openSecureKeyboard,
                               child: Text(_lockout > Duration.zero
-                                  ? 'Bloqueado (${_formatLockout(_lockout)})'
-                                  : 'Desbloquear'),
+                                  ? l10n.unlockLockedFor(
+                                      _formatLockout(_lockout))
+                                  : l10n.unlockButton),
                             ),
                     ),
 
@@ -336,7 +340,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                             color: palette.accent,
                           ),
                           label: Text(
-                            'Usar biometría',
+                            l10n.unlockUseBiometrics,
                             style: TextStyle(color: palette.accent),
                           ),
                         ),
@@ -357,7 +361,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                             ),
                             const SizedBox(width: 6),
                             Text(
-                              'Desbloqueo WiFi disponible',
+                              l10n.unlockWifiAvailable,
                               style: TextStyle(
                                 color: palette.primary.withValues(alpha: 0.5),
                                 fontSize: 11,
@@ -374,7 +378,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       child: TextButton(
                         onPressed: () => context.push(AppRoutes.recovery),
                         child: Text(
-                          '¿Olvidaste tu contraseña maestra?',
+                          l10n.unlockForgotPassword,
                           style: TextStyle(
                             color: palette.textMuted,
                             fontSize: 13,
@@ -425,7 +429,7 @@ class _RemoteUnlockBanner extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Desbloqueando desde dispositivo móvil...',
+              AppLocalizations.of(context).unlockFromMobile,
               style: TextStyle(
                 color: palette.primary,
                 fontSize: 13,
@@ -464,7 +468,7 @@ class _LockoutBanner extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Text(
-              'Demasiados intentos. Reintenta en $remainingText.',
+              AppLocalizations.of(context).unlockTooManyAttempts(remainingText),
               style: TextStyle(
                 color: palette.danger,
                 fontSize: 13,
@@ -506,7 +510,7 @@ class _SecurePasswordTap extends StatelessWidget {
             Expanded(
               child: charCount == 0
                   ? Text(
-                      'Toca para ingresar tu contraseña',
+                      AppLocalizations.of(context).unlockTapToEnter,
                       style: TextStyle(color: palette.textDisabled, fontSize: 14),
                     )
                   : Text(

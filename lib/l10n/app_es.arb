@@ -1,0 +1,47 @@
+{
+  "@@locale": "es",
+
+  "commonCancel": "Cancelar",
+  "commonSave": "Guardar",
+  "commonClose": "Cerrar",
+  "commonDelete": "Eliminar",
+  "commonRetry": "Reintentar",
+
+  "unlockSubtitle": "Introduce tu contraseña maestra",
+  "unlockMasterPasswordHint": "Contraseña maestra",
+  "unlockButton": "Desbloquear",
+  "unlockLockedFor": "Bloqueado ({time})",
+  "unlockUseBiometrics": "Usar biometría",
+  "unlockWifiAvailable": "Desbloqueo WiFi disponible",
+  "unlockForgotPassword": "¿Olvidaste tu contraseña maestra?",
+  "unlockFromMobile": "Desbloqueando desde dispositivo móvil…",
+  "unlockTooManyAttempts": "Demasiados intentos. Reintenta en {time}.",
+  "unlockTapToEnter": "Toca para ingresar tu contraseña",
+  "unlockRemoteFailed": "Desbloqueo remoto fallido: {msg}",
+  "unlockRemoteError": "Error en desbloqueo remoto",
+  "unlockBiometricReason": "Desbloquea tu bóveda",
+
+  "settingsSectionAppearance": "Apariencia",
+  "settingsSectionLanguage": "Idioma",
+  "settingsSectionAutoLock": "Bloqueo automático",
+  "settingsSectionClipboard": "Portapapeles",
+  "settingsSectionPrivacy": "Privacidad",
+  "settingsSectionQuickFill": "Autocompletado rápido",
+
+  "settingsAutoLockLabel": "Bloqueo por inactividad",
+  "settingsAutoLockValue": "{minutes} min",
+  "settingsClearClipboardLabel": "Limpiar portapapeles",
+  "settingsClearClipboardValue": "{seconds}s",
+  "settingsBiometricLabel": "Desbloqueo biométrico",
+  "settingsBiometricSubtitle": "Usa huella dactilar o rostro",
+  "settingsObscureLabel": "Ocultar en segundo plano",
+  "settingsObscureSubtitle": "Aplica pantalla de privacidad al cambiar de app",
+  "settingsAutostartLabel": "Iniciar con el sistema",
+  "settingsAutostartSubtitle": "Arranca minimizado en la bandeja al encender el equipo",
+  "settingsQuickFillDescription": "Pulsa el atajo desde cualquier app para abrir SoloKey y copiar usuario/contraseña al portapapeles (se limpia solo).",
+  "settingsQuickFillTryNow": "Probar ahora",
+
+  "languageSystem": "Seguir el sistema",
+  "languageSpanish": "Español",
+  "languageEnglish": "Inglés"
+}
