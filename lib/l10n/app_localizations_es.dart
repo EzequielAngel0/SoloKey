@@ -920,4 +920,90 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get formCustomDaysInvalid => 'Ingrese un número válido de días';
+
+  @override
+  String get commonLoading => 'Cargando…';
+
+  @override
+  String get folderNewSubfolder => 'Nueva subcarpeta';
+
+  @override
+  String get folderDeleteTitle => 'Eliminar carpeta';
+
+  @override
+  String folderDeleteBodyOrphan(String name) {
+    return '¿Eliminar \"$name\"? Sus credenciales quedarán huérfanas o movidas a la raíz.';
+  }
+
+  @override
+  String folderDeleteBodyReleased(String name) {
+    return '¿Eliminar \"$name\"? Sus subcarpetas o credenciales quedarán liberadas.';
+  }
+
+  @override
+  String get folderDeleted => 'Carpeta eliminada';
+
+  @override
+  String get folderRename => 'Renombrar';
+
+  @override
+  String get folderRenameTitle => 'Renombrar carpeta';
+
+  @override
+  String get folderNewNameLabel => 'Nuevo nombre';
+
+  @override
+  String get folderCreateSubfolder => 'Crear subcarpeta';
+
+  @override
+  String get folderEmptyTitle => 'Carpeta Vacía';
+
+  @override
+  String get folderEmptyDesc => 'No hay subcarpetas ni credenciales aquí.';
+
+  @override
+  String get folderNoFolders => 'Sin carpetas';
+
+  @override
+  String get folderOrganize => 'Organiza tus credenciales';
+
+  @override
+  String get folderCreateRoot => 'Crear carpeta raíz';
+
+  @override
+  String get folderNewRoot => 'Nueva carpeta raíz';
+
+  @override
+  String get folderUnassigned => 'Sin carpeta asignada';
+
+  @override
+  String get folderNew => 'Nueva carpeta';
+
+  @override
+  String get folderAddSubfolder => 'Añadir subcarpeta';
+
+  @override
+  String get folderSelectTitle => 'Seleccionar Carpeta';
+
+  @override
+  String get folderNewRootShort => 'Nueva raíz';
+
+  @override
+  String get folderNoneMainVault => 'Ninguna (Bóveda principal)';
+
+  @override
+  String get favoritesEmptyTitle => 'No tienes favoritos';
+
+  @override
+  String get favoritesEmptyDesc =>
+      'Marca carpetas o credenciales con una estrella';
+
+  @override
+  String get favoritesFoldersHeader => 'Carpetas Favoritas';
+
+  @override
+  String get favoritesCredentialsHeader => 'Credenciales Favoritas';
+
+  @override
+  String get favoriteToggleLabel => 'Marcar como favorita';
 }

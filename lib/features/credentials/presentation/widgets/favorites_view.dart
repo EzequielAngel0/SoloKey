@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../../theme/app_palette.dart';
@@ -31,6 +32,7 @@ class FavoritesView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final favFolders = folders.where((f) => f.isFavorite).toList();
     final favCreds = credentials.where((c) => c.isFavorite).toList();
 
@@ -42,12 +44,12 @@ class FavoritesView extends ConsumerWidget {
             Icon(Icons.star_outline_rounded, size: 72, color: palette.textEmpty),
             const SizedBox(height: 20),
             Text(
-              'No tienes favoritos',
+              l10n.favoritesEmptyTitle,
               style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 8),
             Text(
-              'Marca carpetas o credenciales con una estrella',
+              l10n.favoritesEmptyDesc,
               style: TextStyle(color: palette.textMuted, fontSize: 14),
             ),
             const SizedBox(height: 20),
@@ -64,7 +66,7 @@ class FavoritesView extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              'Carpetas Favoritas',
+              l10n.favoritesFoldersHeader,
               style: TextStyle(color: palette.textDisabled, fontSize: 13, fontWeight: FontWeight.bold),
             ),
           ),
@@ -84,7 +86,7 @@ class FavoritesView extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Text(
-              'Credenciales Favoritas',
+              l10n.favoritesCredentialsHeader,
               style: TextStyle(color: palette.textDisabled, fontSize: 13, fontWeight: FontWeight.bold),
             ),
           ),

@@ -361,5 +361,39 @@
   "formRotCustom": "Custom (days)",
   "formCustomDaysLabel": "Days to remind",
   "formCustomDaysRequired": "You must enter the number of days",
-  "formCustomDaysInvalid": "Enter a valid number of days"
+  "formCustomDaysInvalid": "Enter a valid number of days",
+
+  "commonLoading": "Loading…",
+  "folderNewSubfolder": "New subfolder",
+  "folderDeleteTitle": "Delete folder",
+  "folderDeleteBodyOrphan": "Delete \"{name}\"? Its credentials will be orphaned or moved to the root.",
+  "@folderDeleteBodyOrphan": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "folderDeleteBodyReleased": "Delete \"{name}\"? Its subfolders or credentials will be released.",
+  "@folderDeleteBodyReleased": {
+    "placeholders": { "name": { "type": "String" } }
+  },
+  "folderDeleted": "Folder deleted",
+  "folderRename": "Rename",
+  "folderRenameTitle": "Rename folder",
+  "folderNewNameLabel": "New name",
+  "folderCreateSubfolder": "Create subfolder",
+  "folderEmptyTitle": "Empty folder",
+  "folderEmptyDesc": "There are no subfolders or credentials here.",
+  "folderNoFolders": "No folders",
+  "folderOrganize": "Organise your credentials",
+  "folderCreateRoot": "Create root folder",
+  "folderNewRoot": "New root folder",
+  "folderUnassigned": "No folder assigned",
+  "folderNew": "New folder",
+  "folderAddSubfolder": "Add subfolder",
+  "folderSelectTitle": "Select folder",
+  "folderNewRootShort": "New root",
+  "folderNoneMainVault": "None (Main vault)",
+  "favoritesEmptyTitle": "No favourites yet",
+  "favoritesEmptyDesc": "Star folders or credentials",
+  "favoritesFoldersHeader": "Favourite folders",
+  "favoritesCredentialsHeader": "Favourite credentials",
+  "favoriteToggleLabel": "Mark as favourite"
 }

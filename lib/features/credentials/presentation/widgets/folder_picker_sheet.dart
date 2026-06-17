@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../folders/application/folders_provider.dart';
@@ -15,21 +16,22 @@ class FolderPickerSheet extends ConsumerWidget {
 
   Future<void> _createNewFolder(BuildContext context, WidgetRef ref, String? parentId) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Nueva carpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderNew, style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(labelText: 'Nombre de la carpeta'),
+          decoration: InputDecoration(labelText: l10n.folderNameLabel),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonCreate)),
         ],
       ),
     );
@@ -41,6 +43,7 @@ class FolderPickerSheet extends ConsumerWidget {
 
   Widget _buildNode(BuildContext context, WidgetRef ref, List<Folder> all, Folder f, int depth) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final sub = all.where((sub) => sub.parentId == f.id).toList();
     final isSelected = selectedFolderId == f.id;
     return Theme(
@@ -76,7 +79,7 @@ class FolderPickerSheet extends ConsumerWidget {
             IconButton(
               icon: Icon(Icons.create_new_folder_outlined, color: palette.textMuted),
               onPressed: () => _createNewFolder(context, ref, f.id),
-              tooltip: 'Añadir subcarpeta',
+              tooltip: l10n.folderAddSubfolder,
             ),
             if (sub.isNotEmpty)
               Icon(Icons.expand_more, color: palette.textDisabled)
@@ -92,6 +95,7 @@ class FolderPickerSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
     final roots = folders.where((f) => f.parentId == null).toList();
 
@@ -105,11 +109,11 @@ class FolderPickerSheet extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Seleccionar Carpeta', style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text(l10n.folderSelectTitle, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   onPressed: () => _createNewFolder(context, ref, null),
                   icon: Icon(Icons.create_new_folder_rounded, color: palette.accent),
-                  label: Text('Nueva raíz', style: TextStyle(color: palette.accent)),
+                  label: Text(l10n.folderNewRootShort, style: TextStyle(color: palette.accent)),
                 ),
               ],
             ),
@@ -121,7 +125,7 @@ class FolderPickerSheet extends ConsumerWidget {
                 ListTile(
                   leading: Icon(Icons.inventory_2_outlined, color: palette.textMuted),
                   title: Text(
-                    'Ninguna (Bóveda principal)',
+                    l10n.folderNoneMainVault,
                     style: TextStyle(
                       color: selectedFolderId == null ? palette.accent : palette.textPrimary,
                       fontWeight: selectedFolderId == null ? FontWeight.bold : FontWeight.normal,

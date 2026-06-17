@@ -1801,6 +1801,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Enter a valid number of days'**
   String get formCustomDaysInvalid;
+
+  /// No description provided for @commonLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading…'**
+  String get commonLoading;
+
+  /// No description provided for @folderNewSubfolder.
+  ///
+  /// In en, this message translates to:
+  /// **'New subfolder'**
+  String get folderNewSubfolder;
+
+  /// No description provided for @folderDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete folder'**
+  String get folderDeleteTitle;
+
+  /// No description provided for @folderDeleteBodyOrphan.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Its credentials will be orphaned or moved to the root.'**
+  String folderDeleteBodyOrphan(String name);
+
+  /// No description provided for @folderDeleteBodyReleased.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? Its subfolders or credentials will be released.'**
+  String folderDeleteBodyReleased(String name);
+
+  /// No description provided for @folderDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder deleted'**
+  String get folderDeleted;
+
+  /// No description provided for @folderRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get folderRename;
+
+  /// No description provided for @folderRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename folder'**
+  String get folderRenameTitle;
+
+  /// No description provided for @folderNewNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New name'**
+  String get folderNewNameLabel;
+
+  /// No description provided for @folderCreateSubfolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Create subfolder'**
+  String get folderCreateSubfolder;
+
+  /// No description provided for @folderEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty folder'**
+  String get folderEmptyTitle;
+
+  /// No description provided for @folderEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no subfolders or credentials here.'**
+  String get folderEmptyDesc;
+
+  /// No description provided for @folderNoFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'No folders'**
+  String get folderNoFolders;
+
+  /// No description provided for @folderOrganize.
+  ///
+  /// In en, this message translates to:
+  /// **'Organise your credentials'**
+  String get folderOrganize;
+
+  /// No description provided for @folderCreateRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'Create root folder'**
+  String get folderCreateRoot;
+
+  /// No description provided for @folderNewRoot.
+  ///
+  /// In en, this message translates to:
+  /// **'New root folder'**
+  String get folderNewRoot;
+
+  /// No description provided for @folderUnassigned.
+  ///
+  /// In en, this message translates to:
+  /// **'No folder assigned'**
+  String get folderUnassigned;
+
+  /// No description provided for @folderNew.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder'**
+  String get folderNew;
+
+  /// No description provided for @folderAddSubfolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Add subfolder'**
+  String get folderAddSubfolder;
+
+  /// No description provided for @folderSelectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select folder'**
+  String get folderSelectTitle;
+
+  /// No description provided for @folderNewRootShort.
+  ///
+  /// In en, this message translates to:
+  /// **'New root'**
+  String get folderNewRootShort;
+
+  /// No description provided for @folderNoneMainVault.
+  ///
+  /// In en, this message translates to:
+  /// **'None (Main vault)'**
+  String get folderNoneMainVault;
+
+  /// No description provided for @favoritesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No favourites yet'**
+  String get favoritesEmptyTitle;
+
+  /// No description provided for @favoritesEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Star folders or credentials'**
+  String get favoritesEmptyDesc;
+
+  /// No description provided for @favoritesFoldersHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite folders'**
+  String get favoritesFoldersHeader;
+
+  /// No description provided for @favoritesCredentialsHeader.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite credentials'**
+  String get favoritesCredentialsHeader;
+
+  /// No description provided for @favoriteToggleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Mark as favourite'**
+  String get favoriteToggleLabel;
 }
 
 class _AppLocalizationsDelegate

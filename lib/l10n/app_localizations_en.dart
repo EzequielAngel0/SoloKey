@@ -915,4 +915,89 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get formCustomDaysInvalid => 'Enter a valid number of days';
+
+  @override
+  String get commonLoading => 'Loading…';
+
+  @override
+  String get folderNewSubfolder => 'New subfolder';
+
+  @override
+  String get folderDeleteTitle => 'Delete folder';
+
+  @override
+  String folderDeleteBodyOrphan(String name) {
+    return 'Delete \"$name\"? Its credentials will be orphaned or moved to the root.';
+  }
+
+  @override
+  String folderDeleteBodyReleased(String name) {
+    return 'Delete \"$name\"? Its subfolders or credentials will be released.';
+  }
+
+  @override
+  String get folderDeleted => 'Folder deleted';
+
+  @override
+  String get folderRename => 'Rename';
+
+  @override
+  String get folderRenameTitle => 'Rename folder';
+
+  @override
+  String get folderNewNameLabel => 'New name';
+
+  @override
+  String get folderCreateSubfolder => 'Create subfolder';
+
+  @override
+  String get folderEmptyTitle => 'Empty folder';
+
+  @override
+  String get folderEmptyDesc => 'There are no subfolders or credentials here.';
+
+  @override
+  String get folderNoFolders => 'No folders';
+
+  @override
+  String get folderOrganize => 'Organise your credentials';
+
+  @override
+  String get folderCreateRoot => 'Create root folder';
+
+  @override
+  String get folderNewRoot => 'New root folder';
+
+  @override
+  String get folderUnassigned => 'No folder assigned';
+
+  @override
+  String get folderNew => 'New folder';
+
+  @override
+  String get folderAddSubfolder => 'Add subfolder';
+
+  @override
+  String get folderSelectTitle => 'Select folder';
+
+  @override
+  String get folderNewRootShort => 'New root';
+
+  @override
+  String get folderNoneMainVault => 'None (Main vault)';
+
+  @override
+  String get favoritesEmptyTitle => 'No favourites yet';
+
+  @override
+  String get favoritesEmptyDesc => 'Star folders or credentials';
+
+  @override
+  String get favoritesFoldersHeader => 'Favourite folders';
+
+  @override
+  String get favoritesCredentialsHeader => 'Favourite credentials';
+
+  @override
+  String get favoriteToggleLabel => 'Mark as favourite';
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 
 class FavoriteToggle extends StatelessWidget {
@@ -32,7 +33,7 @@ class FavoriteToggle extends StatelessWidget {
             ),
             const SizedBox(width: 10),
             Text(
-              'Marcar como favorita',
+              AppLocalizations.of(context).favoriteToggleLabel,
               style: TextStyle(color: palette.textPrimary, fontSize: 13),
             ),
             const Spacer(),

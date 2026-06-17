@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../folders/domain/entities/folder.dart';
 import '../../../folders/application/folders_provider.dart';
@@ -13,6 +14,7 @@ void showFolderOptionsSheet({
   VoidCallback? onDelete,
 }) {
   final palette = context.palette;
+  final l10n = AppLocalizations.of(context);
   showModalBottomSheet(
     context: context,
     backgroundColor: palette.drawer,
@@ -39,7 +41,7 @@ void showFolderOptionsSheet({
             color: palette.warning,
           ),
           title: Text(
-            folder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas',
+            folder.isFavorite ? l10n.detailRemoveFavorite : l10n.detailAddFavorite,
             style: TextStyle(color: palette.textPrimary),
           ),
           onTap: () {
@@ -50,7 +52,7 @@ void showFolderOptionsSheet({
         if (showManagementOptions) ...[
           ListTile(
             leading: Icon(Icons.drive_file_rename_outline_rounded, color: palette.textPrimary),
-            title: Text('Renombrar', style: TextStyle(color: palette.textPrimary)),
+            title: Text(l10n.folderRename, style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               if (onRename != null) onRename();
@@ -59,7 +61,7 @@ void showFolderOptionsSheet({
           Divider(color: palette.divider),
           ListTile(
             leading: Icon(Icons.delete_rounded, color: palette.danger),
-            title: Text('Eliminar', style: TextStyle(color: palette.danger)),
+            title: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
             onTap: () {
               Navigator.pop(context);
               if (onDelete != null) onDelete();

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../credentials/application/credentials_provider.dart';
@@ -26,23 +27,24 @@ class FolderScreen extends ConsumerWidget {
 
   Future<void> _createSubfolder(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Nueva subcarpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderNewSubfolder, style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(
-            labelText: 'Nombre de la carpeta',
+          decoration: InputDecoration(
+            labelText: l10n.folderNameLabel,
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonCreate)),
         ],
       ),
     );
@@ -53,20 +55,21 @@ class FolderScreen extends ConsumerWidget {
 
   Future<void> _deleteFolder(BuildContext context, WidgetRef ref, Folder folder) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Eliminar carpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderDeleteTitle, style: TextStyle(color: palette.textPrimary)),
         content: Text(
-          '¿Eliminar "${folder.name}"? Sus credenciales quedarán huérfanas o movidas a la raíz.',
+          l10n.folderDeleteBodyOrphan(folder.name),
           style: TextStyle(color: palette.textMuted),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Eliminar', style: TextStyle(color: palette.danger)),
+            child: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
           ),
         ],
       ),
@@ -80,7 +83,7 @@ class FolderScreen extends ConsumerWidget {
           context.pop();
         }
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Carpeta eliminada'),
+          content: Text(l10n.folderDeleted),
           backgroundColor: palette.success,
         ));
       }
@@ -89,6 +92,7 @@ class FolderScreen extends ConsumerWidget {
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder subFolder) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: palette.drawer,
@@ -102,7 +106,7 @@ class FolderScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: Icon(subFolder.isFavorite ? Icons.star_border_rounded : Icons.star_rounded, color: palette.warning),
-            title: Text(subFolder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas', style: TextStyle(color: palette.textPrimary)),
+            title: Text(subFolder.isFavorite ? l10n.detailRemoveFavorite : l10n.detailAddFavorite, style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               ref.read(foldersNotifierProvider.notifier).toggleFavorite(subFolder.id);
@@ -110,7 +114,7 @@ class FolderScreen extends ConsumerWidget {
           ),
           ListTile(
             leading: Icon(Icons.drive_file_rename_outline_rounded, color: palette.textPrimary),
-            title: Text('Renombrar', style: TextStyle(color: palette.textPrimary)),
+            title: Text(l10n.folderRename, style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               _renameFolder(context, ref, subFolder);
@@ -119,7 +123,7 @@ class FolderScreen extends ConsumerWidget {
           Divider(color: palette.divider),
           ListTile(
             leading: Icon(Icons.delete_rounded, color: palette.danger),
-            title: Text('Eliminar', style: TextStyle(color: palette.danger)),
+            title: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
             onTap: () async {
               Navigator.pop(context);
               _deleteFolder(context, ref, subFolder);
@@ -133,21 +137,22 @@ class FolderScreen extends ConsumerWidget {
 
   Future<void> _renameFolder(BuildContext context, WidgetRef ref, Folder folder) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController(text: folder.name);
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Renombrar carpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderRenameTitle, style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(labelText: 'Nuevo nombre'),
+          decoration: InputDecoration(labelText: l10n.folderNewNameLabel),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Guardar')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonSave)),
         ],
       ),
     );
@@ -159,6 +164,7 @@ class FolderScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final foldersAsync = ref.watch(foldersNotifierProvider);
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
 
@@ -167,7 +173,7 @@ class FolderScreen extends ConsumerWidget {
 
     if (currentFolder == null) {
       return Scaffold(
-        appBar: const VaultAppBar(title: 'Cargando...'),
+        appBar: VaultAppBar(title: l10n.commonLoading),
         body: Center(child: CircularProgressIndicator(color: palette.accent)),
       );
     }
@@ -185,17 +191,17 @@ class FolderScreen extends ConsumerWidget {
               currentFolder.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
               color: palette.warning,
             ),
-            tooltip: currentFolder.isFavorite ? 'Quitar de favoritas' : 'Añadir a favoritas',
+            tooltip: currentFolder.isFavorite ? l10n.detailRemoveFavorite : l10n.detailAddFavorite,
             onPressed: () => ref.read(foldersNotifierProvider.notifier).toggleFavorite(currentFolder.id),
           ),
           IconButton(
             icon: Icon(Icons.create_new_folder_outlined, color: palette.textPrimary),
-            tooltip: 'Crear subcarpeta',
+            tooltip: l10n.folderCreateSubfolder,
             onPressed: () => _createSubfolder(context, ref),
           ),
           IconButton(
             icon: Icon(Icons.delete_outline_rounded, color: palette.danger),
-            tooltip: 'Eliminar carpeta',
+            tooltip: l10n.folderDeleteTitle,
             onPressed: () => _deleteFolder(context, ref, currentFolder),
           ),
         ],
@@ -227,9 +233,9 @@ class FolderScreen extends ConsumerWidget {
                       children: [
                         Icon(Icons.folder_open_rounded, size: 72, color: palette.divider),
                         const SizedBox(height: 20),
-                        Text('Carpeta Vacía', style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(l10n.folderEmptyTitle, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 8),
-                        Text('No hay subcarpetas ni credenciales aquí.', style: TextStyle(color: palette.textMuted, fontSize: 14)),
+                        Text(l10n.folderEmptyDesc, style: TextStyle(color: palette.textMuted, fontSize: 14)),
                       ],
                     ),
                   ),
