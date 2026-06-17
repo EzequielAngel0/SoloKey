@@ -205,64 +205,120 @@ class CredentialCard extends ConsumerWidget {
     final icon  = _typeIcons[credential.type]  ?? Icons.lock_rounded;
     final color = _typeColors[credential.type] ?? const Color(0xFF6C63FF);
 
-    return Material(
-      color: const Color(0xFF16213E),
-      borderRadius: BorderRadius.circular(16),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(16),
-        onTap: () => context.push(
-          AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
-        ),
-        onLongPress: () => _showOptionsSheet(context, ref),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-          child: Row(
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Icon(icon, color: color, size: 22),
+    return Dismissible(
+      key: Key(credential.id),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        HapticFeedback.warningImpact();
+        final confirm = await showDialog<bool>(
+          context: context,
+          builder: (_) => AlertDialog(
+            backgroundColor: const Color(0xFF1A1A2E),
+            title: const Text('Eliminar credencial', style: TextStyle(color: Colors.white)),
+            content: Text(
+              '¿Eliminar "${credential.title}"? Esta acción no se puede deshacer.',
+              style: const TextStyle(color: Color(0xFF9E9EBF)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Cancelar'),
               ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      credential.title,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 15,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    if (credential.username != null) ...[
-                      const SizedBox(height: 3),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Eliminar', style: TextStyle(color: Color(0xFFCF6679))),
+              ),
+            ],
+          ),
+        );
+        if (confirm == true) {
+          HapticFeedback.heavyImpact();
+          await ref.read(credentialsNotifierProvider.notifier).delete(credential.id);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('"${credential.title}" eliminada'),
+                backgroundColor: const Color(0xFFCF6679),
+                behavior: SnackBarBehavior.floating,
+              ),
+            );
+          }
+          return true;
+        }
+        return false;
+      },
+      background: Container(
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 20.0),
+        decoration: BoxDecoration(
+          color: const Color(0xFFCF6679),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Icon(
+          Icons.delete_forever_rounded,
+          color: Colors.white,
+          size: 24,
+        ),
+      ),
+      child: Material(
+        color: const Color(0xFF16213E),
+        borderRadius: BorderRadius.circular(16),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () => context.push(
+            AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
+          ),
+          onLongPress: () => _showOptionsSheet(context, ref),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            child: Row(
+              children: [
+                Container(
+                  width: 46,
+                  height: 46,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icon, color: color, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       Text(
-                        credential.username!,
+                        credential.title,
                         style: const TextStyle(
-                          color: Color(0xFF9E9EBF),
-                          fontSize: 12,
+                          color: Colors.white,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w600,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
+                      if (credential.username != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          credential.username!,
+                          style: const TextStyle(
+                            color: Color(0xFF9E9EBF),
+                            fontSize: 12,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              if (credential.isFavorite)
-                const Icon(Icons.star_rounded,
-                    color: Color(0xFFFFB74D), size: 18),
-              if (credential.type == CredentialType.totp)
-                _TotpVisualizer(credential: credential),
-            ],
+                if (credential.isFavorite)
+                  const Icon(Icons.star_rounded,
+                      color: Color(0xFFFFB74D), size: 18),
+                if (credential.type == CredentialType.totp)
+                  _TotpVisualizer(credential: credential),
+              ],
+            ),
           ),
         ),
       ),
