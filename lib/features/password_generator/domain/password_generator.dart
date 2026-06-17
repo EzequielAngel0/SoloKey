@@ -25,41 +25,45 @@ abstract final class PasswordGenerator {
     if (config.length < 4) throw ArgumentError('Minimum length is 4');
 
     final pool = StringBuffer();
-    final required = <String>[];
+    final requiredSets = <String>[];
 
     if (config.useLowercase) {
       pool.write(_lower);
-      required.add(_lower);
+      requiredSets.add(_lower);
     }
     if (config.useUppercase) {
       pool.write(_upper);
-      required.add(_upper);
+      requiredSets.add(_upper);
     }
     if (config.useNumbers) {
       pool.write(_numbers);
-      required.add(_numbers);
+      requiredSets.add(_numbers);
     }
     if (config.useSymbols) {
       pool.write(config.symbolSet);
-      required.add(config.symbolSet);
+      requiredSets.add(config.symbolSet);
     }
 
     if (pool.isEmpty) throw ArgumentError('At least one character set required');
 
     final rng = Random.secure();
     final poolStr = pool.toString();
+
+    // Fill every position randomly from the full pool — natural distribution.
     final chars = List<String>.generate(
       config.length,
       (_) => poolStr[rng.nextInt(poolStr.length)],
     );
 
-    // Guarantee at least one char from each required set.
-    for (var i = 0; i < required.length && i < config.length; i++) {
-      final set = required[i];
-      chars[i] = set[rng.nextInt(set.length)];
+    // Guarantee at least one char from each enabled charset by placing them
+    // at random (non-repeating) positions within the generated password.
+    final guaranteePositions = List<int>.generate(config.length, (i) => i)
+      ..shuffle(rng);
+    for (var i = 0; i < requiredSets.length && i < config.length; i++) {
+      final charSet = requiredSets[i];
+      chars[guaranteePositions[i]] = charSet[rng.nextInt(charSet.length)];
     }
 
-    chars.shuffle(rng);
     return chars.join();
   }
 
