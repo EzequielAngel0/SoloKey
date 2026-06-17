@@ -43,6 +43,8 @@ class _DesktopPairingView extends ConsumerStatefulWidget {
 
 class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   bool _hasPairingKey = false;
+  bool _phoneConnected = false;
+  bool _isSyncing = false;
   String? _serverStatusMessage;
   StreamSubscription<String>? _serverEventsSubscription;
 
@@ -75,17 +77,25 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           if (event == 'server_started') {
             _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...';
           } else if (event == 'server_stopped') {
+            _phoneConnected = false;
+            _isSyncing = false;
             _serverStatusMessage = 'Servidor apagado.';
           } else if (event == 'client_connecting') {
+            _phoneConnected = true;
             _serverStatusMessage = 'Celular conectándose...';
           } else if (event == 'client_disconnected') {
+            _phoneConnected = false;
+            _isSyncing = false;
             _serverStatusMessage = 'Celular desconectado. Servidor en espera...';
           } else if (event == 'paired') {
             _hasPairingKey = true;
+            _phoneConnected = true;
             _serverStatusMessage = '¡Vinculación completada con éxito!';
           } else if (event == 'sync_manifest_processed') {
+            _isSyncing = true;
             _serverStatusMessage = 'Comparando datos locales con celular...';
           } else if (event == 'sync_completed') {
+            _isSyncing = false;
             _serverStatusMessage = '¡Sincronización bidireccional exitosa!';
             Future.delayed(const Duration(seconds: 4), () {
               if (mounted && _serverStatusMessage == '¡Sincronización bidireccional exitosa!') {
@@ -93,6 +103,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               }
             });
           } else if (event == 'sync_error') {
+            _isSyncing = false;
             _serverStatusMessage = 'Error durante la sincronización.';
           } else if (event.startsWith('remote_unlock')) {
             _serverStatusMessage = 'Recibida solicitud de desbloqueo remoto.';
@@ -299,12 +310,14 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                   ),
                 ],
               ),
+              const SizedBox(height: 14),
+              _buildLiveStatusChip(palette),
               if (_serverStatusMessage != null) ...[
-                const SizedBox(height: 12),
+                const SizedBox(height: 10),
                 Text(
                   _serverStatusMessage!,
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: palette.primary, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ],
             ],
@@ -312,8 +325,10 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
         ),
         const SizedBox(height: 28),
 
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 12,
+          runSpacing: 12,
           children: [
             OutlinedButton.icon(
               onPressed: () async {
@@ -321,6 +336,8 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 await getIt<SyncService>().stopServer();
                 setState(() {
                   _hasPairingKey = false;
+                  _phoneConnected = false;
+                  _isSyncing = false;
                   _serverStatusMessage = null;
                 });
                 ref.read(pairingNotifierProvider.notifier).reset();
@@ -328,10 +345,10 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               icon: Icon(Icons.delete_outline_rounded, color: palette.error),
               label: Text('Eliminar Vínculo', style: TextStyle(color: palette.error)),
               style: OutlinedButton.styleFrom(
+                minimumSize: const Size(0, 46),
                 side: BorderSide(color: palette.error),
               ),
             ),
-            const SizedBox(width: 16),
             ElevatedButton.icon(
               onPressed: () {
                 ref.read(pairingNotifierProvider.notifier).startDesktopServer();
@@ -339,6 +356,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               icon: const Icon(Icons.qr_code_rounded),
               label: const Text('Mostrar QR'),
               style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 46),
                 backgroundColor: palette.primary,
                 foregroundColor: palette.background,
               ),
@@ -346,6 +364,50 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           ],
         ),
       ],
+    );
+  }
+
+  /// Live indicator of the currently-connected mobile device and sync activity.
+  Widget _buildLiveStatusChip(AppPalette palette) {
+    final Color color;
+    final Widget leading;
+    final String label;
+    if (_isSyncing) {
+      color = palette.accent;
+      leading = SizedBox(
+        width: 14,
+        height: 14,
+        child: CircularProgressIndicator(strokeWidth: 2, color: color),
+      );
+      label = 'Sincronizando datos…';
+    } else if (_phoneConnected) {
+      color = palette.success;
+      leading = Icon(Icons.smartphone_rounded, color: color, size: 16);
+      label = 'Celular conectado';
+    } else {
+      color = palette.textMuted;
+      leading = Icon(Icons.hourglass_empty_rounded, color: color, size: 16);
+      label = 'Esperando celular…';
+    }
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          leading,
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: TextStyle(
+                color: color, fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+        ],
+      ),
     );
   }
 }
