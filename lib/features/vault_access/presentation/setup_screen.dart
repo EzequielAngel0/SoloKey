@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/recovery_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/password_strength_indicator.dart';
 import '../../../shared/widgets/secure_text_field.dart';
@@ -80,6 +81,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final vaultState = ref.watch(vaultNotifierProvider);
     final isLoading = vaultState is _Loading;
 
@@ -124,7 +126,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 ),
                 const SizedBox(height: 32),
                 Text(
-                  'Crear contraseña\nmaestra',
+                  l10n.setupTitle,
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
@@ -134,7 +136,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.',
+                  l10n.setupSubtitle,
                   style: TextStyle(
                     fontSize: 14,
                     color: palette.textMuted,
@@ -151,17 +153,21 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
                   style: TextStyle(color: palette.textPrimary, fontSize: 16, letterSpacing: 1.5),
-                  decoration: const InputDecoration(labelText: 'Contraseña maestra', hintText: 'Mínimo 12 caracteres'),
+                  decoration: InputDecoration(
+                    labelText: l10n.unlockMasterPasswordHint,
+                    hintText: l10n.setupMinChars,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 PasswordStrengthIndicator(strength: _strength),
                 const SizedBox(height: 20),
                 SecureTextField(
                   controller: _confirmCtrl,
-                  label: 'Confirmar contraseña',
+                  label: l10n.setupConfirmLabel,
                   textInputAction: TextInputAction.done,
-                  validator: (v) =>
-                      v != _passCtrl.text ? 'Las contraseñas no coinciden' : null,
+                  validator: (v) => v != _passCtrl.text
+                      ? l10n.setupPasswordsMismatch
+                      : null,
                   onSubmitted: (_) => _submit(),
                 ),
                 const SizedBox(height: 12),
@@ -177,7 +183,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                         )
                       : ElevatedButton(
                           onPressed: _submit,
-                          child: const Text('Crear bóveda'),
+                          child: Text(l10n.setupCreateButton),
                         ),
                 ),
               ],
@@ -189,11 +195,12 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
   }
 
   String? _validatePassword(String? v) {
-    if (v == null || v.length < 12) return 'Mínimo 12 caracteres';
-    if (!v.contains(RegExp(r'[A-Z]'))) return 'Incluye al menos una mayúscula';
-    if (!v.contains(RegExp(r'[0-9]'))) return 'Incluye al menos un número';
+    final l10n = AppLocalizations.of(context);
+    if (v == null || v.length < 12) return l10n.setupMinChars;
+    if (!v.contains(RegExp(r'[A-Z]'))) return l10n.setupNeedUppercase;
+    if (!v.contains(RegExp(r'[0-9]'))) return l10n.setupNeedNumber;
     if (!v.contains(RegExp(r'[!@#$%^&*()\-_=+]'))) {
-      return 'Incluye al menos un símbolo';
+      return l10n.setupNeedSymbol;
     }
     return null;
   }
@@ -209,12 +216,13 @@ class _RequirementsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final reqs = [
-      (label: '12+ caracteres', met: password.length >= 12),
-      (label: 'Mayúscula', met: password.contains(RegExp(r'[A-Z]'))),
-      (label: 'Número', met: password.contains(RegExp(r'[0-9]'))),
+      (label: l10n.setupReqChars, met: password.length >= 12),
+      (label: l10n.setupReqUppercase, met: password.contains(RegExp(r'[A-Z]'))),
+      (label: l10n.setupReqNumber, met: password.contains(RegExp(r'[0-9]'))),
       (
-        label: 'Símbolo',
+        label: l10n.setupReqSymbol,
         met: password.contains(RegExp(r'[!@#$%^&*()\-_=+]'))
       ),
     ];

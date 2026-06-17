@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../domain/repositories/i_vault_repository.dart';
 import '../../../app/di/injection.dart';
@@ -99,7 +100,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Tu bóveda segura',
+                  AppLocalizations.of(context).splashTagline,
                   style: TextStyle(
                     fontSize: 14,
                     color: palette.textMuted,

@@ -58,5 +58,21 @@
 
   "languageSystem": "Follow system",
   "languageSpanish": "Spanish",
-  "languageEnglish": "English"
+  "languageEnglish": "English",
+
+  "splashTagline": "Your secure vault",
+
+  "setupTitle": "Create master\npassword",
+  "setupSubtitle": "This password protects your entire vault. It cannot be recovered if you forget it.",
+  "setupMinChars": "At least 12 characters",
+  "setupConfirmLabel": "Confirm password",
+  "setupPasswordsMismatch": "Passwords do not match",
+  "setupCreateButton": "Create vault",
+  "setupNeedUppercase": "Include at least one uppercase letter",
+  "setupNeedNumber": "Include at least one number",
+  "setupNeedSymbol": "Include at least one symbol",
+  "setupReqChars": "12+ characters",
+  "setupReqUppercase": "Uppercase",
+  "setupReqNumber": "Number",
+  "setupReqSymbol": "Symbol"
 }

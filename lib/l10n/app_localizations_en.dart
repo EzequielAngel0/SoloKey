@@ -137,4 +137,47 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get languageEnglish => 'English';
+
+  @override
+  String get splashTagline => 'Your secure vault';
+
+  @override
+  String get setupTitle => 'Create master\npassword';
+
+  @override
+  String get setupSubtitle =>
+      'This password protects your entire vault. It cannot be recovered if you forget it.';
+
+  @override
+  String get setupMinChars => 'At least 12 characters';
+
+  @override
+  String get setupConfirmLabel => 'Confirm password';
+
+  @override
+  String get setupPasswordsMismatch => 'Passwords do not match';
+
+  @override
+  String get setupCreateButton => 'Create vault';
+
+  @override
+  String get setupNeedUppercase => 'Include at least one uppercase letter';
+
+  @override
+  String get setupNeedNumber => 'Include at least one number';
+
+  @override
+  String get setupNeedSymbol => 'Include at least one symbol';
+
+  @override
+  String get setupReqChars => '12+ characters';
+
+  @override
+  String get setupReqUppercase => 'Uppercase';
+
+  @override
+  String get setupReqNumber => 'Number';
+
+  @override
+  String get setupReqSymbol => 'Symbol';
 }

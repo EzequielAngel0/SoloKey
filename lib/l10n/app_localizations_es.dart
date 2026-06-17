@@ -137,4 +137,47 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get languageEnglish => 'Inglés';
+
+  @override
+  String get splashTagline => 'Tu bóveda segura';
+
+  @override
+  String get setupTitle => 'Crear contraseña\nmaestra';
+
+  @override
+  String get setupSubtitle =>
+      'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.';
+
+  @override
+  String get setupMinChars => 'Mínimo 12 caracteres';
+
+  @override
+  String get setupConfirmLabel => 'Confirmar contraseña';
+
+  @override
+  String get setupPasswordsMismatch => 'Las contraseñas no coinciden';
+
+  @override
+  String get setupCreateButton => 'Crear bóveda';
+
+  @override
+  String get setupNeedUppercase => 'Incluye al menos una mayúscula';
+
+  @override
+  String get setupNeedNumber => 'Incluye al menos un número';
+
+  @override
+  String get setupNeedSymbol => 'Incluye al menos un símbolo';
+
+  @override
+  String get setupReqChars => '12+ caracteres';
+
+  @override
+  String get setupReqUppercase => 'Mayúscula';
+
+  @override
+  String get setupReqNumber => 'Número';
+
+  @override
+  String get setupReqSymbol => 'Símbolo';
 }

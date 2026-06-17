@@ -331,6 +331,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'English'**
   String get languageEnglish;
+
+  /// No description provided for @splashTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Your secure vault'**
+  String get splashTagline;
+
+  /// No description provided for @setupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Create master\npassword'**
+  String get setupTitle;
+
+  /// No description provided for @setupSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'This password protects your entire vault. It cannot be recovered if you forget it.'**
+  String get setupSubtitle;
+
+  /// No description provided for @setupMinChars.
+  ///
+  /// In en, this message translates to:
+  /// **'At least 12 characters'**
+  String get setupMinChars;
+
+  /// No description provided for @setupConfirmLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm password'**
+  String get setupConfirmLabel;
+
+  /// No description provided for @setupPasswordsMismatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get setupPasswordsMismatch;
+
+  /// No description provided for @setupCreateButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Create vault'**
+  String get setupCreateButton;
+
+  /// No description provided for @setupNeedUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Include at least one uppercase letter'**
+  String get setupNeedUppercase;
+
+  /// No description provided for @setupNeedNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Include at least one number'**
+  String get setupNeedNumber;
+
+  /// No description provided for @setupNeedSymbol.
+  ///
+  /// In en, this message translates to:
+  /// **'Include at least one symbol'**
+  String get setupNeedSymbol;
+
+  /// No description provided for @setupReqChars.
+  ///
+  /// In en, this message translates to:
+  /// **'12+ characters'**
+  String get setupReqChars;
+
+  /// No description provided for @setupReqUppercase.
+  ///
+  /// In en, this message translates to:
+  /// **'Uppercase'**
+  String get setupReqUppercase;
+
+  /// No description provided for @setupReqNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Number'**
+  String get setupReqNumber;
+
+  /// No description provided for @setupReqSymbol.
+  ///
+  /// In en, this message translates to:
+  /// **'Symbol'**
+  String get setupReqSymbol;
 }
 
 class _AppLocalizationsDelegate

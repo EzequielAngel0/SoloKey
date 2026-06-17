@@ -43,5 +43,21 @@
 
   "languageSystem": "Seguir el sistema",
   "languageSpanish": "Español",
-  "languageEnglish": "Inglés"
+  "languageEnglish": "Inglés",
+
+  "splashTagline": "Tu bóveda segura",
+
+  "setupTitle": "Crear contraseña\nmaestra",
+  "setupSubtitle": "Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.",
+  "setupMinChars": "Mínimo 12 caracteres",
+  "setupConfirmLabel": "Confirmar contraseña",
+  "setupPasswordsMismatch": "Las contraseñas no coinciden",
+  "setupCreateButton": "Crear bóveda",
+  "setupNeedUppercase": "Incluye al menos una mayúscula",
+  "setupNeedNumber": "Incluye al menos un número",
+  "setupNeedSymbol": "Incluye al menos un símbolo",
+  "setupReqChars": "12+ caracteres",
+  "setupReqUppercase": "Mayúscula",
+  "setupReqNumber": "Número",
+  "setupReqSymbol": "Símbolo"
 }
