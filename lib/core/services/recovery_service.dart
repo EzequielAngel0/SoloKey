@@ -69,9 +69,17 @@ class RecoveryService {
   /// On success, the master key is in session and ready to re-encrypt with new password.
   Future<bool> unlockWithRecoveryCode(String code) async {
     final cleanCode = code.replaceAll(RegExp(r'[\s-]'), '');
+    var normalized = cleanCode;
+    final mod = normalized.length % 4;
+    if (mod == 2) {
+      normalized += '==';
+    } else if (mod == 3) {
+      normalized += '=';
+    }
+
     late Uint8List recoveryKeyBytes;
     try {
-      recoveryKeyBytes = Uint8List.fromList(base64Url.decode(cleanCode));
+      recoveryKeyBytes = Uint8List.fromList(base64Url.decode(normalized));
     } catch (_) {
       return false;
     }
