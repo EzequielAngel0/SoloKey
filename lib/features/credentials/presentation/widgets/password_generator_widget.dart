@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 
 import '../../../../features/password_generator/application/password_generator_provider.dart';
@@ -17,6 +18,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final config = ref.watch(passwordConfigNotifierProvider);
     final password = ref.watch(generatedPasswordNotifierProvider);
     final strength = ref.watch(passwordStrengthProvider);
@@ -58,7 +60,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
                 IconButton(
                   icon: Icon(Icons.refresh_rounded, color: palette.accent),
                   onPressed: () => ref.read(generatedPasswordNotifierProvider.notifier).regenerate(),
-                  tooltip: 'Regenerar',
+                  tooltip: l10n.genRegenerate,
                   constraints: const BoxConstraints(),
                   padding: EdgeInsets.zero,
                 ),
@@ -71,7 +73,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
 
           // ── Length slider ────────────────────────────────────────────
           Text(
-            'Longitud: ${config.length}',
+            l10n.genLength(config.length),
             style: TextStyle(
               color: palette.textMuted,
               fontSize: 12,
@@ -130,13 +132,13 @@ class PasswordGeneratorWidget extends ConsumerWidget {
             onPressed: () async {
               await showClipboardCountdownSnackBar(
                 context: context,
-                label: 'Contraseña generada',
+                label: l10n.genGeneratedPassword,
                 value: password,
               );
               onApplyPassword(password);
             },
             icon: const Icon(Icons.check_rounded, size: 18),
-            label: const Text('Usar y Copiar'),
+            label: Text(l10n.genUseAndCopy),
             style: ElevatedButton.styleFrom(
               backgroundColor: palette.accent,
               foregroundColor: palette.onPrimary,

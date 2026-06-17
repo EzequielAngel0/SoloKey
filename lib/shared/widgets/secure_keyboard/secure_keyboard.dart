@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../theme/app_palette.dart';
 
 /// A secure, on-screen keyboard widget for entering sensitive text.
@@ -413,7 +414,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 ),
                 alignment: Alignment.center,
                 child: Text(
-                  'Espacio',
+                  AppLocalizations.of(context).keyboardSpace,
                   style: TextStyle(color: palette.textMuted, fontSize: 12),
                 ),
               ),

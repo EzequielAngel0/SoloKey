@@ -1963,6 +1963,132 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Mark as favourite'**
   String get favoriteToggleLabel;
+
+  /// No description provided for @commonEdit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get commonEdit;
+
+  /// No description provided for @cardCopyUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy username'**
+  String get cardCopyUser;
+
+  /// No description provided for @cardCopyPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy password'**
+  String get cardCopyPassword;
+
+  /// No description provided for @cardCopyPasswordAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to copy the password'**
+  String get cardCopyPasswordAuthReason;
+
+  /// No description provided for @cardMoveToFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to folder'**
+  String get cardMoveToFolder;
+
+  /// No description provided for @cardNoFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'No folder'**
+  String get cardNoFolder;
+
+  /// No description provided for @cardMovedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential moved successfully'**
+  String get cardMovedSuccess;
+
+  /// No description provided for @typeSelNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Note'**
+  String get typeSelNote;
+
+  /// No description provided for @typeSelTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP'**
+  String get typeSelTotp;
+
+  /// No description provided for @typeSelPasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey'**
+  String get typeSelPasskey;
+
+  /// No description provided for @genRegenerate.
+  ///
+  /// In en, this message translates to:
+  /// **'Regenerate'**
+  String get genRegenerate;
+
+  /// No description provided for @genLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Length: {n}'**
+  String genLength(int n);
+
+  /// No description provided for @genGeneratedPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Generated password'**
+  String get genGeneratedPassword;
+
+  /// No description provided for @genUseAndCopy.
+  ///
+  /// In en, this message translates to:
+  /// **'Use & copy'**
+  String get genUseAndCopy;
+
+  /// No description provided for @strengthWeak.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak'**
+  String get strengthWeak;
+
+  /// No description provided for @strengthFair.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair'**
+  String get strengthFair;
+
+  /// No description provided for @strengthGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get strengthGood;
+
+  /// No description provided for @strengthStrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Strong'**
+  String get strengthStrong;
+
+  /// No description provided for @clipboardCopiedClears.
+  ///
+  /// In en, this message translates to:
+  /// **'{label} copied · clears in {seconds}s'**
+  String clipboardCopiedClears(String label, int seconds);
+
+  /// No description provided for @passwordRowGeneratorTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Key generator'**
+  String get passwordRowGeneratorTooltip;
+
+  /// No description provided for @keyboardSpace.
+  ///
+  /// In en, this message translates to:
+  /// **'Space'**
+  String get keyboardSpace;
 }
 
 class _AppLocalizationsDelegate

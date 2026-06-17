@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../domain/entities/credential.dart';
 
@@ -16,13 +17,23 @@ class TypeSelectorPremium extends StatelessWidget {
   final bool isEditing;
 
   static const _items = [
-    (type: CredentialType.password, label: 'Contraseña', icon: Icons.lock_rounded),
-    (type: CredentialType.apiKey, label: 'API Key', icon: Icons.key_rounded),
-    (type: CredentialType.secureNote, label: 'Nota', icon: Icons.note_rounded),
-    (type: CredentialType.totp, label: 'TOTP', icon: Icons.access_time_rounded),
-    (type: CredentialType.passkey, label: 'Passkey', icon: Icons.fingerprint_rounded),
-    (type: CredentialType.sshKey, label: 'Llave SSH', icon: Icons.terminal_rounded),
+    (type: CredentialType.password, icon: Icons.lock_rounded),
+    (type: CredentialType.apiKey, icon: Icons.key_rounded),
+    (type: CredentialType.secureNote, icon: Icons.note_rounded),
+    (type: CredentialType.totp, icon: Icons.access_time_rounded),
+    (type: CredentialType.passkey, icon: Icons.fingerprint_rounded),
+    (type: CredentialType.sshKey, icon: Icons.terminal_rounded),
   ];
+
+  static String _label(AppLocalizations l10n, CredentialType type) =>
+      switch (type) {
+        CredentialType.password => l10n.typePassword,
+        CredentialType.apiKey => l10n.typeApiKey,
+        CredentialType.secureNote => l10n.typeSelNote,
+        CredentialType.totp => l10n.typeSelTotp,
+        CredentialType.passkey => l10n.typeSelPasskey,
+        CredentialType.sshKey => l10n.typeSshKey,
+      };
 
   Color _typeColor(CredentialType type, AppPalette p) => switch (type) {
         CredentialType.password => p.typePassword,
@@ -36,6 +47,7 @@ class TypeSelectorPremium extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return SizedBox(
       height: 80,
       child: ListView.separated(
@@ -89,7 +101,7 @@ class TypeSelectorPremium extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    item.label,
+                    _label(l10n, item.type),
                     style: TextStyle(
                       color: isSelected ? color : isDisabled ? palette.textDisabled : palette.textMuted,
                       fontSize: 10,

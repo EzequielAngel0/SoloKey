@@ -338,5 +338,32 @@
   "favoritesEmptyDesc": "Marca carpetas o credenciales con una estrella",
   "favoritesFoldersHeader": "Carpetas Favoritas",
   "favoritesCredentialsHeader": "Credenciales Favoritas",
-  "favoriteToggleLabel": "Marcar como favorita"
+  "favoriteToggleLabel": "Marcar como favorita",
+
+  "commonEdit": "Editar",
+  "cardCopyUser": "Copiar Usuario",
+  "cardCopyPassword": "Copiar Contraseña",
+  "cardCopyPasswordAuthReason": "Autentícate para copiar la contraseña",
+  "cardMoveToFolder": "Mover a carpeta",
+  "cardNoFolder": "Sin carpeta",
+  "cardMovedSuccess": "Credencial movida con éxito",
+
+  "typeSelNote": "Nota",
+  "typeSelTotp": "TOTP",
+  "typeSelPasskey": "Passkey",
+
+  "genRegenerate": "Regenerar",
+  "genLength": "Longitud: {n}",
+  "genGeneratedPassword": "Contraseña generada",
+  "genUseAndCopy": "Usar y Copiar",
+
+  "strengthWeak": "Débil",
+  "strengthFair": "Regular",
+  "strengthGood": "Buena",
+  "strengthStrong": "Fuerte",
+
+  "clipboardCopiedClears": "{label} copiado · se limpia en {seconds}s",
+
+  "passwordRowGeneratorTooltip": "Generador de claves",
+  "keyboardSpace": "Espacio"
 }

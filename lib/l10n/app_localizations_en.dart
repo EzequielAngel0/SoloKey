@@ -1000,4 +1000,71 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get favoriteToggleLabel => 'Mark as favourite';
+
+  @override
+  String get commonEdit => 'Edit';
+
+  @override
+  String get cardCopyUser => 'Copy username';
+
+  @override
+  String get cardCopyPassword => 'Copy password';
+
+  @override
+  String get cardCopyPasswordAuthReason => 'Authenticate to copy the password';
+
+  @override
+  String get cardMoveToFolder => 'Move to folder';
+
+  @override
+  String get cardNoFolder => 'No folder';
+
+  @override
+  String get cardMovedSuccess => 'Credential moved successfully';
+
+  @override
+  String get typeSelNote => 'Note';
+
+  @override
+  String get typeSelTotp => 'TOTP';
+
+  @override
+  String get typeSelPasskey => 'Passkey';
+
+  @override
+  String get genRegenerate => 'Regenerate';
+
+  @override
+  String genLength(int n) {
+    return 'Length: $n';
+  }
+
+  @override
+  String get genGeneratedPassword => 'Generated password';
+
+  @override
+  String get genUseAndCopy => 'Use & copy';
+
+  @override
+  String get strengthWeak => 'Weak';
+
+  @override
+  String get strengthFair => 'Fair';
+
+  @override
+  String get strengthGood => 'Good';
+
+  @override
+  String get strengthStrong => 'Strong';
+
+  @override
+  String clipboardCopiedClears(String label, int seconds) {
+    return '$label copied · clears in ${seconds}s';
+  }
+
+  @override
+  String get passwordRowGeneratorTooltip => 'Key generator';
+
+  @override
+  String get keyboardSpace => 'Space';
 }

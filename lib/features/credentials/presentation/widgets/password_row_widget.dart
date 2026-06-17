@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../shared/widgets/secure_text_field.dart';
 import 'password_generator_widget.dart';
@@ -62,7 +63,7 @@ class PasswordRowWidget extends StatelessWidget {
                   FocusScope.of(context).unfocus();
                   onToggleGenerator(!showGenerator);
                 },
-                tooltip: 'Generador de claves',
+                tooltip: AppLocalizations.of(context).passwordRowGeneratorTooltip,
               ),
             ),
           ],

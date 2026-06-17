@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../app/di/injection.dart';
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_palette.dart';
 
 class ClipboardCountdown extends StatefulWidget {
@@ -53,7 +54,8 @@ class _ClipboardCountdownState extends State<ClipboardCountdown> {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-            '${widget.label} copiado · se limpia en ${_secondsRemaining}s',
+            AppLocalizations.of(context)
+                .clipboardCopiedClears(widget.label, _secondsRemaining),
             style: const TextStyle(
               color: Colors.white,
               fontSize: 14,

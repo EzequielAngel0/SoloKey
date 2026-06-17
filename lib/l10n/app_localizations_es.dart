@@ -1006,4 +1006,72 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get favoriteToggleLabel => 'Marcar como favorita';
+
+  @override
+  String get commonEdit => 'Editar';
+
+  @override
+  String get cardCopyUser => 'Copiar Usuario';
+
+  @override
+  String get cardCopyPassword => 'Copiar Contraseña';
+
+  @override
+  String get cardCopyPasswordAuthReason =>
+      'Autentícate para copiar la contraseña';
+
+  @override
+  String get cardMoveToFolder => 'Mover a carpeta';
+
+  @override
+  String get cardNoFolder => 'Sin carpeta';
+
+  @override
+  String get cardMovedSuccess => 'Credencial movida con éxito';
+
+  @override
+  String get typeSelNote => 'Nota';
+
+  @override
+  String get typeSelTotp => 'TOTP';
+
+  @override
+  String get typeSelPasskey => 'Passkey';
+
+  @override
+  String get genRegenerate => 'Regenerar';
+
+  @override
+  String genLength(int n) {
+    return 'Longitud: $n';
+  }
+
+  @override
+  String get genGeneratedPassword => 'Contraseña generada';
+
+  @override
+  String get genUseAndCopy => 'Usar y Copiar';
+
+  @override
+  String get strengthWeak => 'Débil';
+
+  @override
+  String get strengthFair => 'Regular';
+
+  @override
+  String get strengthGood => 'Buena';
+
+  @override
+  String get strengthStrong => 'Fuerte';
+
+  @override
+  String clipboardCopiedClears(String label, int seconds) {
+    return '$label copiado · se limpia en ${seconds}s';
+  }
+
+  @override
+  String get passwordRowGeneratorTooltip => 'Generador de claves';
+
+  @override
+  String get keyboardSpace => 'Espacio';
 }

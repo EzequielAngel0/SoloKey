@@ -7,6 +7,7 @@ import 'package:otp/otp.dart';
 import '../../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../../core/utils/auth_helper.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
 import '../../../../theme/app_palette.dart';
@@ -41,6 +42,7 @@ class CredentialCard extends ConsumerWidget {
 
   void _showOptionsSheet(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: palette.drawer,
@@ -65,7 +67,7 @@ class CredentialCard extends ConsumerWidget {
                   color: palette.warning,
                 ),
                 title: Text(
-                  credential.isFavorite ? 'Quitar de favoritas' : 'Añadir a favoritas',
+                  credential.isFavorite ? l10n.detailRemoveFavorite : l10n.detailAddFavorite,
                   style: TextStyle(color: palette.textPrimary),
                 ),
                 onTap: () {
@@ -78,12 +80,12 @@ class CredentialCard extends ConsumerWidget {
               if (credential.username != null)
                 ListTile(
                   leading: Icon(Icons.copy_rounded, color: palette.textPrimary),
-                  title: Text('Copiar Usuario', style: TextStyle(color: palette.textPrimary)),
+                  title: Text(l10n.cardCopyUser, style: TextStyle(color: palette.textPrimary)),
                   onTap: () async {
                     Navigator.pop(context);
                     await showClipboardCountdownSnackBar(
                       context: context,
-                      label: 'Usuario',
+                      label: l10n.fieldUsername,
                       value: credential.username!,
                     );
                   },
@@ -91,26 +93,26 @@ class CredentialCard extends ConsumerWidget {
               if (credential.password != null && credential.type != CredentialType.totp)
                 ListTile(
                   leading: Icon(Icons.password_rounded, color: palette.textPrimary),
-                  title: Text('Copiar Contraseña', style: TextStyle(color: palette.textPrimary)),
+                  title: Text(l10n.cardCopyPassword, style: TextStyle(color: palette.textPrimary)),
                   onTap: () async {
                     Navigator.pop(context);
                     final auth = await AuthHelper.requireAuth(
                       context,
-                      reason: 'Autentícate para copiar la contraseña',
+                      reason: l10n.cardCopyPasswordAuthReason,
                     );
                     if (!auth) return;
                     if (!context.mounted) return;
 
                     await showClipboardCountdownSnackBar(
                       context: context,
-                      label: 'Contraseña',
+                      label: l10n.fieldPassword,
                       value: credential.password!,
                     );
                   },
                 ),
               ListTile(
                 leading: Icon(Icons.drive_file_move_rounded, color: palette.textPrimary),
-                title: Text('Mover a carpeta', style: TextStyle(color: palette.textPrimary)),
+                title: Text(l10n.cardMoveToFolder, style: TextStyle(color: palette.textPrimary)),
                 onTap: () {
                   Navigator.pop(context);
                   _moveFolder(context, ref);
@@ -118,7 +120,7 @@ class CredentialCard extends ConsumerWidget {
               ),
               ListTile(
                 leading: Icon(Icons.edit_rounded, color: palette.textPrimary),
-                title: Text('Editar', style: TextStyle(color: palette.textPrimary)),
+                title: Text(l10n.commonEdit, style: TextStyle(color: palette.textPrimary)),
                 onTap: () {
                   Navigator.pop(context);
                   if (ResponsiveLayout.isDesktop(context)) {
@@ -132,20 +134,20 @@ class CredentialCard extends ConsumerWidget {
               Divider(color: palette.divider),
               ListTile(
                 leading: Icon(Icons.delete_rounded, color: palette.danger),
-                title: Text('Eliminar', style: TextStyle(color: palette.danger)),
+                title: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
                 onTap: () async {
                   Navigator.pop(context);
                   final confirm = await showDialog<bool>(
                     context: context,
                     builder: (_) => AlertDialog(
                       backgroundColor: palette.drawer,
-                      title: Text('Eliminar credencial', style: TextStyle(color: palette.textPrimary)),
-                      content: Text('¿Eliminar "${credential.title}"? Esta acción no se puede deshacer.', style: TextStyle(color: palette.textMuted)),
+                      title: Text(l10n.detailDeleteTitle, style: TextStyle(color: palette.textPrimary)),
+                      content: Text(l10n.detailDeleteBody(credential.title), style: TextStyle(color: palette.textMuted)),
                       actions: [
-                        TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
+                        TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
                         TextButton(
                           onPressed: () => Navigator.pop(context, true),
-                          child: Text('Eliminar', style: TextStyle(color: palette.danger)),
+                          child: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
                         ),
                       ],
                     ),
@@ -171,6 +173,7 @@ class CredentialCard extends ConsumerWidget {
 
   Future<void> _moveFolder(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
 
     final newCategoryId = await showModalBottomSheet<String?>(
@@ -181,11 +184,11 @@ class CredentialCard extends ConsumerWidget {
         children: [
           Padding(
             padding: const EdgeInsets.all(16.0),
-            child: Text('Mover a carpeta', style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(l10n.cardMoveToFolder, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           ListTile(
             leading: Icon(Icons.all_inbox_rounded, color: palette.textPrimary),
-            title: Text('Sin carpeta', style: TextStyle(color: palette.textPrimary)),
+            title: Text(l10n.cardNoFolder, style: TextStyle(color: palette.textPrimary)),
             onTap: () => Navigator.pop(context, ''), // empty means null
           ),
           Divider(color: palette.divider),
@@ -213,7 +216,7 @@ class CredentialCard extends ConsumerWidget {
       await ref.read(credentialsNotifierProvider.notifier).save(updated);
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: const Text('Credencial movida con éxito'),
+          content: Text(l10n.cardMovedSuccess),
           backgroundColor: palette.success,
           duration: const Duration(seconds: 2),
         ));
@@ -224,6 +227,7 @@ class CredentialCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final icon = _typeIcons[credential.type] ?? Icons.lock_rounded;
     final color = credentialTypeColor(credential.type, palette);
 
@@ -236,19 +240,19 @@ class CredentialCard extends ConsumerWidget {
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: palette.drawer,
-            title: Text('Eliminar credencial', style: TextStyle(color: palette.textPrimary)),
+            title: Text(l10n.detailDeleteTitle, style: TextStyle(color: palette.textPrimary)),
             content: Text(
-              '¿Eliminar "${credential.title}"? Esta acción no se puede deshacer.',
+              l10n.detailDeleteBody(credential.title),
               style: TextStyle(color: palette.textMuted),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: Text(l10n.commonCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: Text('Eliminar', style: TextStyle(color: palette.danger)),
+                child: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
               ),
             ],
           ),
@@ -371,6 +375,9 @@ class _TotpVisualizer extends StatefulWidget {
 }
 
 class _TotpVisualizerState extends State<_TotpVisualizer> {
+  // Internal sentinel for an unparseable secret; rendered as a localized label.
+  static const _kError = '__error__';
+
   late Timer _timer;
   String _code = '--- ---';
   double _progress = 1.0;
@@ -412,16 +419,16 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
         });
       }
     } catch (_) {
-      if (mounted) setState(() => _code = 'Error');
+      if (mounted) setState(() => _code = _kError);
     }
   }
 
   Future<void> _quickCopy(BuildContext context) async {
-    if (_code == 'Error' || _code == '--- ---') return;
+    if (_code == _kError || _code == '--- ---') return;
     final cleanCode = _code.replaceAll(' ', '');
     await showClipboardCountdownSnackBar(
       context: context,
-      label: 'Código TOTP',
+      label: AppLocalizations.of(context).totpClipboardLabel,
       value: cleanCode,
     );
   }
@@ -429,6 +436,8 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final displayCode =
+        _code == _kError ? AppLocalizations.of(context).totpInvalid : _code;
     return Container(
       margin: const EdgeInsets.only(left: 8),
       padding: const EdgeInsets.fromLTRB(10, 4, 0, 4),
@@ -440,7 +449,7 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
         mainAxisSize: MainAxisSize.min,
         children: [
           Text(
-            _code,
+            displayCode,
             style: TextStyle(
               color: palette.textPrimary,
               fontSize: 13,

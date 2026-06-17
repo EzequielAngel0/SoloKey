@@ -395,5 +395,41 @@
   "favoritesEmptyDesc": "Star folders or credentials",
   "favoritesFoldersHeader": "Favourite folders",
   "favoritesCredentialsHeader": "Favourite credentials",
-  "favoriteToggleLabel": "Mark as favourite"
+  "favoriteToggleLabel": "Mark as favourite",
+
+  "commonEdit": "Edit",
+  "cardCopyUser": "Copy username",
+  "cardCopyPassword": "Copy password",
+  "cardCopyPasswordAuthReason": "Authenticate to copy the password",
+  "cardMoveToFolder": "Move to folder",
+  "cardNoFolder": "No folder",
+  "cardMovedSuccess": "Credential moved successfully",
+
+  "typeSelNote": "Note",
+  "typeSelTotp": "TOTP",
+  "typeSelPasskey": "Passkey",
+
+  "genRegenerate": "Regenerate",
+  "genLength": "Length: {n}",
+  "@genLength": {
+    "placeholders": { "n": { "type": "int" } }
+  },
+  "genGeneratedPassword": "Generated password",
+  "genUseAndCopy": "Use & copy",
+
+  "strengthWeak": "Weak",
+  "strengthFair": "Fair",
+  "strengthGood": "Good",
+  "strengthStrong": "Strong",
+
+  "clipboardCopiedClears": "{label} copied · clears in {seconds}s",
+  "@clipboardCopiedClears": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "seconds": { "type": "int" }
+    }
+  },
+
+  "passwordRowGeneratorTooltip": "Key generator",
+  "keyboardSpace": "Space"
 }
