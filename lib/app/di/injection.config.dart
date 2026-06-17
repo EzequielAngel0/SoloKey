@@ -28,6 +28,7 @@ import '../../core/infrastructure/security/security_service_impl.dart'
 import '../../core/infrastructure/security/session_manager.dart' as _i795;
 import '../../core/services/autofill_service.dart' as _i923;
 import '../../core/services/biometric_auth_service.dart' as _i455;
+import '../../core/services/csv_import_service.dart' as _i764;
 import '../../core/services/recovery_service.dart' as _i323;
 import '../../core/services/security_audit_service.dart' as _i400;
 import '../../core/services/vault_export_service.dart' as _i332;
@@ -142,6 +143,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i400.SecurityAuditService>(
       () => _i400.SecurityAuditService(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i764.CsvImportService>(
+      () => _i764.CsvImportService(gh<_i366.ICredentialRepository>()),
     );
     gh.lazySingleton<_i885.ClipboardService>(
       () => _i885.ClipboardService(gh<_i657.ISettingsRepository>()),
