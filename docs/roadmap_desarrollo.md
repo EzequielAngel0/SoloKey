@@ -194,6 +194,13 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 - ✅ **SSH (`ssh_key_generator_service.dart`)**: `Ed25519().newKeyPair()` (CSPRNG del paquete `cryptography`); `Random.secure()` solo para el `checkint` (no secreto). **Correcto, sin cambios.**
 - ✅ **Sync (`sync_service.dart`)**: E2EE real — X25519 ECDH + token QR fuera de banda → `K_sync = SHA-256(shared‖token)`; autenticación mutua HMAC-SHA256; mensajes AES-256-GCM; buffers zeroeados. `ws://` es aceptable porque el payload ya va cifrado. **Se conserva**; única mejora pendiente: el WiFi-unlock (sección 5).
+- ✅ **Multi-dispositivo en sync (2026-06-17):** el servidor de escritorio usaba una
+  sola `_syncKey` (emparejar un segundo celular sobreescribía al primero). Ahora cada
+  conexión WebSocket tiene su propia clave (`_ServerPeer`), por lo que **varios celulares
+  pueden emparejarse y sincronizar a la vez** escaneando el mismo QR (cada keypair móvil
+  produce un `K_sync` distinto). El escritorio muestra la **lista de dispositivos
+  conectados** con estado en vivo (Conectado / Sincronizando… / Sincronizado); el móvil
+  envía `device_id` + `device_name` al emparejar; identidades persistidas en `solokey_sync_devices`.
 - ✅ **Bugfix sync — re-cifrado en tránsito (2026-06-17):** el flujo previo "adoptaba el `MasterKeyConfig`" del escritorio (su salt) en el móvil, y transfería los `encrypted_payload` tal cual. Como cada dispositivo genera un salt aleatorio en su setup, `K_movil ≠ K_escritorio` aun con la misma contraseña → al adoptar el salt ajeno, las credenciales propias del móvil quedaban indescifrables (`SecretBox wrong MAC` al desbloquear tras sync). **Fix:** se eliminó la adopción del config y ahora `DeltaSyncManager` **re-cifra cada payload**: lo descifra con la master key local antes de enviar (viaja como `payload_plain` dentro del canal ya cifrado con `K_sync`) y lo re-cifra con la master key local al recibir. Además, `CredentialRepositoryImpl` ahora **tolera filas que no descifran** al listar (una credencial corrupta ya no bloquea todo el desbloqueo).
 - ⬜ **Passkeys**: hoy `PasskeyMetadata` + handle en el campo password, **sin firma WebAuthn real**. Reetiquetar en UI como "respaldo de passkey" (`TypeBadge`, `CredentialCard`, `TypeSelector`, `passkeys_screen`) hasta integrar Credential Manager (Fase 12).
 
