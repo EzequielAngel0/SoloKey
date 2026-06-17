@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../app/di/injection.dart';
-import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../shared/widgets/clipboard_countdown.dart';
 import '../application/password_history_provider.dart';
 
 class PasswordHistoryScreen extends ConsumerWidget {
@@ -85,20 +84,13 @@ class PasswordHistoryScreen extends ConsumerWidget {
                       onPressed: () async {
                         final auth = await AuthHelper.requireAuth(context);
                         if (!auth) return;
+                        if (!context.mounted) return;
 
-                        final seconds = await getIt<ClipboardService>()
-                            .copySecure(entry.password);
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                  'Contraseña copiada · se limpia en ${seconds}s'),
-                              behavior: SnackBarBehavior.floating,
-                              duration: const Duration(seconds: 2),
-                              backgroundColor: const Color(0xFF6C63FF),
-                            ),
-                          );
-                        }
+                        await showClipboardCountdownSnackBar(
+                          context: context,
+                          label: 'Contraseña histórica',
+                          value: entry.password,
+                        );
                       },
                     ),
                   ],

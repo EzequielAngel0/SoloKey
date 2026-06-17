@@ -3,14 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
-import '../../../app/di/injection.dart';
-import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/copy_feedback_button.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../application/credentials_provider.dart';
 import '../domain/entities/credential.dart';
 import '../../../core/utils/auth_helper.dart';
+import '../../../shared/widgets/clipboard_countdown.dart';
 
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
@@ -245,19 +244,13 @@ class _SecretTileState extends State<_SecretTile> {
       final auth = await AuthHelper.requireAuth(context);
       if (!auth) return;
     }
+    if (!context.mounted) return;
 
-    final seconds =
-        await getIt<ClipboardService>().copySecure(widget.value);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('${widget.label} copiado · se limpia en ${seconds}s'),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          backgroundColor: const Color(0xFF6C63FF),
-        ),
-      );
-    }
+    await showClipboardCountdownSnackBar(
+      context: context,
+      label: widget.label,
+      value: widget.value,
+    );
   }
 
   @override
@@ -399,19 +392,14 @@ class _TotpTileState extends State<_TotpTile> {
     
     final auth = await AuthHelper.requireAuth(context);
     if (!auth) return;
+    if (!context.mounted) return;
 
     final cleanCode = _code.replaceAll(' ', '');
-    final seconds = await getIt<ClipboardService>().copySecure(cleanCode);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Código TOTP copiado · se limpia en ${seconds}s'),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          backgroundColor: const Color(0xFFE91E8C),
-        ),
-      );
-    }
+    await showClipboardCountdownSnackBar(
+      context: context,
+      label: 'Código TOTP',
+      value: cleanCode,
+    );
   }
 
   @override

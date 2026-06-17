@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../app/di/injection.dart';
-import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../core/services/recovery_service.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../shared/widgets/clipboard_countdown.dart';
 
 /// Recovery Step 1: Enter recovery code → unlock.
 /// Recovery Step 2: Set new master password.
@@ -339,17 +339,11 @@ class RecoveryCodeDisplay extends StatelessWidget {
               onPressed: () async {
                 // SEC-001: Usar ClipboardService para que el código de
                 // recuperación se limpie automáticamente del portapapeles.
-                await getIt<ClipboardService>().copySecure(code);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text(
-                        'Código copiado — se limpia automáticamente del portapapeles',
-                      ),
-                      behavior: SnackBarBehavior.floating,
-                    ),
-                  );
-                }
+                await showClipboardCountdownSnackBar(
+                  context: context,
+                  label: 'Código de recuperación',
+                  value: code,
+                );
               },
               icon: const Icon(Icons.copy_rounded),
               label: const Text('Copiar código'),

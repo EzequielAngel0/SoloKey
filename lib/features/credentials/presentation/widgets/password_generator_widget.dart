@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-import '../../../../app/di/injection.dart';
-import '../../../../core/infrastructure/clipboard/clipboard_service.dart';
+import '../../../../shared/widgets/clipboard_countdown.dart';
 
 import '../../../../features/password_generator/application/password_generator_provider.dart';
 import '../../../../shared/widgets/password_strength_indicator.dart';
@@ -128,21 +126,12 @@ class PasswordGeneratorWidget extends ConsumerWidget {
           // ── Apply Button ─────────────────────────────────────────────
           ElevatedButton.icon(
             onPressed: () async {
-              final seconds =
-                  await getIt<ClipboardService>().copySecure(password);
+              await showClipboardCountdownSnackBar(
+                context: context,
+                label: 'Contraseña generada',
+                value: password,
+              );
               onApplyPassword(password);
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                      'Copiada · se limpiará en ${seconds}s',
-                    ),
-                    duration: const Duration(seconds: 2),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: const Color(0xFF6C63FF),
-                  ),
-                );
-              }
             },
             icon: const Icon(Icons.check_rounded, size: 18),
             label: const Text('Usar y Copiar'),

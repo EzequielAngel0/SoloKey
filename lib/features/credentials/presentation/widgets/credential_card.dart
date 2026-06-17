@@ -4,10 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
-
-import '../../../../app/di/injection.dart';
-import '../../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../../core/utils/auth_helper.dart';
+import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
 import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
@@ -76,14 +74,11 @@ class CredentialCard extends ConsumerWidget {
               title: const Text('Copiar Usuario', style: TextStyle(color: Colors.white)),
               onTap: () async {
                 Navigator.pop(context);
-                final seconds = await getIt<ClipboardService>().copySecure(credential.username!);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Usuario copiado · se limpia en ${seconds}s'),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: const Color(0xFF6C63FF),
-                  ));
-                }
+                await showClipboardCountdownSnackBar(
+                  context: context,
+                  label: 'Usuario',
+                  value: credential.username!,
+                );
               },
             ),
           if (credential.password != null && credential.type != CredentialType.totp)
@@ -97,15 +92,13 @@ class CredentialCard extends ConsumerWidget {
                   reason: 'Autentícate para copiar la contraseña',
                 );
                 if (!auth) return;
+                if (!context.mounted) return;
 
-                final seconds = await getIt<ClipboardService>().copySecure(credential.password!);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                    content: Text('Contraseña copiada · se limpia en ${seconds}s'),
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: const Color(0xFF6C63FF),
-                  ));
-                }
+                await showClipboardCountdownSnackBar(
+                  context: context,
+                  label: 'Contraseña',
+                  value: credential.password!,
+                );
               },
             ),
           ListTile(
@@ -388,17 +381,11 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
   Future<void> _quickCopy(BuildContext context) async {
     if (_code == 'Error' || _code == '--- ---') return;
     final cleanCode = _code.replaceAll(' ', '');
-    final seconds = await getIt<ClipboardService>().copySecure(cleanCode);
-    if (context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('TOTP copiado · se limpia en ${seconds}s'),
-          behavior: SnackBarBehavior.floating,
-          duration: const Duration(seconds: 2),
-          backgroundColor: const Color(0xFFE91E8C),
-        ),
-      );
-    }
+    await showClipboardCountdownSnackBar(
+      context: context,
+      label: 'Código TOTP',
+      value: cleanCode,
+    );
   }
 
   @override
