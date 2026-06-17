@@ -8,6 +8,7 @@ import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
 import '../../../features/folders/application/folders_provider.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -177,18 +178,19 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   }
 
   Future<bool> _confirmReplace() async {
+    final palette = context.palette;
     return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
-            backgroundColor: const Color(0xFF1A1A2E),
-            title: const Text(
+            backgroundColor: palette.drawer,
+            title: Text(
               '¿Sobrescribir bóveda?',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: palette.textPrimary),
             ),
-            content: const Text(
+            content: Text(
               'Esta acción eliminará TODAS las credenciales actuales y las '
               'reemplazará con las del archivo. Esta operación no se puede deshacer.',
-              style: TextStyle(color: Color(0xFF9E9EBF)),
+              style: TextStyle(color: palette.textMuted),
             ),
             actions: [
               TextButton(
@@ -197,9 +199,9 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
-                child: const Text(
+                child: Text(
                   'Sobrescribir',
-                  style: TextStyle(color: Color(0xFFCF6679)),
+                  style: TextStyle(color: palette.danger),
                 ),
               ),
             ],
@@ -210,11 +212,11 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
+    final palette = context.palette;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor:
-            error ? const Color(0xFFCF6679) : const Color(0xFF4CAF50),
+        backgroundColor: error ? palette.danger : palette.success,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -224,14 +226,15 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Scaffold(
       appBar: VaultAppBar(
         title: 'Transferir datos',
         bottom: TabBar(
           controller: _tabController,
-          indicatorColor: const Color(0xFF6C63FF),
-          labelColor: Colors.white,
-          unselectedLabelColor: const Color(0xFF5C5C7A),
+          indicatorColor: palette.accent,
+          labelColor: palette.textPrimary,
+          unselectedLabelColor: palette.textDisabled,
           tabs: const [
             Tab(icon: Icon(Icons.upload_rounded), text: 'Exportar'),
             Tab(icon: Icon(Icons.download_rounded), text: 'Importar'),
@@ -297,15 +300,16 @@ class _ExportTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         // ── Export password ──────────────────────────────────────────────────
-        _SectionLabel(label: 'Contraseña de exportación'),
+        const _SectionLabel(label: 'Contraseña de exportación'),
         const SizedBox(height: 8),
         _InfoBanner(
           icon: Icons.info_outline_rounded,
-          color: const Color(0xFF6C63FF),
+          color: palette.accent,
           text: 'Crea una contraseña para proteger este backup. '
               'Necesitarás ingresarla al importar en cualquier dispositivo.',
         ),
@@ -319,7 +323,7 @@ class _ExportTab extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Type filter ──────────────────────────────────────────────────────
-        _SectionLabel(label: 'Selecciona qué exportar'),
+        const _SectionLabel(label: 'Selecciona qué exportar'),
         const SizedBox(height: 8),
         _Card(
           children: CredentialType.values
@@ -329,11 +333,11 @@ class _ExportTab extends StatelessWidget {
                   onChanged: (v) => onTypeToggled(t, v ?? false),
                   title: Text(
                     typeLabel(t),
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 14),
                   ),
-                  secondary: Icon(typeIcon(t), color: const Color(0xFF6C63FF)),
-                  activeColor: const Color(0xFF6C63FF),
-                  checkColor: Colors.white,
+                  secondary: Icon(typeIcon(t), color: palette.accent),
+                  activeColor: palette.accent,
+                  checkColor: palette.onPrimary,
                   controlAffinity: ListTileControlAffinity.trailing,
                 ),
               )
@@ -343,15 +347,15 @@ class _ExportTab extends StatelessWidget {
         const SizedBox(height: 20),
         _InfoBanner(
           icon: Icons.lock_rounded,
-          color: const Color(0xFF4CAF50),
+          color: palette.success,
           text: 'El archivo se cifra con AES-256-GCM + Argon2id. '
               'Solo quién conozca la contraseña de exportación puede abrirlo.',
         ),
         const SizedBox(height: 24),
 
         if (isLoading)
-          const Center(
-            child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+          Center(
+            child: CircularProgressIndicator(color: palette.accent),
           )
         else
           ElevatedButton.icon(
@@ -367,7 +371,7 @@ class _ExportTab extends StatelessWidget {
           const SizedBox(height: 16),
           _ResultCard(
             icon: Icons.check_circle_rounded,
-            color: const Color(0xFF4CAF50),
+            color: palette.success,
             title: 'Exportación completada',
             subtitle: '${lastSummary!.totalCredentials} credenciales · '
                 '${lastSummary!.totalFolders} carpetas',
@@ -401,15 +405,16 @@ class _ImportTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         // ── Export password ──────────────────────────────────────────────────
-        _SectionLabel(label: 'Contraseña del backup'),
+        const _SectionLabel(label: 'Contraseña del backup'),
         const SizedBox(height: 8),
         _InfoBanner(
           icon: Icons.key_rounded,
-          color: const Color(0xFF6C63FF),
+          color: palette.accent,
           text: 'Ingresa la contraseña que usaste al exportar el backup. '
               'Si importas un backup tuyo del mismo dispositivo puedes '
               'dejar este campo vacío.',
@@ -424,7 +429,7 @@ class _ImportTab extends StatelessWidget {
         const SizedBox(height: 24),
 
         // ── Mode ─────────────────────────────────────────────────────────────
-        _SectionLabel(label: 'Modo de importación'),
+        const _SectionLabel(label: 'Modo de importación'),
         const SizedBox(height: 8),
         _Card(
           children: [
@@ -432,29 +437,29 @@ class _ImportTab extends StatelessWidget {
               value: ImportMode.merge,
               groupValue: mode,
               onChanged: onModeChanged,
-              activeColor: const Color(0xFF6C63FF),
-              title: const Text(
+              activeColor: palette.accent,
+              title: Text(
                 'Combinar',
-                style: TextStyle(color: Colors.white, fontSize: 14),
+                style: TextStyle(color: palette.textPrimary, fontSize: 14),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Añadir sin borrar tus credenciales actuales',
-                style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
             ),
-            const Divider(height: 1, indent: 48, color: Color(0xFF2A2A4A)),
+            Divider(height: 1, indent: 48, color: palette.divider),
             _RadioTile<ImportMode>(
               value: ImportMode.replace,
               groupValue: mode,
               onChanged: onModeChanged,
-              activeColor: const Color(0xFFCF6679),
-              title: const Text(
+              activeColor: palette.danger,
+              title: Text(
                 'Sobrescribir',
-                style: TextStyle(color: Color(0xFFCF6679), fontSize: 14),
+                style: TextStyle(color: palette.danger, fontSize: 14),
               ),
-              subtitle: const Text(
+              subtitle: Text(
                 'Borrará todo y reemplazará con el archivo',
-                style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
             ),
           ],
@@ -462,8 +467,8 @@ class _ImportTab extends StatelessWidget {
 
         const SizedBox(height: 24),
         if (isLoading)
-          const Center(
-            child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+          Center(
+            child: CircularProgressIndicator(color: palette.accent),
           )
         else ...[
           ElevatedButton.icon(
@@ -477,11 +482,11 @@ class _ImportTab extends StatelessWidget {
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: onImportCsv,
-            icon: const Icon(Icons.description_rounded, color: Color(0xFF03DAC6)),
-            label: const Text('Importar desde CSV (Bitwarden/Chrome/1Pass)', style: TextStyle(color: Color(0xFF03DAC6))),
+            icon: Icon(Icons.description_rounded, color: palette.secondary),
+            label: Text('Importar desde CSV (Bitwarden/Chrome/1Pass)', style: TextStyle(color: palette.secondary)),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
-              side: const BorderSide(color: Color(0xFF03DAC6)),
+              side: BorderSide(color: palette.secondary),
             ),
           ),
         ],
@@ -493,8 +498,8 @@ class _ImportTab extends StatelessWidget {
                 ? Icons.check_circle_rounded
                 : Icons.error_rounded,
             color: lastResult!.success
-                ? const Color(0xFF4CAF50)
-                : const Color(0xFFCF6679),
+                ? palette.success
+                : palette.danger,
             title:
                 lastResult!.success ? 'Importación completada' : 'Error',
             subtitle: lastResult!.message,
@@ -527,18 +532,19 @@ class _PasswordFieldState extends State<_PasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return TextField(
       controller: widget.controller,
       obscureText: _obscure,
-      style: const TextStyle(color: Colors.white),
+      style: TextStyle(color: palette.textPrimary),
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,
-        hintStyle: const TextStyle(color: Color(0xFF5C5C7A), fontSize: 12),
+        hintStyle: TextStyle(color: palette.textDisabled, fontSize: 12),
         suffixIcon: IconButton(
           icon: Icon(
             _obscure ? Icons.visibility_rounded : Icons.visibility_off_rounded,
-            color: const Color(0xFF9E9EBF),
+            color: palette.textMuted,
             size: 20,
           ),
           onPressed: () => setState(() => _obscure = !_obscure),
@@ -584,7 +590,7 @@ class _RadioTile<T> extends StatelessWidget {
                 shape: BoxShape.circle,
                 border: Border.all(
                   color:
-                      _selected ? activeColor : const Color(0xFF5C5C7A),
+                      _selected ? activeColor : context.palette.textDisabled,
                   width: 2,
                 ),
               ),
@@ -607,7 +613,7 @@ class _RadioTile<T> extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   title,
-                  if (subtitle != null) subtitle!,
+                  ?subtitle,
                 ],
               ),
             ),
@@ -626,8 +632,8 @@ class _SectionLabel extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label.toUpperCase(),
-      style: const TextStyle(
-        color: Color(0xFF9E9EBF),
+      style: TextStyle(
+        color: context.palette.textMuted,
         fontSize: 11,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.2,
@@ -644,7 +650,7 @@ class _Card extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: context.palette.card,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),
@@ -656,7 +662,7 @@ class _InfoBanner extends StatelessWidget {
   const _InfoBanner({
     required this.icon,
     required this.text,
-    this.color = const Color(0xFF6C63FF),
+    required this.color,
   });
   final IconData icon;
   final String text;
@@ -678,8 +684,8 @@ class _InfoBanner extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              style: const TextStyle(
-                color: Color(0xFF9E9EBF),
+              style: TextStyle(
+                color: context.palette.textMuted,
                 fontSize: 12,
                 height: 1.4,
               ),
@@ -731,8 +737,8 @@ class _ResultCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   subtitle,
-                  style: const TextStyle(
-                    color: Color(0xFF9E9EBF),
+                  style: TextStyle(
+                    color: context.palette.textMuted,
                     fontSize: 12,
                   ),
                 ),

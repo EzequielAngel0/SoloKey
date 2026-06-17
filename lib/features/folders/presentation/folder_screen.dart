@@ -8,6 +8,7 @@ import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../credentials/application/credentials_provider.dart';
 import '../../credentials/presentation/widgets/credential_card.dart';
+import '../../../theme/app_palette.dart';
 import '../application/folders_provider.dart';
 import '../domain/entities/folder.dart';
 
@@ -15,25 +16,26 @@ class FolderScreen extends ConsumerWidget {
   const FolderScreen({super.key, required this.folderId});
   final String folderId;
 
-  Color _hexToColor(String hex) {
+  Color _hexToColor(BuildContext context, String hex) {
     try {
       return Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
     } catch (_) {
-      return const Color(0xFF6C63FF);
+      return context.palette.accent;
     }
   }
 
   Future<void> _createSubfolder(BuildContext context, WidgetRef ref) async {
+    final palette = context.palette;
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Nueva subcarpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Nueva subcarpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(
             labelText: 'Nombre de la carpeta',
           ),
@@ -50,20 +52,21 @@ class FolderScreen extends ConsumerWidget {
   }
 
   Future<void> _deleteFolder(BuildContext context, WidgetRef ref, Folder folder) async {
+    final palette = context.palette;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Eliminar carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Eliminar carpeta', style: TextStyle(color: palette.textPrimary)),
         content: Text(
           '¿Eliminar "${folder.name}"? Sus credenciales quedarán huérfanas o movidas a la raíz.',
-          style: const TextStyle(color: Color(0xFF9E9EBF)),
+          style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar', style: TextStyle(color: Color(0xFFCF6679))),
+            child: Text('Eliminar', style: TextStyle(color: palette.danger)),
           ),
         ],
       ),
@@ -76,46 +79,47 @@ class FolderScreen extends ConsumerWidget {
         } else {
           context.pop();
         }
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Carpeta eliminada'),
-          backgroundColor: Color(0xFF4CAF50),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Carpeta eliminada'),
+          backgroundColor: palette.success,
         ));
       }
     }
   }
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder subFolder) {
+    final palette = context.palette;
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
+      backgroundColor: palette.drawer,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) => Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(subFolder.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+            child: Text(subFolder.name, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
           ),
           ListTile(
-            leading: Icon(subFolder.isFavorite ? Icons.star_border_rounded : Icons.star_rounded, color: const Color(0xFFFFB74D)),
-            title: Text(subFolder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas', style: const TextStyle(color: Colors.white)),
+            leading: Icon(subFolder.isFavorite ? Icons.star_border_rounded : Icons.star_rounded, color: palette.warning),
+            title: Text(subFolder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas', style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               ref.read(foldersNotifierProvider.notifier).toggleFavorite(subFolder.id);
             },
           ),
           ListTile(
-            leading: const Icon(Icons.drive_file_rename_outline_rounded, color: Colors.white),
-            title: const Text('Renombrar', style: TextStyle(color: Colors.white)),
+            leading: Icon(Icons.drive_file_rename_outline_rounded, color: palette.textPrimary),
+            title: Text('Renombrar', style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               _renameFolder(context, ref, subFolder);
             },
           ),
-          const Divider(color: Color(0xFF2A2A4A)),
+          Divider(color: palette.divider),
           ListTile(
-            leading: const Icon(Icons.delete_rounded, color: Color(0xFFCF6679)),
-            title: const Text('Eliminar', style: TextStyle(color: Color(0xFFCF6679))),
+            leading: Icon(Icons.delete_rounded, color: palette.danger),
+            title: Text('Eliminar', style: TextStyle(color: palette.danger)),
             onTap: () async {
               Navigator.pop(context);
               _deleteFolder(context, ref, subFolder);
@@ -128,16 +132,17 @@ class FolderScreen extends ConsumerWidget {
   }
 
   Future<void> _renameFolder(BuildContext context, WidgetRef ref, Folder folder) async {
+    final palette = context.palette;
     final ctrl = TextEditingController(text: folder.name);
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Renombrar carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Renombrar carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(labelText: 'Nuevo nombre'),
         ),
         actions: [
@@ -153,6 +158,7 @@ class FolderScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final foldersAsync = ref.watch(foldersNotifierProvider);
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
 
@@ -160,9 +166,9 @@ class FolderScreen extends ConsumerWidget {
     final currentFolder = folders.where((f) => f.id == folderId).firstOrNull;
 
     if (currentFolder == null) {
-      return const Scaffold(
-        appBar: VaultAppBar(title: 'Cargando...'),
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF))),
+      return Scaffold(
+        appBar: const VaultAppBar(title: 'Cargando...'),
+        body: Center(child: CircularProgressIndicator(color: palette.accent)),
       );
     }
 
@@ -177,18 +183,18 @@ class FolderScreen extends ConsumerWidget {
           IconButton(
             icon: Icon(
               currentFolder.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
-              color: const Color(0xFFFFB74D),
+              color: palette.warning,
             ),
             tooltip: currentFolder.isFavorite ? 'Quitar de favoritas' : 'Añadir a favoritas',
             onPressed: () => ref.read(foldersNotifierProvider.notifier).toggleFavorite(currentFolder.id),
           ),
           IconButton(
-            icon: const Icon(Icons.create_new_folder_outlined, color: Colors.white),
+            icon: Icon(Icons.create_new_folder_outlined, color: palette.textPrimary),
             tooltip: 'Crear subcarpeta',
             onPressed: () => _createSubfolder(context, ref),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFCF6679)),
+            icon: Icon(Icons.delete_outline_rounded, color: palette.danger),
             tooltip: 'Eliminar carpeta',
             onPressed: () => _deleteFolder(context, ref, currentFolder),
           ),
@@ -202,12 +208,12 @@ class FolderScreen extends ConsumerWidget {
             context.push(AppRoutes.credentialCreate);
           }
         },
-        backgroundColor: const Color(0xFF6C63FF),
-        child: const Icon(Icons.add_rounded, color: Colors.white),
+        backgroundColor: palette.accent,
+        child: Icon(Icons.add_rounded, color: palette.onPrimary),
       ),
       body: RefreshIndicator(
-        color: const Color(0xFF6C63FF),
-        backgroundColor: const Color(0xFF1A1A2E),
+        color: palette.accent,
+        backgroundColor: palette.drawer,
         onRefresh: () async {
           await ref.read(credentialsNotifierProvider.notifier).refresh();
         },
@@ -216,14 +222,14 @@ class FolderScreen extends ConsumerWidget {
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
                   SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                  const Center(
+                  Center(
                     child: Column(
                       children: [
-                        Icon(Icons.folder_open_rounded, size: 72, color: Color(0xFF2A2A4A)),
-                        SizedBox(height: 20),
-                        Text('Carpeta Vacía', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                        SizedBox(height: 8),
-                        Text('No hay subcarpetas ni credenciales aquí.', style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14)),
+                        Icon(Icons.folder_open_rounded, size: 72, color: palette.divider),
+                        const SizedBox(height: 20),
+                        Text('Carpeta Vacía', style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
+                        const SizedBox(height: 8),
+                        Text('No hay subcarpetas ni credenciales aquí.', style: TextStyle(color: palette.textMuted, fontSize: 14)),
                       ],
                     ),
                   ),
@@ -245,20 +251,20 @@ class FolderScreen extends ConsumerWidget {
                             }
                           },
                           onLongPress: () => _showFolderOptionsSheet(context, ref, f),
-                          tileColor: const Color(0xFF16213E),
+                          tileColor: palette.card,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           leading: Icon(
-                            f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, 
-                            color: _hexToColor(f.colorHex)
+                            f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded,
+                            color: _hexToColor(context, f.colorHex)
                           ),
-                          title: Text(f.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                          trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF5C5C7A)),
+                          title: Text(f.name, style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500)),
+                          trailing: Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
                         ),
                       )),
                   if (subFolders.isNotEmpty && subCredentials.isNotEmpty)
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      child: Divider(color: Color(0xFF2A2A4A)),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      child: Divider(color: palette.divider),
                     ),
                   ...subCredentials.map((c) => Padding(
                         padding: const EdgeInsets.only(bottom: 10),

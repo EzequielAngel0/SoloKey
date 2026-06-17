@@ -9,6 +9,7 @@ import '../../../app/di/injection.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../core/services/biometric_auth_service.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 import '../../credentials/presentation/qr_scanner_screen.dart';
 import '../application/pairing_notifier.dart';
 import '../infrastructure/sync_service.dart';
@@ -114,6 +115,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final state = ref.watch(pairingNotifierProvider);
 
     return Center(
@@ -122,9 +124,9 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
         margin: const EdgeInsets.all(24),
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
-          color: const Color(0xFF161622),
+          color: palette.card,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFF222232)),
+          border: Border.all(color: palette.divider),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -133,17 +135,17 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               if (_hasPairingKey) ...[
                 _buildDesktopConnectedSection(state),
               ] else ...[
-                const Icon(Icons.sync_rounded, size: 64, color: Color(0xFF39FF14)),
+                Icon(Icons.sync_rounded, size: 64, color: palette.primary),
                 const SizedBox(height: 20),
-                const Text(
+                Text(
                   'Vincular con App Móvil',
-                  style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                  style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
-                const Text(
+                Text(
                   'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13, height: 1.4),
+                  style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
                 ),
                 const SizedBox(height: 28),
                 ElevatedButton.icon(
@@ -153,19 +155,19 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 ),
               ],
             ] else if (state.status == PairingStatus.loading) ...[
-              const CircularProgressIndicator(color: Color(0xFF39FF14)),
+              CircularProgressIndicator(color: palette.primary),
               const SizedBox(height: 20),
-              const Text('Iniciando servidor local...', style: TextStyle(color: Colors.white70)),
+              Text('Iniciando servidor local...', style: TextStyle(color: palette.textMuted)),
             ] else if (state.status == PairingStatus.serverReady && state.payload != null) ...[
-              const Text(
+              Text(
                 'Escanea este código QR',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Abre SoloKey en tu móvil, ve a Sincronizar y escanea este código.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 12),
+                style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
               const SizedBox(height: 24),
               // QR Code container with light background to make it scannable
@@ -185,33 +187,33 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               const SizedBox(height: 20),
               Text(
                 'IP: ${state.payload!.ip}  ·  Puerto: ${state.payload!.port}',
-                style: const TextStyle(color: Color(0xFF5C5C7A), fontSize: 12, fontWeight: FontWeight.w500),
+                style: TextStyle(color: palette.textDisabled, fontSize: 12, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 24),
               OutlinedButton.icon(
                 onPressed: () => ref.read(pairingNotifierProvider.notifier).stopDesktopServer(),
-                icon: const Icon(Icons.close_rounded, color: Color(0xFFFF3366)),
-                label: const Text('Cancelar', style: TextStyle(color: Color(0xFFFF3366))),
+                icon: Icon(Icons.close_rounded, color: palette.error),
+                label: Text('Cancelar', style: TextStyle(color: palette.error)),
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFFF3366)),
+                  side: BorderSide(color: palette.error),
                 ),
               ),
             ] else if (state.status == PairingStatus.connecting) ...[
-              const CircularProgressIndicator(color: Color(0xFF39FF14)),
+              CircularProgressIndicator(color: palette.primary),
               const SizedBox(height: 20),
-              const Text('Conectando con el dispositivo móvil...', style: TextStyle(color: Colors.white70)),
+              Text('Conectando con el dispositivo móvil...', style: TextStyle(color: palette.textMuted)),
             ] else if (state.status == PairingStatus.paired) ...[
-              const Icon(Icons.check_circle_rounded, size: 64, color: Color(0xFF39FF14)),
+              Icon(Icons.check_circle_rounded, size: 64, color: palette.primary),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 '¡Vinculado Exitosamente!',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
-              const Text(
+              Text(
                 'Los dispositivos ahora están enlazados de forma segura.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13),
+                style: TextStyle(color: palette.textMuted, fontSize: 13),
               ),
               const SizedBox(height: 28),
               ElevatedButton(
@@ -219,17 +221,17 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 child: const Text('Entendido'),
               ),
             ] else if (state.status == PairingStatus.failed) ...[
-              const Icon(Icons.error_outline_rounded, size: 64, color: Color(0xFFFF3366)),
+              Icon(Icons.error_outline_rounded, size: 64, color: palette.error),
               const SizedBox(height: 20),
-              const Text(
+              Text(
                 'Error de Vinculación',
-                style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
                 state.errorMessage ?? 'Ocurrió un error inesperado.',
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Color(0xFF8E8E9F), fontSize: 13),
+                style: TextStyle(color: palette.textMuted, fontSize: 13),
               ),
               const SizedBox(height: 28),
               ElevatedButton(
@@ -244,20 +246,21 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   }
 
   Widget _buildDesktopConnectedSection(PairingState state) {
+    final palette = context.palette;
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const Icon(Icons.check_circle_rounded, size: 64, color: Color(0xFF39FF14)),
+        Icon(Icons.check_circle_rounded, size: 64, color: palette.primary),
         const SizedBox(height: 20),
-        const Text(
+        Text(
           'Computadora Vinculada',
-          style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        const Text(
+        Text(
           'Esta computadora está emparejada de forma segura con tu dispositivo móvil.',
           textAlign: TextAlign.center,
-          style: TextStyle(color: Color(0xFF8E8E9F), fontSize: 13, height: 1.4),
+          style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
         ),
         const SizedBox(height: 24),
 
@@ -265,9 +268,9 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF1F1F30),
+            color: palette.surface,
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFF2A2A40)),
+            border: Border.all(color: palette.divider),
           ),
           child: Column(
             children: [
@@ -277,12 +280,12 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                   Container(
                     width: 10,
                     height: 10,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF39FF14),
+                    decoration: BoxDecoration(
+                      color: palette.primary,
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Color(0xFF39FF14),
+                          color: palette.primary,
                           blurRadius: 8,
                           spreadRadius: 1,
                         )
@@ -290,9 +293,9 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text(
+                  Text(
                     'Servidor local E2EE Activo',
-                    style: TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.bold),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -301,7 +304,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 Text(
                   _serverStatusMessage!,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF39FF14), fontSize: 12, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: palette.primary, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ],
             ],
@@ -322,10 +325,10 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 });
                 ref.read(pairingNotifierProvider.notifier).reset();
               },
-              icon: const Icon(Icons.delete_outline_rounded, color: Color(0xFFFF3366)),
-              label: const Text('Eliminar Vínculo', style: TextStyle(color: Color(0xFFFF3366))),
+              icon: Icon(Icons.delete_outline_rounded, color: palette.error),
+              label: Text('Eliminar Vínculo', style: TextStyle(color: palette.error)),
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFFF3366)),
+                side: BorderSide(color: palette.error),
               ),
             ),
             const SizedBox(width: 16),
@@ -336,8 +339,8 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               icon: const Icon(Icons.qr_code_rounded),
               label: const Text('Mostrar QR'),
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFF39FF14),
-                foregroundColor: const Color(0xFF0C0C14),
+                backgroundColor: palette.primary,
+                foregroundColor: palette.background,
               ),
             ),
           ],
@@ -485,6 +488,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final state = ref.watch(pairingNotifierProvider);
 
     return Center(
@@ -494,17 +498,17 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (state.status == PairingStatus.idle) ...[
-              const Icon(Icons.sync_rounded, size: 72, color: Color(0xFF6C63FF)),
+              Icon(Icons.sync_rounded, size: 72, color: palette.accent),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Vincular Computadora',
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Escanea el código QR generado por la aplicación SoloKey en tu computadora para sincronizar los datos locales.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14, height: 1.4),
+                style: TextStyle(color: palette.textMuted, fontSize: 14, height: 1.4),
               ),
               const SizedBox(height: 36),
               ElevatedButton.icon(
@@ -512,7 +516,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                 icon: const Icon(Icons.qr_code_scanner_rounded),
                 label: const Text('Escanear Código QR'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6C63FF),
+                  backgroundColor: palette.accent,
                   minimumSize: const Size(240, 54),
                 ),
               ),
@@ -520,31 +524,31 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
               // ── WiFi Unlock Button ──────────────────────────────────────
               if (_hasPairingKey) ...[
                 const SizedBox(height: 32),
-                const Divider(color: Color(0xFF2A2A4A), height: 1),
+                Divider(color: palette.divider, height: 1),
                 const SizedBox(height: 28),
                 _buildSyncSection(),
                 const SizedBox(height: 24),
                 _buildWifiUnlockSection(),
               ],
             ] else if (state.status == PairingStatus.connecting) ...[
-              const CircularProgressIndicator(color: Color(0xFF6C63FF)),
+              CircularProgressIndicator(color: palette.accent),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Negociando claves de encriptación...',
-                style: TextStyle(color: Colors.white70, fontSize: 15),
+                style: TextStyle(color: palette.textMuted, fontSize: 15),
               ),
             ] else if (state.status == PairingStatus.paired) ...[
-              const Icon(Icons.check_circle_rounded, size: 72, color: Color(0xFF4CAF50)),
+              Icon(Icons.check_circle_rounded, size: 72, color: palette.success),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 '¡Computadora Vinculada!',
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
-              const Text(
+              Text(
                 'Los datos ahora se sincronizarán de forma segura entre dispositivos.',
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14),
+                style: TextStyle(color: palette.textMuted, fontSize: 14),
               ),
               const SizedBox(height: 36),
               ElevatedButton(
@@ -553,17 +557,17 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                   _checkPairingKey();
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF4CAF50),
+                  backgroundColor: palette.success,
                   minimumSize: const Size(200, 50),
                 ),
                 child: const Text('Volver'),
               ),
             ] else if (state.status == PairingStatus.failed) ...[
-              const Icon(Icons.error_outline_rounded, size: 72, color: Color(0xFFCF6679)),
+              Icon(Icons.error_outline_rounded, size: 72, color: palette.danger),
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Error de Vinculación',
-                style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+                style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Padding(
@@ -571,14 +575,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                 child: Text(
                   state.errorMessage ?? 'No se pudo conectar con la computadora.',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(color: Color(0xFF9E9EBF), fontSize: 14),
+                  style: TextStyle(color: palette.textMuted, fontSize: 14),
                 ),
               ),
               const SizedBox(height: 36),
               ElevatedButton(
                 onPressed: _scanQr,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFCF6679),
+                  backgroundColor: palette.danger,
                   minimumSize: const Size(200, 50),
                 ),
                 child: const Text('Volver a Intentar'),
@@ -591,13 +595,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   }
 
   Widget _buildWifiUnlockSection() {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161622),
+        color: palette.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFF39FF14).withValues(alpha: 0.2),
+          color: palette.primary.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -606,29 +611,29 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF39FF14).withValues(alpha: 0.1),
+              color: palette.primary.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.wifi_rounded,
-              color: Color(0xFF39FF14),
+              color: palette.primary,
               size: 32,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Desbloqueo Remoto',
             style: TextStyle(
-              color: Colors.white,
+              color: palette.textPrimary,
               fontSize: 17,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Desbloquea la bóveda de tu computadora usando la biometría de este dispositivo.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 13, height: 1.3),
+            style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.3),
           ),
           const SizedBox(height: 20),
 
@@ -641,8 +646,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: _isSendingUnlock
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -650,14 +655,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            color: Color(0xFF39FF14),
+                            color: palette.primary,
                             strokeWidth: 2,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Text(
                           'Enviando...',
-                          style: TextStyle(color: Color(0xFF39FF14), fontSize: 14),
+                          style: TextStyle(color: palette.primary, fontSize: 14),
                         ),
                       ],
                     ),
@@ -667,8 +672,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                     icon: const Icon(Icons.lock_open_rounded),
                     label: const Text('Desbloquear Computadora'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF39FF14),
-                      foregroundColor: const Color(0xFF0C0C14),
+                      backgroundColor: palette.primary,
+                      foregroundColor: palette.background,
                       minimumSize: const Size(240, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -682,6 +687,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   }
 
   Widget _buildUnlockResultBanner() {
+    final palette = context.palette;
     late final IconData icon;
     late final Color color;
     late final String message;
@@ -689,24 +695,24 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
     switch (_unlockResult) {
       case 'sent':
         icon = Icons.check_circle_rounded;
-        color = const Color(0xFF4CAF50);
+        color = palette.success;
         message = '¡Solicitud enviada! La bóveda debería desbloquearse.';
         break;
       case 'auth_cancelled':
         icon = Icons.fingerprint_rounded;
-        color = const Color(0xFF9E9EBF);
+        color = palette.textMuted;
         message = 'Autenticación biométrica cancelada.';
         break;
       case 'no_password':
         icon = Icons.warning_amber_rounded;
-        color = const Color(0xFFFF9800);
+        color = palette.warning;
         message = 'Activa el bloqueo biométrico primero en Ajustes.';
         break;
       case 'failed':
       case 'error':
       default:
         icon = Icons.error_outline_rounded;
-        color = const Color(0xFFCF6679);
+        color = palette.danger;
         message = 'No se pudo conectar con la computadora.';
         break;
     }
@@ -734,13 +740,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   }
 
   Widget _buildSyncSection() {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF161622),
+        color: palette.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: const Color(0xFF6C63FF).withValues(alpha: 0.2),
+          color: palette.accent.withValues(alpha: 0.2),
         ),
       ),
       child: Column(
@@ -749,29 +756,29 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF6C63FF).withValues(alpha: 0.1),
+              color: palette.accent.withValues(alpha: 0.1),
               shape: BoxShape.circle,
             ),
-            child: const Icon(
+            child: Icon(
               Icons.sync_alt_rounded,
-              color: Color(0xFF6C63FF),
+              color: palette.accent,
               size: 32,
             ),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Sincronizar Bóveda',
             style: TextStyle(
-              color: Colors.white,
+              color: palette.textPrimary,
               fontSize: 17,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Intercambia y actualiza tus credenciales bidireccionalmente en red local.',
             textAlign: TextAlign.center,
-            style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 13, height: 1.3),
+            style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.3),
           ),
           const SizedBox(height: 20),
 
@@ -779,25 +786,25 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: (_syncStatusMessage!.startsWith('Error') 
-                    ? const Color(0xFFCF6679) 
-                    : const Color(0xFF6C63FF)).withValues(alpha: 0.1),
+                color: (_syncStatusMessage!.startsWith('Error')
+                    ? palette.danger
+                    : palette.accent).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: (_syncStatusMessage!.startsWith('Error') 
-                      ? const Color(0xFFCF6679) 
-                      : const Color(0xFF6C63FF)).withValues(alpha: 0.3),
+                  color: (_syncStatusMessage!.startsWith('Error')
+                      ? palette.danger
+                      : palette.accent).withValues(alpha: 0.3),
                 ),
               ),
               child: Row(
                 children: [
                   Icon(
-                    _syncStatusMessage!.startsWith('Error') 
-                        ? Icons.error_outline_rounded 
+                    _syncStatusMessage!.startsWith('Error')
+                        ? Icons.error_outline_rounded
                         : (_syncStatusMessage!.startsWith('¡Sincronización') ? Icons.check_circle_rounded : Icons.sync_rounded),
-                    color: _syncStatusMessage!.startsWith('Error') 
-                        ? const Color(0xFFCF6679) 
-                        : (_syncStatusMessage!.startsWith('¡Sincronización') ? const Color(0xFF4CAF50) : const Color(0xFF6C63FF)),
+                    color: _syncStatusMessage!.startsWith('Error')
+                        ? palette.danger
+                        : (_syncStatusMessage!.startsWith('¡Sincronización') ? palette.success : palette.accent),
                     size: 20,
                   ),
                   const SizedBox(width: 10),
@@ -805,9 +812,9 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                     child: Text(
                       _syncStatusMessage!,
                       style: TextStyle(
-                        color: _syncStatusMessage!.startsWith('Error') 
-                            ? const Color(0xFFCF6679) 
-                            : (_syncStatusMessage!.startsWith('¡Sincronización') ? const Color(0xFF4CAF50) : Colors.white70),
+                        color: _syncStatusMessage!.startsWith('Error')
+                            ? palette.danger
+                            : (_syncStatusMessage!.startsWith('¡Sincronización') ? palette.success : palette.textMuted),
                         fontSize: 12,
                         height: 1.3,
                       ),
@@ -822,8 +829,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           AnimatedSwitcher(
             duration: const Duration(milliseconds: 200),
             child: _isSyncing
-                ? const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
+                ? Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -831,14 +838,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                           width: 20,
                           height: 20,
                           child: CircularProgressIndicator(
-                            color: Color(0xFF6C63FF),
+                            color: palette.accent,
                             strokeWidth: 2,
                           ),
                         ),
-                        SizedBox(width: 12),
+                        const SizedBox(width: 12),
                         Text(
                           'Sincronizando...',
-                          style: TextStyle(color: Color(0xFF6C63FF), fontSize: 14),
+                          style: TextStyle(color: palette.accent, fontSize: 14),
                         ),
                       ],
                     ),
@@ -881,8 +888,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                     icon: const Icon(Icons.sync_rounded),
                     label: const Text('Sincronizar Bóveda'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6C63FF),
-                      foregroundColor: Colors.white,
+                      backgroundColor: palette.accent,
+                      foregroundColor: palette.onPrimary,
                       minimumSize: const Size(240, 50),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
