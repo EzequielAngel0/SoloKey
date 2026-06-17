@@ -28,7 +28,6 @@ import '../../core/infrastructure/security/i_security_service.dart' as _i1023;
 import '../../core/infrastructure/security/security_service_impl.dart'
     as _i1063;
 import '../../core/infrastructure/security/session_manager.dart' as _i795;
-import '../../core/services/autofill_service.dart' as _i923;
 import '../../core/services/biometric_auth_service.dart' as _i455;
 import '../../core/services/brute_force_guard.dart' as _i714;
 import '../../core/services/csv_import_service.dart' as _i764;
@@ -38,6 +37,10 @@ import '../../core/services/scheduled_backup_service.dart' as _i1009;
 import '../../core/services/security_audit_service.dart' as _i400;
 import '../../core/services/ssh_key_generator_service.dart' as _i972;
 import '../../core/services/vault_export_service.dart' as _i332;
+import '../../features/autofill/infrastructure/autofill_fetch_service.dart'
+    as _i1059;
+import '../../features/autofill/infrastructure/autofill_settings_service.dart'
+    as _i479;
 import '../../features/credentials/application/credential_use_cases.dart'
     as _i472;
 import '../../features/credentials/domain/repositories/i_credential_repository.dart'
@@ -78,14 +81,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.secureStorage,
     );
     gh.lazySingleton<_i795.SessionManager>(() => _i795.SessionManager());
-    gh.lazySingleton<_i923.AutofillSettingsService>(
-      () => _i923.AutofillSettingsService(),
-    );
     gh.lazySingleton<_i455.BiometricAuthService>(
       () => _i455.BiometricAuthService(),
     );
     gh.lazySingleton<_i972.SshKeyGeneratorService>(
       () => _i972.SshKeyGeneratorService(),
+    );
+    gh.lazySingleton<_i479.AutofillSettingsService>(
+      () => _i479.AutofillSettingsService(),
     );
     gh.lazySingleton<_i1023.ISecurityService>(
       () => _i1063.SecurityServiceImpl(),
@@ -158,8 +161,8 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i558.FlutterSecureStorage>(),
       ),
     );
-    gh.lazySingleton<_i923.AutofillQueryHandler>(
-      () => _i923.AutofillQueryHandler(
+    gh.lazySingleton<_i1059.AutofillFetchService>(
+      () => _i1059.AutofillFetchService(
         gh<_i366.ICredentialRepository>(),
         gh<_i795.SessionManager>(),
       ),

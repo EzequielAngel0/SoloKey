@@ -62,6 +62,18 @@
                 android:resource="@xml/autofill_service_config" />
         </service>
 
+        <!--
+            Biometric-gated unlock + fetch for autofill. Launched only by the
+            AutofillService's authentication IntentSender; not exported.
+            Transparent theme: shows just the system biometric prompt.
+        -->
+        <activity
+            android:name=".AutofillAuthActivity"
+            android:exported="false"
+            android:theme="@style/Theme.SoloKey.Transparent"
+            android:excludeFromRecents="true"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" />
+
     </application>
 
     <!-- Required to query activities that can process text, see:

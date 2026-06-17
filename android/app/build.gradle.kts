@@ -48,4 +48,8 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
     implementation("androidx.credentials:credentials:1.2.2")
     implementation("androidx.credentials:credentials-play-services-auth:1.2.2")
+    // Inline autofill suggestions (chips inside the keyboard, Android 11+).
+    implementation("androidx.autofill:autofill:1.1.0")
+    // Biometric gate before injecting credentials into the target field.
+    implementation("androidx.biometric:biometric:1.1.0")
 }

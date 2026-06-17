@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:local_notifier/local_notifier.dart';
@@ -15,7 +16,10 @@ import 'package:workmanager/workmanager.dart';
 import 'app/app.dart';
 import 'app/di/injection.dart';
 import 'app/di/provider_overrides.dart';
+import 'core/services/notification_navigation.dart';
 import 'core/services/notification_service.dart';
+import 'features/autofill/infrastructure/autofill_fetch_service.dart';
+import 'router/app_router.dart';
 
 /// WorkManager background entry point (Android). Runs in its own isolate, so it
 /// opens a fresh DB handle and notifies without GetIt or the master key.
@@ -27,6 +31,32 @@ void callbackDispatcher() {
     DartPluginRegistrant.ensureInitialized();
     await runBackgroundRotationCheck();
     return true;
+  });
+}
+
+/// Dedicated Dart entry point for the Android autofill flow. Launched by the
+/// native `AutofillAuthActivity` in a short-lived headless FlutterEngine AFTER
+/// the user passes biometric auth. It exposes the `com.solokey/autofill` channel
+/// so the native side can fetch the decrypted credential matches for the caller
+/// app. The engine is destroyed by the activity once it has the result.
+@pragma('vm:entry-point')
+void autofillEntrypoint() {
+  WidgetsFlutterBinding.ensureInitialized();
+  // Headless isolate: plugins (secure storage, sqlite) need explicit registration.
+  DartPluginRegistrant.ensureInitialized();
+
+  // Register the channel handler synchronously to avoid a missing-handler race
+  // with the native invoke; DI readiness is awaited inside each call.
+  final ready = configureDependencies();
+  const channel = MethodChannel('com.solokey/autofill');
+  channel.setMethodCallHandler((call) async {
+    if (call.method != 'fetchMatches') return const <Map<String, String>>[];
+    await ready;
+    final args = (call.arguments as Map?) ?? const {};
+    return getIt<AutofillFetchService>().fetchMatches(
+      package: (args['package'] as String?) ?? '',
+      domain: (args['domain'] as String?) ?? '',
+    );
   });
 }
 
@@ -103,6 +133,28 @@ Future<void> main(List<String> args) async {
           );
         } catch (_) {
           // El hotkey es best-effort; no debe impedir el arranque.
+        }
+
+        // Quick-Fill (Ctrl+Shift+L): trae SoloKey al frente y abre el overlay
+        // de autocompletado rapido para copiar credenciales hacia otra app.
+        // Es el equivalente de escritorio al autofill del SO (que no existe
+        // fuera de Android). Si la boveda esta bloqueada, el guard del router
+        // redirige a /unlock primero.
+        try {
+          await hotKeyManager.register(
+            HotKey(
+              key: PhysicalKeyboardKey.keyL,
+              modifiers: [HotKeyModifier.control, HotKeyModifier.shift],
+              scope: HotKeyScope.system,
+            ),
+            keyDownHandler: (_) async {
+              await windowManager.show();
+              await windowManager.focus();
+              rootNavigatorKey.currentContext?.go(AppRoutes.quickFill);
+            },
+          );
+        } catch (_) {
+          // best-effort; no debe impedir el arranque.
         }
       }
 

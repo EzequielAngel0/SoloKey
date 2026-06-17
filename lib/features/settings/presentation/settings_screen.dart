@@ -218,11 +218,81 @@ class _SettingsBody extends StatelessWidget {
             ),
           ],
         ),
+        if (isDesktop) ...[
+          const SizedBox(height: 24),
+          const _SectionHeader(label: 'Autocompletado rápido'),
+          const SizedBox(height: 8),
+          const _SettingsCard(
+            children: [_QuickFillInfoTile()],
+          ),
+        ],
         const SizedBox(height: 32),
         _DataManagementSection(),
         const SizedBox(height: 32),
         _DangerZone(),
       ],
+    );
+  }
+}
+
+/// Desktop-only card explaining the global Quick-Fill hotkey. Desktop OSes have
+/// no system autofill, so SoloKey offers a hotkey-driven copy-to-clipboard flow.
+class _QuickFillInfoTile extends StatelessWidget {
+  const _QuickFillInfoTile();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.bolt_rounded, color: palette.accent, size: 22),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Pulsa el atajo desde cualquier app para abrir SoloKey y copiar '
+                  'usuario/contraseña al portapapeles (se limpia solo).',
+                  style: TextStyle(color: palette.textMuted, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: palette.cardDark,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: palette.divider),
+                ),
+                child: Text(
+                  'Ctrl + Shift + L',
+                  style: TextStyle(
+                    color: palette.textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+              const Spacer(),
+              TextButton.icon(
+                onPressed: () => context.push(AppRoutes.quickFill),
+                icon: const Icon(Icons.open_in_new_rounded, size: 16),
+                label: const Text('Probar ahora'),
+                style: TextButton.styleFrom(foregroundColor: palette.accent),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }

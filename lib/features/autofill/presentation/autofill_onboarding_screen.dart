@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/di/injection.dart';
-import '../../../core/services/autofill_service.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
+import '../infrastructure/autofill_settings_service.dart';
 
 /// Onboarding screen that guides the user through activating SoloKey
 /// as the system Autofill provider in Android settings.
@@ -142,8 +142,8 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
               ),
               const SizedBox(height: 10),
               const _FeatureChip(
-                icon: Icons.lock_rounded,
-                label: 'Solo funciona con la bóveda desbloqueada',
+                icon: Icons.fingerprint_rounded,
+                label: 'Pide tu huella antes de rellenar (biometría)',
               ),
               const SizedBox(height: 10),
               const _FeatureChip(

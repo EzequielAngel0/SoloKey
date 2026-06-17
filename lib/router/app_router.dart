@@ -8,8 +8,9 @@ import '../features/credentials/presentation/credential_form_screen.dart';
 import '../features/credentials/presentation/home_screen.dart';
 import '../features/credentials/presentation/password_history_screen.dart';
 import '../features/credentials/presentation/security_audit_screen.dart';
+import '../features/autofill/presentation/autofill_onboarding_screen.dart';
+import '../features/autofill/presentation/quick_fill_screen.dart';
 import '../features/passkeys/presentation/passkeys_screen.dart';
-import '../features/settings/presentation/autofill_onboarding_screen.dart';
 import '../features/vault_transfer/presentation/transfer_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
@@ -39,6 +40,7 @@ abstract final class AppRoutes {
   static const qrScanner           = '/qr-scanner';
   static const transfer            = '/transfer';
   static const autofillOnboarding  = '/autofill-onboarding';
+  static const quickFill           = '/quick-fill';
   static const passkeys            = '/passkeys';
   static const sync                = '/sync';
 }
@@ -84,6 +86,7 @@ class _RouterNotifier extends ChangeNotifier {
         loc.startsWith('/qr-scanner') ||
         loc.startsWith('/transfer') ||
         loc.startsWith('/autofill-onboarding') ||
+        loc.startsWith('/quick-fill') ||
         loc.startsWith('/sync');
 
     // Redirect to unlock if trying to access protected routes while locked
@@ -178,6 +181,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.autofillOnboarding,
         builder: (_, _) => const AutofillOnboardingScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.quickFill,
+        builder: (_, _) => const QuickFillScreen(),
       ),
       GoRoute(
         path: AppRoutes.passkeys,
