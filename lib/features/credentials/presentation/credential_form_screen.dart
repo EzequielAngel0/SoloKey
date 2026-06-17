@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../shared/extensions/color_extensions.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_colors.dart';
 import '../application/credentials_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/entities/credential.dart';
@@ -21,7 +24,8 @@ class CredentialFormScreen extends ConsumerStatefulWidget {
       _CredentialFormScreenState();
 }
 
-class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
+class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
+    with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
 
   // Shared controllers
@@ -50,9 +54,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
   bool _showGenerator = false;
   Credential? _existing;
 
+  late AnimationController _saveAnimCtrl;
+  late Animation<double> _saveScale;
+
   @override
   void initState() {
     super.initState();
+    _saveAnimCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 200),
+    );
+    _saveScale = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _saveAnimCtrl, curve: Curves.easeInOut),
+    );
     if (widget.existingId != null) _loadExisting();
   }
 
@@ -82,6 +96,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
 
   @override
   void dispose() {
+    _saveAnimCtrl.dispose();
     for (final c in [
       _titleCtrl, _notesCtrl, _usernameCtrl, _passwordCtrl, _websiteCtrl,
       _serviceCtrl, _apiKeyCtrl, _endpointCtrl, _scopesCtrl,
@@ -165,7 +180,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    await _saveAnimCtrl.forward();
+    await _saveAnimCtrl.reverse();
     setState(() => _isLoading = true);
+
     final credential = _buildCredential();
     try {
       if (_existing == null) {
@@ -173,13 +191,35 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
       } else {
         await ref.read(credentialsNotifierProvider.notifier).updateCredential(credential);
       }
-      if (mounted) context.pop();
+      HapticFeedback.mediumImpact();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text(
+                  _existing == null ? 'Credencial creada' : 'Cambios guardados',
+                  style: const TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+        context.pop();
+      }
     } catch (e) {
+      HapticFeedback.heavyImpact();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error: $e'),
-            backgroundColor: const Color(0xFFCF6679),
+            backgroundColor: AppColors.danger,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -226,12 +266,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
             _titleCtrl.text = Uri.decodeComponent(titleFromPath);
           }
         });
+        HapticFeedback.mediumImpact();
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Código QR escaneado con éxito'),
-            backgroundColor: Color(0xFF4CAF50),
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.qr_code_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 8),
+                Text('Código QR escaneado con éxito'),
+              ],
+            ),
+            backgroundColor: AppColors.success,
             behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       } else {
@@ -244,10 +292,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
 
   void _showError(String msg) {
     if (!mounted) return;
+    HapticFeedback.heavyImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: const Color(0xFFCF6679),
+        backgroundColor: AppColors.danger,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -256,307 +305,677 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen> {
   @override
   Widget build(BuildContext context) {
     final isEdit = _existing != null;
+    final typeColor = _typeColor(_type);
+
     return Scaffold(
       appBar: VaultAppBar(
         title: isEdit ? 'Editar credencial' : 'Nueva credencial',
+        actions: [
+          if (!_isLoading)
+            TextButton.icon(
+              onPressed: _save,
+              icon: const Icon(Icons.check_rounded, size: 18),
+              label: Text(
+                isEdit ? 'Guardar' : 'Crear',
+                style: const TextStyle(fontWeight: FontWeight.w600),
+              ),
+              style: TextButton.styleFrom(
+                foregroundColor: AppColors.primary,
+              ),
+            ),
+        ],
       ),
       body: Form(
         key: _formKey,
         child: ListView(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
           children: [
-            // ── Type selector ────────────────────────────────────────
-            _TypeSelector(
+            // ── Type selector (premium horizontal scroll) ──────────────
+            _TypeSelectorPremium(
               selected: _type,
+              isEditing: isEdit,
               onChanged: (t) => setState(() {
                 _type = t;
                 _showGenerator = false;
               }),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 24),
 
-            // ── Title (common) ───────────────────────────────────────
-            TextFormField(
-              controller: _titleCtrl,
-              style: const TextStyle(color: Colors.white),
-              decoration: const InputDecoration(labelText: 'Título *'),
-              validator: (v) =>
-                  v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+            // ── Header section: Title + Favorite ──────────────────────
+            _FormSection(
+              icon: Icons.badge_rounded,
+              accentColor: typeColor,
+              title: 'Identificación',
+              children: [
+                TextFormField(
+                  controller: _titleCtrl,
+                  style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
+                  decoration: InputDecoration(
+                    labelText: 'Título',
+                    hintText: _titleHint,
+                    prefixIcon: Icon(_typeIcon(_type), size: 18, color: typeColor.withValues(alpha: 0.7)),
+                  ),
+                  validator: (v) =>
+                      v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+                  textCapitalization: TextCapitalization.sentences,
+                ),
+                const SizedBox(height: 12),
+                _FavoriteToggle(
+                  value: _isFavorite,
+                  onChanged: (v) {
+                    HapticFeedback.selectionClick();
+                    setState(() => _isFavorite = v);
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
 
-            // ── Type-specific fields ─────────────────────────────────
+            // ── Type-specific fields ───────────────────────────────────
             _buildFieldsByType(),
 
-            // ── Notes (common except TOTP) ────────────────────────────
+            // ── Notes (common except TOTP) ─────────────────────────────
             if (_type != CredentialType.totp) ...[
-              const SizedBox(height: 14),
-              TextFormField(
-                controller: _notesCtrl,
-                style: const TextStyle(color: Colors.white),
-                maxLines: _type == CredentialType.secureNote ? 10 : 4,
-                decoration: InputDecoration(
-                  labelText: _type == CredentialType.secureNote
-                      ? 'Contenido *'
-                      : 'Notas',
-                  alignLabelWithHint: true,
-                ),
-                validator: _type == CredentialType.secureNote
-                    ? (v) => v == null || v.trim().isEmpty
-                        ? 'El contenido es requerido'
-                        : null
-                    : null,
+              const SizedBox(height: 16),
+              _FormSection(
+                icon: Icons.notes_rounded,
+                accentColor: typeColor,
+                title: _type == CredentialType.secureNote ? 'Contenido' : 'Notas',
+                children: [
+                  TextFormField(
+                    controller: _notesCtrl,
+                    style: const TextStyle(color: Colors.white),
+                    maxLines: _type == CredentialType.secureNote ? 10 : 4,
+                    decoration: InputDecoration(
+                      labelText: _type == CredentialType.secureNote
+                          ? 'Contenido seguro'
+                          : 'Notas adicionales',
+                      hintText: _type == CredentialType.secureNote
+                          ? 'Escribe tu nota privada aquí…'
+                          : 'Opcional — agregar contexto o recordatorios',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: _type == CredentialType.secureNote
+                        ? (v) => v == null || v.trim().isEmpty
+                            ? 'El contenido es requerido'
+                            : null
+                        : null,
+                  ),
+                ],
               ),
             ],
 
-            // ── Folder Picker ────────────────────────────────────────
-            const SizedBox(height: 14),
-            Consumer(
-              builder: (context, ref, _) {
-                final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
-                final currentFolder = folders.where((f) => f.id == _folderId).firstOrNull;
-                
-                return InkWell(
-                  onTap: () async {
-                    FocusScope.of(context).unfocus();
-                    final List<String?>? selection = await showModalBottomSheet<List<String?>>(
-                      context: context,
-                      isScrollControlled: true,
-                      backgroundColor: const Color(0xFF1A1A2E),
-                      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                      builder: (_) => _FolderPickerSheet(selectedFolderId: _folderId),
-                    );
-                    if (selection != null) {
-                      setState(() => _folderId = selection.first);
-                    }
-                  },
-                  borderRadius: BorderRadius.circular(12),
-                  child: InputDecorator(
-                    decoration: const InputDecoration(
-                      labelText: 'Carpeta',
-                      prefixIcon: Icon(Icons.folder_outlined, color: Color(0xFF9E9EBF)),
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          currentFolder?.name ?? 'Bóveda principal',
-                          style: TextStyle(
-                            color: currentFolder == null ? const Color(0xFF9E9EBF) : Colors.white,
-                          ),
+            // ── Folder Picker ───────────────────────────────────────────
+            const SizedBox(height: 16),
+            _FormSection(
+              icon: Icons.folder_rounded,
+              accentColor: AppColors.textMuted,
+              title: 'Organización',
+              children: [
+                Consumer(
+                  builder: (context, ref, _) {
+                    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+                    final currentFolder = folders.where((f) => f.id == _folderId).firstOrNull;
+                    
+                    return InkWell(
+                      onTap: () async {
+                        FocusScope.of(context).unfocus();
+                        final List<String?>? selection = await showModalBottomSheet<List<String?>>(
+                          context: context,
+                          isScrollControlled: true,
+                          backgroundColor: AppColors.drawer,
+                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+                          builder: (_) => _FolderPickerSheet(selectedFolderId: _folderId),
+                        );
+                        if (selection != null) {
+                          setState(() => _folderId = selection.first);
+                        }
+                      },
+                      borderRadius: BorderRadius.circular(12),
+                      child: InputDecorator(
+                        decoration: const InputDecoration(
+                          labelText: 'Carpeta',
+                          prefixIcon: Icon(Icons.folder_outlined, color: AppColors.textMuted),
                         ),
-                        const Icon(Icons.arrow_drop_down_rounded, color: Color(0xFF9E9EBF)),
-                      ],
-                    ),
-                  ),
-                );
-              },
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                currentFolder?.name ?? 'Bóveda principal',
+                                style: TextStyle(
+                                  color: currentFolder == null ? AppColors.textMuted : Colors.white,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const Icon(Icons.arrow_drop_down_rounded, color: AppColors.textMuted),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ],
             ),
 
-            // ── Favorite toggle ────────────────────────────────────
-            const SizedBox(height: 20),
-            _FavoriteToggle(
-              value: _isFavorite,
-              onChanged: (v) => setState(() => _isFavorite = v),
-            ),
             const SizedBox(height: 32),
 
-            // ── Save button ─────────────────────────────────────────
-            _isLoading
-                ? const Center(
-                    child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
-                  )
-                : ElevatedButton(
-                    onPressed: _save,
-                    child: Text(isEdit ? 'Guardar cambios' : 'Crear credencial'),
-                  ),
+            // ── Save button ─────────────────────────────────────────────
+            ScaleTransition(
+              scale: _saveScale,
+              child: _isLoading
+                  ? const Center(
+                      child: CircularProgressIndicator(color: AppColors.accent),
+                    )
+                  : _SaveButton(
+                      label: isEdit ? 'Guardar cambios' : 'Crear credencial',
+                      color: typeColor,
+                      onPressed: _save,
+                      icon: isEdit ? Icons.save_rounded : Icons.add_rounded,
+                    ),
+            ),
           ],
         ),
       ),
     );
   }
 
+  String get _titleHint => switch (_type) {
+    CredentialType.password   => 'ej. Netflix, GitHub, Gmail',
+    CredentialType.apiKey     => 'ej. OpenAI, Stripe, AWS',
+    CredentialType.secureNote => 'ej. Llaves del servidor, Seeds',
+    CredentialType.totp       => 'ej. GitHub 2FA, Google',
+    CredentialType.passkey    => 'ej. google.com Passkey',
+  };
+
+  IconData _typeIcon(CredentialType t) => switch (t) {
+    CredentialType.password   => Icons.lock_rounded,
+    CredentialType.apiKey     => Icons.key_rounded,
+    CredentialType.secureNote => Icons.note_rounded,
+    CredentialType.totp       => Icons.access_time_rounded,
+    CredentialType.passkey    => Icons.fingerprint_rounded,
+  };
+
+  Color _typeColor(CredentialType t) => switch (t) {
+    CredentialType.password   => AppColors.typePassword,
+    CredentialType.apiKey     => AppColors.typeApiKey,
+    CredentialType.secureNote => AppColors.typeNote,
+    CredentialType.totp       => AppColors.typeTotp,
+    CredentialType.passkey    => AppColors.typePasskey,
+  };
+
   Widget _buildFieldsByType() {
     return AnimatedSwitcher(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      transitionBuilder: (child, animation) => FadeTransition(
+        opacity: animation,
+        child: SlideTransition(
+          position: Tween<Offset>(
+            begin: const Offset(0, 0.05),
+            end: Offset.zero,
+          ).animate(animation),
+          child: child,
+        ),
+      ),
       child: KeyedSubtree(
         key: ValueKey(_type),
         child: switch (_type) {
-          CredentialType.password => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  controller: _usernameCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Usuario / Email',
-                    prefixIcon: Icon(Icons.person_outline_rounded,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                _PasswordRow(
-                  ctrl: _passwordCtrl,
-                  label: 'Contraseña',
-                  showGenerator: _showGenerator,
-                  onToggleGenerator: (v) => setState(() => _showGenerator = v),
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: _websiteCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  keyboardType: TextInputType.url,
-                  decoration: const InputDecoration(
-                    labelText: 'Sitio web / URL',
-                    prefixIcon: Icon(Icons.language_rounded,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                ),
-              ],
-            ),
-
-          CredentialType.apiKey => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                TextFormField(
-                  controller: _serviceCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Nombre del servicio *',
-                    prefixIcon: Icon(Icons.cloud_rounded,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 14),
-                _PasswordRow(
-                  ctrl: _apiKeyCtrl,
-                  label: 'API Key / Token *',
-                  showGenerator: _showGenerator,
-                  onToggleGenerator: (v) => setState(() => _showGenerator = v),
-                  validator: (v) =>
-                      v == null || v.isEmpty ? 'Campo requerido' : null,
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: _endpointCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  keyboardType: TextInputType.url,
-                  decoration: const InputDecoration(
-                    labelText: 'Endpoint URL (opcional)',
-                    prefixIcon: Icon(Icons.link_rounded,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: _scopesCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Permisos / Scopes (opcional)',
-                    hintText: 'read:user, write:repo…',
-                    prefixIcon: Icon(Icons.security_rounded,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                ),
-              ],
-            ),
-
+          CredentialType.password => _buildPasswordFields(),
+          CredentialType.apiKey   => _buildApiKeyFields(),
           CredentialType.secureNote => const SizedBox.shrink(),
+          CredentialType.totp     => _buildTotpFields(),
+          CredentialType.passkey  => _buildPasskeyInfo(),
+        },
+      ),
+    );
+  }
 
-          CredentialType.totp => Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE91E8C).withValues(alpha: 0.08),
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: const Color(0xFFE91E8C).withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: const Row(
-                    children: [
-                      Icon(Icons.info_outline_rounded,
-                          size: 16, color: Color(0xFFE91E8C)),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Text(
-                          'Ingresa la clave secreta TOTP (Base32) de tu cuenta. '
-                          'La encontrarás al activar 2FA en el sitio web.',
-                          style: TextStyle(
-                            color: Color(0xFFE91E8C),
-                            fontSize: 11,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 14),
-                ElevatedButton.icon(
-                  onPressed: _scanQr,
-                  icon: const Icon(Icons.qr_code_scanner_rounded),
-                  label: const Text('Escanear QR de cuenta'),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFE91E8C).withValues(alpha: 0.1),
-                    foregroundColor: const Color(0xFFE91E8C),
-                    elevation: 0,
-                    side: BorderSide(
-                      color: const Color(0xFFE91E8C).withValues(alpha: 0.3),
-                    ),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextFormField(
-                  controller: _totpIssuerCtrl,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: const InputDecoration(
-                    labelText: 'Cuenta / Emisor',
-                    hintText: 'ej. GitHub, Google, AWS',
-                    prefixIcon: Icon(Icons.account_circle_outlined,
-                        size: 18, color: Color(0xFF9E9EBF)),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                SecureTextField(
-                  controller: _totpSecretCtrl,
-                  label: 'Clave secreta TOTP *',
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Campo requerido' : null,
-                ),
-              ],
+  Widget _buildPasswordFields() {
+    return _FormSection(
+      icon: Icons.lock_rounded,
+      accentColor: AppColors.typePassword,
+      title: 'Credenciales de acceso',
+      children: [
+        TextFormField(
+          controller: _usernameCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'Usuario / Email',
+            hintText: 'usuario@ejemplo.com',
+            prefixIcon: Icon(Icons.person_outline_rounded, size: 18, color: AppColors.textMuted),
+          ),
+          keyboardType: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 14),
+        _PasswordRow(
+          ctrl: _passwordCtrl,
+          label: 'Contraseña',
+          showGenerator: _showGenerator,
+          onToggleGenerator: (v) => setState(() => _showGenerator = v),
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _websiteCtrl,
+          style: const TextStyle(color: Colors.white),
+          keyboardType: TextInputType.url,
+          decoration: const InputDecoration(
+            labelText: 'Sitio web / URL',
+            hintText: 'https://ejemplo.com',
+            prefixIcon: Icon(Icons.language_rounded, size: 18, color: AppColors.textMuted),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildApiKeyFields() {
+    return _FormSection(
+      icon: Icons.key_rounded,
+      accentColor: AppColors.typeApiKey,
+      title: 'Detalles de la API',
+      children: [
+        TextFormField(
+          controller: _serviceCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'Nombre del servicio',
+            hintText: 'ej. OpenAI, Stripe, Supabase',
+            prefixIcon: Icon(Icons.cloud_rounded, size: 18, color: AppColors.textMuted),
+          ),
+          validator: (v) =>
+              v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+        ),
+        const SizedBox(height: 14),
+        _PasswordRow(
+          ctrl: _apiKeyCtrl,
+          label: 'API Key / Token',
+          showGenerator: _showGenerator,
+          onToggleGenerator: (v) => setState(() => _showGenerator = v),
+          validator: (v) =>
+              v == null || v.isEmpty ? 'Campo requerido' : null,
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _endpointCtrl,
+          style: const TextStyle(color: Colors.white),
+          keyboardType: TextInputType.url,
+          decoration: const InputDecoration(
+            labelText: 'Endpoint URL',
+            hintText: 'https://api.example.com/v1',
+            prefixIcon: Icon(Icons.link_rounded, size: 18, color: AppColors.textMuted),
+          ),
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _scopesCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'Permisos / Scopes',
+            hintText: 'read:user, write:repo…',
+            prefixIcon: Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildTotpFields() {
+    return _FormSection(
+      icon: Icons.access_time_rounded,
+      accentColor: AppColors.typeTotp,
+      title: 'Configuración 2FA',
+      children: [
+        // Info banner
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.typeTotp.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(
+              color: AppColors.typeTotp.withValues(alpha: 0.2),
             ),
+          ),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Icon(Icons.info_outline_rounded, size: 16, color: AppColors.typeTotp.withValues(alpha: 0.8)),
+              const SizedBox(width: 10),
+              const Expanded(
+                child: Text(
+                  'Ingresa la clave secreta TOTP (Base32) de tu cuenta. '
+                  'La encontrarás al activar 2FA en el sitio web, '
+                  'o puedes escanear el código QR directamente.',
+                  style: TextStyle(
+                    color: AppColors.textMuted,
+                    fontSize: 12,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 16),
 
-          // Passkeys are platform-managed via FIDO2 — show read-only info
-          CredentialType.passkey => Container(
-              padding: const EdgeInsets.all(16),
+        // QR scan button — prominent
+        Material(
+          color: AppColors.typeTotp.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+          child: InkWell(
+            onTap: _scanQr,
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                  color: AppColors.typeTotp.withValues(alpha: 0.25),
                 ),
               ),
               child: const Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.fingerprint_rounded, color: Color(0xFF4CAF50), size: 20),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Las Passkeys se registran directamente con la plataforma '
-                      'FIDO2 del dispositivo. Usa la pantalla de Passkeys en '
-                      'Ajustes para registrar o gestionar tus passkeys.',
-                      style: TextStyle(color: Color(0xFF4CAF50), fontSize: 12, height: 1.5),
+                  Icon(Icons.qr_code_scanner_rounded, color: AppColors.typeTotp, size: 22),
+                  SizedBox(width: 10),
+                  Text(
+                    'Escanear código QR',
+                    style: TextStyle(
+                      color: AppColors.typeTotp,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
                 ],
               ),
             ),
+          ),
+        ),
+
+        const SizedBox(height: 16),
+        // Divider with "o"
+        Row(
+          children: [
+            Expanded(child: Divider(color: AppColors.divider.withValues(alpha: 0.5))),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text('o ingresa manualmente', style: TextStyle(color: AppColors.textDisabled, fontSize: 11)),
+            ),
+            Expanded(child: Divider(color: AppColors.divider.withValues(alpha: 0.5))),
+          ],
+        ),
+        const SizedBox(height: 16),
+
+        TextFormField(
+          controller: _totpIssuerCtrl,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'Cuenta / Emisor',
+            hintText: 'ej. GitHub, Google, AWS',
+            prefixIcon: Icon(Icons.account_circle_outlined, size: 18, color: AppColors.textMuted),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SecureTextField(
+          controller: _totpSecretCtrl,
+          label: 'Clave secreta TOTP (Base32)',
+          validator: (v) =>
+              v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPasskeyInfo() {
+    return _FormSection(
+      icon: Icons.fingerprint_rounded,
+      accentColor: AppColors.typePasskey,
+      title: 'Passkey (FIDO2)',
+      children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: AppColors.typePasskey.withValues(alpha: 0.06),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: AppColors.typePasskey.withValues(alpha: 0.2),
+            ),
+          ),
+          child: const Column(
+            children: [
+              Icon(Icons.fingerprint_rounded, color: AppColors.typePasskey, size: 32),
+              SizedBox(height: 12),
+              Text(
+                'Las Passkeys se registran directamente con la plataforma '
+                'FIDO2 del dispositivo.',
+                style: TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.5),
+                textAlign: TextAlign.center,
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Usa la pantalla de Passkeys en Ajustes para registrar o gestionar tus passkeys.',
+                style: TextStyle(color: AppColors.textDisabled, fontSize: 12, height: 1.4),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// ── Form Section wrapper — groups fields with visual identity ─────────────────
+
+class _FormSection extends StatelessWidget {
+  const _FormSection({
+    required this.icon,
+    required this.accentColor,
+    required this.title,
+    required this.children,
+  });
+
+  final IconData icon;
+  final Color accentColor;
+  final String title;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: accentColor.withValues(alpha: 0.12),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Section header
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: accentColor.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(icon, color: accentColor, size: 14),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                title.toUpperCase(),
+                style: TextStyle(
+                  color: accentColor.withValues(alpha: 0.8),
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...children,
+        ],
+      ),
+    );
+  }
+}
+
+// ── Save button with gradient ────────────────────────────────────────────────
+
+class _SaveButton extends StatelessWidget {
+  const _SaveButton({
+    required this.label,
+    required this.color,
+    required this.onPressed,
+    required this.icon,
+  });
+
+  final String label;
+  final Color color;
+  final VoidCallback onPressed;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(14),
+        gradient: LinearGradient(
+          colors: [color, color.withValues(alpha: 0.7)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: color.withValues(alpha: 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(14),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(icon, color: Colors.white, size: 20),
+                const SizedBox(width: 8),
+                Text(
+                  label,
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── Premium Type Selector ──────────────────────────────────────────────────────
+
+class _TypeSelectorPremium extends StatelessWidget {
+  const _TypeSelectorPremium({
+    required this.selected,
+    required this.onChanged,
+    this.isEditing = false,
+  });
+
+  final CredentialType selected;
+  final ValueChanged<CredentialType> onChanged;
+  final bool isEditing;
+
+  static const _items = [
+    (type: CredentialType.password,   label: 'Contraseña', icon: Icons.lock_rounded,          color: AppColors.typePassword),
+    (type: CredentialType.apiKey,     label: 'API Key',    icon: Icons.key_rounded,           color: AppColors.typeApiKey),
+    (type: CredentialType.secureNote, label: 'Nota',       icon: Icons.note_rounded,          color: AppColors.typeNote),
+    (type: CredentialType.totp,       label: 'TOTP',       icon: Icons.access_time_rounded,   color: AppColors.typeTotp),
+    (type: CredentialType.passkey,    label: 'Passkey',    icon: Icons.fingerprint_rounded,   color: AppColors.typePasskey),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 80,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: _items.length,
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemBuilder: (_, i) {
+          final item = _items[i];
+          final isSelected = item.type == selected;
+          final isDisabled = isEditing && item.type != selected;
+
+          return GestureDetector(
+            onTap: isDisabled ? null : () {
+              HapticFeedback.selectionClick();
+              onChanged(item.type);
+            },
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeOutCubic,
+              width: isSelected ? 100 : 72,
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? item.color.withValues(alpha: 0.15)
+                    : isDisabled
+                        ? AppColors.card.withValues(alpha: 0.5)
+                        : AppColors.card,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: isSelected ? item.color : Colors.transparent,
+                  width: isSelected ? 1.5 : 1,
+                ),
+                boxShadow: isSelected
+                    ? [BoxShadow(color: item.color.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 2))]
+                    : null,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  AnimatedScale(
+                    scale: isSelected ? 1.15 : 1.0,
+                    duration: const Duration(milliseconds: 200),
+                    child: Icon(
+                      item.icon,
+                      color: isSelected ? item.color : isDisabled ? AppColors.textDisabled : AppColors.textMuted,
+                      size: 22,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    item.label,
+                    style: TextStyle(
+                      color: isSelected ? item.color : isDisabled ? AppColors.textDisabled : AppColors.textMuted,
+                      fontSize: 10,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+            ),
+          );
         },
       ),
     );
@@ -600,18 +1019,24 @@ class _PasswordRow extends StatelessWidget {
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
                 color: showGenerator
-                    ? const Color(0xFF6C63FF).withValues(alpha: 0.2)
-                    : const Color(0xFF16213E),
+                    ? AppColors.accent.withValues(alpha: 0.2)
+                    : AppColors.card,
                 borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: showGenerator
+                      ? AppColors.accent.withValues(alpha: 0.5)
+                      : Colors.transparent,
+                ),
               ),
               child: IconButton(
                 icon: Icon(
                   Icons.auto_fix_high_rounded,
                   color: showGenerator
-                      ? const Color(0xFF6C63FF)
-                      : Colors.white54,
+                      ? AppColors.accent
+                      : AppColors.textMuted,
                 ),
                 onPressed: () {
+                  HapticFeedback.selectionClick();
                   FocusScope.of(context).unfocus();
                   onToggleGenerator(!showGenerator);
                 },
@@ -628,6 +1053,7 @@ class _PasswordRow extends StatelessWidget {
               ? PasswordGeneratorWidget(
                   onApplyPassword: (pass) {
                     ctrl.text = pass;
+                    HapticFeedback.mediumImpact();
                     onToggleGenerator(false);
                   },
                 )
@@ -649,37 +1075,30 @@ class _FavoriteToggle extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: () => onChanged(!value),
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: const Color(0xFF16213E),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
         child: Row(
           children: [
-            Icon(
-              value ? Icons.star_rounded : Icons.star_border_rounded,
-              color: value ? const Color(0xFFFFB74D) : const Color(0xFF9E9EBF),
-              size: 22,
-            ),
-            const SizedBox(width: 12),
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('Marcar como favorita',
-                      style: TextStyle(color: Colors.white, fontSize: 14)),
-                  Text('Aparecerá destacada en tu bóveda',
-                      style: TextStyle(
-                          color: Color(0xFF9E9EBF), fontSize: 11)),
-                ],
+            AnimatedScale(
+              scale: value ? 1.2 : 1.0,
+              duration: const Duration(milliseconds: 200),
+              child: Icon(
+                value ? Icons.star_rounded : Icons.star_border_rounded,
+                color: value ? AppColors.warning : AppColors.textMuted,
+                size: 20,
               ),
             ),
+            const SizedBox(width: 10),
+            const Text(
+              'Marcar como favorita',
+              style: TextStyle(color: Colors.white, fontSize: 13),
+            ),
+            const Spacer(),
             Switch(
               value: value,
               onChanged: onChanged,
-              activeTrackColor: const Color(0xFFFFB74D),
+              activeTrackColor: AppColors.warning,
             ),
           ],
         ),
@@ -688,94 +1107,18 @@ class _FavoriteToggle extends StatelessWidget {
   }
 }
 
-// ── Type selector ─────────────────────────────────────────────────────────────
-
-class _TypeSelector extends StatelessWidget {
-  const _TypeSelector({required this.selected, required this.onChanged});
-  final CredentialType selected;
-  final ValueChanged<CredentialType> onChanged;
-
-  static const _items = [
-    (type: CredentialType.password,   label: 'Contraseña', icon: Icons.lock_rounded),
-    (type: CredentialType.apiKey,     label: 'API Key',    icon: Icons.key_rounded),
-    (type: CredentialType.secureNote, label: 'Nota',       icon: Icons.note_rounded),
-    (type: CredentialType.totp,       label: 'TOTP 2FA',   icon: Icons.access_time_rounded),
-    (type: CredentialType.passkey,    label: 'Passkey',    icon: Icons.fingerprint_rounded),
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      children: _items.map((item) {
-        final isSelected = item.type == selected;
-        final color = switch (item.type) {
-          CredentialType.password   => const Color(0xFF6C63FF),
-          CredentialType.apiKey     => const Color(0xFF03DAC6),
-          CredentialType.secureNote => const Color(0xFFFFB74D),
-          CredentialType.totp       => const Color(0xFFE91E8C),
-          CredentialType.passkey    => const Color(0xFF4CAF50),
-        };
-        return Expanded(
-          child: GestureDetector(
-            onTap: () => onChanged(item.type),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              margin: const EdgeInsets.only(right: 8),
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? color.withValues(alpha: 0.15)
-                    : const Color(0xFF16213E),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                  color: isSelected ? color : Colors.transparent,
-                  width: 1.5,
-                ),
-              ),
-              child: Column(
-                children: [
-                  Icon(
-                    item.icon,
-                    color: isSelected ? color : const Color(0xFF5C5C7A),
-                    size: 20,
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    item.label,
-                    style: TextStyle(
-                      color: isSelected ? color : const Color(0xFF5C5C7A),
-                      fontSize: 10,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-}
+// ── Folder picker bottom sheet ────────────────────────────────────────────────
 
 class _FolderPickerSheet extends ConsumerWidget {
   const _FolderPickerSheet({this.selectedFolderId});
   final String? selectedFolderId;
-
-  Color _hexToColor(String hex) {
-    try {
-      return Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
-    } catch (_) {
-      return const Color(0xFF6C63FF);
-    }
-  }
 
   Future<void> _createNewFolder(BuildContext context, WidgetRef ref, String? parentId) async {
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
+        backgroundColor: AppColors.drawer,
         title: const Text('Nueva carpeta', style: TextStyle(color: Colors.white)),
         content: TextField(
           controller: ctrl,
@@ -806,20 +1149,20 @@ class _FolderPickerSheet extends ConsumerWidget {
           onTap: () => Navigator.pop(context, <String?>[f.id]),
           child: Row(
             children: [
-              Icon(f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, color: _hexToColor(f.colorHex)),
+              Icon(f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, color: f.colorHex.toColor()),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   f.name,
                   style: TextStyle(
-                    color: isSelected ? const Color(0xFF6C63FF) : Colors.white,
+                    color: isSelected ? AppColors.accent : Colors.white,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ),
               if (isSelected) ...[
                 const SizedBox(width: 8),
-                const Icon(Icons.check_circle_rounded, color: Color(0xFF6C63FF), size: 16),
+                const Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 16),
               ]
             ],
           ),
@@ -829,12 +1172,12 @@ class _FolderPickerSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.create_new_folder_outlined, color: Color(0xFF9E9EBF)),
+              icon: const Icon(Icons.create_new_folder_outlined, color: AppColors.textMuted),
               onPressed: () => _createNewFolder(context, ref, f.id),
               tooltip: 'Añadir subcarpeta',
             ),
             if (sub.isNotEmpty)
-              const Icon(Icons.expand_more, color: Color(0xFF5C5C7A))
+              const Icon(Icons.expand_more, color: AppColors.textDisabled)
             else
               const SizedBox(width: 24),
           ],
@@ -862,20 +1205,26 @@ class _FolderPickerSheet extends ConsumerWidget {
                 const Text('Seleccionar Carpeta', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   onPressed: () => _createNewFolder(context, ref, null),
-                  icon: const Icon(Icons.create_new_folder_rounded, color: Color(0xFF6C63FF)),
-                  label: const Text('Nueva raíz', style: TextStyle(color: Color(0xFF6C63FF))),
+                  icon: const Icon(Icons.create_new_folder_rounded, color: AppColors.accent),
+                  label: const Text('Nueva raíz', style: TextStyle(color: AppColors.accent)),
                 ),
               ],
             ),
           ),
-          const Divider(color: Color(0xFF2A2A4A)),
+          const Divider(color: AppColors.divider),
           Expanded(
             child: ListView(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.inventory_2_outlined, color: Color(0xFF9E9EBF)),
-                  title: Text('Ninguna (Bóveda principal)', style: TextStyle(color: selectedFolderId == null ? const Color(0xFF6C63FF) : Colors.white, fontWeight: selectedFolderId == null ? FontWeight.bold : FontWeight.normal)),
-                  trailing: selectedFolderId == null ? const Icon(Icons.check_circle_rounded, color: Color(0xFF6C63FF)) : null,
+                  leading: const Icon(Icons.inventory_2_outlined, color: AppColors.textMuted),
+                  title: Text(
+                    'Ninguna (Bóveda principal)',
+                    style: TextStyle(
+                      color: selectedFolderId == null ? AppColors.accent : Colors.white,
+                      fontWeight: selectedFolderId == null ? FontWeight.bold : FontWeight.normal,
+                    ),
+                  ),
+                  trailing: selectedFolderId == null ? const Icon(Icons.check_circle_rounded, color: AppColors.accent) : null,
                   onTap: () => Navigator.pop(context, <String?>[null]),
                 ),
                 ...roots.map((r) => _buildNode(context, ref, folders, r, 0)),
