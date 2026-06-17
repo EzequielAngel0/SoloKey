@@ -15,6 +15,8 @@ class CredentialSensitivePayload {
     this.website,
     this.notes,
     required this.customFields,
+    this.passkeyMetadata,
+    this.sshKeyMetadata,
   });
 
   final String? username;
@@ -22,6 +24,8 @@ class CredentialSensitivePayload {
   final String? website;
   final String? notes;
   final List<Map<String, dynamic>> customFields;
+  final PasskeyMetadata? passkeyMetadata;
+  final SshKeyMetadata? sshKeyMetadata;
 
   Map<String, dynamic> toJson() => {
         'username': username,
@@ -29,6 +33,8 @@ class CredentialSensitivePayload {
         'website': website,
         'notes': notes,
         'customFields': customFields,
+        'passkeyMetadata': passkeyMetadata?.toJson(),
+        'sshKeyMetadata': sshKeyMetadata?.toJson(),
       };
 
   factory CredentialSensitivePayload.fromJson(Map<String, dynamic> json) =>
@@ -39,6 +45,12 @@ class CredentialSensitivePayload {
         notes: json['notes'] as String?,
         customFields: (json['customFields'] as List<dynamic>)
             .cast<Map<String, dynamic>>(),
+        passkeyMetadata: json['passkeyMetadata'] != null
+            ? PasskeyMetadata.fromJson(json['passkeyMetadata'] as Map<String, dynamic>)
+            : null,
+        sshKeyMetadata: json['sshKeyMetadata'] != null
+            ? SshKeyMetadata.fromJson(json['sshKeyMetadata'] as Map<String, dynamic>)
+            : null,
       );
 
   Uint8List toBytes() => Uint8List.fromList(utf8.encode(jsonEncode(toJson())));
@@ -61,6 +73,7 @@ abstract final class CredentialDto {
         type: Value(credential.type.name),
         categoryId: Value(credential.categoryId),
         isFavorite: Value(credential.isFavorite),
+        isDoubleEncrypted: Value(credential.isDoubleEncrypted),
         encryptedPayload: Value(encryptedPayload),
         createdAt: Value(credential.createdAt.millisecondsSinceEpoch),
         updatedAt: Value(credential.updatedAt.millisecondsSinceEpoch),
@@ -89,8 +102,11 @@ abstract final class CredentialDto {
             .toList(),
         categoryId: entry.categoryId,
         isFavorite: entry.isFavorite,
+        isDoubleEncrypted: entry.isDoubleEncrypted,
         createdAt: DateTime.fromMillisecondsSinceEpoch(entry.createdAt),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(entry.updatedAt),
+        passkeyMetadata: payload.passkeyMetadata,
+        sshKeyMetadata: payload.sshKeyMetadata,
       );
 
   static CredentialSensitivePayload toPayload(Credential c) =>
@@ -106,6 +122,8 @@ abstract final class CredentialDto {
                   'isSecret': f.isSecret,
                 })
             .toList(),
+        passkeyMetadata: c.passkeyMetadata,
+        sshKeyMetadata: c.sshKeyMetadata,
       );
 
   static String newId() => const Uuid().v4();

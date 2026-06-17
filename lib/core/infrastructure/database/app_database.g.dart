@@ -73,6 +73,21 @@ class $CredentialEntriesTable extends CredentialEntries
     ),
     defaultValue: const Constant(false),
   );
+  static const VerificationMeta _isDoubleEncryptedMeta = const VerificationMeta(
+    'isDoubleEncrypted',
+  );
+  @override
+  late final GeneratedColumn<bool> isDoubleEncrypted = GeneratedColumn<bool>(
+    'is_double_encrypted',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_double_encrypted" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _encryptedPayloadMeta = const VerificationMeta(
     'encryptedPayload',
   );
@@ -115,6 +130,7 @@ class $CredentialEntriesTable extends CredentialEntries
     categoryId,
     folderId,
     isFavorite,
+    isDoubleEncrypted,
     encryptedPayload,
     createdAt,
     updatedAt,
@@ -168,6 +184,15 @@ class $CredentialEntriesTable extends CredentialEntries
       context.handle(
         _isFavoriteMeta,
         isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
+      );
+    }
+    if (data.containsKey('is_double_encrypted')) {
+      context.handle(
+        _isDoubleEncryptedMeta,
+        isDoubleEncrypted.isAcceptableOrUnknown(
+          data['is_double_encrypted']!,
+          _isDoubleEncryptedMeta,
+        ),
       );
     }
     if (data.containsKey('encrypted_payload')) {
@@ -230,6 +255,10 @@ class $CredentialEntriesTable extends CredentialEntries
         DriftSqlType.bool,
         data['${effectivePrefix}is_favorite'],
       )!,
+      isDoubleEncrypted: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_double_encrypted'],
+      )!,
       encryptedPayload: attachedDatabase.typeMapping.read(
         DriftSqlType.blob,
         data['${effectivePrefix}encrypted_payload'],
@@ -270,6 +299,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
   /// Favourite flag — unencrypted for quick access.
   final bool isFavorite;
 
+  /// Whether the credential is double-encrypted using a secondary PIN.
+  final bool isDoubleEncrypted;
+
   /// AES-256-GCM blob: nonce(12) || ciphertext || tag(16).
   /// Contains JSON-encoded sensitive payload including passkeyMetadata.
   final Uint8List encryptedPayload;
@@ -286,6 +318,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     this.categoryId,
     this.folderId,
     required this.isFavorite,
+    required this.isDoubleEncrypted,
     required this.encryptedPayload,
     required this.createdAt,
     required this.updatedAt,
@@ -303,6 +336,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       map['folder_id'] = Variable<String>(folderId);
     }
     map['is_favorite'] = Variable<bool>(isFavorite);
+    map['is_double_encrypted'] = Variable<bool>(isDoubleEncrypted);
     map['encrypted_payload'] = Variable<Uint8List>(encryptedPayload);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
@@ -321,6 +355,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           ? const Value.absent()
           : Value(folderId),
       isFavorite: Value(isFavorite),
+      isDoubleEncrypted: Value(isDoubleEncrypted),
       encryptedPayload: Value(encryptedPayload),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -339,6 +374,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       categoryId: serializer.fromJson<String?>(json['categoryId']),
       folderId: serializer.fromJson<String?>(json['folderId']),
       isFavorite: serializer.fromJson<bool>(json['isFavorite']),
+      isDoubleEncrypted: serializer.fromJson<bool>(json['isDoubleEncrypted']),
       encryptedPayload: serializer.fromJson<Uint8List>(
         json['encryptedPayload'],
       ),
@@ -356,6 +392,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       'categoryId': serializer.toJson<String?>(categoryId),
       'folderId': serializer.toJson<String?>(folderId),
       'isFavorite': serializer.toJson<bool>(isFavorite),
+      'isDoubleEncrypted': serializer.toJson<bool>(isDoubleEncrypted),
       'encryptedPayload': serializer.toJson<Uint8List>(encryptedPayload),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
@@ -369,6 +406,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     Value<String?> categoryId = const Value.absent(),
     Value<String?> folderId = const Value.absent(),
     bool? isFavorite,
+    bool? isDoubleEncrypted,
     Uint8List? encryptedPayload,
     int? createdAt,
     int? updatedAt,
@@ -379,6 +417,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     categoryId: categoryId.present ? categoryId.value : this.categoryId,
     folderId: folderId.present ? folderId.value : this.folderId,
     isFavorite: isFavorite ?? this.isFavorite,
+    isDoubleEncrypted: isDoubleEncrypted ?? this.isDoubleEncrypted,
     encryptedPayload: encryptedPayload ?? this.encryptedPayload,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -395,6 +434,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       isFavorite: data.isFavorite.present
           ? data.isFavorite.value
           : this.isFavorite,
+      isDoubleEncrypted: data.isDoubleEncrypted.present
+          ? data.isDoubleEncrypted.value
+          : this.isDoubleEncrypted,
       encryptedPayload: data.encryptedPayload.present
           ? data.encryptedPayload.value
           : this.encryptedPayload,
@@ -412,6 +454,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           ..write('categoryId: $categoryId, ')
           ..write('folderId: $folderId, ')
           ..write('isFavorite: $isFavorite, ')
+          ..write('isDoubleEncrypted: $isDoubleEncrypted, ')
           ..write('encryptedPayload: $encryptedPayload, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -427,6 +470,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     categoryId,
     folderId,
     isFavorite,
+    isDoubleEncrypted,
     $driftBlobEquality.hash(encryptedPayload),
     createdAt,
     updatedAt,
@@ -441,6 +485,7 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           other.categoryId == this.categoryId &&
           other.folderId == this.folderId &&
           other.isFavorite == this.isFavorite &&
+          other.isDoubleEncrypted == this.isDoubleEncrypted &&
           $driftBlobEquality.equals(
             other.encryptedPayload,
             this.encryptedPayload,
@@ -456,6 +501,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
   final Value<String?> categoryId;
   final Value<String?> folderId;
   final Value<bool> isFavorite;
+  final Value<bool> isDoubleEncrypted;
   final Value<Uint8List> encryptedPayload;
   final Value<int> createdAt;
   final Value<int> updatedAt;
@@ -467,6 +513,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     this.categoryId = const Value.absent(),
     this.folderId = const Value.absent(),
     this.isFavorite = const Value.absent(),
+    this.isDoubleEncrypted = const Value.absent(),
     this.encryptedPayload = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -479,6 +526,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     this.categoryId = const Value.absent(),
     this.folderId = const Value.absent(),
     this.isFavorite = const Value.absent(),
+    this.isDoubleEncrypted = const Value.absent(),
     required Uint8List encryptedPayload,
     required int createdAt,
     required int updatedAt,
@@ -496,6 +544,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Expression<String>? categoryId,
     Expression<String>? folderId,
     Expression<bool>? isFavorite,
+    Expression<bool>? isDoubleEncrypted,
     Expression<Uint8List>? encryptedPayload,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
@@ -508,6 +557,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
       if (categoryId != null) 'category_id': categoryId,
       if (folderId != null) 'folder_id': folderId,
       if (isFavorite != null) 'is_favorite': isFavorite,
+      if (isDoubleEncrypted != null) 'is_double_encrypted': isDoubleEncrypted,
       if (encryptedPayload != null) 'encrypted_payload': encryptedPayload,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -522,6 +572,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Value<String?>? categoryId,
     Value<String?>? folderId,
     Value<bool>? isFavorite,
+    Value<bool>? isDoubleEncrypted,
     Value<Uint8List>? encryptedPayload,
     Value<int>? createdAt,
     Value<int>? updatedAt,
@@ -534,6 +585,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
       categoryId: categoryId ?? this.categoryId,
       folderId: folderId ?? this.folderId,
       isFavorite: isFavorite ?? this.isFavorite,
+      isDoubleEncrypted: isDoubleEncrypted ?? this.isDoubleEncrypted,
       encryptedPayload: encryptedPayload ?? this.encryptedPayload,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -562,6 +614,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     if (isFavorite.present) {
       map['is_favorite'] = Variable<bool>(isFavorite.value);
     }
+    if (isDoubleEncrypted.present) {
+      map['is_double_encrypted'] = Variable<bool>(isDoubleEncrypted.value);
+    }
     if (encryptedPayload.present) {
       map['encrypted_payload'] = Variable<Uint8List>(encryptedPayload.value);
     }
@@ -586,6 +641,7 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
           ..write('categoryId: $categoryId, ')
           ..write('folderId: $folderId, ')
           ..write('isFavorite: $isFavorite, ')
+          ..write('isDoubleEncrypted: $isDoubleEncrypted, ')
           ..write('encryptedPayload: $encryptedPayload, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
@@ -1733,6 +1789,7 @@ typedef $$CredentialEntriesTableCreateCompanionBuilder =
       Value<String?> categoryId,
       Value<String?> folderId,
       Value<bool> isFavorite,
+      Value<bool> isDoubleEncrypted,
       required Uint8List encryptedPayload,
       required int createdAt,
       required int updatedAt,
@@ -1746,6 +1803,7 @@ typedef $$CredentialEntriesTableUpdateCompanionBuilder =
       Value<String?> categoryId,
       Value<String?> folderId,
       Value<bool> isFavorite,
+      Value<bool> isDoubleEncrypted,
       Value<Uint8List> encryptedPayload,
       Value<int> createdAt,
       Value<int> updatedAt,
@@ -1788,6 +1846,11 @@ class $$CredentialEntriesTableFilterComposer
 
   ColumnFilters<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isDoubleEncrypted => $composableBuilder(
+    column: $table.isDoubleEncrypted,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -1846,6 +1909,11 @@ class $$CredentialEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get isDoubleEncrypted => $composableBuilder(
+    column: $table.isDoubleEncrypted,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<Uint8List> get encryptedPayload => $composableBuilder(
     column: $table.encryptedPayload,
     builder: (column) => ColumnOrderings(column),
@@ -1890,6 +1958,11 @@ class $$CredentialEntriesTableAnnotationComposer
 
   GeneratedColumn<bool> get isFavorite => $composableBuilder(
     column: $table.isFavorite,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isDoubleEncrypted => $composableBuilder(
+    column: $table.isDoubleEncrypted,
     builder: (column) => column,
   );
 
@@ -1951,6 +2024,7 @@ class $$CredentialEntriesTableTableManager
                 Value<String?> categoryId = const Value.absent(),
                 Value<String?> folderId = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
+                Value<bool> isDoubleEncrypted = const Value.absent(),
                 Value<Uint8List> encryptedPayload = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
@@ -1962,6 +2036,7 @@ class $$CredentialEntriesTableTableManager
                 categoryId: categoryId,
                 folderId: folderId,
                 isFavorite: isFavorite,
+                isDoubleEncrypted: isDoubleEncrypted,
                 encryptedPayload: encryptedPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -1975,6 +2050,7 @@ class $$CredentialEntriesTableTableManager
                 Value<String?> categoryId = const Value.absent(),
                 Value<String?> folderId = const Value.absent(),
                 Value<bool> isFavorite = const Value.absent(),
+                Value<bool> isDoubleEncrypted = const Value.absent(),
                 required Uint8List encryptedPayload,
                 required int createdAt,
                 required int updatedAt,
@@ -1986,6 +2062,7 @@ class $$CredentialEntriesTableTableManager
                 categoryId: categoryId,
                 folderId: folderId,
                 isFavorite: isFavorite,
+                isDoubleEncrypted: isDoubleEncrypted,
                 encryptedPayload: encryptedPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,

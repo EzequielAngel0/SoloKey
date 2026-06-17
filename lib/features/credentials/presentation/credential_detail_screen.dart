@@ -10,6 +10,9 @@ import '../application/credentials_provider.dart';
 import '../domain/entities/credential.dart';
 import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
+import '../../../app/di/injection.dart';
+import '../../../core/infrastructure/security/double_envelope_service.dart';
+import '../../../core/services/biometric_auth_service.dart';
 
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
@@ -87,12 +90,14 @@ class _DetailView extends ConsumerWidget {
               value: credential.username!,
               isSecret: false,
             ),
-          if (credential.password != null)
+          if (credential.password != null && credential.type != CredentialType.sshKey)
             _SecretTile(
               icon: Icons.lock_rounded,
-              label: 'Contraseña',
+              label: 'Contrasena',
               value: credential.password!,
               isSecret: true,
+              isDoubleEncrypted: credential.isDoubleEncrypted,
+              credentialId: credential.id,
             ),
           if (credential.website != null)
             _SecretTile(
@@ -109,12 +114,48 @@ class _DetailView extends ConsumerWidget {
               isSecret: false,
               multiline: true,
             ),
+          if (credential.type == CredentialType.sshKey && credential.sshKeyMetadata != null) ...[
+            _SecretTile(
+              icon: Icons.vpn_key_rounded,
+              label: 'Tipo de Llave',
+              value: credential.sshKeyMetadata!.keyType,
+              isSecret: false,
+            ),
+            _SecretTile(
+              icon: Icons.terminal_rounded,
+              label: 'Llave Privada',
+              value: credential.sshKeyMetadata!.privateKey,
+              isSecret: true,
+              multiline: true,
+              isDoubleEncrypted: credential.isDoubleEncrypted,
+              credentialId: credential.id,
+            ),
+            if (credential.sshKeyMetadata!.publicKey.isNotEmpty)
+              _SecretTile(
+                icon: Icons.public_rounded,
+                label: 'Llave Publica',
+                value: credential.sshKeyMetadata!.publicKey,
+                isSecret: false,
+                multiline: true,
+              ),
+            if (credential.sshKeyMetadata!.passphrase != null && credential.sshKeyMetadata!.passphrase!.isNotEmpty)
+              _SecretTile(
+                icon: Icons.vpn_key_outlined,
+                label: 'Passphrase de la Llave',
+                value: credential.sshKeyMetadata!.passphrase!,
+                isSecret: true,
+                isDoubleEncrypted: credential.isDoubleEncrypted,
+                credentialId: credential.id,
+              ),
+          ],
           ...credential.customFields.map(
             (f) => _SecretTile(
               icon: Icons.code_rounded,
               label: f.label,
               value: f.value,
               isSecret: f.isSecret,
+              isDoubleEncrypted: credential.isDoubleEncrypted,
+              credentialId: credential.id,
             ),
           ),
           if (credential.type == CredentialType.totp &&
@@ -181,11 +222,12 @@ class _TypeBadge extends StatelessWidget {
   final CredentialType type;
 
   static const _labels = {
-    CredentialType.password:   'Contraseña',
+    CredentialType.password:   'Contrasena',
     CredentialType.apiKey:     'API Key',
     CredentialType.secureNote: 'Nota segura',
     CredentialType.totp:       'TOTP / 2FA',
     CredentialType.passkey:    'Passkey',
+    CredentialType.sshKey:     'Llave SSH',
   };
 
   static const _colors = {
@@ -194,6 +236,7 @@ class _TypeBadge extends StatelessWidget {
     CredentialType.secureNote: Color(0xFFFFB74D),
     CredentialType.totp:       Color(0xFFE91E8C),
     CredentialType.passkey:    Color(0xFF4CAF50),
+    CredentialType.sshKey:     Color(0xFF00E5FF),
   };
 
   @override
@@ -224,6 +267,8 @@ class _SecretTile extends StatefulWidget {
     required this.value,
     required this.isSecret,
     this.multiline = false,
+    this.isDoubleEncrypted = false,
+    this.credentialId = '',
   });
 
   final IconData icon;
@@ -231,6 +276,8 @@ class _SecretTile extends StatefulWidget {
   final String value;
   final bool isSecret;
   final bool multiline;
+  final bool isDoubleEncrypted;
+  final String credentialId;
 
   @override
   State<_SecretTile> createState() => _SecretTileState();
@@ -238,6 +285,91 @@ class _SecretTile extends StatefulWidget {
 
 class _SecretTileState extends State<_SecretTile> {
   bool _revealed = false;
+  String? _decryptedValue;
+  bool _decrypting = false;
+
+  Future<String?> _getPlainValue(BuildContext context) async {
+    if (!widget.isDoubleEncrypted || !widget.value.startsWith('double_enc_v1:')) {
+      return widget.value;
+    }
+    if (_decryptedValue != null) {
+      return _decryptedValue;
+    }
+
+    setState(() => _decrypting = true);
+    try {
+      final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
+      final bioService = getIt<BiometricAuthService>();
+      
+      final savedPin = await doubleEnvelopeService.getPinFromSecureStorage(widget.credentialId);
+      if (savedPin != null) {
+        final auth = await bioService.authenticate(reason: 'Autenticate para descifrar este secreto');
+        if (auth) {
+          final plain = await doubleEnvelopeService.decryptField(
+            encryptedValue: widget.value,
+            pin: savedPin,
+          );
+          if (mounted) setState(() => _decryptedValue = plain);
+          return plain;
+        }
+      }
+
+      if (!context.mounted) return null;
+      final pin = await _showPinDialog(context);
+      if (pin != null && pin.isNotEmpty) {
+        final plain = await doubleEnvelopeService.decryptField(
+          encryptedValue: widget.value,
+          pin: pin,
+        );
+        if (mounted) setState(() => _decryptedValue = plain);
+        return plain;
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al descifrar: $e'),
+            backgroundColor: const Color(0xFFCF6679),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _decrypting = false);
+    }
+    return null;
+  }
+
+  Future<String?> _showPinDialog(BuildContext context) async {
+    final controller = TextEditingController();
+    return showDialog<String>(
+      context: context,
+      builder: (diagContext) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A2E),
+        title: const Text('Ingresa PIN Secundario', style: TextStyle(color: Colors.white, fontSize: 16)),
+        content: TextField(
+          controller: controller,
+          obscureText: true,
+          autofocus: true,
+          keyboardType: TextInputType.number,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'PIN de Sobre Cifrado',
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(diagContext),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(diagContext, controller.text),
+            child: const Text('Aceptar'),
+          ),
+        ],
+      ),
+    );
+  }
 
   Future<void> _copy(BuildContext context) async {
     if (widget.isSecret) {
@@ -246,17 +378,21 @@ class _SecretTileState extends State<_SecretTile> {
     }
     if (!context.mounted) return;
 
+    final plain = await _getPlainValue(context);
+    if (plain == null) return;
+
     await showClipboardCountdownSnackBar(
       context: context,
       label: widget.label,
-      value: widget.value,
+      value: plain,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    final displayValue =
-        widget.isSecret && !_revealed ? '••••••••••••' : widget.value;
+    final displayValue = _decrypting
+        ? 'Descifrando...'
+        : (widget.isSecret && !_revealed ? '••••••••••••' : (_decryptedValue ?? widget.value));
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -289,7 +425,7 @@ class _SecretTileState extends State<_SecretTile> {
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 14,
-                    letterSpacing: widget.isSecret && !_revealed ? 2 : 0,
+                    letterSpacing: widget.isSecret && !_revealed && !_decrypting ? 2 : 0,
                   ),
                   maxLines: widget.multiline ? null : 1,
                   overflow: widget.multiline
@@ -309,11 +445,17 @@ class _SecretTileState extends State<_SecretTile> {
                 size: 18,
               ),
               onPressed: () async {
-                if (!_revealed) {
-                  final auth = await AuthHelper.requireAuth(context);
-                  if (!auth) return;
+                if (_revealed) {
+                  setState(() {
+                    _revealed = false;
+                    _decryptedValue = null; // Clear from memory when hidden!
+                  });
+                } else {
+                  final plain = await _getPlainValue(context);
+                  if (plain != null) {
+                    setState(() => _revealed = true);
+                  }
                 }
-                setState(() => _revealed = !_revealed);
               },
               padding: EdgeInsets.zero,
               constraints: const BoxConstraints(),

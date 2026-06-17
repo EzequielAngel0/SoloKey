@@ -16,6 +16,8 @@ import 'widgets/type_selector_premium.dart';
 import 'widgets/password_row_widget.dart';
 import 'widgets/favorite_toggle.dart';
 import 'widgets/folder_picker_sheet.dart';
+import '../../../app/di/injection.dart';
+import '../../../core/infrastructure/security/double_envelope_service.dart';
 
 class CredentialFormScreen extends ConsumerStatefulWidget {
   const CredentialFormScreen({super.key, this.existingId});
@@ -56,6 +58,17 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   bool _showGenerator = false;
   Credential? _existing;
 
+  // SSH Key specific controllers
+  final _sshPrivateKeyCtrl = TextEditingController();
+  final _sshPublicKeyCtrl  = TextEditingController();
+  final _sshPassphraseCtrl = TextEditingController();
+  String _sshKeyType = 'Ed25519';
+
+  // Double Envelope encryption state
+  bool _isDoubleEncrypted = false;
+  final _secondaryPinCtrl = TextEditingController();
+  bool _savePinBiometrically = false;
+
   late AnimationController _saveAnimCtrl;
   late Animation<double> _saveScale;
 
@@ -81,6 +94,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _type = _existing!.type;
       _isFavorite = _existing!.isFavorite;
       _folderId = _existing!.categoryId;
+      _isDoubleEncrypted = _existing!.isDoubleEncrypted;
 
       // Populate type-specific fields from customFields map
       final cf = {for (final f in _existing!.customFields) f.label: f.value};
@@ -93,6 +107,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _scopesCtrl.text   = cf['scopes'] ?? '';
       _totpSecretCtrl.text = _existing!.password ?? '';
       _totpIssuerCtrl.text = cf['issuer'] ?? '';
+
+      if (_type == CredentialType.sshKey && _existing!.sshKeyMetadata != null) {
+        final ssh = _existing!.sshKeyMetadata!;
+        _sshPrivateKeyCtrl.text = ssh.privateKey;
+        _sshPublicKeyCtrl.text = ssh.publicKey;
+        _sshPassphraseCtrl.text = ssh.passphrase ?? '';
+        _sshKeyType = ssh.keyType;
+      }
+
+      // Check if biometric PIN was saved
+      if (_isDoubleEncrypted) {
+        getIt<DoubleEnvelopeService>().getPinFromSecureStorage(_existing!.id).then((savedPin) {
+          if (mounted && savedPin != null) {
+            setState(() {
+              _savePinBiometrically = true;
+              _secondaryPinCtrl.text = savedPin;
+            });
+          }
+        });
+      }
     }
   }
 
@@ -103,6 +137,8 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _titleCtrl, _notesCtrl, _usernameCtrl, _passwordCtrl, _websiteCtrl,
       _serviceCtrl, _apiKeyCtrl, _endpointCtrl, _scopesCtrl,
       _totpSecretCtrl, _totpIssuerCtrl,
+      _sshPrivateKeyCtrl, _sshPublicKeyCtrl, _sshPassphraseCtrl,
+      _secondaryPinCtrl,
     ]) {
       c.dispose();
     }
@@ -173,6 +209,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           updatedAt: now,
         );
 
+      case CredentialType.sshKey:
+        return Credential(
+          id: _existing?.id ?? const Uuid().v4(),
+          type: _type,
+          title: _titleCtrl.text.trim(),
+          password: _sshPrivateKeyCtrl.text.isEmpty ? null : _sshPrivateKeyCtrl.text.trim(),
+          notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          isFavorite: _isFavorite,
+          categoryId: _folderId,
+          isDoubleEncrypted: _isDoubleEncrypted,
+          createdAt: _existing?.createdAt ?? now,
+          updatedAt: now,
+          sshKeyMetadata: SshKeyMetadata(
+            privateKey: _sshPrivateKeyCtrl.text.trim(),
+            publicKey: _sshPublicKeyCtrl.text.trim(),
+            passphrase: _sshPassphraseCtrl.text.isEmpty ? null : _sshPassphraseCtrl.text.trim(),
+            keyType: _sshKeyType,
+          ),
+        );
+
       case CredentialType.passkey:
         return _existing!.copyWith(updatedAt: now);
     }
@@ -184,8 +240,100 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     await _saveAnimCtrl.reverse();
     setState(() => _isLoading = true);
 
-    final credential = _buildCredential();
+    var credential = _buildCredential();
     try {
+      if (_isDoubleEncrypted) {
+        final pin = _secondaryPinCtrl.text.trim();
+        if (pin.isEmpty && _existing == null) {
+          throw Exception('Debes ingresar un PIN secundario para el cifrado doble');
+        }
+        
+        if (pin.isNotEmpty) {
+          final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
+          
+          String? encryptedPassword;
+          if (credential.password != null && !credential.password!.startsWith('double_enc_v1:')) {
+            encryptedPassword = await doubleEnvelopeService.encryptField(
+              plaintext: credential.password!,
+              pin: pin,
+            );
+          } else {
+            encryptedPassword = credential.password;
+          }
+          
+          SshKeyMetadata? encryptedSshMetadata;
+          if (credential.sshKeyMetadata != null) {
+            final ssh = credential.sshKeyMetadata!;
+            final encPriv = ssh.privateKey.startsWith('double_enc_v1:')
+                ? ssh.privateKey
+                : await doubleEnvelopeService.encryptField(plaintext: ssh.privateKey, pin: pin);
+            final encPass = (ssh.passphrase != null && !ssh.passphrase!.startsWith('double_enc_v1:'))
+                ? await doubleEnvelopeService.encryptField(plaintext: ssh.passphrase!, pin: pin)
+                : ssh.passphrase;
+            encryptedSshMetadata = ssh.copyWith(
+              privateKey: encPriv,
+              passphrase: encPass,
+            );
+          }
+          
+          credential = credential.copyWith(
+            password: encryptedPassword,
+            sshKeyMetadata: encryptedSshMetadata,
+            isDoubleEncrypted: true,
+          );
+          
+          if (_savePinBiometrically) {
+            await doubleEnvelopeService.savePinToSecureStorage(
+              credentialId: credential.id,
+              pin: pin,
+            );
+          } else {
+            await doubleEnvelopeService.deletePinFromSecureStorage(credential.id);
+          }
+        }
+      } else {
+        if (_existing?.isDoubleEncrypted == true) {
+          final pin = _secondaryPinCtrl.text.trim();
+          if (pin.isEmpty) {
+            throw Exception('Ingresa el PIN secundario para desactivar el cifrado doble');
+          }
+          final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
+          
+          String? decryptedPassword;
+          if (credential.password != null && credential.password!.startsWith('double_enc_v1:')) {
+            decryptedPassword = await doubleEnvelopeService.decryptField(
+              encryptedValue: credential.password!,
+              pin: pin,
+            );
+          } else {
+            decryptedPassword = credential.password;
+          }
+          
+          SshKeyMetadata? decryptedSshMetadata;
+          if (credential.sshKeyMetadata != null) {
+            final ssh = credential.sshKeyMetadata!;
+            final decPriv = ssh.privateKey.startsWith('double_enc_v1:')
+                ? await doubleEnvelopeService.decryptField(encryptedValue: ssh.privateKey, pin: pin)
+                : ssh.privateKey;
+            final decPass = (ssh.passphrase != null && ssh.passphrase!.startsWith('double_enc_v1:'))
+                ? await doubleEnvelopeService.decryptField(encryptedValue: ssh.passphrase!, pin: pin)
+                : ssh.passphrase;
+            decryptedSshMetadata = ssh.copyWith(
+              privateKey: decPriv,
+              passphrase: decPass,
+            );
+          }
+          
+          credential = credential.copyWith(
+            password: decryptedPassword,
+            sshKeyMetadata: decryptedSshMetadata,
+            isDoubleEncrypted: false,
+          );
+          
+          await doubleEnvelopeService.deletePinFromSecureStorage(credential.id);
+        }
+      }
+
       if (_existing == null) {
         await ref.read(credentialsNotifierProvider.notifier).save(credential);
       } else {
@@ -402,6 +550,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             ],
 
             const SizedBox(height: 16),
+            _buildDoubleEncryptionSection(),
+
+            const SizedBox(height: 16),
             FormSection(
               icon: Icons.folder_rounded,
               accentColor: AppColors.textMuted,
@@ -481,6 +632,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     CredentialType.secureNote => 'ej. Llaves del servidor, Seeds',
     CredentialType.totp       => 'ej. GitHub 2FA, Google',
     CredentialType.passkey    => 'ej. google.com Passkey',
+    CredentialType.sshKey     => 'ej. Servidor Produccion, GitHub SSH Key',
   };
 
   IconData _typeIcon(CredentialType t) => switch (t) {
@@ -489,6 +641,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     CredentialType.secureNote => Icons.note_rounded,
     CredentialType.totp       => Icons.access_time_rounded,
     CredentialType.passkey    => Icons.fingerprint_rounded,
+    CredentialType.sshKey     => Icons.terminal_rounded,
   };
 
   Color _typeColor(CredentialType t) => switch (t) {
@@ -497,6 +650,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     CredentialType.secureNote => AppColors.typeNote,
     CredentialType.totp       => AppColors.typeTotp,
     CredentialType.passkey    => AppColors.typePasskey,
+    CredentialType.sshKey     => AppColors.typeSshKey,
   };
 
   Widget _buildFieldsByType() {
@@ -522,6 +676,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           CredentialType.secureNote => const SizedBox.shrink(),
           CredentialType.totp     => _buildTotpFields(),
           CredentialType.passkey  => _buildPasskeyInfo(),
+          CredentialType.sshKey   => _buildSshKeyFields(),
         },
       ),
     );
@@ -753,6 +908,128 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             ],
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildSshKeyFields() {
+    return FormSection(
+      icon: Icons.terminal_rounded,
+      accentColor: AppColors.typeSshKey,
+      title: 'Configuracion de Llave SSH',
+      children: [
+        DropdownButtonFormField<String>(
+          value: _sshKeyType,
+          style: const TextStyle(color: Colors.white),
+          dropdownColor: AppColors.drawer,
+          decoration: const InputDecoration(
+            labelText: 'Tipo de Llave',
+            prefixIcon: Icon(Icons.vpn_key_outlined, size: 18, color: AppColors.textMuted),
+          ),
+          items: const [
+            DropdownMenuItem(value: 'Ed25519', child: Text('Ed25519')),
+            DropdownMenuItem(value: 'RSA', child: Text('RSA')),
+            DropdownMenuItem(value: 'ECDSA', child: Text('ECDSA')),
+          ],
+          onChanged: (val) {
+            if (val != null) setState(() => _sshKeyType = val);
+          },
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _sshPrivateKeyCtrl,
+          style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 13),
+          maxLines: 6,
+          decoration: const InputDecoration(
+            labelText: 'Llave Privada',
+            hintText: '-----BEGIN OPENSSH PRIVATE KEY-----\n...',
+            alignLabelWithHint: true,
+            prefixIcon: Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
+          ),
+          validator: (v) =>
+              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty) ? 'La llave privada es requerida' : null,
+        ),
+        const SizedBox(height: 14),
+        TextFormField(
+          controller: _sshPublicKeyCtrl,
+          style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 13),
+          maxLines: 4,
+          decoration: const InputDecoration(
+            labelText: 'Llave Publica (Opcional)',
+            hintText: 'ssh-ed25519 AAAA...',
+            alignLabelWithHint: true,
+            prefixIcon: Icon(Icons.public_rounded, size: 18, color: AppColors.textMuted),
+          ),
+        ),
+        const SizedBox(height: 14),
+        SecureTextField(
+          controller: _sshPassphraseCtrl,
+          label: 'Passphrase de la Llave (Opcional)',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDoubleEncryptionSection() {
+    if (_type == CredentialType.passkey) return const SizedBox.shrink();
+
+    return FormSection(
+      icon: Icons.enhanced_encryption_rounded,
+      accentColor: AppColors.secondary,
+      title: 'Cifrado de Sobre Doble',
+      children: [
+        SwitchListTile(
+          value: _isDoubleEncrypted,
+          onChanged: (v) {
+            HapticFeedback.selectionClick();
+            setState(() {
+              _isDoubleEncrypted = v;
+              if (!v) {
+                _secondaryPinCtrl.clear();
+                _savePinBiometrically = false;
+              }
+            });
+          },
+          title: const Text('Activar Cifrado Doble', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+          subtitle: const Text(
+            'Protege los secretos de este registro con un PIN secundario. Se cifraran adicionalmente.',
+            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+          ),
+          activeColor: AppColors.secondary,
+          contentPadding: EdgeInsets.zero,
+        ),
+        if (_isDoubleEncrypted) ...[
+          const SizedBox(height: 14),
+          SecureTextField(
+            controller: _secondaryPinCtrl,
+            label: _existing?.isDoubleEncrypted == true
+                ? 'PIN Secundario (Dejar vacio para mantener actual o ingresar para cambiar)'
+                : 'PIN Secundario',
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            validator: (v) {
+              if (_isDoubleEncrypted && _existing == null && (v == null || v.trim().isEmpty)) {
+                return 'El PIN secundario es requerido';
+              }
+              return null;
+            },
+          ),
+          const SizedBox(height: 8),
+          SwitchListTile(
+            value: _savePinBiometrically,
+            onChanged: (v) {
+              HapticFeedback.selectionClick();
+              setState(() => _savePinBiometrically = v);
+            },
+            title: const Text('Desbloqueo biometrico', style: TextStyle(color: Colors.white, fontSize: 13)),
+            subtitle: const Text(
+              'Guardar el PIN cifrado para desbloquear rapidamente con huella/rostro.',
+              style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+            ),
+            activeColor: AppColors.secondary,
+            contentPadding: EdgeInsets.zero,
+          ),
+        ],
       ],
     );
   }

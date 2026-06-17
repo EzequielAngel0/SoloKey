@@ -23,6 +23,7 @@ class CredentialCard extends ConsumerWidget {
     CredentialType.secureNote: Icons.note_rounded,
     CredentialType.totp:       Icons.access_time_rounded,
     CredentialType.passkey:    Icons.fingerprint_rounded,
+    CredentialType.sshKey:     Icons.terminal_rounded,
   };
 
   static const _typeColors = {
@@ -31,6 +32,7 @@ class CredentialCard extends ConsumerWidget {
     CredentialType.secureNote: Color(0xFFFFB74D),
     CredentialType.totp:       Color(0xFFE91E8C),
     CredentialType.passkey:    Color(0xFF4CAF50),
+    CredentialType.sshKey:     Color(0xFF00E5FF),
   };
 
   void _showOptionsSheet(BuildContext context, WidgetRef ref) {
@@ -310,6 +312,11 @@ class CredentialCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+                if (credential.isDoubleEncrypted) ...[
+                  const SizedBox(width: 6),
+                  const Icon(Icons.enhanced_encryption_rounded,
+                      color: Color(0xFF00E5FF), size: 16),
+                ],
                 if (credential.isFavorite)
                   const Icon(Icons.star_rounded,
                       color: Color(0xFFFFB74D), size: 18),

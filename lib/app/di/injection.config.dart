@@ -22,6 +22,8 @@ import '../../core/infrastructure/database/daos/password_history_dao.dart'
     as _i386;
 import '../../core/infrastructure/security/app_lifecycle_observer.dart'
     as _i301;
+import '../../core/infrastructure/security/double_envelope_service.dart'
+    as _i971;
 import '../../core/infrastructure/security/i_security_service.dart' as _i1023;
 import '../../core/infrastructure/security/security_service_impl.dart'
     as _i1063;
@@ -124,6 +126,12 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i386.PasswordHistoryDao>(),
         gh<_i1023.ISecurityService>(),
         gh<_i795.SessionManager>(),
+      ),
+    );
+    gh.lazySingleton<_i971.DoubleEnvelopeService>(
+      () => _i971.DoubleEnvelopeService(
+        gh<_i1023.ISecurityService>(),
+        gh<_i558.FlutterSecureStorage>(),
       ),
     );
     gh.lazySingleton<_i923.AutofillQueryHandler>(

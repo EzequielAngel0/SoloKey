@@ -527,6 +527,243 @@ abstract class _PasskeyMetadata implements PasskeyMetadata {
       throw _privateConstructorUsedError;
 }
 
+SshKeyMetadata _$SshKeyMetadataFromJson(Map<String, dynamic> json) {
+  return _SshKeyMetadata.fromJson(json);
+}
+
+/// @nodoc
+mixin _$SshKeyMetadata {
+  String get privateKey =>
+      throw _privateConstructorUsedError; // stored encrypted
+  String get publicKey =>
+      throw _privateConstructorUsedError; // stored encrypted
+  String? get passphrase =>
+      throw _privateConstructorUsedError; // stored encrypted
+  String get keyType => throw _privateConstructorUsedError;
+
+  /// Serializes this SshKeyMetadata to a JSON map.
+  Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
+
+  /// Create a copy of SshKeyMetadata
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  $SshKeyMetadataCopyWith<SshKeyMetadata> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
+/// @nodoc
+abstract class $SshKeyMetadataCopyWith<$Res> {
+  factory $SshKeyMetadataCopyWith(
+    SshKeyMetadata value,
+    $Res Function(SshKeyMetadata) then,
+  ) = _$SshKeyMetadataCopyWithImpl<$Res, SshKeyMetadata>;
+  @useResult
+  $Res call({
+    String privateKey,
+    String publicKey,
+    String? passphrase,
+    String keyType,
+  });
+}
+
+/// @nodoc
+class _$SshKeyMetadataCopyWithImpl<$Res, $Val extends SshKeyMetadata>
+    implements $SshKeyMetadataCopyWith<$Res> {
+  _$SshKeyMetadataCopyWithImpl(this._value, this._then);
+
+  // ignore: unused_field
+  final $Val _value;
+  // ignore: unused_field
+  final $Res Function($Val) _then;
+
+  /// Create a copy of SshKeyMetadata
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? privateKey = null,
+    Object? publicKey = null,
+    Object? passphrase = freezed,
+    Object? keyType = null,
+  }) {
+    return _then(
+      _value.copyWith(
+            privateKey: null == privateKey
+                ? _value.privateKey
+                : privateKey // ignore: cast_nullable_to_non_nullable
+                      as String,
+            publicKey: null == publicKey
+                ? _value.publicKey
+                : publicKey // ignore: cast_nullable_to_non_nullable
+                      as String,
+            passphrase: freezed == passphrase
+                ? _value.passphrase
+                : passphrase // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            keyType: null == keyType
+                ? _value.keyType
+                : keyType // ignore: cast_nullable_to_non_nullable
+                      as String,
+          )
+          as $Val,
+    );
+  }
+}
+
+/// @nodoc
+abstract class _$$SshKeyMetadataImplCopyWith<$Res>
+    implements $SshKeyMetadataCopyWith<$Res> {
+  factory _$$SshKeyMetadataImplCopyWith(
+    _$SshKeyMetadataImpl value,
+    $Res Function(_$SshKeyMetadataImpl) then,
+  ) = __$$SshKeyMetadataImplCopyWithImpl<$Res>;
+  @override
+  @useResult
+  $Res call({
+    String privateKey,
+    String publicKey,
+    String? passphrase,
+    String keyType,
+  });
+}
+
+/// @nodoc
+class __$$SshKeyMetadataImplCopyWithImpl<$Res>
+    extends _$SshKeyMetadataCopyWithImpl<$Res, _$SshKeyMetadataImpl>
+    implements _$$SshKeyMetadataImplCopyWith<$Res> {
+  __$$SshKeyMetadataImplCopyWithImpl(
+    _$SshKeyMetadataImpl _value,
+    $Res Function(_$SshKeyMetadataImpl) _then,
+  ) : super(_value, _then);
+
+  /// Create a copy of SshKeyMetadata
+  /// with the given fields replaced by the non-null parameter values.
+  @pragma('vm:prefer-inline')
+  @override
+  $Res call({
+    Object? privateKey = null,
+    Object? publicKey = null,
+    Object? passphrase = freezed,
+    Object? keyType = null,
+  }) {
+    return _then(
+      _$SshKeyMetadataImpl(
+        privateKey: null == privateKey
+            ? _value.privateKey
+            : privateKey // ignore: cast_nullable_to_non_nullable
+                  as String,
+        publicKey: null == publicKey
+            ? _value.publicKey
+            : publicKey // ignore: cast_nullable_to_non_nullable
+                  as String,
+        passphrase: freezed == passphrase
+            ? _value.passphrase
+            : passphrase // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        keyType: null == keyType
+            ? _value.keyType
+            : keyType // ignore: cast_nullable_to_non_nullable
+                  as String,
+      ),
+    );
+  }
+}
+
+/// @nodoc
+@JsonSerializable()
+class _$SshKeyMetadataImpl implements _SshKeyMetadata {
+  const _$SshKeyMetadataImpl({
+    required this.privateKey,
+    required this.publicKey,
+    this.passphrase,
+    this.keyType = 'Ed25519',
+  });
+
+  factory _$SshKeyMetadataImpl.fromJson(Map<String, dynamic> json) =>
+      _$$SshKeyMetadataImplFromJson(json);
+
+  @override
+  final String privateKey;
+  // stored encrypted
+  @override
+  final String publicKey;
+  // stored encrypted
+  @override
+  final String? passphrase;
+  // stored encrypted
+  @override
+  @JsonKey()
+  final String keyType;
+
+  @override
+  String toString() {
+    return 'SshKeyMetadata(privateKey: $privateKey, publicKey: $publicKey, passphrase: $passphrase, keyType: $keyType)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return identical(this, other) ||
+        (other.runtimeType == runtimeType &&
+            other is _$SshKeyMetadataImpl &&
+            (identical(other.privateKey, privateKey) ||
+                other.privateKey == privateKey) &&
+            (identical(other.publicKey, publicKey) ||
+                other.publicKey == publicKey) &&
+            (identical(other.passphrase, passphrase) ||
+                other.passphrase == passphrase) &&
+            (identical(other.keyType, keyType) || other.keyType == keyType));
+  }
+
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  int get hashCode =>
+      Object.hash(runtimeType, privateKey, publicKey, passphrase, keyType);
+
+  /// Create a copy of SshKeyMetadata
+  /// with the given fields replaced by the non-null parameter values.
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  @override
+  @pragma('vm:prefer-inline')
+  _$$SshKeyMetadataImplCopyWith<_$SshKeyMetadataImpl> get copyWith =>
+      __$$SshKeyMetadataImplCopyWithImpl<_$SshKeyMetadataImpl>(
+        this,
+        _$identity,
+      );
+
+  @override
+  Map<String, dynamic> toJson() {
+    return _$$SshKeyMetadataImplToJson(this);
+  }
+}
+
+abstract class _SshKeyMetadata implements SshKeyMetadata {
+  const factory _SshKeyMetadata({
+    required final String privateKey,
+    required final String publicKey,
+    final String? passphrase,
+    final String keyType,
+  }) = _$SshKeyMetadataImpl;
+
+  factory _SshKeyMetadata.fromJson(Map<String, dynamic> json) =
+      _$SshKeyMetadataImpl.fromJson;
+
+  @override
+  String get privateKey; // stored encrypted
+  @override
+  String get publicKey; // stored encrypted
+  @override
+  String? get passphrase; // stored encrypted
+  @override
+  String get keyType;
+
+  /// Create a copy of SshKeyMetadata
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @JsonKey(includeFromJson: false, includeToJson: false)
+  _$$SshKeyMetadataImplCopyWith<_$SshKeyMetadataImpl> get copyWith =>
+      throw _privateConstructorUsedError;
+}
+
 Credential _$CredentialFromJson(Map<String, dynamic> json) {
   return _Credential.fromJson(json);
 }
@@ -545,11 +782,15 @@ mixin _$Credential {
   String? get categoryId => throw _privateConstructorUsedError;
   String? get folderId => throw _privateConstructorUsedError;
   bool get isFavorite => throw _privateConstructorUsedError;
+  bool get isDoubleEncrypted => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
   /// Present only when [type] == [CredentialType.passkey]
   PasskeyMetadata? get passkeyMetadata => throw _privateConstructorUsedError;
+
+  /// Present only when [type] == [CredentialType.sshKey]
+  SshKeyMetadata? get sshKeyMetadata => throw _privateConstructorUsedError;
 
   /// Serializes this Credential to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -580,12 +821,15 @@ abstract class $CredentialCopyWith<$Res> {
     String? categoryId,
     String? folderId,
     bool isFavorite,
+    bool isDoubleEncrypted,
     DateTime createdAt,
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
+    SshKeyMetadata? sshKeyMetadata,
   });
 
   $PasskeyMetadataCopyWith<$Res>? get passkeyMetadata;
+  $SshKeyMetadataCopyWith<$Res>? get sshKeyMetadata;
 }
 
 /// @nodoc
@@ -614,9 +858,11 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
     Object? categoryId = freezed,
     Object? folderId = freezed,
     Object? isFavorite = null,
+    Object? isDoubleEncrypted = null,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
+    Object? sshKeyMetadata = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -664,6 +910,10 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
                 ? _value.isFavorite
                 : isFavorite // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isDoubleEncrypted: null == isDoubleEncrypted
+                ? _value.isDoubleEncrypted
+                : isDoubleEncrypted // ignore: cast_nullable_to_non_nullable
+                      as bool,
             createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -676,6 +926,10 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
                 ? _value.passkeyMetadata
                 : passkeyMetadata // ignore: cast_nullable_to_non_nullable
                       as PasskeyMetadata?,
+            sshKeyMetadata: freezed == sshKeyMetadata
+                ? _value.sshKeyMetadata
+                : sshKeyMetadata // ignore: cast_nullable_to_non_nullable
+                      as SshKeyMetadata?,
           )
           as $Val,
     );
@@ -692,6 +946,20 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
 
     return $PasskeyMetadataCopyWith<$Res>(_value.passkeyMetadata!, (value) {
       return _then(_value.copyWith(passkeyMetadata: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Credential
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $SshKeyMetadataCopyWith<$Res>? get sshKeyMetadata {
+    if (_value.sshKeyMetadata == null) {
+      return null;
+    }
+
+    return $SshKeyMetadataCopyWith<$Res>(_value.sshKeyMetadata!, (value) {
+      return _then(_value.copyWith(sshKeyMetadata: value) as $Val);
     });
   }
 }
@@ -717,13 +985,17 @@ abstract class _$$CredentialImplCopyWith<$Res>
     String? categoryId,
     String? folderId,
     bool isFavorite,
+    bool isDoubleEncrypted,
     DateTime createdAt,
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
+    SshKeyMetadata? sshKeyMetadata,
   });
 
   @override
   $PasskeyMetadataCopyWith<$Res>? get passkeyMetadata;
+  @override
+  $SshKeyMetadataCopyWith<$Res>? get sshKeyMetadata;
 }
 
 /// @nodoc
@@ -751,9 +1023,11 @@ class __$$CredentialImplCopyWithImpl<$Res>
     Object? categoryId = freezed,
     Object? folderId = freezed,
     Object? isFavorite = null,
+    Object? isDoubleEncrypted = null,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
+    Object? sshKeyMetadata = freezed,
   }) {
     return _then(
       _$CredentialImpl(
@@ -801,6 +1075,10 @@ class __$$CredentialImplCopyWithImpl<$Res>
             ? _value.isFavorite
             : isFavorite // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isDoubleEncrypted: null == isDoubleEncrypted
+            ? _value.isDoubleEncrypted
+            : isDoubleEncrypted // ignore: cast_nullable_to_non_nullable
+                  as bool,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -813,6 +1091,10 @@ class __$$CredentialImplCopyWithImpl<$Res>
             ? _value.passkeyMetadata
             : passkeyMetadata // ignore: cast_nullable_to_non_nullable
                   as PasskeyMetadata?,
+        sshKeyMetadata: freezed == sshKeyMetadata
+            ? _value.sshKeyMetadata
+            : sshKeyMetadata // ignore: cast_nullable_to_non_nullable
+                  as SshKeyMetadata?,
       ),
     );
   }
@@ -833,9 +1115,11 @@ class _$CredentialImpl implements _Credential {
     this.categoryId,
     this.folderId,
     this.isFavorite = false,
+    this.isDoubleEncrypted = false,
     required this.createdAt,
     required this.updatedAt,
     this.passkeyMetadata,
+    this.sshKeyMetadata,
   }) : _customFields = customFields;
 
   factory _$CredentialImpl.fromJson(Map<String, dynamic> json) =>
@@ -875,6 +1159,9 @@ class _$CredentialImpl implements _Credential {
   @JsonKey()
   final bool isFavorite;
   @override
+  @JsonKey()
+  final bool isDoubleEncrypted;
+  @override
   final DateTime createdAt;
   @override
   final DateTime updatedAt;
@@ -883,9 +1170,13 @@ class _$CredentialImpl implements _Credential {
   @override
   final PasskeyMetadata? passkeyMetadata;
 
+  /// Present only when [type] == [CredentialType.sshKey]
+  @override
+  final SshKeyMetadata? sshKeyMetadata;
+
   @override
   String toString() {
-    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata)';
+    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, isDoubleEncrypted: $isDoubleEncrypted, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata, sshKeyMetadata: $sshKeyMetadata)';
   }
 
   @override
@@ -912,12 +1203,16 @@ class _$CredentialImpl implements _Credential {
                 other.folderId == folderId) &&
             (identical(other.isFavorite, isFavorite) ||
                 other.isFavorite == isFavorite) &&
+            (identical(other.isDoubleEncrypted, isDoubleEncrypted) ||
+                other.isDoubleEncrypted == isDoubleEncrypted) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
             (identical(other.passkeyMetadata, passkeyMetadata) ||
-                other.passkeyMetadata == passkeyMetadata));
+                other.passkeyMetadata == passkeyMetadata) &&
+            (identical(other.sshKeyMetadata, sshKeyMetadata) ||
+                other.sshKeyMetadata == sshKeyMetadata));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -935,9 +1230,11 @@ class _$CredentialImpl implements _Credential {
     categoryId,
     folderId,
     isFavorite,
+    isDoubleEncrypted,
     createdAt,
     updatedAt,
     passkeyMetadata,
+    sshKeyMetadata,
   );
 
   /// Create a copy of Credential
@@ -967,9 +1264,11 @@ abstract class _Credential implements Credential {
     final String? categoryId,
     final String? folderId,
     final bool isFavorite,
+    final bool isDoubleEncrypted,
     required final DateTime createdAt,
     required final DateTime updatedAt,
     final PasskeyMetadata? passkeyMetadata,
+    final SshKeyMetadata? sshKeyMetadata,
   }) = _$CredentialImpl;
 
   factory _Credential.fromJson(Map<String, dynamic> json) =
@@ -998,6 +1297,8 @@ abstract class _Credential implements Credential {
   @override
   bool get isFavorite;
   @override
+  bool get isDoubleEncrypted;
+  @override
   DateTime get createdAt;
   @override
   DateTime get updatedAt;
@@ -1005,6 +1306,10 @@ abstract class _Credential implements Credential {
   /// Present only when [type] == [CredentialType.passkey]
   @override
   PasskeyMetadata? get passkeyMetadata;
+
+  /// Present only when [type] == [CredentialType.sshKey]
+  @override
+  SshKeyMetadata? get sshKeyMetadata;
 
   /// Create a copy of Credential
   /// with the given fields replaced by the non-null parameter values.

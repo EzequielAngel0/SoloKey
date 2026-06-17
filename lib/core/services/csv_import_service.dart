@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:injectable/injectable.dart';
 import 'package:uuid/uuid.dart';
 import '../../features/credentials/domain/entities/credential.dart';

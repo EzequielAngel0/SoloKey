@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SecureTextField extends StatefulWidget {
   const SecureTextField({
@@ -11,6 +12,8 @@ class SecureTextField extends StatefulWidget {
     this.onSubmitted,
     this.autofocus = false,
     this.enabled = true,
+    this.keyboardType,
+    this.inputFormatters,
   });
 
   final TextEditingController controller;
@@ -21,6 +24,8 @@ class SecureTextField extends StatefulWidget {
   final void Function(String)? onSubmitted;
   final bool autofocus;
   final bool enabled;
+  final TextInputType? keyboardType;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<SecureTextField> createState() => _SecureTextFieldState();
@@ -39,6 +44,8 @@ class _SecureTextFieldState extends State<SecureTextField> {
       textInputAction: widget.textInputAction,
       onFieldSubmitted: widget.onSubmitted,
       validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      inputFormatters: widget.inputFormatters,
       style: const TextStyle(
         color: Colors.white,
         fontSize: 16,

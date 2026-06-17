@@ -171,6 +171,17 @@ Para desarrollar este **Local-First Password Manager en Flutter/Dart**, el avanc
 
 ---
 
+### ✅ Fase 8.7: Llaves SSH y Cifrado de Sobre Doble — COMPLETADA (2026-06-17)
+- **Agentes Principales:** Mezcla de 🛡️ `Auditor_Seguridad_Mobile`, 🧑‍💻 `Desarrollador_Flutter_Core` y 💾 `Ingeniero_Persistencia`.
+- **Entregables completados:**
+  1. **Llaves SSH:** Añadido `CredentialType.sshKey`, modelo de metadatos `SshKeyMetadata`, mapeo de payload, soporte en selector visual de tipos, formulario con campos monoespacio multilínea, y vista detallada con copiado independiente.
+  2. **Cifrado de Sobre Doble:** Creado `DoubleEnvelopeService` (Argon2id + AES-256-GCM a nivel de registro). Migración drift de base de datos a v6 añadiendo columna `isDoubleEncrypted`.
+  3. **Seguridad RAM:** Desencriptado al vuelo en widget `_SecretTile` al revelar/copiar pidiendo PIN o Huella dactilar; eliminación de RAM instantánea del texto plano al ocultarse.
+  4. **Protección de Auditoría:** Ignorado de claves SSH y Passkeys en chequeo de contraseñas débiles y envíos HaveIBeenPwned en `SecurityAuditService`.
+  5. **Pruebas Unitarias:** Creado `double_envelope_service_test.dart` y verificado en verde. 32/32 tests unitarios pasando con éxito.
+
+---
+
 ## 🛠️ Fases Pendientes (Roadmap Futuro)
 
 ### ⏳ Fase 9: Exportación/Importación Selectiva Segura
@@ -272,4 +283,4 @@ Para acatar las configuraciones, deberás usar frecuentemente:
 | Build | `build_runner` | Entidades y DTO generados en sync |
 | Config | `analysis_options.yaml` | Lint estricto: avoid_print, prefer_const |
 
-*FIN DEL CONTEXTO Y MANUAL DE OPERACIONES. Fase actual: **8.6 — Pulido Integral COMPLETADO. Listo para Roadmap Futuro o Producción.***
+*FIN DEL CONTEXTO Y MANUAL DE OPERACIONES. Fase actual: **8.7 — Llaves SSH y Cifrado Doble COMPLETADO. Listo para planificar la aplicación de escritorio.***

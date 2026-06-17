@@ -28,6 +28,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     CredentialType.apiKey,
     CredentialType.secureNote,
     CredentialType.totp,
+    CredentialType.sshKey,
   };
   final _exportPasswordCtrl = TextEditingController();
   bool _exporting = false;
@@ -61,6 +62,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         CredentialType.secureNote => 'Notas seguras',
         CredentialType.totp => 'Autenticadores (TOTP)',
         CredentialType.passkey => 'Passkeys',
+        CredentialType.sshKey => 'Llaves SSH',
       };
 
   IconData _typeIcon(CredentialType type) => switch (type) {
@@ -69,6 +71,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         CredentialType.secureNote => Icons.note_rounded,
         CredentialType.totp => Icons.qr_code_rounded,
         CredentialType.passkey => Icons.fingerprint_rounded,
+        CredentialType.sshKey => Icons.terminal_rounded,
       };
 
   Future<void> _doExport() async {

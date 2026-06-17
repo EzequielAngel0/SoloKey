@@ -39,4 +39,5 @@ abstract final class AppColors {
   static const typeNote      = warning;
   static const typeTotp      = Color(0xFFE91E8C);
   static const typePasskey   = Color(0xFF4CAF50);
+  static const typeSshKey    = Color(0xFF00E5FF);
 }

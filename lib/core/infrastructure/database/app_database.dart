@@ -27,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 5;
+  int get schemaVersion => 6;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -50,6 +50,14 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(
               credentialEntries,
               credentialEntries.folderId as GeneratedColumn,
+            );
+          }
+          if (from < 6) {
+            // isDoubleEncrypted for credential entries — enables double-envelope encryption.
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.isDoubleEncrypted as GeneratedColumn,
             );
           }
         },

@@ -10,6 +10,8 @@ enum CredentialType {
   totp,
   /// FIDO2 / WebAuthn Passkey
   passkey,
+  /// SSH Key Pair
+  sshKey,
 }
 
 @freezed
@@ -54,6 +56,20 @@ class PasskeyMetadata with _$PasskeyMetadata {
       _$PasskeyMetadataFromJson(json);
 }
 
+/// Metadata and keys for an SSH Key.
+@freezed
+class SshKeyMetadata with _$SshKeyMetadata {
+  const factory SshKeyMetadata({
+    required String privateKey, // stored encrypted
+    required String publicKey,  // stored encrypted
+    String? passphrase,         // stored encrypted
+    @Default('Ed25519') String keyType,
+  }) = _SshKeyMetadata;
+
+  factory SshKeyMetadata.fromJson(Map<String, dynamic> json) =>
+      _$SshKeyMetadataFromJson(json);
+}
+
 @freezed
 class Credential with _$Credential {
   const factory Credential({
@@ -68,10 +84,13 @@ class Credential with _$Credential {
     String? categoryId,
     String? folderId,
     @Default(false) bool isFavorite,
+    @Default(false) bool isDoubleEncrypted,
     required DateTime createdAt,
     required DateTime updatedAt,
     /// Present only when [type] == [CredentialType.passkey]
     PasskeyMetadata? passkeyMetadata,
+    /// Present only when [type] == [CredentialType.sshKey]
+    SshKeyMetadata? sshKeyMetadata,
   }) = _Credential;
 
   factory Credential.fromJson(Map<String, dynamic> json) =>

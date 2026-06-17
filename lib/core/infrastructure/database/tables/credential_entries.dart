@@ -25,6 +25,10 @@ class CredentialEntries extends Table {
   BoolColumn get isFavorite =>
       boolean().withDefault(const Constant(false))();
 
+  /// Whether the credential is double-encrypted using a secondary PIN.
+  BoolColumn get isDoubleEncrypted =>
+      boolean().withDefault(const Constant(false))();
+
   /// AES-256-GCM blob: nonce(12) || ciphertext || tag(16).
   /// Contains JSON-encoded sensitive payload including passkeyMetadata.
   BlobColumn get encryptedPayload => blob()();

@@ -42,7 +42,10 @@ class SecurityAuditService {
     final breachChecks = <Future<void>>[];
 
     for (final c in credentials) {
-      if (c.type == CredentialType.secureNote || c.type == CredentialType.totp) {
+      if (c.type == CredentialType.secureNote ||
+          c.type == CredentialType.totp ||
+          c.type == CredentialType.passkey ||
+          c.type == CredentialType.sshKey) {
         continue;
       }
 

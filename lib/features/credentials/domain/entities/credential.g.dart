@@ -42,6 +42,23 @@ Map<String, dynamic> _$$PasskeyMetadataImplToJson(
   'userVerificationRequired': instance.userVerificationRequired,
 };
 
+_$SshKeyMetadataImpl _$$SshKeyMetadataImplFromJson(Map<String, dynamic> json) =>
+    _$SshKeyMetadataImpl(
+      privateKey: json['privateKey'] as String,
+      publicKey: json['publicKey'] as String,
+      passphrase: json['passphrase'] as String?,
+      keyType: json['keyType'] as String? ?? 'Ed25519',
+    );
+
+Map<String, dynamic> _$$SshKeyMetadataImplToJson(
+  _$SshKeyMetadataImpl instance,
+) => <String, dynamic>{
+  'privateKey': instance.privateKey,
+  'publicKey': instance.publicKey,
+  'passphrase': instance.passphrase,
+  'keyType': instance.keyType,
+};
+
 _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
     _$CredentialImpl(
       id: json['id'] as String,
@@ -59,12 +76,18 @@ _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
       categoryId: json['categoryId'] as String?,
       folderId: json['folderId'] as String?,
       isFavorite: json['isFavorite'] as bool? ?? false,
+      isDoubleEncrypted: json['isDoubleEncrypted'] as bool? ?? false,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       passkeyMetadata: json['passkeyMetadata'] == null
           ? null
           : PasskeyMetadata.fromJson(
               json['passkeyMetadata'] as Map<String, dynamic>,
+            ),
+      sshKeyMetadata: json['sshKeyMetadata'] == null
+          ? null
+          : SshKeyMetadata.fromJson(
+              json['sshKeyMetadata'] as Map<String, dynamic>,
             ),
     );
 
@@ -81,9 +104,11 @@ Map<String, dynamic> _$$CredentialImplToJson(_$CredentialImpl instance) =>
       'categoryId': instance.categoryId,
       'folderId': instance.folderId,
       'isFavorite': instance.isFavorite,
+      'isDoubleEncrypted': instance.isDoubleEncrypted,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
       'passkeyMetadata': instance.passkeyMetadata,
+      'sshKeyMetadata': instance.sshKeyMetadata,
     };
 
 const _$CredentialTypeEnumMap = {
@@ -92,4 +117,5 @@ const _$CredentialTypeEnumMap = {
   CredentialType.secureNote: 'secureNote',
   CredentialType.totp: 'totp',
   CredentialType.passkey: 'passkey',
+  CredentialType.sshKey: 'sshKey',
 };

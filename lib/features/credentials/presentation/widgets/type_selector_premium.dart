@@ -21,6 +21,7 @@ class TypeSelectorPremium extends StatelessWidget {
     (type: CredentialType.secureNote, label: 'Nota',       icon: Icons.note_rounded,          color: AppColors.typeNote),
     (type: CredentialType.totp,       label: 'TOTP',       icon: Icons.access_time_rounded,   color: AppColors.typeTotp),
     (type: CredentialType.passkey,    label: 'Passkey',    icon: Icons.fingerprint_rounded,   color: AppColors.typePasskey),
+    (type: CredentialType.sshKey,     label: 'Llave SSH',  icon: Icons.terminal_rounded,      color: AppColors.typeSshKey),
   ];
 
   @override
