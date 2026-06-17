@@ -75,7 +75,7 @@ Future<void> main() async {
           'rotationCheck',
           frequency: const Duration(hours: 24),
           initialDelay: const Duration(hours: 1),
-          existingWorkPolicy: ExistingWorkPolicy.keep,
+          existingWorkPolicy: ExistingPeriodicWorkPolicy.keep,
         );
         await notifications.initialize();
       }

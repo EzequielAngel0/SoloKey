@@ -129,16 +129,30 @@ Uso en widgets: `context.palette.card`, `context.palette.textMuted`, etc.
 
 ---
 
-## 2. Renombrado de package → `com.angelezequiel.solokey`
+## 2. Renombrado de package → `com.angelezequiel.solokey` — ✅ COMPLETADO (2026-06-17)
 
-Estado actual: `applicationId/namespace = com.vaultguard` (Android). Pasos:
+Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
-- ⬜ `android/app/build.gradle(.kts)`: `namespace` y `applicationId` → `com.angelezequiel.solokey`.
-- ⬜ Mover `android/app/src/main/kotlin/com/vaultguard/…` → `…/com/angelezequiel/solokey/…` y actualizar `package` en `MainActivity.kt` y `SoloKeyAutofillService.kt`.
-- ⬜ `AndroidManifest.xml`: las referencias `.MainActivity` / `.SoloKeyAutofillService` son relativas al namespace → se resuelven solas; verificar.
-- ⬜ Revisar `debug/` y `profile/` `AndroidManifest` si existen.
-- ⬜ Verificación: `flutter analyze` + `flutter build apk --debug` (build puede tardar).
-- ℹ️ El **nombre del paquete Dart** (`pubspec.yaml: name: password_manager`) es independiente; renombrarlo a `solokey` es opcional y de mayor alcance (toca todos los `import 'package:…'`). **No** incluido salvo que se pida.
+- ✅ `android/app/build.gradle.kts`: `namespace` y `applicationId` → `com.angelezequiel.solokey`.
+- ✅ Movidos `MainActivity.kt`, `PasskeyHandler.kt`, `SoloKeyAutofillService.kt` de
+  `com/vaultguard/password_manager/` → `com/angelezequiel/solokey/` con `package` actualizado.
+- ✅ `autofill_service_config.xml`: `settingsActivity` → `com.angelezequiel.solokey.MainActivity`.
+- ✅ `AndroidManifest.xml`: `.MainActivity` / `.SoloKeyAutofillService` son relativas al
+  namespace → se resuelven solas (verificado). `debug/` y `profile/` no tienen refs de package.
+- ✅ Verificación: `flutter build apk --debug` OK; `flutter analyze` 0 errores; 33/33 tests.
+- ℹ️ El nombre del paquete Dart (`pubspec.yaml: name: password_manager`) NO se cambió (es
+  independiente y de mayor alcance).
+- ⚠️ Cambiar el `applicationId` hace que Android trate la app como **instalación nueva**: la
+  bóveda del `com.vaultguard.*` anterior (Keystore/secure storage) NO migra. Solo relevante si
+  había datos en el dispositivo; en dev se reinstala limpio.
+
+### Fixes de build colaterales (necesarios para compilar en Flutter 3.38)
+- ✅ **Core library desugaring** habilitado (`isCoreLibraryDesugaringEnabled = true` +
+  `coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")`) — lo exigía
+  `flutter_local_notifications`.
+- ✅ **`workmanager` 0.5.2 → 0.9.0+3** (federado, embedding v2). 0.5.2 usaba la API v1
+  (`registerWith`/`ShimPluginRegistry`/`Registrar`) ya eliminada. Único cambio Dart:
+  `ExistingWorkPolicy.keep` → `ExistingPeriodicWorkPolicy.keep` en `main.dart`.
 
 ---
 
@@ -192,7 +206,7 @@ Estado actual: `applicationId/namespace = com.vaultguard` (Android). Pasos:
 | 2 | Temas: migrar ~820 refs a la paleta | 🔴 | Temas L2 | ✅ |
 | 3 | Temas: 4 variantes + sistema + selector | 🔴 | Temas L3 | ✅ |
 | 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ✅ |
-| 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ⬜ |
+| 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ✅ |
 | 6 | Móvil: acciones de notificación | 🔴 | Features B | ⬜ |
 | 7 | Móvil: autofill inline + biometría | 🔴 | Features B | ⬜ |
 | 8 | Escritorio: autostart al tray | 🔴 | Features C | ⬜ |

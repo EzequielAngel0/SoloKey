@@ -1,4 +1,4 @@
-package com.vaultguard.password_manager
+package com.angelezequiel.solokey
 
 import android.content.ComponentName
 import android.content.Intent

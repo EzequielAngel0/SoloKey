@@ -1,4 +1,4 @@
-package com.vaultguard.password_manager
+package com.angelezequiel.solokey
 
 import android.app.assist.AssistStructure
 import android.os.CancellationSignal
