@@ -4,7 +4,9 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
@@ -56,6 +58,7 @@ Future<void> main(List<String> args) async {
 
       if (isDesktop) {
         await localNotifier.setup(appName: 'SoloKey');
+        await hotKeyManager.unregisterAll();
 
         // Autostart (registro HKCU\...\Run en Windows). El toggle en Ajustes
         // llama a enable()/disable(); aqui solo configuramos la ruta + arg.
@@ -83,6 +86,24 @@ Future<void> main(List<String> args) async {
             await windowManager.focus();
           }
         });
+
+        // Hotkey global tipo spotlight (Ctrl+Shift+K): trae SoloKey al frente
+        // desde cualquier app, sin abrir la ventana manualmente.
+        try {
+          await hotKeyManager.register(
+            HotKey(
+              key: PhysicalKeyboardKey.keyK,
+              modifiers: [HotKeyModifier.control, HotKeyModifier.shift],
+              scope: HotKeyScope.system,
+            ),
+            keyDownHandler: (_) async {
+              await windowManager.show();
+              await windowManager.focus();
+            },
+          );
+        } catch (_) {
+          // El hotkey es best-effort; no debe impedir el arranque.
+        }
       }
 
       // Android: schedule a daily background rotation sweep + foreground setup.

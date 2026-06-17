@@ -68,6 +68,7 @@ dependencies:
   local_notifier: ^0.1.6
   workmanager: ^0.9.0+3
   launch_at_startup: ^0.5.1
+  hotkey_manager: ^0.2.3
 
 dev_dependencies:
   flutter_test:
