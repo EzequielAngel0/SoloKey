@@ -13,6 +13,7 @@ import '../../folders/domain/entities/folder.dart';
 import '../application/credentials_provider.dart';
 import '../domain/entities/credential.dart';
 import 'widgets/credential_card.dart';
+import 'widgets/folder_options_sheet.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -210,28 +211,10 @@ class _FavoritesView extends ConsumerWidget {
 
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder folder) {
-    showModalBottomSheet(
+    showFolderOptionsSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(folder.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          ),
-          ListTile(
-            leading: Icon(folder.isFavorite ? Icons.star_border_rounded : Icons.star_rounded, color: const Color(0xFFFFB74D)),
-            title: Text(folder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas', style: const TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              ref.read(foldersNotifierProvider.notifier).toggleFavorite(folder.id);
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+      ref: ref,
+      folder: folder,
     );
   }
 
@@ -299,46 +282,13 @@ class _FolderListView extends ConsumerWidget {
 
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder folder) {
-    showModalBottomSheet(
+    showFolderOptionsSheet(
       context: context,
-      backgroundColor: const Color(0xFF1A1A2E),
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Text(folder.name, style: const TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-          ),
-          ListTile(
-            leading: Icon(folder.isFavorite ? Icons.star_border_rounded : Icons.star_rounded, color: const Color(0xFFFFB74D)),
-            title: Text(folder.isFavorite ? 'Quitar de favoritos' : 'Añadir a favoritas', style: const TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              ref.read(foldersNotifierProvider.notifier).toggleFavorite(folder.id);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.drive_file_rename_outline_rounded, color: Colors.white),
-            title: const Text('Renombrar', style: TextStyle(color: Colors.white)),
-            onTap: () {
-              Navigator.pop(context);
-              _renameFolder(context, ref, folder);
-            },
-          ),
-
-          const Divider(color: Color(0xFF2A2A4A)),
-          ListTile(
-            leading: const Icon(Icons.delete_rounded, color: Color(0xFFCF6679)),
-            title: const Text('Eliminar', style: TextStyle(color: Color(0xFFCF6679))),
-            onTap: () async {
-              Navigator.pop(context);
-              _deleteFolder(context, ref, folder);
-            },
-          ),
-          const SizedBox(height: 20),
-        ],
-      ),
+      ref: ref,
+      folder: folder,
+      showManagementOptions: true,
+      onRename: () => _renameFolder(context, ref, folder),
+      onDelete: () => _deleteFolder(context, ref, folder),
     );
   }
 
