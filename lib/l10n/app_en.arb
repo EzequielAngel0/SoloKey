@@ -167,5 +167,35 @@
 
   "totpTitle": "Verification code (2FA)",
   "totpClipboardLabel": "TOTP code",
-  "totpInvalid": "Invalid"
+  "totpInvalid": "Invalid",
+
+  "historyTitle": "History",
+  "historyEmpty": "No old passwords.",
+  "historyCopyTooltip": "Copy password",
+  "historyClipboardLabel": "Historical password",
+  "historyRestoreTooltip": "Restore password",
+  "historyRestoreTitle": "Restore password?",
+  "historyRestoreBody": "This will replace the credential's current password with this historical one. Continue?",
+  "historyRestoreConfirm": "Restore",
+  "historyRestoreSuccess": "Password restored successfully",
+  "historyRestoreError": "Error restoring the password: {msg}",
+  "@historyRestoreError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
+
+  "recoveryTitle": "Recover access",
+  "recoveryCodeTitle": "Recovery code",
+  "recoveryCodeDescription": "The recovery code was generated when you set up your vault. If you saved it, enter it here to reset your master password.",
+  "recoveryEnterCode": "Enter the recovery code",
+  "recoveryWrongCode": "Incorrect code. Check it and try again.",
+  "recoveryVerifyButton": "Verify code",
+  "recoveryEnterNewPassword": "Enter the new master password",
+  "recoveryMin8": "The password must be at least 8 characters",
+  "recoveryPasswordUpdated": "Master password updated successfully",
+  "recoveryCodeVerified": "Code verified. Now set your new master password.",
+  "recoveryNewPasswordLabel": "New master password",
+  "recoveryResetButton": "Reset master password",
+  "recoveryCodeWarning": "Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.",
+  "recoveryCopyCode": "Copy code",
+  "recoveryCodeSavedContinue": "I saved it, continue"
 }

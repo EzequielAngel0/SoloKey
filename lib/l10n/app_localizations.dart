@@ -757,6 +757,156 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid'**
   String get totpInvalid;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No old passwords.'**
+  String get historyEmpty;
+
+  /// No description provided for @historyCopyTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy password'**
+  String get historyCopyTooltip;
+
+  /// No description provided for @historyClipboardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Historical password'**
+  String get historyClipboardLabel;
+
+  /// No description provided for @historyRestoreTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore password'**
+  String get historyRestoreTooltip;
+
+  /// No description provided for @historyRestoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore password?'**
+  String get historyRestoreTitle;
+
+  /// No description provided for @historyRestoreBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will replace the credential\'s current password with this historical one. Continue?'**
+  String get historyRestoreBody;
+
+  /// No description provided for @historyRestoreConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get historyRestoreConfirm;
+
+  /// No description provided for @historyRestoreSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password restored successfully'**
+  String get historyRestoreSuccess;
+
+  /// No description provided for @historyRestoreError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error restoring the password: {msg}'**
+  String historyRestoreError(String msg);
+
+  /// No description provided for @recoveryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recover access'**
+  String get recoveryTitle;
+
+  /// No description provided for @recoveryCodeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recovery code'**
+  String get recoveryCodeTitle;
+
+  /// No description provided for @recoveryCodeDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The recovery code was generated when you set up your vault. If you saved it, enter it here to reset your master password.'**
+  String get recoveryCodeDescription;
+
+  /// No description provided for @recoveryEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the recovery code'**
+  String get recoveryEnterCode;
+
+  /// No description provided for @recoveryWrongCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect code. Check it and try again.'**
+  String get recoveryWrongCode;
+
+  /// No description provided for @recoveryVerifyButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify code'**
+  String get recoveryVerifyButton;
+
+  /// No description provided for @recoveryEnterNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the new master password'**
+  String get recoveryEnterNewPassword;
+
+  /// No description provided for @recoveryMin8.
+  ///
+  /// In en, this message translates to:
+  /// **'The password must be at least 8 characters'**
+  String get recoveryMin8;
+
+  /// No description provided for @recoveryPasswordUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Master password updated successfully'**
+  String get recoveryPasswordUpdated;
+
+  /// No description provided for @recoveryCodeVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Code verified. Now set your new master password.'**
+  String get recoveryCodeVerified;
+
+  /// No description provided for @recoveryNewPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New master password'**
+  String get recoveryNewPasswordLabel;
+
+  /// No description provided for @recoveryResetButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset master password'**
+  String get recoveryResetButton;
+
+  /// No description provided for @recoveryCodeWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.'**
+  String get recoveryCodeWarning;
+
+  /// No description provided for @recoveryCopyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get recoveryCopyCode;
+
+  /// No description provided for @recoveryCodeSavedContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'I saved it, continue'**
+  String get recoveryCodeSavedContinue;
 }
 
 class _AppLocalizationsDelegate

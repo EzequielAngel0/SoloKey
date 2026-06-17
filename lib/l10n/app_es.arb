@@ -128,5 +128,32 @@
 
   "totpTitle": "Código de verificación (2FA)",
   "totpClipboardLabel": "Código TOTP",
-  "totpInvalid": "Inválido"
+  "totpInvalid": "Inválido",
+
+  "historyTitle": "Historial",
+  "historyEmpty": "No hay contraseñas antiguas.",
+  "historyCopyTooltip": "Copiar contraseña",
+  "historyClipboardLabel": "Contraseña histórica",
+  "historyRestoreTooltip": "Restaurar contraseña",
+  "historyRestoreTitle": "¿Restaurar contraseña?",
+  "historyRestoreBody": "Esta acción reemplazará la contraseña actual de la credencial con esta contraseña histórica. ¿Deseas continuar?",
+  "historyRestoreConfirm": "Restaurar",
+  "historyRestoreSuccess": "Contraseña restaurada con éxito",
+  "historyRestoreError": "Error al restaurar la contraseña: {msg}",
+
+  "recoveryTitle": "Recuperar acceso",
+  "recoveryCodeTitle": "Código de recuperación",
+  "recoveryCodeDescription": "El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.",
+  "recoveryEnterCode": "Ingresa el código de recuperación",
+  "recoveryWrongCode": "Código incorrecto. Verifica e intenta de nuevo.",
+  "recoveryVerifyButton": "Verificar código",
+  "recoveryEnterNewPassword": "Ingresa la nueva contraseña maestra",
+  "recoveryMin8": "La contraseña debe tener al menos 8 caracteres",
+  "recoveryPasswordUpdated": "Contraseña maestra actualizada exitosamente",
+  "recoveryCodeVerified": "Código verificado. Ahora establece tu nueva contraseña maestra.",
+  "recoveryNewPasswordLabel": "Nueva contraseña maestra",
+  "recoveryResetButton": "Restablecer contraseña maestra",
+  "recoveryCodeWarning": "¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.",
+  "recoveryCopyCode": "Copiar código",
+  "recoveryCodeSavedContinue": "Ya lo guardé, continuar"
 }

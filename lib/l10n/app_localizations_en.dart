@@ -365,4 +365,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get totpInvalid => 'Invalid';
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String get historyEmpty => 'No old passwords.';
+
+  @override
+  String get historyCopyTooltip => 'Copy password';
+
+  @override
+  String get historyClipboardLabel => 'Historical password';
+
+  @override
+  String get historyRestoreTooltip => 'Restore password';
+
+  @override
+  String get historyRestoreTitle => 'Restore password?';
+
+  @override
+  String get historyRestoreBody =>
+      'This will replace the credential\'s current password with this historical one. Continue?';
+
+  @override
+  String get historyRestoreConfirm => 'Restore';
+
+  @override
+  String get historyRestoreSuccess => 'Password restored successfully';
+
+  @override
+  String historyRestoreError(String msg) {
+    return 'Error restoring the password: $msg';
+  }
+
+  @override
+  String get recoveryTitle => 'Recover access';
+
+  @override
+  String get recoveryCodeTitle => 'Recovery code';
+
+  @override
+  String get recoveryCodeDescription =>
+      'The recovery code was generated when you set up your vault. If you saved it, enter it here to reset your master password.';
+
+  @override
+  String get recoveryEnterCode => 'Enter the recovery code';
+
+  @override
+  String get recoveryWrongCode => 'Incorrect code. Check it and try again.';
+
+  @override
+  String get recoveryVerifyButton => 'Verify code';
+
+  @override
+  String get recoveryEnterNewPassword => 'Enter the new master password';
+
+  @override
+  String get recoveryMin8 => 'The password must be at least 8 characters';
+
+  @override
+  String get recoveryPasswordUpdated => 'Master password updated successfully';
+
+  @override
+  String get recoveryCodeVerified =>
+      'Code verified. Now set your new master password.';
+
+  @override
+  String get recoveryNewPasswordLabel => 'New master password';
+
+  @override
+  String get recoveryResetButton => 'Reset master password';
+
+  @override
+  String get recoveryCodeWarning =>
+      'Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.';
+
+  @override
+  String get recoveryCopyCode => 'Copy code';
+
+  @override
+  String get recoveryCodeSavedContinue => 'I saved it, continue';
 }

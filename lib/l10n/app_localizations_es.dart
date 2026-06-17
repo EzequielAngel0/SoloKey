@@ -366,4 +366,87 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get totpInvalid => 'Inválido';
+
+  @override
+  String get historyTitle => 'Historial';
+
+  @override
+  String get historyEmpty => 'No hay contraseñas antiguas.';
+
+  @override
+  String get historyCopyTooltip => 'Copiar contraseña';
+
+  @override
+  String get historyClipboardLabel => 'Contraseña histórica';
+
+  @override
+  String get historyRestoreTooltip => 'Restaurar contraseña';
+
+  @override
+  String get historyRestoreTitle => '¿Restaurar contraseña?';
+
+  @override
+  String get historyRestoreBody =>
+      'Esta acción reemplazará la contraseña actual de la credencial con esta contraseña histórica. ¿Deseas continuar?';
+
+  @override
+  String get historyRestoreConfirm => 'Restaurar';
+
+  @override
+  String get historyRestoreSuccess => 'Contraseña restaurada con éxito';
+
+  @override
+  String historyRestoreError(String msg) {
+    return 'Error al restaurar la contraseña: $msg';
+  }
+
+  @override
+  String get recoveryTitle => 'Recuperar acceso';
+
+  @override
+  String get recoveryCodeTitle => 'Código de recuperación';
+
+  @override
+  String get recoveryCodeDescription =>
+      'El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.';
+
+  @override
+  String get recoveryEnterCode => 'Ingresa el código de recuperación';
+
+  @override
+  String get recoveryWrongCode =>
+      'Código incorrecto. Verifica e intenta de nuevo.';
+
+  @override
+  String get recoveryVerifyButton => 'Verificar código';
+
+  @override
+  String get recoveryEnterNewPassword => 'Ingresa la nueva contraseña maestra';
+
+  @override
+  String get recoveryMin8 => 'La contraseña debe tener al menos 8 caracteres';
+
+  @override
+  String get recoveryPasswordUpdated =>
+      'Contraseña maestra actualizada exitosamente';
+
+  @override
+  String get recoveryCodeVerified =>
+      'Código verificado. Ahora establece tu nueva contraseña maestra.';
+
+  @override
+  String get recoveryNewPasswordLabel => 'Nueva contraseña maestra';
+
+  @override
+  String get recoveryResetButton => 'Restablecer contraseña maestra';
+
+  @override
+  String get recoveryCodeWarning =>
+      '¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.';
+
+  @override
+  String get recoveryCopyCode => 'Copiar código';
+
+  @override
+  String get recoveryCodeSavedContinue => 'Ya lo guardé, continuar';
 }

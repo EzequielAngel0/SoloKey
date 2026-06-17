@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/recovery_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
@@ -36,9 +37,10 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   }
 
   Future<void> _verifyCode() async {
+    final l10n = AppLocalizations.of(context);
     final code = _codeCtrl.text.trim();
     if (code.isEmpty) {
-      setState(() => _error = 'Ingresa el código de recuperación');
+      setState(() => _error = l10n.recoveryEnterCode);
       return;
     }
     setState(() {
@@ -53,30 +55,31 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         setState(() => _step = 2);
       } else {
         setState(
-          () => _error = 'Código incorrecto. Verifica e intenta de nuevo.',
+          () => _error = l10n.recoveryWrongCode,
         );
       }
     } catch (e) {
-      setState(() => _error = 'Error: $e');
+      setState(() => _error = l10n.commonErrorDetail('$e'));
     } finally {
       setState(() => _isLoading = false);
     }
   }
 
   Future<void> _resetPassword() async {
+    final l10n = AppLocalizations.of(context);
     final pwd = _newPasswordCtrl.text;
     final confirm = _confirmCtrl.text;
 
     if (pwd.isEmpty) {
-      setState(() => _error = 'Ingresa la nueva contraseña maestra');
+      setState(() => _error = l10n.recoveryEnterNewPassword);
       return;
     }
     if (pwd.length < 8) {
-      setState(() => _error = 'La contraseña debe tener al menos 8 caracteres');
+      setState(() => _error = l10n.recoveryMin8);
       return;
     }
     if (pwd != confirm) {
-      setState(() => _error = 'Las contraseñas no coinciden');
+      setState(() => _error = l10n.setupPasswordsMismatch);
       return;
     }
     setState(() {
@@ -88,7 +91,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Contraseña maestra actualizada exitosamente'),
+            content: Text(l10n.recoveryPasswordUpdated),
             backgroundColor: context.palette.success,
             behavior: SnackBarBehavior.floating,
           ),
@@ -96,7 +99,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
         context.go('/');
       }
     } catch (e) {
-      setState(() => _error = 'Error: $e');
+      setState(() => _error = l10n.commonErrorDetail('$e'));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -105,7 +108,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const VaultAppBar(title: 'Recuperar acceso'),
+      appBar: VaultAppBar(title: AppLocalizations.of(context).recoveryTitle),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         child: _step == 1 ? _buildStepOne() : _buildStepTwo(),
@@ -115,6 +118,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
 
   Widget _buildStepOne() {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return SingleChildScrollView(
       key: const ValueKey(1),
       padding: const EdgeInsets.all(24),
@@ -136,7 +140,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                 Icon(Icons.key_rounded, color: palette.warning, size: 40),
                 const SizedBox(height: 12),
                 Text(
-                  'Código de recuperación',
+                  l10n.recoveryCodeTitle,
                   style: TextStyle(
                     color: palette.textPrimary,
                     fontSize: 18,
@@ -145,8 +149,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'El código de recuperación fue generado al configurar tu bóveda. '
-                  'Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.',
+                  l10n.recoveryCodeDescription,
                   style: TextStyle(color: palette.textMuted, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
@@ -166,7 +169,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
             ),
             maxLines: 3,
             decoration: InputDecoration(
-              labelText: 'Código de recuperación',
+              labelText: l10n.recoveryCodeTitle,
               hintText: 'XXXX-XXXX-XXXX-XXXX-…',
               prefixIcon: Icon(Icons.vpn_key_rounded, color: palette.textMuted),
             ),
@@ -195,7 +198,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               : ElevatedButton.icon(
                   onPressed: _verifyCode,
                   icon: const Icon(Icons.arrow_forward_rounded),
-                  label: const Text('Verificar código'),
+                  label: Text(l10n.recoveryVerifyButton),
                 ),
         ],
       ),
@@ -204,6 +207,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
 
   Widget _buildStepTwo() {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return SingleChildScrollView(
       key: const ValueKey(2),
       padding: const EdgeInsets.all(24),
@@ -225,7 +229,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Código verificado. Ahora establece tu nueva contraseña maestra.',
+                    l10n.recoveryCodeVerified,
                     style: TextStyle(color: palette.textPrimary, fontSize: 13),
                   ),
                 ),
@@ -235,13 +239,13 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           const SizedBox(height: 28),
           SecureTextField(
             controller: _newPasswordCtrl,
-            label: 'Nueva contraseña maestra',
+            label: l10n.recoveryNewPasswordLabel,
             validator: (_) => null,
           ),
           const SizedBox(height: 16),
           SecureTextField(
             controller: _confirmCtrl,
-            label: 'Confirmar contraseña',
+            label: l10n.setupConfirmLabel,
             validator: (_) => null,
           ),
           if (_error != null) ...[
@@ -266,7 +270,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
               : ElevatedButton.icon(
                   onPressed: _resetPassword,
                   icon: const Icon(Icons.lock_reset_rounded),
-                  label: const Text('Restablecer contraseña maestra'),
+                  label: Text(l10n.recoveryResetButton),
                 ),
         ],
       ),
@@ -287,9 +291,10 @@ class RecoveryCodeDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Código de recuperación'),
+        title: Text(l10n.recoveryCodeTitle),
         automaticallyImplyLeading: false,
       ),
       body: Padding(
@@ -312,8 +317,7 @@ class RecoveryCodeDisplay extends StatelessWidget {
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(
-                      '¡Guarda este código en un lugar seguro! '
-                      'Solo se muestra UNA VEZ y no se puede recuperar.',
+                      l10n.recoveryCodeWarning,
                       style: TextStyle(color: palette.danger, fontSize: 13),
                     ),
                   ),
@@ -345,17 +349,17 @@ class RecoveryCodeDisplay extends StatelessWidget {
                 // recuperación se limpie automáticamente del portapapeles.
                 await showClipboardCountdownSnackBar(
                   context: context,
-                  label: 'Código de recuperación',
+                  label: l10n.recoveryCodeTitle,
                   value: code,
                 );
               },
               icon: const Icon(Icons.copy_rounded),
-              label: const Text('Copiar código'),
+              label: Text(l10n.recoveryCopyCode),
             ),
             const Spacer(),
             ElevatedButton(
               onPressed: () => context.go(targetRoute),
-              child: const Text('Ya lo guardé, continuar'),
+              child: Text(l10n.recoveryCodeSavedContinue),
             ),
           ],
         ),
