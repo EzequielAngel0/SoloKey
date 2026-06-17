@@ -32,6 +32,8 @@ class SyncService {
 
   static const String _serviceType = '_solokey-sync._tcp';
   static const String _kSyncKeyName = 'solokey_sync_key';
+  static const String _kSyncDevicesName = 'solokey_sync_devices';
+  static const String _kDeviceIdName = 'solokey_device_id';
 
   // Desktop Server State
   HttpServer? _server;
@@ -39,6 +41,23 @@ class SyncService {
   String? _pairingToken;
   crypto.SimpleKeyPair? _desktopKeyPair;
   Uint8List? _syncKey;
+
+  /// Live registry of mobile devices currently connected to the desktop server.
+  /// Each WebSocket connection has its OWN per-connection sync key, so several
+  /// phones can pair and sync at the same time without overwriting each other.
+  final Set<_ServerPeer> _peers = {};
+
+  /// Snapshot of connected (paired) devices, de-duplicated by id.
+  List<ConnectedDevice> get connectedDevices {
+    final byId = <String, ConnectedDevice>{};
+    for (final p in _peers) {
+      if (p.key == null) continue; // handshake not finished yet
+      byId[p.id] =
+          ConnectedDevice(id: p.id, name: p.name, status: p.status);
+    }
+    return byId.values.toList();
+  }
+
   final StreamController<String> _serverEventController =
       StreamController<String>.broadcast();
   Stream<String> get serverEvents => _serverEventController.stream;
@@ -122,6 +141,8 @@ class SyncService {
   }
 
   void _handleServerConnection(WebSocketChannel ws) {
+    final peer = _ServerPeer();
+    _peers.add(peer);
     _serverEventController.add('client_connecting');
 
     ws.stream.listen(
@@ -131,26 +152,29 @@ class SyncService {
           final type = data['type'] as String;
 
           if (type == 'ecdh_exchange') {
-            await _handleEcdhExchange(ws, data);
+            await _handleEcdhExchange(ws, data, peer);
           } else if (type == 'encrypted') {
-            await _handleEncryptedServerMessage(ws, data);
+            await _handleEncryptedServerMessage(ws, data, peer);
           }
         } catch (e) {
           ws.sink.add(
               jsonEncode({'type': 'error', 'message': 'Processing error: $e'}));
         }
       },
-      onDone: () {
-        _serverEventController.add('client_disconnected');
-      },
-      onError: (err) {
-        _serverEventController.add('client_error: $err');
-      },
+      onDone: () => _removePeer(peer),
+      onError: (_) => _removePeer(peer),
     );
   }
 
+  void _removePeer(_ServerPeer peer) {
+    if (peer.key != null) zeroBuffer(peer.key!);
+    _peers.remove(peer);
+    _serverEventController.add('client_disconnected');
+    _serverEventController.add('devices_changed');
+  }
+
   Future<void> _handleEcdhExchange(
-      WebSocketChannel ws, Map<String, dynamic> data) async {
+      WebSocketChannel ws, Map<String, dynamic> data, _ServerPeer peer) async {
     final mobilePubKeyBase64 = data['public_key'] as String;
     final signature = data['signature'] as String;
 
@@ -164,7 +188,9 @@ class SyncService {
     final mobilePubKey = crypto.SimplePublicKey(mobilePubKeyBytes,
         type: crypto.KeyPairType.x25519);
 
-    // Compute ECDH shared secret
+    // Compute ECDH shared secret. Each mobile keypair yields a distinct shared
+    // secret (and therefore a distinct K_sync) even off the same pairing QR, so
+    // multiple phones can pair simultaneously.
     final algorithm = crypto.X25519();
     final sharedSecret = await algorithm.sharedSecretKey(
       keyPair: _desktopKeyPair!,
@@ -189,16 +215,22 @@ class SyncService {
     final expectedSig = base64Encode(expectedMac.bytes);
 
     if (signature == expectedSig) {
-      // Valid pairing! Save key.
-      _syncKey = kSyncCandidate;
-      await _storage.write(
-          key: _kSyncKeyName, value: base64Encode(_syncKey!));
+      // Valid pairing! Bind the key to THIS connection (not a global field).
+      peer.key = kSyncCandidate;
+      peer.id = (data['device_id'] as String?)?.trim().isNotEmpty == true
+          ? data['device_id'] as String
+          : 'device-${_peers.length}';
+      peer.name = (data['device_name'] as String?)?.trim().isNotEmpty == true
+          ? data['device_name'] as String
+          : 'Dispositivo móvil';
+      peer.status = DeviceSyncStatus.connected;
+      await _savePairedDevice(peer.id, peer.name);
 
       // Respond with Desktop signature: HMAC(kSync, DesktopPubKey)
       final desktopPubKey = await _desktopKeyPair!.extractPublicKey();
       final responseMac = await hmac.calculateMac(
         desktopPubKey.bytes,
-        secretKey: crypto.SecretKey(_syncKey!),
+        secretKey: crypto.SecretKey(peer.key!),
       );
 
       // NOTE: We intentionally DO NOT share the MasterKeyConfig. Each device
@@ -210,6 +242,7 @@ class SyncService {
         'signature': base64Encode(responseMac.bytes),
       }));
       _serverEventController.add('paired');
+      _serverEventController.add('devices_changed');
     } else {
       ws.sink.add(jsonEncode(
           {'type': 'error', 'message': 'Invalid pairing token signature'}));
@@ -218,21 +251,16 @@ class SyncService {
   }
 
   Future<void> _handleEncryptedServerMessage(
-      WebSocketChannel ws, Map<String, dynamic> data) async {
-    if (_syncKey == null) {
-      final saved = await _storage.read(key: _kSyncKeyName);
-      if (saved != null) {
-        _syncKey = base64Decode(saved);
-      } else {
-        ws.sink.add(
-            jsonEncode({'type': 'error', 'message': 'Unpaired connection'}));
-        return;
-      }
+      WebSocketChannel ws, Map<String, dynamic> data, _ServerPeer peer) async {
+    if (peer.key == null) {
+      ws.sink.add(
+          jsonEncode({'type': 'error', 'message': 'Unpaired connection'}));
+      return;
     }
 
     final cipherBlob = base64Decode(data['payload'] as String);
     final plainBytes =
-        await _securityService.decrypt(cipherBlob, _syncKey!);
+        await _securityService.decrypt(cipherBlob, peer.key!);
     final plainText = utf8.decode(plainBytes);
 
     // Zero the decrypted buffer copy held in plainBytes
@@ -240,22 +268,24 @@ class SyncService {
 
     final decryptedMessage =
         jsonDecode(plainText) as Map<String, dynamic>;
-    await _handleDecryptedServerMessage(ws, decryptedMessage);
+    await _handleDecryptedServerMessage(ws, decryptedMessage, peer);
   }
 
   Future<void> _handleDecryptedServerMessage(
-      WebSocketChannel ws, Map<String, dynamic> msg) async {
+      WebSocketChannel ws, Map<String, dynamic> msg, _ServerPeer peer) async {
     final action = msg['action'] as String;
 
     switch (action) {
       case 'sync_manifest':
-        await _handleSyncManifest(ws, msg);
+        peer.status = DeviceSyncStatus.syncing;
+        _serverEventController.add('devices_changed');
+        await _handleSyncManifest(ws, msg, peer);
         break;
       case 'sync_push':
-        await _handleSyncPush(ws, msg);
+        await _handleSyncPush(ws, msg, peer);
         break;
       case 'wifi_unlock':
-        await _handleWifiUnlock(ws, msg);
+        await _handleWifiUnlock(ws, msg, peer);
         break;
       default:
         debugPrint('[SyncService] Unknown action: $action');
@@ -269,7 +299,7 @@ class SyncService {
   /// Handles the first step of delta sync: remote sends its manifest.
   /// We compare, compute what we need and what we can push, and respond.
   Future<void> _handleSyncManifest(
-      WebSocketChannel ws, Map<String, dynamic> msg) async {
+      WebSocketChannel ws, Map<String, dynamic> msg, _ServerPeer peer) async {
     try {
       final payload = msg['payload'] as Map<String, dynamic>;
 
@@ -304,18 +334,20 @@ class SyncService {
           'push_folders':
               folderDeltas.toPush.map((i) => i.toJson()).toList(),
         },
-      });
+      }, peer);
 
       _serverEventController.add('sync_manifest_processed');
     } catch (e) {
       debugPrint('[SyncService] Error processing sync manifest: $e');
+      peer.status = DeviceSyncStatus.connected;
+      _serverEventController.add('devices_changed');
       _serverEventController.add('sync_error');
     }
   }
 
   /// Handles the second step: remote pushes the rows we requested.
   Future<void> _handleSyncPush(
-      WebSocketChannel ws, Map<String, dynamic> msg) async {
+      WebSocketChannel ws, Map<String, dynamic> msg, _ServerPeer peer) async {
     try {
       final payload = msg['payload'] as Map<String, dynamic>;
 
@@ -343,11 +375,15 @@ class SyncService {
           'credentials_applied': credApplied,
           'folders_applied': folderApplied,
         },
-      });
+      }, peer);
 
+      peer.status = DeviceSyncStatus.synced;
+      _serverEventController.add('devices_changed');
       _serverEventController.add('sync_completed');
     } catch (e) {
       debugPrint('[SyncService] Error applying sync push: $e');
+      peer.status = DeviceSyncStatus.connected;
+      _serverEventController.add('devices_changed');
       _serverEventController.add('sync_error');
     }
   }
@@ -361,7 +397,7 @@ class SyncService {
   /// We emit a `remote_unlock:<password>` event for the UnlockScreen to
   /// pick up and use to unlock the vault.
   Future<void> _handleWifiUnlock(
-      WebSocketChannel ws, Map<String, dynamic> msg) async {
+      WebSocketChannel ws, Map<String, dynamic> msg, _ServerPeer peer) async {
     try {
       final masterPassword = msg['master_password'] as String?;
 
@@ -369,7 +405,7 @@ class SyncService {
         await _sendEncryptedMessage(ws, {
           'action': 'wifi_unlock_response',
           'payload': {'success': false, 'error': 'Missing master password'},
-        });
+        }, peer);
         return;
       }
 
@@ -381,13 +417,13 @@ class SyncService {
       await _sendEncryptedMessage(ws, {
         'action': 'wifi_unlock_response',
         'payload': {'success': true},
-      });
+      }, peer);
     } catch (e) {
       debugPrint('[SyncService] WiFi unlock error: $e');
       await _sendEncryptedMessage(ws, {
         'action': 'wifi_unlock_response',
         'payload': {'success': false, 'error': 'Server error'},
-      });
+      }, peer);
     }
   }
 
@@ -468,11 +504,14 @@ class SyncService {
       );
       final mobileSig = base64Encode(mobileMac.bytes);
 
-      // 4. Send ECDH exchange request
+      // 4. Send ECDH exchange request (with this device's identity so the
+      //    desktop can list it among connected devices).
       _clientChannel!.sink.add(jsonEncode({
         'type': 'ecdh_exchange',
         'public_key': mobilePubKeyBase64,
         'signature': mobileSig,
+        'device_id': await _localDeviceId(),
+        'device_name': _localDeviceName(),
       }));
 
       // 5. Wait for server response
@@ -771,16 +810,63 @@ class SyncService {
     }
   }
 
-  /// Checks if we have a stored K_sync key (i.e., previously paired).
+  /// Checks if this device has paired before — either as a mobile client
+  /// (single stored K_sync) or as a desktop server (one or more known devices).
   Future<bool> hasPairingKey() async {
     final saved = await _storage.read(key: _kSyncKeyName);
-    return saved != null;
+    if (saved != null) return true;
+    final devices = await _loadPairedDevices();
+    return devices.isNotEmpty;
   }
 
-  /// Removes the stored pairing key, effectively "un-pairing" the devices.
+  /// Removes all pairing state, effectively "un-pairing" the devices.
   Future<void> removePairingKey() async {
     await _storage.delete(key: _kSyncKeyName);
+    await _storage.delete(key: _kSyncDevicesName);
+    for (final p in _peers) {
+      if (p.key != null) zeroBuffer(p.key!);
+    }
+    _peers.clear();
     _syncKey = null;
+    _serverEventController.add('devices_changed');
+  }
+
+  /// Loads the persisted `{deviceId: deviceName}` map of paired mobile devices.
+  Future<Map<String, String>> _loadPairedDevices() async {
+    final raw = await _storage.read(key: _kSyncDevicesName);
+    if (raw == null) return {};
+    try {
+      return Map<String, String>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> _savePairedDevice(String id, String name) async {
+    final devices = await _loadPairedDevices();
+    devices[id] = name;
+    await _storage.write(key: _kSyncDevicesName, value: jsonEncode(devices));
+  }
+
+  /// Stable random id for THIS device, used to label it on the peer. Persisted.
+  Future<String> _localDeviceId() async {
+    var id = await _storage.read(key: _kDeviceIdName);
+    if (id == null) {
+      id = _cryptoRandomBytes(8)
+          .map((b) => b.toRadixString(16).padLeft(2, '0'))
+          .join();
+      await _storage.write(key: _kDeviceIdName, value: id);
+    }
+    return id;
+  }
+
+  String _localDeviceName() {
+    if (Platform.isAndroid) return 'Celular Android';
+    if (Platform.isIOS) return 'iPhone';
+    if (Platform.isWindows) return 'PC Windows';
+    if (Platform.isMacOS) return 'Mac';
+    if (Platform.isLinux) return 'Equipo Linux';
+    return 'Dispositivo móvil';
   }
 
   // ───────────────────────────────────────────────────────────────────────────
@@ -788,11 +874,11 @@ class SyncService {
   // ───────────────────────────────────────────────────────────────────────────
 
   Future<void> _sendEncryptedMessage(
-      WebSocketChannel ws, Map<String, dynamic> plainMsg) async {
-    if (_syncKey == null) return;
+      WebSocketChannel ws, Map<String, dynamic> plainMsg, _ServerPeer peer) async {
+    if (peer.key == null) return;
     final plainBytes = utf8.encode(jsonEncode(plainMsg));
     final encryptedBytes = await _securityService.encrypt(
-        Uint8List.fromList(plainBytes), _syncKey!);
+        Uint8List.fromList(plainBytes), peer.key!);
     ws.sink.add(jsonEncode({
       'type': 'encrypted',
       'payload': base64Encode(encryptedBytes),
@@ -869,6 +955,10 @@ class SyncService {
     await stopDiscovery();
     _clientChannel?.sink.close();
     _clientChannel = null;
+    for (final p in _peers) {
+      if (p.key != null) zeroBuffer(p.key!);
+    }
+    _peers.clear();
     if (_syncKey != null) {
       zeroBuffer(_syncKey!);
       _syncKey = null;
@@ -876,4 +966,30 @@ class SyncService {
     await _serverEventController.close();
     await _clientEventController.close();
   }
+}
+
+/// Sync status of a connected device, surfaced in the desktop UI.
+enum DeviceSyncStatus { connected, syncing, synced }
+
+/// Immutable snapshot of a mobile device currently connected to the desktop
+/// sync server. Exposed via [SyncService.connectedDevices].
+class ConnectedDevice {
+  const ConnectedDevice({
+    required this.id,
+    required this.name,
+    required this.status,
+  });
+
+  final String id;
+  final String name;
+  final DeviceSyncStatus status;
+}
+
+/// Per-connection server state. Each WebSocket gets its own [_ServerPeer] so the
+/// desktop can serve several phones at once, each with its own [key].
+class _ServerPeer {
+  Uint8List? key;
+  String id = '';
+  String name = 'Dispositivo móvil';
+  DeviceSyncStatus status = DeviceSyncStatus.connected;
 }
