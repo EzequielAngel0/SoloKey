@@ -170,6 +170,7 @@ class _DetailView extends ConsumerWidget {
           if (credential.type == CredentialType.totp &&
               credential.password != null)
             _TotpTile(secretId: credential.password!),
+          _buildRotationStatusTile(context),
           const SizedBox(height: 16),
           Center(
             child: TextButton.icon(
@@ -182,6 +183,87 @@ class _DetailView extends ConsumerWidget {
                 foregroundColor: const Color(0xFF6C63FF),
                 textStyle: const TextStyle(fontSize: 13),
               ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRotationStatusTile(BuildContext context) {
+    if (credential.rotationInterval == 'none') return const SizedBox.shrink();
+
+    final intervalText = switch (credential.rotationInterval) {
+      'monthly' => 'Mensual',
+      'quarterly' => 'Cada 3 meses',
+      'semiAnnually' => 'Cada 6 meses',
+      'custom' => 'Personalizado (${credential.customRotationDays} días)',
+      _ => 'Ninguno',
+    };
+
+    int days = switch (credential.rotationInterval) {
+      'monthly' => 30,
+      'quarterly' => 90,
+      'semiAnnually' => 180,
+      'custom' => credential.customRotationDays ?? 30,
+      _ => 0,
+    };
+
+    final lastChanged = credential.updatedAt;
+    final nextRotation = lastChanged.add(Duration(days: days));
+    final daysRemaining = nextRotation.difference(DateTime.now()).inDays;
+    final isOverdue = daysRemaining <= 0;
+
+    return Container(
+      margin: const EdgeInsets.only(top: 8, bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: isOverdue
+            ? const Color(0xFFCF6679).withValues(alpha: 0.1)
+            : const Color(0xFF03DAC6).withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isOverdue
+              ? const Color(0xFFCF6679).withValues(alpha: 0.3)
+              : const Color(0xFF03DAC6).withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Icon(
+            isOverdue ? Icons.warning_amber_rounded : Icons.lock_clock_rounded,
+            color: isOverdue ? const Color(0xFFCF6679) : const Color(0xFF03DAC6),
+            size: 24,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  isOverdue
+                      ? 'ROTACIÓN DE CONTRASEÑA VENCIDA'
+                      : 'RECORDATORIO DE ROTACIÓN',
+                  style: TextStyle(
+                    color: isOverdue ? const Color(0xFFCF6679) : const Color(0xFF03DAC6),
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  isOverdue
+                      ? 'Debes cambiar esta contraseña. Han pasado más de $days días desde la última actualización.'
+                      : 'Próximo cambio requerido en $daysRemaining días ($intervalText).',
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 13,
+                    height: 1.4,
+                  ),
+                ),
+              ],
             ),
           ),
         ],

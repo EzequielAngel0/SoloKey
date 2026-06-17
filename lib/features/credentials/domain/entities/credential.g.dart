@@ -89,27 +89,36 @@ _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
           : SshKeyMetadata.fromJson(
               json['sshKeyMetadata'] as Map<String, dynamic>,
             ),
+      rotationInterval: json['rotationInterval'] as String? ?? 'none',
+      customRotationDays: (json['customRotationDays'] as num?)?.toInt(),
+      lastRotationPromptedAt: json['lastRotationPromptedAt'] == null
+          ? null
+          : DateTime.parse(json['lastRotationPromptedAt'] as String),
     );
 
-Map<String, dynamic> _$$CredentialImplToJson(_$CredentialImpl instance) =>
-    <String, dynamic>{
-      'id': instance.id,
-      'type': _$CredentialTypeEnumMap[instance.type]!,
-      'title': instance.title,
-      'username': instance.username,
-      'password': instance.password,
-      'website': instance.website,
-      'notes': instance.notes,
-      'customFields': instance.customFields,
-      'categoryId': instance.categoryId,
-      'folderId': instance.folderId,
-      'isFavorite': instance.isFavorite,
-      'isDoubleEncrypted': instance.isDoubleEncrypted,
-      'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
-      'passkeyMetadata': instance.passkeyMetadata,
-      'sshKeyMetadata': instance.sshKeyMetadata,
-    };
+Map<String, dynamic> _$$CredentialImplToJson(
+  _$CredentialImpl instance,
+) => <String, dynamic>{
+  'id': instance.id,
+  'type': _$CredentialTypeEnumMap[instance.type]!,
+  'title': instance.title,
+  'username': instance.username,
+  'password': instance.password,
+  'website': instance.website,
+  'notes': instance.notes,
+  'customFields': instance.customFields,
+  'categoryId': instance.categoryId,
+  'folderId': instance.folderId,
+  'isFavorite': instance.isFavorite,
+  'isDoubleEncrypted': instance.isDoubleEncrypted,
+  'createdAt': instance.createdAt.toIso8601String(),
+  'updatedAt': instance.updatedAt.toIso8601String(),
+  'passkeyMetadata': instance.passkeyMetadata,
+  'sshKeyMetadata': instance.sshKeyMetadata,
+  'rotationInterval': instance.rotationInterval,
+  'customRotationDays': instance.customRotationDays,
+  'lastRotationPromptedAt': instance.lastRotationPromptedAt?.toIso8601String(),
+};
 
 const _$CredentialTypeEnumMap = {
   CredentialType.password: 'password',

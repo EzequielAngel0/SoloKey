@@ -110,16 +110,37 @@ class SecurityAuditService {
         ));
       }
 
-      // Staleness check — not updated in 90+ days
-      final daysSinceUpdate =
-          DateTime.now().difference(c.updatedAt).inDays;
-      if (daysSinceUpdate >= 90) {
-        issues.add(AuditIssue(
-          credential: c,
-          severity: AuditSeverity.info,
-          title: 'Contraseña antigua',
-          description: 'No se ha actualizado en $daysSinceUpdate días.',
-        ));
+      // Staleness check / Rotation Reminder check
+      if (c.rotationInterval != 'none') {
+        final days = switch (c.rotationInterval) {
+          'monthly' => 30,
+          'quarterly' => 90,
+          'semiAnnually' => 180,
+          'custom' => c.customRotationDays ?? 30,
+          _ => 0,
+        };
+
+        if (days > 0) {
+          final daysSinceUpdate = DateTime.now().difference(c.updatedAt).inDays;
+          if (daysSinceUpdate >= days) {
+            issues.add(AuditIssue(
+              credential: c,
+              severity: AuditSeverity.warning,
+              title: 'Rotación requerida',
+              description: 'Expiró hace ${daysSinceUpdate - days} días (establecido cada $days días).',
+            ));
+          }
+        }
+      } else {
+        final daysSinceUpdate = DateTime.now().difference(c.updatedAt).inDays;
+        if (daysSinceUpdate >= 180) {
+          issues.add(AuditIssue(
+            credential: c,
+            severity: AuditSeverity.info,
+            title: 'Contraseña antigua',
+            description: 'No se ha actualizado en más de 6 meses ($daysSinceUpdate días).',
+          ));
+        }
       }
     }
 

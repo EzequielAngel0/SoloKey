@@ -75,8 +75,15 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   bool _isGeneratingSshKey = false;
   List<CustomField> _customFields = [];
 
+  // Password Rotation Reminder state
+  String _rotationInterval = 'none';
+  int? _customRotationDays;
+  DateTime? _lastRotationPromptedAt;
+  final _customRotationDaysCtrl = TextEditingController();
+
   late AnimationController _saveAnimCtrl;
   late Animation<double> _saveScale;
+
 
   @override
   void initState() {
@@ -149,6 +156,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _customFields = _existing!.customFields
           .where((f) => f.label != 'scopes' && f.label != 'issuer')
           .toList();
+      _rotationInterval = _existing!.rotationInterval;
+      _customRotationDays = _existing!.customRotationDays;
+      _lastRotationPromptedAt = _existing!.lastRotationPromptedAt;
+      _customRotationDaysCtrl.text = _customRotationDays?.toString() ?? '';
     }
   }
 
@@ -160,7 +171,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _serviceCtrl, _apiKeyCtrl, _endpointCtrl, _scopesCtrl,
       _totpSecretCtrl, _totpIssuerCtrl,
       _sshPrivateKeyCtrl, _sshPublicKeyCtrl, _sshPassphraseCtrl,
-      _secondaryPinCtrl,
+      _secondaryPinCtrl, _customRotationDaysCtrl,
     ]) {
       c.dispose();
     }
@@ -169,6 +180,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   Credential _buildCredential() {
     final now = DateTime.now();
+
+    // Check if secret was rotated to reset lastRotationPromptedAt
+    bool isPasswordChanged = false;
+    if (_existing != null) {
+      if (_type == CredentialType.password && _passwordCtrl.text != _existing!.password) {
+        isPasswordChanged = true;
+      } else if (_type == CredentialType.apiKey && _apiKeyCtrl.text != _existing!.password) {
+        isPasswordChanged = true;
+      } else if (_type == CredentialType.sshKey && _sshPrivateKeyCtrl.text != _existing!.password) {
+        isPasswordChanged = true;
+      }
+    }
+    final resolvedLastPrompted = isPasswordChanged ? null : _lastRotationPromptedAt;
+
     switch (_type) {
       case CredentialType.password:
         return Credential(
@@ -184,6 +209,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
           updatedAt: now,
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
         );
 
       case CredentialType.apiKey:
@@ -204,6 +232,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
           updatedAt: now,
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
         );
 
       case CredentialType.secureNote:
@@ -217,6 +248,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
           updatedAt: now,
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
         );
 
       case CredentialType.totp:
@@ -235,6 +269,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
           updatedAt: now,
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
         );
 
       case CredentialType.sshKey:
@@ -256,10 +293,18 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             passphrase: _sshPassphraseCtrl.text.isEmpty ? null : _sshPassphraseCtrl.text.trim(),
             keyType: _sshKeyType,
           ),
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
         );
 
       case CredentialType.passkey:
-        return _existing!.copyWith(updatedAt: now);
+        return _existing!.copyWith(
+          updatedAt: now,
+          rotationInterval: _rotationInterval,
+          customRotationDays: _customRotationDays,
+          lastRotationPromptedAt: resolvedLastPrompted,
+        );
     }
   }
 
@@ -901,6 +946,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             _buildDoubleEncryptionSection(),
 
             const SizedBox(height: 16),
+            _buildRotationReminderSection(),
+
+            const SizedBox(height: 16),
             FormSection(
               icon: Icons.folder_rounded,
               accentColor: AppColors.textMuted,
@@ -1400,6 +1448,80 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             ),
             activeColor: AppColors.secondary,
             contentPadding: EdgeInsets.zero,
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildRotationReminderSection() {
+    if (_type != CredentialType.password &&
+        _type != CredentialType.apiKey &&
+        _type != CredentialType.sshKey) {
+      return const SizedBox.shrink();
+    }
+
+    final typeColor = _typeColor(_type);
+
+    return FormSection(
+      icon: Icons.update_rounded,
+      accentColor: typeColor,
+      title: 'Recordatorio de Rotación',
+      children: [
+        DropdownButtonFormField<String>(
+          value: _rotationInterval,
+          style: const TextStyle(color: Colors.white),
+          dropdownColor: AppColors.drawer,
+          decoration: const InputDecoration(
+            labelText: 'Recordar cambiar contraseña',
+            prefixIcon: Icon(Icons.alarm_rounded, size: 18, color: AppColors.textMuted),
+          ),
+          items: const [
+            DropdownMenuItem(value: 'none', child: Text('No recordar')),
+            DropdownMenuItem(value: 'monthly', child: Text('Cada mes')),
+            DropdownMenuItem(value: 'quarterly', child: Text('Cada 3 meses')),
+            DropdownMenuItem(value: 'semiAnnually', child: Text('Cada 6 meses')),
+            DropdownMenuItem(value: 'custom', child: Text('Personalizado (días)')),
+          ],
+          onChanged: (val) {
+            if (val != null) {
+              setState(() {
+                _rotationInterval = val;
+                if (val != 'custom') {
+                  _customRotationDays = null;
+                  _customRotationDaysCtrl.clear();
+                }
+              });
+            }
+          },
+        ),
+        if (_rotationInterval == 'custom') ...[
+          const SizedBox(height: 14),
+          TextFormField(
+            controller: _customRotationDaysCtrl,
+            style: const TextStyle(color: Colors.white),
+            keyboardType: TextInputType.number,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            decoration: const InputDecoration(
+              labelText: 'Días para recordar',
+              hintText: 'ej. 45, 90',
+              prefixIcon: Icon(Icons.date_range_rounded, size: 18, color: AppColors.textMuted),
+            ),
+            validator: (v) {
+              if (_rotationInterval == 'custom') {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Debe ingresar el número de días';
+                }
+                final days = int.tryParse(v);
+                if (days == null || days <= 0) {
+                  return 'Ingrese un número válido de días';
+                }
+              }
+              return null;
+            },
+            onChanged: (v) {
+              _customRotationDays = int.tryParse(v);
+            },
           ),
         ],
       ],

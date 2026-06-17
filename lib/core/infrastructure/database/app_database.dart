@@ -27,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 6;
+  int get schemaVersion => 7;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -58,6 +58,24 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(
               credentialEntries,
               credentialEntries.isDoubleEncrypted as GeneratedColumn,
+            );
+          }
+          if (from < 7) {
+            // Password rotation reminder fields.
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.rotationInterval as GeneratedColumn,
+            );
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.customRotationDays as GeneratedColumn,
+            );
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.lastRotationPromptedAt as GeneratedColumn,
             );
           }
         },

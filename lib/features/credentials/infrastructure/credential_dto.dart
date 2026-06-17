@@ -77,6 +77,11 @@ abstract final class CredentialDto {
         encryptedPayload: Value(encryptedPayload),
         createdAt: Value(credential.createdAt.millisecondsSinceEpoch),
         updatedAt: Value(credential.updatedAt.millisecondsSinceEpoch),
+        rotationInterval: Value(credential.rotationInterval),
+        customRotationDays: Value(credential.customRotationDays),
+        lastRotationPromptedAt: Value(
+          credential.lastRotationPromptedAt?.millisecondsSinceEpoch,
+        ),
       );
 
   static Credential fromEntry({
@@ -107,6 +112,11 @@ abstract final class CredentialDto {
         updatedAt: DateTime.fromMillisecondsSinceEpoch(entry.updatedAt),
         passkeyMetadata: payload.passkeyMetadata,
         sshKeyMetadata: payload.sshKeyMetadata,
+        rotationInterval: entry.rotationInterval,
+        customRotationDays: entry.customRotationDays,
+        lastRotationPromptedAt: entry.lastRotationPromptedAt != null
+            ? DateTime.fromMillisecondsSinceEpoch(entry.lastRotationPromptedAt!)
+            : null,
       );
 
   static CredentialSensitivePayload toPayload(Credential c) =>

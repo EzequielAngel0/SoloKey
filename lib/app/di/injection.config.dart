@@ -85,13 +85,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1023.ISecurityService>(
       () => _i1063.SecurityServiceImpl(),
     );
-    gh.lazySingleton<_i706.SyncService>(
-      () => _i706.SyncService(
-        gh<_i558.FlutterSecureStorage>(),
-        gh<_i1042.AppDatabase>(),
-        gh<_i1023.ISecurityService>(),
-      ),
-    );
     gh.lazySingleton<_i753.CredentialDao>(
       () => registerModule.credentialDao(gh<_i1042.AppDatabase>()),
     );
@@ -174,6 +167,14 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i301.AppLifecycleObserver(
         gh<_i795.SessionManager>(),
         gh<_i657.ISettingsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i706.SyncService>(
+      () => _i706.SyncService(
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i1042.AppDatabase>(),
+        gh<_i1023.ISecurityService>(),
+        gh<_i286.IVaultRepository>(),
       ),
     );
     gh.lazySingleton<_i332.VaultExportService>(

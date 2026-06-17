@@ -122,6 +122,38 @@ class $CredentialEntriesTable extends CredentialEntries
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _rotationIntervalMeta = const VerificationMeta(
+    'rotationInterval',
+  );
+  @override
+  late final GeneratedColumn<String> rotationInterval = GeneratedColumn<String>(
+    'rotation_interval',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('none'),
+  );
+  static const VerificationMeta _customRotationDaysMeta =
+      const VerificationMeta('customRotationDays');
+  @override
+  late final GeneratedColumn<int> customRotationDays = GeneratedColumn<int>(
+    'custom_rotation_days',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _lastRotationPromptedAtMeta =
+      const VerificationMeta('lastRotationPromptedAt');
+  @override
+  late final GeneratedColumn<int> lastRotationPromptedAt = GeneratedColumn<int>(
+    'last_rotation_prompted_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -134,6 +166,9 @@ class $CredentialEntriesTable extends CredentialEntries
     encryptedPayload,
     createdAt,
     updatedAt,
+    rotationInterval,
+    customRotationDays,
+    lastRotationPromptedAt,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -222,6 +257,33 @@ class $CredentialEntriesTable extends CredentialEntries
     } else if (isInserting) {
       context.missing(_updatedAtMeta);
     }
+    if (data.containsKey('rotation_interval')) {
+      context.handle(
+        _rotationIntervalMeta,
+        rotationInterval.isAcceptableOrUnknown(
+          data['rotation_interval']!,
+          _rotationIntervalMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_rotation_days')) {
+      context.handle(
+        _customRotationDaysMeta,
+        customRotationDays.isAcceptableOrUnknown(
+          data['custom_rotation_days']!,
+          _customRotationDaysMeta,
+        ),
+      );
+    }
+    if (data.containsKey('last_rotation_prompted_at')) {
+      context.handle(
+        _lastRotationPromptedAtMeta,
+        lastRotationPromptedAt.isAcceptableOrUnknown(
+          data['last_rotation_prompted_at']!,
+          _lastRotationPromptedAtMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -271,6 +333,18 @@ class $CredentialEntriesTable extends CredentialEntries
         DriftSqlType.int,
         data['${effectivePrefix}updated_at'],
       )!,
+      rotationInterval: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}rotation_interval'],
+      )!,
+      customRotationDays: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}custom_rotation_days'],
+      ),
+      lastRotationPromptedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}last_rotation_prompted_at'],
+      ),
     );
   }
 
@@ -311,6 +385,15 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
 
   /// Unix timestamp in milliseconds.
   final int updatedAt;
+
+  /// Rotation reminder interval (none, monthly, quarterly, semiAnnually, custom).
+  final String rotationInterval;
+
+  /// Custom rotation period in days (only used when rotationInterval == 'custom').
+  final int? customRotationDays;
+
+  /// Unix timestamp in ms — last time a rotation notification was shown.
+  final int? lastRotationPromptedAt;
   const CredentialEntry({
     required this.id,
     required this.title,
@@ -322,6 +405,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     required this.encryptedPayload,
     required this.createdAt,
     required this.updatedAt,
+    required this.rotationInterval,
+    this.customRotationDays,
+    this.lastRotationPromptedAt,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -340,6 +426,13 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     map['encrypted_payload'] = Variable<Uint8List>(encryptedPayload);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
+    map['rotation_interval'] = Variable<String>(rotationInterval);
+    if (!nullToAbsent || customRotationDays != null) {
+      map['custom_rotation_days'] = Variable<int>(customRotationDays);
+    }
+    if (!nullToAbsent || lastRotationPromptedAt != null) {
+      map['last_rotation_prompted_at'] = Variable<int>(lastRotationPromptedAt);
+    }
     return map;
   }
 
@@ -359,6 +452,13 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       encryptedPayload: Value(encryptedPayload),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
+      rotationInterval: Value(rotationInterval),
+      customRotationDays: customRotationDays == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customRotationDays),
+      lastRotationPromptedAt: lastRotationPromptedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(lastRotationPromptedAt),
     );
   }
 
@@ -380,6 +480,11 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       ),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
+      rotationInterval: serializer.fromJson<String>(json['rotationInterval']),
+      customRotationDays: serializer.fromJson<int?>(json['customRotationDays']),
+      lastRotationPromptedAt: serializer.fromJson<int?>(
+        json['lastRotationPromptedAt'],
+      ),
     );
   }
   @override
@@ -396,6 +501,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       'encryptedPayload': serializer.toJson<Uint8List>(encryptedPayload),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
+      'rotationInterval': serializer.toJson<String>(rotationInterval),
+      'customRotationDays': serializer.toJson<int?>(customRotationDays),
+      'lastRotationPromptedAt': serializer.toJson<int?>(lastRotationPromptedAt),
     };
   }
 
@@ -410,6 +518,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     Uint8List? encryptedPayload,
     int? createdAt,
     int? updatedAt,
+    String? rotationInterval,
+    Value<int?> customRotationDays = const Value.absent(),
+    Value<int?> lastRotationPromptedAt = const Value.absent(),
   }) => CredentialEntry(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -421,6 +532,13 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     encryptedPayload: encryptedPayload ?? this.encryptedPayload,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
+    rotationInterval: rotationInterval ?? this.rotationInterval,
+    customRotationDays: customRotationDays.present
+        ? customRotationDays.value
+        : this.customRotationDays,
+    lastRotationPromptedAt: lastRotationPromptedAt.present
+        ? lastRotationPromptedAt.value
+        : this.lastRotationPromptedAt,
   );
   CredentialEntry copyWithCompanion(CredentialEntriesCompanion data) {
     return CredentialEntry(
@@ -442,6 +560,15 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           : this.encryptedPayload,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      rotationInterval: data.rotationInterval.present
+          ? data.rotationInterval.value
+          : this.rotationInterval,
+      customRotationDays: data.customRotationDays.present
+          ? data.customRotationDays.value
+          : this.customRotationDays,
+      lastRotationPromptedAt: data.lastRotationPromptedAt.present
+          ? data.lastRotationPromptedAt.value
+          : this.lastRotationPromptedAt,
     );
   }
 
@@ -457,7 +584,10 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           ..write('isDoubleEncrypted: $isDoubleEncrypted, ')
           ..write('encryptedPayload: $encryptedPayload, ')
           ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rotationInterval: $rotationInterval, ')
+          ..write('customRotationDays: $customRotationDays, ')
+          ..write('lastRotationPromptedAt: $lastRotationPromptedAt')
           ..write(')'))
         .toString();
   }
@@ -474,6 +604,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     $driftBlobEquality.hash(encryptedPayload),
     createdAt,
     updatedAt,
+    rotationInterval,
+    customRotationDays,
+    lastRotationPromptedAt,
   );
   @override
   bool operator ==(Object other) =>
@@ -491,7 +624,10 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
             this.encryptedPayload,
           ) &&
           other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
+          other.updatedAt == this.updatedAt &&
+          other.rotationInterval == this.rotationInterval &&
+          other.customRotationDays == this.customRotationDays &&
+          other.lastRotationPromptedAt == this.lastRotationPromptedAt);
 }
 
 class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
@@ -505,6 +641,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
   final Value<Uint8List> encryptedPayload;
   final Value<int> createdAt;
   final Value<int> updatedAt;
+  final Value<String> rotationInterval;
+  final Value<int?> customRotationDays;
+  final Value<int?> lastRotationPromptedAt;
   final Value<int> rowid;
   const CredentialEntriesCompanion({
     this.id = const Value.absent(),
@@ -517,6 +656,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     this.encryptedPayload = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
+    this.rotationInterval = const Value.absent(),
+    this.customRotationDays = const Value.absent(),
+    this.lastRotationPromptedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CredentialEntriesCompanion.insert({
@@ -530,6 +672,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     required Uint8List encryptedPayload,
     required int createdAt,
     required int updatedAt,
+    this.rotationInterval = const Value.absent(),
+    this.customRotationDays = const Value.absent(),
+    this.lastRotationPromptedAt = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        title = Value(title),
@@ -548,6 +693,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Expression<Uint8List>? encryptedPayload,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
+    Expression<String>? rotationInterval,
+    Expression<int>? customRotationDays,
+    Expression<int>? lastRotationPromptedAt,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -561,6 +709,11 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
       if (encryptedPayload != null) 'encrypted_payload': encryptedPayload,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
+      if (rotationInterval != null) 'rotation_interval': rotationInterval,
+      if (customRotationDays != null)
+        'custom_rotation_days': customRotationDays,
+      if (lastRotationPromptedAt != null)
+        'last_rotation_prompted_at': lastRotationPromptedAt,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -576,6 +729,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Value<Uint8List>? encryptedPayload,
     Value<int>? createdAt,
     Value<int>? updatedAt,
+    Value<String>? rotationInterval,
+    Value<int?>? customRotationDays,
+    Value<int?>? lastRotationPromptedAt,
     Value<int>? rowid,
   }) {
     return CredentialEntriesCompanion(
@@ -589,6 +745,10 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
       encryptedPayload: encryptedPayload ?? this.encryptedPayload,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
+      rotationInterval: rotationInterval ?? this.rotationInterval,
+      customRotationDays: customRotationDays ?? this.customRotationDays,
+      lastRotationPromptedAt:
+          lastRotationPromptedAt ?? this.lastRotationPromptedAt,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -626,6 +786,17 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     if (updatedAt.present) {
       map['updated_at'] = Variable<int>(updatedAt.value);
     }
+    if (rotationInterval.present) {
+      map['rotation_interval'] = Variable<String>(rotationInterval.value);
+    }
+    if (customRotationDays.present) {
+      map['custom_rotation_days'] = Variable<int>(customRotationDays.value);
+    }
+    if (lastRotationPromptedAt.present) {
+      map['last_rotation_prompted_at'] = Variable<int>(
+        lastRotationPromptedAt.value,
+      );
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -645,6 +816,9 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
           ..write('encryptedPayload: $encryptedPayload, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
+          ..write('rotationInterval: $rotationInterval, ')
+          ..write('customRotationDays: $customRotationDays, ')
+          ..write('lastRotationPromptedAt: $lastRotationPromptedAt, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -1793,6 +1967,9 @@ typedef $$CredentialEntriesTableCreateCompanionBuilder =
       required Uint8List encryptedPayload,
       required int createdAt,
       required int updatedAt,
+      Value<String> rotationInterval,
+      Value<int?> customRotationDays,
+      Value<int?> lastRotationPromptedAt,
       Value<int> rowid,
     });
 typedef $$CredentialEntriesTableUpdateCompanionBuilder =
@@ -1807,6 +1984,9 @@ typedef $$CredentialEntriesTableUpdateCompanionBuilder =
       Value<Uint8List> encryptedPayload,
       Value<int> createdAt,
       Value<int> updatedAt,
+      Value<String> rotationInterval,
+      Value<int?> customRotationDays,
+      Value<int?> lastRotationPromptedAt,
       Value<int> rowid,
     });
 
@@ -1866,6 +2046,21 @@ class $$CredentialEntriesTableFilterComposer
 
   ColumnFilters<int> get updatedAt => $composableBuilder(
     column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get rotationInterval => $composableBuilder(
+    column: $table.rotationInterval,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get customRotationDays => $composableBuilder(
+    column: $table.customRotationDays,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get lastRotationPromptedAt => $composableBuilder(
+    column: $table.lastRotationPromptedAt,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1928,6 +2123,21 @@ class $$CredentialEntriesTableOrderingComposer
     column: $table.updatedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get rotationInterval => $composableBuilder(
+    column: $table.rotationInterval,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get customRotationDays => $composableBuilder(
+    column: $table.customRotationDays,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get lastRotationPromptedAt => $composableBuilder(
+    column: $table.lastRotationPromptedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CredentialEntriesTableAnnotationComposer
@@ -1976,6 +2186,21 @@ class $$CredentialEntriesTableAnnotationComposer
 
   GeneratedColumn<int> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get rotationInterval => $composableBuilder(
+    column: $table.rotationInterval,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get customRotationDays => $composableBuilder(
+    column: $table.customRotationDays,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get lastRotationPromptedAt => $composableBuilder(
+    column: $table.lastRotationPromptedAt,
+    builder: (column) => column,
+  );
 }
 
 class $$CredentialEntriesTableTableManager
@@ -2028,6 +2253,9 @@ class $$CredentialEntriesTableTableManager
                 Value<Uint8List> encryptedPayload = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
+                Value<String> rotationInterval = const Value.absent(),
+                Value<int?> customRotationDays = const Value.absent(),
+                Value<int?> lastRotationPromptedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CredentialEntriesCompanion(
                 id: id,
@@ -2040,6 +2268,9 @@ class $$CredentialEntriesTableTableManager
                 encryptedPayload: encryptedPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                rotationInterval: rotationInterval,
+                customRotationDays: customRotationDays,
+                lastRotationPromptedAt: lastRotationPromptedAt,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -2054,6 +2285,9 @@ class $$CredentialEntriesTableTableManager
                 required Uint8List encryptedPayload,
                 required int createdAt,
                 required int updatedAt,
+                Value<String> rotationInterval = const Value.absent(),
+                Value<int?> customRotationDays = const Value.absent(),
+                Value<int?> lastRotationPromptedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CredentialEntriesCompanion.insert(
                 id: id,
@@ -2066,6 +2300,9 @@ class $$CredentialEntriesTableTableManager
                 encryptedPayload: encryptedPayload,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
+                rotationInterval: rotationInterval,
+                customRotationDays: customRotationDays,
+                lastRotationPromptedAt: lastRotationPromptedAt,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

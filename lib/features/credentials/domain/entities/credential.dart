@@ -91,6 +91,13 @@ class Credential with _$Credential {
     PasskeyMetadata? passkeyMetadata,
     /// Present only when [type] == [CredentialType.sshKey]
     SshKeyMetadata? sshKeyMetadata,
+    /// Rotation reminder interval: 'none', 'monthly', 'quarterly',
+    /// 'semiAnnually', or 'custom'.
+    @Default('none') String rotationInterval,
+    /// Custom rotation period in days (used when rotationInterval == 'custom').
+    int? customRotationDays,
+    /// Last time a rotation notification was shown for this credential.
+    DateTime? lastRotationPromptedAt,
   }) = _Credential;
 
   factory Credential.fromJson(Map<String, dynamic> json) =>

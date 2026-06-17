@@ -792,6 +792,16 @@ mixin _$Credential {
   /// Present only when [type] == [CredentialType.sshKey]
   SshKeyMetadata? get sshKeyMetadata => throw _privateConstructorUsedError;
 
+  /// Rotation reminder interval: 'none', 'monthly', 'quarterly',
+  /// 'semiAnnually', or 'custom'.
+  String get rotationInterval => throw _privateConstructorUsedError;
+
+  /// Custom rotation period in days (used when rotationInterval == 'custom').
+  int? get customRotationDays => throw _privateConstructorUsedError;
+
+  /// Last time a rotation notification was shown for this credential.
+  DateTime? get lastRotationPromptedAt => throw _privateConstructorUsedError;
+
   /// Serializes this Credential to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
 
@@ -826,6 +836,9 @@ abstract class $CredentialCopyWith<$Res> {
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
     SshKeyMetadata? sshKeyMetadata,
+    String rotationInterval,
+    int? customRotationDays,
+    DateTime? lastRotationPromptedAt,
   });
 
   $PasskeyMetadataCopyWith<$Res>? get passkeyMetadata;
@@ -863,6 +876,9 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
     Object? sshKeyMetadata = freezed,
+    Object? rotationInterval = null,
+    Object? customRotationDays = freezed,
+    Object? lastRotationPromptedAt = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -930,6 +946,18 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
                 ? _value.sshKeyMetadata
                 : sshKeyMetadata // ignore: cast_nullable_to_non_nullable
                       as SshKeyMetadata?,
+            rotationInterval: null == rotationInterval
+                ? _value.rotationInterval
+                : rotationInterval // ignore: cast_nullable_to_non_nullable
+                      as String,
+            customRotationDays: freezed == customRotationDays
+                ? _value.customRotationDays
+                : customRotationDays // ignore: cast_nullable_to_non_nullable
+                      as int?,
+            lastRotationPromptedAt: freezed == lastRotationPromptedAt
+                ? _value.lastRotationPromptedAt
+                : lastRotationPromptedAt // ignore: cast_nullable_to_non_nullable
+                      as DateTime?,
           )
           as $Val,
     );
@@ -990,6 +1018,9 @@ abstract class _$$CredentialImplCopyWith<$Res>
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
     SshKeyMetadata? sshKeyMetadata,
+    String rotationInterval,
+    int? customRotationDays,
+    DateTime? lastRotationPromptedAt,
   });
 
   @override
@@ -1028,6 +1059,9 @@ class __$$CredentialImplCopyWithImpl<$Res>
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
     Object? sshKeyMetadata = freezed,
+    Object? rotationInterval = null,
+    Object? customRotationDays = freezed,
+    Object? lastRotationPromptedAt = freezed,
   }) {
     return _then(
       _$CredentialImpl(
@@ -1095,6 +1129,18 @@ class __$$CredentialImplCopyWithImpl<$Res>
             ? _value.sshKeyMetadata
             : sshKeyMetadata // ignore: cast_nullable_to_non_nullable
                   as SshKeyMetadata?,
+        rotationInterval: null == rotationInterval
+            ? _value.rotationInterval
+            : rotationInterval // ignore: cast_nullable_to_non_nullable
+                  as String,
+        customRotationDays: freezed == customRotationDays
+            ? _value.customRotationDays
+            : customRotationDays // ignore: cast_nullable_to_non_nullable
+                  as int?,
+        lastRotationPromptedAt: freezed == lastRotationPromptedAt
+            ? _value.lastRotationPromptedAt
+            : lastRotationPromptedAt // ignore: cast_nullable_to_non_nullable
+                  as DateTime?,
       ),
     );
   }
@@ -1120,6 +1166,9 @@ class _$CredentialImpl implements _Credential {
     required this.updatedAt,
     this.passkeyMetadata,
     this.sshKeyMetadata,
+    this.rotationInterval = 'none',
+    this.customRotationDays,
+    this.lastRotationPromptedAt,
   }) : _customFields = customFields;
 
   factory _$CredentialImpl.fromJson(Map<String, dynamic> json) =>
@@ -1174,9 +1223,23 @@ class _$CredentialImpl implements _Credential {
   @override
   final SshKeyMetadata? sshKeyMetadata;
 
+  /// Rotation reminder interval: 'none', 'monthly', 'quarterly',
+  /// 'semiAnnually', or 'custom'.
+  @override
+  @JsonKey()
+  final String rotationInterval;
+
+  /// Custom rotation period in days (used when rotationInterval == 'custom').
+  @override
+  final int? customRotationDays;
+
+  /// Last time a rotation notification was shown for this credential.
+  @override
+  final DateTime? lastRotationPromptedAt;
+
   @override
   String toString() {
-    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, isDoubleEncrypted: $isDoubleEncrypted, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata, sshKeyMetadata: $sshKeyMetadata)';
+    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, isDoubleEncrypted: $isDoubleEncrypted, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata, sshKeyMetadata: $sshKeyMetadata, rotationInterval: $rotationInterval, customRotationDays: $customRotationDays, lastRotationPromptedAt: $lastRotationPromptedAt)';
   }
 
   @override
@@ -1212,12 +1275,18 @@ class _$CredentialImpl implements _Credential {
             (identical(other.passkeyMetadata, passkeyMetadata) ||
                 other.passkeyMetadata == passkeyMetadata) &&
             (identical(other.sshKeyMetadata, sshKeyMetadata) ||
-                other.sshKeyMetadata == sshKeyMetadata));
+                other.sshKeyMetadata == sshKeyMetadata) &&
+            (identical(other.rotationInterval, rotationInterval) ||
+                other.rotationInterval == rotationInterval) &&
+            (identical(other.customRotationDays, customRotationDays) ||
+                other.customRotationDays == customRotationDays) &&
+            (identical(other.lastRotationPromptedAt, lastRotationPromptedAt) ||
+                other.lastRotationPromptedAt == lastRotationPromptedAt));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     id,
     type,
@@ -1235,7 +1304,10 @@ class _$CredentialImpl implements _Credential {
     updatedAt,
     passkeyMetadata,
     sshKeyMetadata,
-  );
+    rotationInterval,
+    customRotationDays,
+    lastRotationPromptedAt,
+  ]);
 
   /// Create a copy of Credential
   /// with the given fields replaced by the non-null parameter values.
@@ -1269,6 +1341,9 @@ abstract class _Credential implements Credential {
     required final DateTime updatedAt,
     final PasskeyMetadata? passkeyMetadata,
     final SshKeyMetadata? sshKeyMetadata,
+    final String rotationInterval,
+    final int? customRotationDays,
+    final DateTime? lastRotationPromptedAt,
   }) = _$CredentialImpl;
 
   factory _Credential.fromJson(Map<String, dynamic> json) =
@@ -1310,6 +1385,19 @@ abstract class _Credential implements Credential {
   /// Present only when [type] == [CredentialType.sshKey]
   @override
   SshKeyMetadata? get sshKeyMetadata;
+
+  /// Rotation reminder interval: 'none', 'monthly', 'quarterly',
+  /// 'semiAnnually', or 'custom'.
+  @override
+  String get rotationInterval;
+
+  /// Custom rotation period in days (used when rotationInterval == 'custom').
+  @override
+  int? get customRotationDays;
+
+  /// Last time a rotation notification was shown for this credential.
+  @override
+  DateTime? get lastRotationPromptedAt;
 
   /// Create a copy of Credential
   /// with the given fields replaced by the non-null parameter values.

@@ -321,6 +321,9 @@ class DeltaSyncManager {
         'encrypted_payload': base64Encode(row.encryptedPayload),
         'created_at': row.createdAt,
         'updated_at': row.updatedAt,
+        'rotation_interval': row.rotationInterval,
+        'custom_rotation_days': row.customRotationDays,
+        'last_rotation_prompted_at': row.lastRotationPromptedAt,
       };
 
   CredentialEntriesCompanion _jsonToCredentialCompanion(
@@ -337,6 +340,9 @@ class DeltaSyncManager {
           Value(Uint8List.fromList(base64Decode(json['encrypted_payload'] as String))),
       createdAt: Value(json['created_at'] as int),
       updatedAt: Value(json['updated_at'] as int),
+      rotationInterval: Value(json['rotation_interval'] as String? ?? 'none'),
+      customRotationDays: Value(json['custom_rotation_days'] as int?),
+      lastRotationPromptedAt: Value(json['last_rotation_prompted_at'] as int?),
     );
   }
 

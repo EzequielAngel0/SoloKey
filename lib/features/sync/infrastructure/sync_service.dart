@@ -16,16 +16,19 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
+import '../../vault_access/domain/entities/master_key_config.dart';
+import '../../vault_access/domain/repositories/i_vault_repository.dart';
 import '../domain/pairing_payload.dart';
 import 'delta_sync_manager.dart';
 
 @lazySingleton
 class SyncService {
-  SyncService(this._storage, this._db, this._securityService);
+  SyncService(this._storage, this._db, this._securityService, this._vaultRepo);
 
   final FlutterSecureStorage _storage;
   final AppDatabase _db;
   final ISecurityService _securityService;
+  final IVaultRepository _vaultRepo;
 
   static const String _serviceType = '_solokey-sync._tcp';
   static const String _kSyncKeyName = 'solokey_sync_key';
@@ -197,10 +200,18 @@ class SyncService {
         secretKey: crypto.SecretKey(_syncKey!),
       );
 
-      ws.sink.add(jsonEncode({
+      // Include MasterKeyConfig so the remote device derives the same
+      // vault master key (same salt + KDF params → same AES key).
+      final masterConfig = await _vaultRepo.getMasterKeyConfig();
+      final responsePayload = <String, dynamic>{
         'type': 'ecdh_response',
         'signature': base64Encode(responseMac.bytes),
-      }));
+      };
+      if (masterConfig != null) {
+        responsePayload['master_key_config'] = masterConfig.toJson();
+      }
+
+      ws.sink.add(jsonEncode(responsePayload));
       _serverEventController.add('paired');
     } else {
       ws.sink.add(jsonEncode(
@@ -491,6 +502,17 @@ class SyncService {
               await _storage.write(
                   key: _kSyncKeyName,
                   value: base64Encode(_syncKey!));
+
+              // Adopt the server's MasterKeyConfig so both devices
+              // derive the same vault AES key from the same salt.
+              final remoteConfig = data['master_key_config'];
+              if (remoteConfig != null) {
+                final config = MasterKeyConfig.fromJson(
+                    remoteConfig as Map<String, dynamic>);
+                await _vaultRepo.saveMasterKeyConfig(config);
+                debugPrint('[SyncService] Adopted remote MasterKeyConfig');
+              }
+
               _clientEventController.add('paired');
               responseCompleter.complete(true);
             } else {
@@ -879,6 +901,9 @@ class SyncService {
         'encrypted_payload': base64Encode(row.encryptedPayload),
         'created_at': row.createdAt,
         'updated_at': row.updatedAt,
+        'rotation_interval': row.rotationInterval,
+        'custom_rotation_days': row.customRotationDays,
+        'last_rotation_prompted_at': row.lastRotationPromptedAt,
       };
 
   Map<String, dynamic> _folderEntryToJson(FolderEntry row) => {

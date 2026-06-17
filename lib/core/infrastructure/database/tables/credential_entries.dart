@@ -39,6 +39,16 @@ class CredentialEntries extends Table {
   /// Unix timestamp in milliseconds.
   IntColumn get updatedAt => integer()();
 
+  /// Rotation reminder interval (none, monthly, quarterly, semiAnnually, custom).
+  TextColumn get rotationInterval =>
+      text().withDefault(const Constant('none'))();
+
+  /// Custom rotation period in days (only used when rotationInterval == 'custom').
+  IntColumn get customRotationDays => integer().nullable()();
+
+  /// Unix timestamp in ms — last time a rotation notification was shown.
+  IntColumn get lastRotationPromptedAt => integer().nullable()();
+
   @override
   Set<Column> get primaryKey => {id};
 }
