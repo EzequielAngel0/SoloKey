@@ -1067,4 +1067,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keyboardSpace => 'Space';
+
+  @override
+  String get transferTitle => 'Transfer data';
+
+  @override
+  String get transferTabExport => 'Export';
+
+  @override
+  String get transferTabImport => 'Import';
+
+  @override
+  String get transferErrorTitle => 'Error';
+
+  @override
+  String get transferTypePasswords => 'Passwords';
+
+  @override
+  String get transferTypeApiKeys => 'API Keys';
+
+  @override
+  String get transferTypeSecureNotes => 'Secure notes';
+
+  @override
+  String get transferTypeTotp => 'Authenticators (TOTP)';
+
+  @override
+  String get transferTypePasskeys => 'Passkeys';
+
+  @override
+  String get transferTypeSshKeys => 'SSH keys';
+
+  @override
+  String get transferExportPasswordRequired => 'Enter an export password';
+
+  @override
+  String get transferSelectAtLeastOneType =>
+      'Select at least one credential type';
+
+  @override
+  String transferExportedSummary(int creds, int folders) {
+    return 'Exported $creds credentials · $folders folders';
+  }
+
+  @override
+  String transferExportError(String msg) {
+    return 'Export error: $msg';
+  }
+
+  @override
+  String transferImportError(String msg) {
+    return 'Import error: $msg';
+  }
+
+  @override
+  String transferImportCsvError(String msg) {
+    return 'CSV import error: $msg';
+  }
+
+  @override
+  String get transferOverwriteTitle => 'Overwrite vault?';
+
+  @override
+  String get transferOverwriteBody =>
+      'This will delete ALL current credentials and replace them with those from the file. This operation cannot be undone.';
+
+  @override
+  String get transferOverwriteConfirm => 'Overwrite';
+
+  @override
+  String get transferExportPasswordLabel => 'Export password';
+
+  @override
+  String get transferExportPasswordInfo =>
+      'Create a password to protect this backup. You\'ll need it when importing on any device.';
+
+  @override
+  String get transferExportPasswordHint => 'e.g.: \"my-backup-key-2025\"';
+
+  @override
+  String get transferSelectWhatToExport => 'Choose what to export';
+
+  @override
+  String get transferEncryptionInfo =>
+      'The file is encrypted with AES-256-GCM + Argon2id. Only someone who knows the export password can open it.';
+
+  @override
+  String get transferExportButton => 'Export vault';
+
+  @override
+  String get transferExportDone => 'Export completed';
+
+  @override
+  String transferSummary(int creds, int folders) {
+    return '$creds credentials · $folders folders';
+  }
+
+  @override
+  String get transferBackupPasswordLabel => 'Backup password';
+
+  @override
+  String get transferImportPasswordInfo =>
+      'Enter the password you used when exporting the backup. If you import a backup of your own from the same device you can leave this field empty.';
+
+  @override
+  String get transferImportPasswordHint =>
+      'Leave empty for same-device backups';
+
+  @override
+  String get transferImportModeLabel => 'Import mode';
+
+  @override
+  String get transferModeMerge => 'Merge';
+
+  @override
+  String get transferModeMergeSub =>
+      'Add without deleting your current credentials';
+
+  @override
+  String get transferModeOverwrite => 'Overwrite';
+
+  @override
+  String get transferModeOverwriteSub =>
+      'Will delete everything and replace with the file';
+
+  @override
+  String get transferSelectFile => 'Select file (.skvault)';
+
+  @override
+  String get transferImportCsv => 'Import from CSV (Bitwarden/Chrome/1Pass)';
+
+  @override
+  String get transferImportDone => 'Import completed';
 }

@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/services/vault_export_service.dart';
 import '../../../core/services/csv_import_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
 import '../../../features/folders/application/folders_provider.dart';
@@ -57,14 +58,17 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  String _typeLabel(CredentialType type) => switch (type) {
-        CredentialType.password => 'Contraseñas',
-        CredentialType.apiKey => 'API Keys',
-        CredentialType.secureNote => 'Notas seguras',
-        CredentialType.totp => 'Autenticadores (TOTP)',
-        CredentialType.passkey => 'Passkeys',
-        CredentialType.sshKey => 'Llaves SSH',
-      };
+  String _typeLabel(CredentialType type) {
+    final l10n = AppLocalizations.of(context);
+    return switch (type) {
+      CredentialType.password => l10n.transferTypePasswords,
+      CredentialType.apiKey => l10n.transferTypeApiKeys,
+      CredentialType.secureNote => l10n.transferTypeSecureNotes,
+      CredentialType.totp => l10n.transferTypeTotp,
+      CredentialType.passkey => l10n.transferTypePasskeys,
+      CredentialType.sshKey => l10n.transferTypeSshKeys,
+    };
+  }
 
   IconData _typeIcon(CredentialType type) => switch (type) {
         CredentialType.password => Icons.lock_rounded,
@@ -76,13 +80,14 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       };
 
   Future<void> _doExport() async {
+    final l10n = AppLocalizations.of(context);
     final password = _exportPasswordCtrl.text.trim();
     if (password.isEmpty) {
-      _snack('Ingresa una contraseña de exportación', error: true);
+      _snack(l10n.transferExportPasswordRequired, error: true);
       return;
     }
     if (_selectedTypes.isEmpty) {
-      _snack('Selecciona al menos un tipo de credencial', error: true);
+      _snack(l10n.transferSelectAtLeastOneType, error: true);
       return;
     }
     setState(() {
@@ -100,18 +105,19 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       if (mounted) {
         setState(() => _lastExport = summary);
         _snack(
-          'Exportadas ${summary.totalCredentials} credenciales · '
-          '${summary.totalFolders} carpetas',
+          l10n.transferExportedSummary(
+              summary.totalCredentials, summary.totalFolders),
         );
       }
     } catch (e) {
-      if (mounted) _snack('Error al exportar: $e', error: true);
+      if (mounted) _snack(l10n.transferExportError('$e'), error: true);
     } finally {
       if (mounted) setState(() => _exporting = false);
     }
   }
 
   Future<void> _doImport() async {
+    final l10n = AppLocalizations.of(context);
     final password = _importPasswordCtrl.text.trim();
     if (_importMode == ImportMode.replace) {
       final confirmed = await _confirmReplace();
@@ -138,13 +144,14 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         }
       }
     } catch (e) {
-      if (mounted) _snack('Error al importar: $e', error: true);
+      if (mounted) _snack(l10n.transferImportError('$e'), error: true);
     } finally {
       if (mounted) setState(() => _importing = false);
     }
   }
 
   Future<void> _doImportCsv() async {
+    final l10n = AppLocalizations.of(context);
     if (_importMode == ImportMode.replace) {
       final confirmed = await _confirmReplace();
       if (!confirmed) return;
@@ -171,7 +178,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         }
       }
     } catch (e) {
-      if (mounted) _snack('Error al importar CSV: $e', error: true);
+      if (mounted) _snack(l10n.transferImportCsvError('$e'), error: true);
     } finally {
       if (mounted) setState(() => _importing = false);
     }
@@ -179,28 +186,28 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
   Future<bool> _confirmReplace() async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
             backgroundColor: palette.drawer,
             title: Text(
-              '¿Sobrescribir bóveda?',
+              l10n.transferOverwriteTitle,
               style: TextStyle(color: palette.textPrimary),
             ),
             content: Text(
-              'Esta acción eliminará TODAS las credenciales actuales y las '
-              'reemplazará con las del archivo. Esta operación no se puede deshacer.',
+              l10n.transferOverwriteBody,
               style: TextStyle(color: palette.textMuted),
             ),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context, false),
-                child: const Text('Cancelar'),
+                child: Text(l10n.commonCancel),
               ),
               TextButton(
                 onPressed: () => Navigator.pop(context, true),
                 child: Text(
-                  'Sobrescribir',
+                  l10n.transferOverwriteConfirm,
                   style: TextStyle(color: palette.danger),
                 ),
               ),
@@ -227,17 +234,18 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: VaultAppBar(
-        title: 'Transferir datos',
+        title: l10n.transferTitle,
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: palette.accent,
           labelColor: palette.textPrimary,
           unselectedLabelColor: palette.textDisabled,
-          tabs: const [
-            Tab(icon: Icon(Icons.upload_rounded), text: 'Exportar'),
-            Tab(icon: Icon(Icons.download_rounded), text: 'Importar'),
+          tabs: [
+            Tab(icon: const Icon(Icons.upload_rounded), text: l10n.transferTabExport),
+            Tab(icon: const Icon(Icons.download_rounded), text: l10n.transferTabImport),
           ],
         ),
       ),
@@ -301,29 +309,29 @@ class _ExportTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         // ── Export password ──────────────────────────────────────────────────
-        const _SectionLabel(label: 'Contraseña de exportación'),
+        _SectionLabel(label: l10n.transferExportPasswordLabel),
         const SizedBox(height: 8),
         _InfoBanner(
           icon: Icons.info_outline_rounded,
           color: palette.accent,
-          text: 'Crea una contraseña para proteger este backup. '
-              'Necesitarás ingresarla al importar en cualquier dispositivo.',
+          text: l10n.transferExportPasswordInfo,
         ),
         const SizedBox(height: 12),
         _PasswordField(
           controller: passwordCtrl,
-          label: 'Contraseña de exportación',
-          hint: 'Ej: "mi-clave-backup-2025"',
+          label: l10n.transferExportPasswordLabel,
+          hint: l10n.transferExportPasswordHint,
         ),
 
         const SizedBox(height: 24),
 
         // ── Type filter ──────────────────────────────────────────────────────
-        const _SectionLabel(label: 'Selecciona qué exportar'),
+        _SectionLabel(label: l10n.transferSelectWhatToExport),
         const SizedBox(height: 8),
         _Card(
           children: CredentialType.values
@@ -348,8 +356,7 @@ class _ExportTab extends StatelessWidget {
         _InfoBanner(
           icon: Icons.lock_rounded,
           color: palette.success,
-          text: 'El archivo se cifra con AES-256-GCM + Argon2id. '
-              'Solo quién conozca la contraseña de exportación puede abrirlo.',
+          text: l10n.transferEncryptionInfo,
         ),
         const SizedBox(height: 24),
 
@@ -361,7 +368,7 @@ class _ExportTab extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onExport,
             icon: const Icon(Icons.upload_rounded),
-            label: const Text('Exportar bóveda'),
+            label: Text(l10n.transferExportButton),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
@@ -372,9 +379,9 @@ class _ExportTab extends StatelessWidget {
           _ResultCard(
             icon: Icons.check_circle_rounded,
             color: palette.success,
-            title: 'Exportación completada',
-            subtitle: '${lastSummary!.totalCredentials} credenciales · '
-                '${lastSummary!.totalFolders} carpetas',
+            title: l10n.transferExportDone,
+            subtitle: l10n.transferSummary(
+                lastSummary!.totalCredentials, lastSummary!.totalFolders),
           ),
         ],
       ],
@@ -406,30 +413,29 @@ class _ImportTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
         // ── Export password ──────────────────────────────────────────────────
-        const _SectionLabel(label: 'Contraseña del backup'),
+        _SectionLabel(label: l10n.transferBackupPasswordLabel),
         const SizedBox(height: 8),
         _InfoBanner(
           icon: Icons.key_rounded,
           color: palette.accent,
-          text: 'Ingresa la contraseña que usaste al exportar el backup. '
-              'Si importas un backup tuyo del mismo dispositivo puedes '
-              'dejar este campo vacío.',
+          text: l10n.transferImportPasswordInfo,
         ),
         const SizedBox(height: 12),
         _PasswordField(
           controller: passwordCtrl,
-          label: 'Contraseña de exportación',
-          hint: 'Déjala vacía para backups del mismo dispositivo',
+          label: l10n.transferExportPasswordLabel,
+          hint: l10n.transferImportPasswordHint,
         ),
 
         const SizedBox(height: 24),
 
         // ── Mode ─────────────────────────────────────────────────────────────
-        const _SectionLabel(label: 'Modo de importación'),
+        _SectionLabel(label: l10n.transferImportModeLabel),
         const SizedBox(height: 8),
         _Card(
           children: [
@@ -439,11 +445,11 @@ class _ImportTab extends StatelessWidget {
               onChanged: onModeChanged,
               activeColor: palette.accent,
               title: Text(
-                'Combinar',
+                l10n.transferModeMerge,
                 style: TextStyle(color: palette.textPrimary, fontSize: 14),
               ),
               subtitle: Text(
-                'Añadir sin borrar tus credenciales actuales',
+                l10n.transferModeMergeSub,
                 style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
             ),
@@ -454,11 +460,11 @@ class _ImportTab extends StatelessWidget {
               onChanged: onModeChanged,
               activeColor: palette.danger,
               title: Text(
-                'Sobrescribir',
+                l10n.transferModeOverwrite,
                 style: TextStyle(color: palette.danger, fontSize: 14),
               ),
               subtitle: Text(
-                'Borrará todo y reemplazará con el archivo',
+                l10n.transferModeOverwriteSub,
                 style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
             ),
@@ -474,7 +480,7 @@ class _ImportTab extends StatelessWidget {
           ElevatedButton.icon(
             onPressed: onImport,
             icon: const Icon(Icons.download_rounded),
-            label: const Text('Seleccionar archivo (.skvault)'),
+            label: Text(l10n.transferSelectFile),
             style: ElevatedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
             ),
@@ -483,7 +489,7 @@ class _ImportTab extends StatelessWidget {
           OutlinedButton.icon(
             onPressed: onImportCsv,
             icon: Icon(Icons.description_rounded, color: palette.secondary),
-            label: Text('Importar desde CSV (Bitwarden/Chrome/1Pass)', style: TextStyle(color: palette.secondary)),
+            label: Text(l10n.transferImportCsv, style: TextStyle(color: palette.secondary)),
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
               side: BorderSide(color: palette.secondary),
@@ -501,7 +507,7 @@ class _ImportTab extends StatelessWidget {
                 ? palette.success
                 : palette.danger,
             title:
-                lastResult!.success ? 'Importación completada' : 'Error',
+                lastResult!.success ? l10n.transferImportDone : l10n.transferErrorTitle,
             subtitle: lastResult!.message,
           ),
         ],

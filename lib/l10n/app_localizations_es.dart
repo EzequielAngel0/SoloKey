@@ -1074,4 +1074,137 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get keyboardSpace => 'Espacio';
+
+  @override
+  String get transferTitle => 'Transferir datos';
+
+  @override
+  String get transferTabExport => 'Exportar';
+
+  @override
+  String get transferTabImport => 'Importar';
+
+  @override
+  String get transferErrorTitle => 'Error';
+
+  @override
+  String get transferTypePasswords => 'Contraseñas';
+
+  @override
+  String get transferTypeApiKeys => 'API Keys';
+
+  @override
+  String get transferTypeSecureNotes => 'Notas seguras';
+
+  @override
+  String get transferTypeTotp => 'Autenticadores (TOTP)';
+
+  @override
+  String get transferTypePasskeys => 'Passkeys';
+
+  @override
+  String get transferTypeSshKeys => 'Llaves SSH';
+
+  @override
+  String get transferExportPasswordRequired =>
+      'Ingresa una contraseña de exportación';
+
+  @override
+  String get transferSelectAtLeastOneType =>
+      'Selecciona al menos un tipo de credencial';
+
+  @override
+  String transferExportedSummary(int creds, int folders) {
+    return 'Exportadas $creds credenciales · $folders carpetas';
+  }
+
+  @override
+  String transferExportError(String msg) {
+    return 'Error al exportar: $msg';
+  }
+
+  @override
+  String transferImportError(String msg) {
+    return 'Error al importar: $msg';
+  }
+
+  @override
+  String transferImportCsvError(String msg) {
+    return 'Error al importar CSV: $msg';
+  }
+
+  @override
+  String get transferOverwriteTitle => '¿Sobrescribir bóveda?';
+
+  @override
+  String get transferOverwriteBody =>
+      'Esta acción eliminará TODAS las credenciales actuales y las reemplazará con las del archivo. Esta operación no se puede deshacer.';
+
+  @override
+  String get transferOverwriteConfirm => 'Sobrescribir';
+
+  @override
+  String get transferExportPasswordLabel => 'Contraseña de exportación';
+
+  @override
+  String get transferExportPasswordInfo =>
+      'Crea una contraseña para proteger este backup. Necesitarás ingresarla al importar en cualquier dispositivo.';
+
+  @override
+  String get transferExportPasswordHint => 'Ej: \"mi-clave-backup-2025\"';
+
+  @override
+  String get transferSelectWhatToExport => 'Selecciona qué exportar';
+
+  @override
+  String get transferEncryptionInfo =>
+      'El archivo se cifra con AES-256-GCM + Argon2id. Solo quién conozca la contraseña de exportación puede abrirlo.';
+
+  @override
+  String get transferExportButton => 'Exportar bóveda';
+
+  @override
+  String get transferExportDone => 'Exportación completada';
+
+  @override
+  String transferSummary(int creds, int folders) {
+    return '$creds credenciales · $folders carpetas';
+  }
+
+  @override
+  String get transferBackupPasswordLabel => 'Contraseña del backup';
+
+  @override
+  String get transferImportPasswordInfo =>
+      'Ingresa la contraseña que usaste al exportar el backup. Si importas un backup tuyo del mismo dispositivo puedes dejar este campo vacío.';
+
+  @override
+  String get transferImportPasswordHint =>
+      'Déjala vacía para backups del mismo dispositivo';
+
+  @override
+  String get transferImportModeLabel => 'Modo de importación';
+
+  @override
+  String get transferModeMerge => 'Combinar';
+
+  @override
+  String get transferModeMergeSub =>
+      'Añadir sin borrar tus credenciales actuales';
+
+  @override
+  String get transferModeOverwrite => 'Sobrescribir';
+
+  @override
+  String get transferModeOverwriteSub =>
+      'Borrará todo y reemplazará con el archivo';
+
+  @override
+  String get transferSelectFile => 'Seleccionar archivo (.skvault)';
+
+  @override
+  String get transferImportCsv => 'Importar desde CSV (Bitwarden/Chrome/1Pass)';
+
+  @override
+  String get transferImportDone => 'Importación completada';
 }

@@ -2089,6 +2089,234 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Space'**
   String get keyboardSpace;
+
+  /// No description provided for @transferTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer data'**
+  String get transferTitle;
+
+  /// No description provided for @transferTabExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get transferTabExport;
+
+  /// No description provided for @transferTabImport.
+  ///
+  /// In en, this message translates to:
+  /// **'Import'**
+  String get transferTabImport;
+
+  /// No description provided for @transferErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get transferErrorTitle;
+
+  /// No description provided for @transferTypePasswords.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords'**
+  String get transferTypePasswords;
+
+  /// No description provided for @transferTypeApiKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'API Keys'**
+  String get transferTypeApiKeys;
+
+  /// No description provided for @transferTypeSecureNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure notes'**
+  String get transferTypeSecureNotes;
+
+  /// No description provided for @transferTypeTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticators (TOTP)'**
+  String get transferTypeTotp;
+
+  /// No description provided for @transferTypePasskeys.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys'**
+  String get transferTypePasskeys;
+
+  /// No description provided for @transferTypeSshKeys.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH keys'**
+  String get transferTypeSshKeys;
+
+  /// No description provided for @transferExportPasswordRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter an export password'**
+  String get transferExportPasswordRequired;
+
+  /// No description provided for @transferSelectAtLeastOneType.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one credential type'**
+  String get transferSelectAtLeastOneType;
+
+  /// No description provided for @transferExportedSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Exported {creds} credentials · {folders} folders'**
+  String transferExportedSummary(int creds, int folders);
+
+  /// No description provided for @transferExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Export error: {msg}'**
+  String transferExportError(String msg);
+
+  /// No description provided for @transferImportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Import error: {msg}'**
+  String transferImportError(String msg);
+
+  /// No description provided for @transferImportCsvError.
+  ///
+  /// In en, this message translates to:
+  /// **'CSV import error: {msg}'**
+  String transferImportCsvError(String msg);
+
+  /// No description provided for @transferOverwriteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite vault?'**
+  String get transferOverwriteTitle;
+
+  /// No description provided for @transferOverwriteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'This will delete ALL current credentials and replace them with those from the file. This operation cannot be undone.'**
+  String get transferOverwriteBody;
+
+  /// No description provided for @transferOverwriteConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get transferOverwriteConfirm;
+
+  /// No description provided for @transferExportPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Export password'**
+  String get transferExportPasswordLabel;
+
+  /// No description provided for @transferExportPasswordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Create a password to protect this backup. You\'ll need it when importing on any device.'**
+  String get transferExportPasswordInfo;
+
+  /// No description provided for @transferExportPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g.: \"my-backup-key-2025\"'**
+  String get transferExportPasswordHint;
+
+  /// No description provided for @transferSelectWhatToExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose what to export'**
+  String get transferSelectWhatToExport;
+
+  /// No description provided for @transferEncryptionInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'The file is encrypted with AES-256-GCM + Argon2id. Only someone who knows the export password can open it.'**
+  String get transferEncryptionInfo;
+
+  /// No description provided for @transferExportButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Export vault'**
+  String get transferExportButton;
+
+  /// No description provided for @transferExportDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Export completed'**
+  String get transferExportDone;
+
+  /// No description provided for @transferSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{creds} credentials · {folders} folders'**
+  String transferSummary(int creds, int folders);
+
+  /// No description provided for @transferBackupPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get transferBackupPasswordLabel;
+
+  /// No description provided for @transferImportPasswordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the password you used when exporting the backup. If you import a backup of your own from the same device you can leave this field empty.'**
+  String get transferImportPasswordInfo;
+
+  /// No description provided for @transferImportPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Leave empty for same-device backups'**
+  String get transferImportPasswordHint;
+
+  /// No description provided for @transferImportModeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Import mode'**
+  String get transferImportModeLabel;
+
+  /// No description provided for @transferModeMerge.
+  ///
+  /// In en, this message translates to:
+  /// **'Merge'**
+  String get transferModeMerge;
+
+  /// No description provided for @transferModeMergeSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Add without deleting your current credentials'**
+  String get transferModeMergeSub;
+
+  /// No description provided for @transferModeOverwrite.
+  ///
+  /// In en, this message translates to:
+  /// **'Overwrite'**
+  String get transferModeOverwrite;
+
+  /// No description provided for @transferModeOverwriteSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Will delete everything and replace with the file'**
+  String get transferModeOverwriteSub;
+
+  /// No description provided for @transferSelectFile.
+  ///
+  /// In en, this message translates to:
+  /// **'Select file (.skvault)'**
+  String get transferSelectFile;
+
+  /// No description provided for @transferImportCsv.
+  ///
+  /// In en, this message translates to:
+  /// **'Import from CSV (Bitwarden/Chrome/1Pass)'**
+  String get transferImportCsv;
+
+  /// No description provided for @transferImportDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Import completed'**
+  String get transferImportDone;
 }
 
 class _AppLocalizationsDelegate
