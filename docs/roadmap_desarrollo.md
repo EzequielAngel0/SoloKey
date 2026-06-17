@@ -246,13 +246,14 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
   (persistido, retrocompatible) + helper `LanguageMode` + selector en Ajustes › Idioma.
   Cambiar el idioma reconstruye la UI al vuelo.
 - ✅ **Pantallas migradas**: Splash, Setup, Unlock, Ajustes (cabeceras + sliders/toggles + Quick-Fill),
-  Home + EmptyState, detalle de credencial (campos/tipos/rotación/diálogos/TOTP), Historial,
-  Recuperación (+ RecoveryCodeDisplay), onboarding de autofill, Quick-Fill de escritorio,
-  Auditoría de Seguridad y Respaldos de Passkey. ~200 claves ARB (es/en).
-- ⬜ **Pendiente (siguientes lotes)**: `credential_form_screen` (formulario grande), carpetas
-  (`folder_screen` + widgets), sync/pairing, transfer, layout de escritorio, widgets compartidos
-  (badges/selectores de tipo, fuerza de contraseña), menú del tray + textos de notificaciones, y los
-  textos generados por `SecurityAuditService` (capa de datos: requieren devolver claves, no strings).
+  Home + EmptyState, detalle de credencial (campos/tipos/rotación/diálogos/TOTP), **formulario de
+  credencial** (secciones por tipo, campos personalizados, cifrado doble, rotación, QR/SSH, validadores
+  y snackbars), Historial, Recuperación (+ RecoveryCodeDisplay), onboarding de autofill, Quick-Fill de
+  escritorio, Auditoría de Seguridad y Respaldos de Passkey. ~290 claves ARB (es/en).
+- ⬜ **Pendiente (siguientes lotes)**: carpetas (`folder_screen` + widgets), sync/pairing, transfer,
+  layout de escritorio, widgets compartidos (badges/selectores de tipo, fuerza de contraseña), menú del
+  tray + textos de notificaciones, y los textos generados por `SecurityAuditService` (capa de datos:
+  requieren devolver claves, no strings).
 
 ---
 
