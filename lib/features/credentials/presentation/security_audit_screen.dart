@@ -8,6 +8,7 @@ import '../../../app/di/injection.dart';
 import '../../../core/services/security_audit_service.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 
 part 'security_audit_screen.g.dart';
 
@@ -27,10 +28,11 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final auditAsync = ref.watch(auditResultsProvider(_checkBreaches));
 
     return Scaffold(
-      appBar: VaultAppBar(title: 'Auditoría de Seguridad'),
+      appBar: const VaultAppBar(title: 'Auditoría de Seguridad'),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -40,33 +42,33 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
               padding: const EdgeInsets.all(16.0),
               child: Container(
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFF1E1E38), Color(0xFF16162A)],
+                  gradient: LinearGradient(
+                    colors: [palette.surface, palette.card],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: const Color(0xFF2E2E4A)),
+                  border: Border.all(color: palette.divider),
                 ),
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       'Análisis de Seguridad',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: palette.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
+                    Text(
                       'SoloKey analiza tus credenciales localmente para identificar contraseñas débiles, cortas, reutilizadas o antiguas.',
-                      style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 13),
+                      style: TextStyle(color: palette.textMuted, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
-                    const Divider(color: Color(0xFF2E2E4A)),
+                    Divider(color: palette.divider),
                     const SizedBox(height: 8),
                     // Breach check option
                     Row(
@@ -77,12 +79,12 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                             children: [
                               Row(
                                 children: [
-                                  const Icon(Icons.cloud_sync_rounded, color: Color(0xFF6C63FF), size: 20),
+                                  Icon(Icons.cloud_sync_rounded, color: palette.accent, size: 20),
                                   const SizedBox(width: 8),
-                                  const Text(
+                                  Text(
                                     'Verificar filtraciones (online)',
                                     style: TextStyle(
-                                      color: Colors.white,
+                                      color: palette.textPrimary,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w600,
                                     ),
@@ -91,13 +93,13 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                                   Container(
                                     padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
+                                      color: palette.accent.withValues(alpha: 0.15),
                                       borderRadius: BorderRadius.circular(4),
                                     ),
-                                    child: const Text(
+                                    child: Text(
                                       'PRIVADO',
                                       style: TextStyle(
-                                        color: Color(0xFF8C84FF),
+                                        color: palette.accent,
                                         fontSize: 9,
                                         fontWeight: FontWeight.bold,
                                       ),
@@ -106,19 +108,19 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                                 ],
                               ),
                               const SizedBox(height: 4),
-                              const Text(
+                              Text(
                                 'Usa k-Anonymity (HaveIBeenPwned) para buscar contraseñas expuestas sin revelar tu contraseña real.',
-                                style: TextStyle(color: Color(0xFF8C8C9E), fontSize: 11),
+                                style: TextStyle(color: palette.textMuted, fontSize: 11),
                               ),
                             ],
                           ),
                         ),
                         Switch(
                           value: _checkBreaches,
-                          activeColor: const Color(0xFF6C63FF),
-                          activeTrackColor: const Color(0xFF6C63FF).withValues(alpha: 0.3),
-                          inactiveThumbColor: const Color(0xFF5C5C7A),
-                          inactiveTrackColor: const Color(0xFF1E1E30),
+                          activeThumbColor: palette.accent,
+                          activeTrackColor: palette.accent.withValues(alpha: 0.3),
+                          inactiveThumbColor: palette.textDisabled,
+                          inactiveTrackColor: palette.surface,
                           onChanged: (val) {
                             HapticFeedback.mediumImpact();
                             setState(() {
@@ -136,9 +138,9 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
 
           // Audit Results List
           auditAsync.when(
-            loading: () => const SliverFillRemaining(
+            loading: () => SliverFillRemaining(
               child: Center(
-                child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+                child: CircularProgressIndicator(color: palette.accent),
               ),
             ),
             error: (e, _) => SliverFillRemaining(
@@ -147,7 +149,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
                     'Error: $e',
-                    style: const TextStyle(color: Color(0xFFCF6679)),
+                    style: TextStyle(color: palette.danger),
                     textAlign: TextAlign.center,
                   ),
                 ),
@@ -185,6 +187,7 @@ class _AllGood extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -192,22 +195,21 @@ class _AllGood extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.12),
+              color: palette.success.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Icons.verified_rounded,
-                color: Color(0xFF4CAF50), size: 60),
+            child: Icon(Icons.verified_rounded, color: palette.success, size: 60),
           ),
           const SizedBox(height: 20),
-          const Text('¡Todo en orden!',
+          Text('¡Todo en orden!',
               style: TextStyle(
-                  color: Colors.white,
+                  color: palette.textPrimary,
                   fontSize: 22,
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'No se encontraron problemas en tu bóveda.',
-            style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14),
+            style: TextStyle(color: palette.textMuted, fontSize: 14),
             textAlign: TextAlign.center,
           ),
         ],
@@ -220,42 +222,38 @@ class _IssueCard extends StatelessWidget {
   const _IssueCard({required this.issue});
   final AuditIssue issue;
 
-  static const _severityData = {
-    AuditSeverity.critical: (
-      color: Color(0xFFCF6679),
-      icon: Icons.error_rounded,
-      label: 'Crítico',
-    ),
-    AuditSeverity.warning: (
-      color: Color(0xFFFFB74D),
-      icon: Icons.warning_rounded,
-      label: 'Advertencia',
-    ),
-    AuditSeverity.info: (
-      color: Color(0xFF6C63FF),
-      icon: Icons.info_rounded,
-      label: 'Info',
-    ),
+  static const _severityMeta = {
+    AuditSeverity.critical: (icon: Icons.error_rounded, label: 'Crítico'),
+    AuditSeverity.warning: (icon: Icons.warning_rounded, label: 'Advertencia'),
+    AuditSeverity.info: (icon: Icons.info_rounded, label: 'Info'),
   };
+
+  Color _severityColor(AuditSeverity severity, AppPalette p) => switch (severity) {
+        AuditSeverity.critical => p.danger,
+        AuditSeverity.warning => p.warning,
+        AuditSeverity.info => p.accent,
+      };
 
   @override
   Widget build(BuildContext context) {
-    final data = _severityData[issue.severity]!;
+    final palette = context.palette;
+    final meta = _severityMeta[issue.severity]!;
+    final color = _severityColor(issue.severity, palette);
     return GestureDetector(
       onTap: () => context.push(AppRoutes.credentialEdit.replaceFirst(':id', issue.credential.id)),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: const Color(0xFF16213E),
+          color: palette.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: data.color.withValues(alpha: 0.3),
+            color: color.withValues(alpha: 0.3),
           ),
         ),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(data.icon, color: data.color, size: 22),
+            Icon(meta.icon, color: color, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -267,13 +265,13 @@ class _IssueCard extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 6, vertical: 2),
                         decoration: BoxDecoration(
-                          color: data.color.withValues(alpha: 0.15),
+                          color: color.withValues(alpha: 0.15),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          data.label,
+                          meta.label,
                           style: TextStyle(
-                            color: data.color,
+                            color: color,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -283,8 +281,8 @@ class _IssueCard extends StatelessWidget {
                       Expanded(
                         child: Text(
                           issue.credential.title,
-                          style: const TextStyle(
-                            color: Colors.white,
+                          style: TextStyle(
+                            color: palette.textPrimary,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -296,8 +294,8 @@ class _IssueCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(
                     issue.title,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: palette.textPrimary,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
@@ -305,8 +303,8 @@ class _IssueCard extends StatelessWidget {
                   const SizedBox(height: 4),
                   Text(
                     issue.description,
-                    style: const TextStyle(
-                      color: Color(0xFF9E9EBF),
+                    style: TextStyle(
+                      color: palette.textMuted,
                       fontSize: 12,
                     ),
                   ),
