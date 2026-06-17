@@ -34,6 +34,16 @@ class CredentialDao extends DatabaseAccessor<AppDatabase>
   Future<void> upsert(CredentialEntriesCompanion entry) =>
       into(credentialEntries).insertOnConflictUpdate(entry);
 
+  /// Stamps [timestampMs] (epoch ms) into `lastRotationPromptedAt` without
+  /// touching the encrypted payload — usable from a background isolate that
+  /// has no master key in RAM.
+  Future<void> markRotationPrompted(String id, int timestampMs) =>
+      (update(credentialEntries)..where((t) => t.id.equals(id))).write(
+        CredentialEntriesCompanion(
+          lastRotationPromptedAt: Value(timestampMs),
+        ),
+      );
+
   Future<int> deleteById(String id) =>
       (delete(credentialEntries)..where((t) => t.id.equals(id))).go();
 }

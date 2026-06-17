@@ -6,6 +6,9 @@
     <!-- Camera for QR scanning -->
     <uses-permission android:name="android.permission.CAMERA" />
 
+    <!-- Post notifications (Android 13+) -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:label="SoloKey"
         android:name="${applicationName}"

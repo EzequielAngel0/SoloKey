@@ -31,6 +31,7 @@ import '../../core/infrastructure/security/session_manager.dart' as _i795;
 import '../../core/services/autofill_service.dart' as _i923;
 import '../../core/services/biometric_auth_service.dart' as _i455;
 import '../../core/services/csv_import_service.dart' as _i764;
+import '../../core/services/notification_service.dart' as _i4;
 import '../../core/services/recovery_service.dart' as _i323;
 import '../../core/services/security_audit_service.dart' as _i400;
 import '../../core/services/ssh_key_generator_service.dart' as _i972;
@@ -84,6 +85,10 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i1023.ISecurityService>(
       () => _i1063.SecurityServiceImpl(),
+    );
+    gh.lazySingleton<_i4.NotificationService>(
+      () => _i4.NotificationService(gh<_i1042.AppDatabase>()),
+      dispose: (i) => i.dispose(),
     );
     gh.lazySingleton<_i753.CredentialDao>(
       () => registerModule.credentialDao(gh<_i1042.AppDatabase>()),

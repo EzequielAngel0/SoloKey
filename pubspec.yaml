@@ -63,6 +63,11 @@ dependencies:
   qr_flutter: ^4.1.0
   web_socket_channel: ^3.0.3
 
+  # ── Native Notifications & Background Services ─────────────────
+  flutter_local_notifications: ^20.1.0
+  local_notifier: ^0.1.6
+  workmanager: ^0.5.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter

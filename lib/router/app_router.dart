@@ -2,6 +2,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../core/services/notification_navigation.dart';
 import '../features/credentials/presentation/credential_detail_screen.dart';
 import '../features/credentials/presentation/credential_form_screen.dart';
 import '../features/credentials/presentation/home_screen.dart';
@@ -105,6 +106,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
 
   final router = GoRouter(
     initialLocation: AppRoutes.splash,
+    navigatorKey: rootNavigatorKey,
     debugLogDiagnostics: false,
     refreshListenable: notifier,
     redirect: notifier.redirect,

@@ -5,11 +5,27 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:workmanager/workmanager.dart';
 
 import 'app/app.dart';
 import 'app/di/injection.dart';
 import 'app/di/provider_overrides.dart';
+import 'core/services/notification_service.dart';
+
+/// WorkManager background entry point (Android). Runs in its own isolate, so it
+/// opens a fresh DB handle and notifies without GetIt or the master key.
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Workmanager().executeTask((task, inputData) async {
+    // Background isolates don't auto-register plugins; without this the DB
+    // (path_provider/sqlite) and notification plugin fail to load.
+    DartPluginRegistrant.ensureInitialized();
+    await runBackgroundRotationCheck();
+    return true;
+  });
+}
 
 Future<void> main() async {
   // Capture Flutter framework errors (widget build failures, layout, etc.)
@@ -30,7 +46,12 @@ Future<void> main() async {
       WidgetsFlutterBinding.ensureInitialized();
       await configureDependencies();
 
-      if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+      final notifications = getIt<NotificationService>();
+      final isDesktop = !kIsWeb &&
+          (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
+
+      if (isDesktop) {
+        await localNotifier.setup(appName: 'SoloKey');
         await windowManager.ensureInitialized();
         await windowManager.setPreventClose(true);
         const windowOptions = WindowOptions(
@@ -46,12 +67,30 @@ Future<void> main() async {
         });
       }
 
+      // Android: schedule a daily background rotation sweep + foreground setup.
+      if (!kIsWeb && Platform.isAndroid) {
+        await Workmanager().initialize(callbackDispatcher);
+        await Workmanager().registerPeriodicTask(
+          'solokey-rotation-check',
+          'rotationCheck',
+          frequency: const Duration(hours: 24),
+          initialDelay: const Duration(hours: 1),
+          existingWorkPolicy: ExistingWorkPolicy.keep,
+        );
+        await notifications.initialize();
+      }
+
       runApp(
         ProviderScope(
           overrides: buildProviderOverrides(),
           child: const App(),
         ),
       );
+
+      // Desktop tray daemon: periodic in-process rotation sweeps.
+      if (isDesktop) {
+        notifications.startDesktopDaemon();
+      }
     },
     (error, stack) {
       // Zone-level error handler — last resort safety net.
