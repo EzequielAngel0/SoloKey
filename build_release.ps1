@@ -8,12 +8,11 @@
     - APK general (universal, todas las ABIs)         -> dist/SoloKey-<ver>-universal.apk
     - APKs split-per-abi (arm64-v8a / armeabi-v7a / x86_64)
                                                        -> dist/<abi>/SoloKey-<ver>-<abi>.apk
-    - Build portable de Windows (SoloKey.exe + DLLs + data) -> dist/windows/
-    - Instalador Inno Setup                            -> dist/SoloKey-<ver>-setup.exe
-                                                          (requiere Inno Setup / ISCC.exe)
+    - Instalador de Windows (Inno Setup)               -> dist/SoloKey-<ver>-setup.exe
+                                                          (compila Windows; requiere ISCC.exe)
 
 .PARAMETER Target
-  Que compilar: android | windows | inno | all. Por defecto: all.
+  Que compilar: android | inno | all. Por defecto: all.
 
 .PARAMETER Clean
   Ejecuta 'flutter clean' antes de compilar.
@@ -21,12 +20,11 @@
 .EXAMPLE
   ./build_release.ps1
   ./build_release.ps1 -Target android
-  ./build_release.ps1 -Target inno
-  ./build_release.ps1 -Target windows -Clean
+  ./build_release.ps1 -Target inno -Clean
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('android', 'windows', 'inno', 'all')]
+    [ValidateSet('android', 'inno', 'all')]
     [string]$Target = 'all',
     [switch]$Clean
 )
@@ -108,7 +106,9 @@ function Build-Android {
     Write-Host "APKs listos en $Dist" -ForegroundColor Green
 }
 
-# ── Windows ────────────────────────────────────────────────────────────────────
+# ── Instalador Inno Setup (Windows) ──────────────────────────────────────────────
+# Compila Windows y produce SoloKey-<ver>-setup.exe directo en dist/. App
+# desempaquetada (la boveda queda en %APPDATA%, igual que el .exe). Firma opcional.
 function Find-WindowsRelease {
     # La ruta de salida varia segun la version de Flutter.
     $candidates = @(
@@ -120,26 +120,6 @@ function Find-WindowsRelease {
     return $winSrc
 }
 
-# Copia el ejecutable portable (exe + DLLs + data) a dist/windows, sin el .msix.
-function Copy-WindowsRelease {
-    $winSrc = Find-WindowsRelease
-    $winDest = Join-Path $Dist 'windows'
-    if (Test-Path $winDest) { Remove-Item $winDest -Recurse -Force -ErrorAction Stop }
-    Confirm-Dir $winDest
-    Copy-Item (Join-Path $winSrc '*') $winDest -Recurse -Force -Exclude '*.msix' -ErrorAction Stop
-    Write-Host "Windows portable -> $winDest (SoloKey.exe + DLLs + data)" -ForegroundColor Green
-}
-
-function Build-Windows {
-    Write-Step 'Compilando Windows (.exe, release)'
-    flutter build windows --release
-    if ($LASTEXITCODE -ne 0) { throw "Fallo 'flutter build windows --release' (exit $LASTEXITCODE)." }
-    Copy-WindowsRelease
-}
-
-# ── Instalador Inno Setup (Windows) ──────────────────────────────────────────────
-# Produce SoloKey-<ver>-setup.exe a partir de dist/windows. App desempaquetada
-# (la boveda queda en la misma ubicacion que el .exe). La firma es opcional.
 function Find-Iscc {
     $candidates = @(
         "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
@@ -160,13 +140,14 @@ function Find-Iscc {
 }
 
 function Build-Inno {
-    # El instalador empaqueta dist/windows; aseguramos que exista.
-    if (-not (Test-Path (Join-Path $Dist 'windows\SoloKey.exe'))) {
-        Build-Windows
-    }
+    Write-Step 'Compilando Windows (.exe, release)'
+    flutter build windows --release
+    if ($LASTEXITCODE -ne 0) { throw "Fallo 'flutter build windows --release' (exit $LASTEXITCODE)." }
+
+    $relDir = Find-WindowsRelease
     $iscc = Find-Iscc
     Write-Step 'Generando instalador con Inno Setup (SoloKey-setup.exe)'
-    & $iscc "/DMyAppVersion=$Version" (Join-Path $Root 'installer\SoloKey.iss')
+    & $iscc "/DMyAppVersion=$Version" "/DSourceDir=$relDir" (Join-Path $Root 'installer\SoloKey.iss')
     if ($LASTEXITCODE -ne 0) { throw "Fallo ISCC / Inno Setup (exit $LASTEXITCODE)." }
     Write-Host "Instalador -> $(Join-Path $Dist "$AppName-$Version-setup.exe")" -ForegroundColor Green
 }
@@ -176,9 +157,8 @@ Confirm-Dir $Dist
 
 switch ($Target) {
     'android' { Build-Android }
-    'windows' { Build-Windows }
     'inno'    { Build-Inno }
-    'all'     { Build-Android; Build-Windows; Build-Inno }
+    'all'     { Build-Android; Build-Inno }
 }
 
 Write-Step "Listo. Artefactos en: $Dist"

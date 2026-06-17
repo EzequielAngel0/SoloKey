@@ -12,6 +12,12 @@
   #define MyAppVersion "1.0.0"
 #endif
 
+; Carpeta con el build portable de Windows (exe + DLLs + data). build_release.ps1
+; la pasa con /DSourceDir=<ruta del Release>; por defecto apunta al build local.
+#ifndef SourceDir
+  #define SourceDir SourcePath + "\..\build\windows\x64\runner\Release"
+#endif
+
 #define MyAppName "SoloKey"
 #define MyAppPublisher "Angel Ezequiel Barbosa Lomeli"
 #define MyAppExeName "SoloKey.exe"
@@ -47,7 +53,7 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "{#SourcePath}\..\dist\windows\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.msix"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 [Icons]
 Name: "{group}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserModelID: "{#MyAppId}"
