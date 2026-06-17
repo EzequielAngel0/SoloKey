@@ -13,6 +13,7 @@ import '../../features/folders/domain/entities/folder.dart';
 import '../../features/folders/domain/repositories/i_folder_repository.dart';
 import '../infrastructure/security/i_security_service.dart';
 import '../infrastructure/security/session_manager.dart';
+import 'csv_import_service.dart';
 
 /// Encrypted vault export/import service.
 ///
@@ -293,6 +294,66 @@ class VaultExportService {
           'Importados ${credentials.length} credenciales y ${folders.length} carpetas',
       credentialsImported: credentials.length,
       foldersImported: folders.length,
+      countsByType: countsByType,
+    );
+  }
+
+  Future<ImportResult> importCsv({
+    required CsvImportService csvService,
+    ImportMode mode = ImportMode.merge,
+  }) async {
+    final result = await FilePicker.platform.pickFiles(
+      type: FileType.any,
+      withData: true,
+    );
+    if (result == null || result.files.isEmpty) {
+      return const ImportResult(success: false, message: 'Importación cancelada');
+    }
+
+    final fileBytes = result.files.first.bytes;
+    if (fileBytes == null) {
+      return const ImportResult(success: false, message: 'Archivo inválido o vacío');
+    }
+
+    late String csvContent;
+    try {
+      csvContent = utf8.decode(fileBytes);
+    } catch (_) {
+      return const ImportResult(
+        success: false,
+        message: 'No se pudo decodificar el archivo como texto CSV UTF-8 válido.',
+      );
+    }
+
+    final credentials = csvService.parseCsv(csvContent);
+
+    if (credentials.isEmpty) {
+      return const ImportResult(
+        success: false,
+        message: 'No se encontraron credenciales válidas en el archivo CSV',
+      );
+    }
+
+    if (mode == ImportMode.replace) {
+      final existing = await _credRepo.getAll();
+      for (final c in existing) {
+        await _credRepo.delete(c.id);
+      }
+    }
+
+    for (final c in credentials) {
+      await _credRepo.save(c);
+    }
+
+    final countsByType = <CredentialType, int>{};
+    for (final c in credentials) {
+      countsByType[c.type] = (countsByType[c.type] ?? 0) + 1;
+    }
+
+    return ImportResult(
+      success: true,
+      message: 'Importadas ${credentials.length} credenciales desde CSV',
+      credentialsImported: credentials.length,
       countsByType: countsByType,
     );
   }

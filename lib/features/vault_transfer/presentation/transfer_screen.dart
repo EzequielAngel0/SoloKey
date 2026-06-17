@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/vault_export_service.dart';
+import '../../../core/services/csv_import_service.dart';
 import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
 import '../../../features/folders/application/folders_provider.dart';
@@ -139,6 +140,39 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     }
   }
 
+  Future<void> _doImportCsv() async {
+    if (_importMode == ImportMode.replace) {
+      final confirmed = await _confirmReplace();
+      if (!confirmed) return;
+    }
+    setState(() {
+      _importing = true;
+      _lastImport = null;
+    });
+    try {
+      final exportService = getIt<VaultExportService>();
+      final csvService = getIt<CsvImportService>();
+      final result = await exportService.importCsv(
+        csvService: csvService,
+        mode: _importMode,
+      );
+      if (mounted) {
+        setState(() => _lastImport = result);
+        _snack(result.message, error: !result.success);
+
+        // Refresh all screens so imported data appears immediately
+        if (result.success) {
+          ref.read(credentialsNotifierProvider.notifier).refresh();
+          ref.read(foldersNotifierProvider.notifier).refresh();
+        }
+      }
+    } catch (e) {
+      if (mounted) _snack('Error al importar CSV: $e', error: true);
+    } finally {
+      if (mounted) setState(() => _importing = false);
+    }
+  }
+
   Future<bool> _confirmReplace() async {
     return await showDialog<bool>(
           context: context,
@@ -225,6 +259,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
             onModeChanged: (m) => setState(() => _importMode = m),
             passwordCtrl: _importPasswordCtrl,
             onImport: _importing ? null : _doImport,
+            onImportCsv: _importing ? null : _doImportCsv,
             isLoading: _importing,
             lastResult: _lastImport,
           ),
@@ -348,6 +383,7 @@ class _ImportTab extends StatelessWidget {
     required this.onModeChanged,
     required this.passwordCtrl,
     required this.onImport,
+    required this.onImportCsv,
     required this.isLoading,
     required this.lastResult,
   });
@@ -356,6 +392,7 @@ class _ImportTab extends StatelessWidget {
   final ValueChanged<ImportMode> onModeChanged;
   final TextEditingController passwordCtrl;
   final VoidCallback? onImport;
+  final VoidCallback? onImportCsv;
   final bool isLoading;
   final ImportResult? lastResult;
 
@@ -425,7 +462,7 @@ class _ImportTab extends StatelessWidget {
           const Center(
             child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
           )
-        else
+        else ...[
           ElevatedButton.icon(
             onPressed: onImport,
             icon: const Icon(Icons.download_rounded),
@@ -434,6 +471,17 @@ class _ImportTab extends StatelessWidget {
               minimumSize: const Size.fromHeight(52),
             ),
           ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onImportCsv,
+            icon: const Icon(Icons.description_rounded, color: Color(0xFF03DAC6)),
+            label: const Text('Importar desde CSV (Bitwarden/Chrome/1Pass)', style: TextStyle(color: Color(0xFF03DAC6))),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+              side: const BorderSide(color: Color(0xFF03DAC6)),
+            ),
+          ),
+        ],
 
         if (lastResult != null) ...[
           const SizedBox(height: 16),
@@ -556,7 +604,7 @@ class _RadioTile<T> extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   title,
-                  ?subtitle,
+                  if (subtitle != null) subtitle,
                 ],
               ),
             ),
