@@ -13,6 +13,7 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   clearClipboardSeconds: (json['clearClipboardSeconds'] as num?)?.toInt() ?? 30,
   biometricEnabled: json['biometricEnabled'] as bool? ?? false,
   obscureOnBackground: json['obscureOnBackground'] as bool? ?? true,
+  themeMode: json['themeMode'] as String? ?? 'system',
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -22,4 +23,5 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'clearClipboardSeconds': instance.clearClipboardSeconds,
   'biometricEnabled': instance.biometricEnabled,
   'obscureOnBackground': instance.obscureOnBackground,
+  'themeMode': instance.themeMode,
 };

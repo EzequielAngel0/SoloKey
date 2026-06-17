@@ -7,7 +7,8 @@ import 'package:flutter/material.dart';
 /// support trivial in the future.
 abstract final class AppColors {
   // ── Branding ────────────────────────────────────────────────────────────────
-  static const primary       = Color(0xFF39FF14);  // Neon green
+  // De-neon'd: indigo is now the brand color, replacing the legacy neon green.
+  static const primary       = Color(0xFF6C63FF);  // Indigo (brand)
   static const accent        = Color(0xFF6C63FF);  // Indigo/Violet
   static const secondary     = Color(0xFF03DAC6);  // Teal
 
@@ -39,5 +40,5 @@ abstract final class AppColors {
   static const typeNote      = warning;
   static const typeTotp      = Color(0xFFE91E8C);
   static const typePasskey   = Color(0xFF4CAF50);
-  static const typeSshKey    = Color(0xFF00E5FF);
+  static const typeSshKey    = Color(0xFF00B8D4);  // Softened cyan
 }

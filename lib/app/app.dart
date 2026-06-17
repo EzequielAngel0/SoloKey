@@ -7,6 +7,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
+import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
@@ -137,9 +138,46 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
 
   void _onUserActivity() => _observer.onUserActivity();
 
+  static const _pageTransitions = PageTransitionsTheme(
+    builders: {
+      TargetPlatform.android: SlideUpFadeTransition(),
+      TargetPlatform.iOS: SlideUpFadeTransition(),
+    },
+  );
+
   @override
   Widget build(BuildContext context) {
     final router = ref.read(appRouterProvider);
+
+    // Resolve the active theme reactively from the persisted settings. While the
+    // settings are still loading we fall back to the historical dark default.
+    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final mode = settings == null
+        ? AppThemeMode.dark
+        : AppThemeMode.fromKey(settings.themeMode);
+
+    final ThemeData theme;
+    ThemeData? darkTheme;
+    final ThemeMode themeMode;
+    switch (mode) {
+      case AppThemeMode.system:
+        // Let Flutter pick light/dark based on the OS brightness.
+        theme = AppTheme.light().copyWith(pageTransitionsTheme: _pageTransitions);
+        darkTheme = AppTheme.dark().copyWith(pageTransitionsTheme: _pageTransitions);
+        themeMode = ThemeMode.system;
+      case AppThemeMode.light:
+        theme = AppTheme.light().copyWith(pageTransitionsTheme: _pageTransitions);
+        themeMode = ThemeMode.light;
+      case AppThemeMode.dark:
+        theme = AppTheme.dark().copyWith(pageTransitionsTheme: _pageTransitions);
+        themeMode = ThemeMode.light;
+      case AppThemeMode.dim:
+        theme = AppTheme.dim().copyWith(pageTransitionsTheme: _pageTransitions);
+        themeMode = ThemeMode.light;
+      case AppThemeMode.oled:
+        theme = AppTheme.oled().copyWith(pageTransitionsTheme: _pageTransitions);
+        themeMode = ThemeMode.light;
+    }
 
     return Listener(
       // Reset inactivity timer on any pointer event (tap, scroll, drag).
@@ -147,14 +185,9 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
       child: MaterialApp.router(
         title: 'SoloKey',
         debugShowCheckedModeBanner: false,
-        theme: AppTheme.dark().copyWith(
-          pageTransitionsTheme: const PageTransitionsTheme(
-            builders: {
-              TargetPlatform.android: SlideUpFadeTransition(),
-              TargetPlatform.iOS: SlideUpFadeTransition(),
-            },
-          ),
-        ),
+        theme: theme,
+        darkTheme: darkTheme,
+        themeMode: themeMode,
         routerConfig: router,
       ),
     );

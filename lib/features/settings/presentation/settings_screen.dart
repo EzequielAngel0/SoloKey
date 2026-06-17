@@ -16,6 +16,7 @@ import '../domain/entities/app_security_settings.dart';
 import '../domain/repositories/i_settings_repository.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../theme/app_palette.dart';
+import '../../../theme/app_theme.dart';
 
 part 'settings_screen.g.dart';
 
@@ -102,6 +103,17 @@ class _SettingsBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        const _SectionHeader(label: 'Apariencia'),
+        const SizedBox(height: 8),
+        _SettingsCard(
+          children: [
+            _ThemeModeTile(
+              current: settings.themeMode,
+              onChanged: (key) => onUpdate(settings.copyWith(themeMode: key)),
+            ),
+          ],
+        ),
+        const SizedBox(height: 24),
         const _SectionHeader(label: 'Bloqueo automático'),
         const SizedBox(height: 8),
         _SettingsCard(
@@ -342,6 +354,82 @@ class _Divider extends StatelessWidget {
       indent: 48,
       endIndent: 16,
       color: context.palette.divider,
+    );
+  }
+}
+
+class _ThemeModeTile extends StatelessWidget {
+  const _ThemeModeTile({required this.current, required this.onChanged});
+
+  final String current;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.palette_rounded, color: palette.accent, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                'Tema de la aplicación',
+                style: TextStyle(color: palette.textPrimary, fontSize: 14),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: AppThemeMode.values.map((m) {
+              final selected = m.key == current;
+              return GestureDetector(
+                onTap: () => onChanged(m.key),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? palette.accent.withValues(alpha: 0.15)
+                        : palette.surface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: selected ? palette.accent : palette.divider,
+                      width: selected ? 1.4 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        m.icon,
+                        size: 15,
+                        color: selected ? palette.accent : palette.textMuted,
+                      ),
+                      const SizedBox(width: 7),
+                      Text(
+                        m.label,
+                        style: TextStyle(
+                          color: selected ? palette.accent : palette.textMuted,
+                          fontSize: 12.5,
+                          fontWeight:
+                              selected ? FontWeight.w600 : FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

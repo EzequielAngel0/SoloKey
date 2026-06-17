@@ -112,12 +112,20 @@ Uso en widgets: `context.palette.card`, `context.palette.textMuted`, etc.
     de verdad) y el fondo blanco del QR (debe ser blanco real para escanear).
     `flutter analyze` 0 errores; 33/33 tests verde. Passkeys reetiquetadas a
     "respaldo de passkey" (item #4) hechas junto con esta migración.
-- **Lote 3 — Activación** ⬜
-  - `enum AppThemeMode { system, light, dark, dim, oled }`.
-  - `AppPalette.light/.dim/.oled` + `AppTheme.build(mode)` → 4 `ThemeData` con `ColorScheme` y temas de componentes coherentes (de-neon aquí).
-  - `ThemeNotifier` (Riverpod) + persistencia en `AppSecuritySettings` (nuevo campo `themeMode`).
-  - `App` resuelve el `ThemeData` reactivo (sistema vía `MediaQuery.platformBrightnessOf`).
-  - Selector en `SettingsScreen` (4 temas + "Seguir el sistema").
+- **Lote 3 — Activación** ✅ (2026-06-17)
+  - `enum AppThemeMode { system, light, dark, dim, oled }` (en `app_theme.dart`,
+    con `key`/`label`/`icon` y `fromKey`).
+  - `AppPalette.light/.dim/.oled` + `AppTheme.fromPalette(palette, brightness)` →
+    `ThemeData` por paleta con `ColorScheme` y componentes coherentes. **De-neon
+    aplicado**: `dark.primary` y `AppColors.primary` pasan de `#39FF14` a `#6C63FF`;
+    cian SSH suavizado a `#00B8D4`. (No queda ningún `#39FF14` en `lib/`.)
+  - Persistencia: nuevo campo `@Default('system') String themeMode` en
+    `AppSecuritySettings` (serializa vía `toJson`, retrocompatible). El selector
+    guarda vía `SettingsNotifier.save`, sin un `ThemeNotifier` extra.
+  - `App` resuelve el `ThemeData` reactivo observando `settingsNotifierProvider`;
+    "seguir el sistema" usa `theme`+`darkTheme`+`ThemeMode.system` (brillo del SO).
+  - Selector en `SettingsScreen` (sección "Apariencia", 4 temas + "Seguir el sistema").
+  - `flutter analyze` 0 errores; 33/33 tests verde.
 
 ---
 
@@ -182,7 +190,7 @@ Estado actual: `applicationId/namespace = com.vaultguard` (Android). Pasos:
 | --: | :--- | :--- | :--- | :--- |
 | 1 | Temas: infraestructura `AppPalette` | 🔴 | Temas L1 | ✅ |
 | 2 | Temas: migrar ~820 refs a la paleta | 🔴 | Temas L2 | ✅ |
-| 3 | Temas: 4 variantes + sistema + selector | 🔴 | Temas L3 | ⬜ |
+| 3 | Temas: 4 variantes + sistema + selector | 🔴 | Temas L3 | ✅ |
 | 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ✅ |
 | 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ⬜ |
 | 6 | Móvil: acciones de notificación | 🔴 | Features B | ⬜ |

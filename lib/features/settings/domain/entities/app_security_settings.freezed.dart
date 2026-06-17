@@ -25,6 +25,7 @@ mixin _$AppSecuritySettings {
   int get clearClipboardSeconds => throw _privateConstructorUsedError;
   bool get biometricEnabled => throw _privateConstructorUsedError;
   bool get obscureOnBackground => throw _privateConstructorUsedError;
+  String get themeMode => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -48,6 +49,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     int clearClipboardSeconds,
     bool biometricEnabled,
     bool obscureOnBackground,
+    String themeMode,
   });
 }
 
@@ -70,6 +72,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? clearClipboardSeconds = null,
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
+    Object? themeMode = null,
   }) {
     return _then(
       _value.copyWith(
@@ -89,6 +92,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.obscureOnBackground
                 : obscureOnBackground // ignore: cast_nullable_to_non_nullable
                       as bool,
+            themeMode: null == themeMode
+                ? _value.themeMode
+                : themeMode // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -109,6 +116,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     int clearClipboardSeconds,
     bool biometricEnabled,
     bool obscureOnBackground,
+    String themeMode,
   });
 }
 
@@ -130,6 +138,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? clearClipboardSeconds = null,
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
+    Object? themeMode = null,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -149,6 +158,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.obscureOnBackground
             : obscureOnBackground // ignore: cast_nullable_to_non_nullable
                   as bool,
+        themeMode: null == themeMode
+            ? _value.themeMode
+            : themeMode // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -162,6 +175,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.clearClipboardSeconds = 30,
     this.biometricEnabled = false,
     this.obscureOnBackground = true,
+    this.themeMode = 'system',
   });
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -179,10 +193,13 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final bool obscureOnBackground;
+  @override
+  @JsonKey()
+  final String themeMode;
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode)';
   }
 
   @override
@@ -197,7 +214,9 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
             (identical(other.biometricEnabled, biometricEnabled) ||
                 other.biometricEnabled == biometricEnabled) &&
             (identical(other.obscureOnBackground, obscureOnBackground) ||
-                other.obscureOnBackground == obscureOnBackground));
+                other.obscureOnBackground == obscureOnBackground) &&
+            (identical(other.themeMode, themeMode) ||
+                other.themeMode == themeMode));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -208,6 +227,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     clearClipboardSeconds,
     biometricEnabled,
     obscureOnBackground,
+    themeMode,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -233,6 +253,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final int clearClipboardSeconds,
     final bool biometricEnabled,
     final bool obscureOnBackground,
+    final String themeMode,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -246,6 +267,8 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   bool get biometricEnabled;
   @override
   bool get obscureOnBackground;
+  @override
+  String get themeMode;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

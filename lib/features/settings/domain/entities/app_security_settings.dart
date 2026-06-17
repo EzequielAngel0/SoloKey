@@ -10,6 +10,7 @@ class AppSecuritySettings with _$AppSecuritySettings {
     @Default(30) int clearClipboardSeconds,
     @Default(false) bool biometricEnabled,
     @Default(true) bool obscureOnBackground,
+    @Default('system') String themeMode,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>
