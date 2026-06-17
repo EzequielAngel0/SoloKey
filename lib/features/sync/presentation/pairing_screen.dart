@@ -706,7 +706,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
       case 'no_password':
         icon = Icons.warning_amber_rounded;
         color = palette.warning;
-        message = 'Activa el bloqueo biométrico primero en Ajustes.';
+        message = 'Desbloquea esta app con tu contraseña maestra (no huella) '
+            'una vez para habilitar el desbloqueo remoto.';
         break;
       case 'failed':
       case 'error':

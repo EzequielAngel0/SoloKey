@@ -81,12 +81,14 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                                 children: [
                                   Icon(Icons.cloud_sync_rounded, color: palette.accent, size: 20),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    'Verificar filtraciones (online)',
-                                    style: TextStyle(
-                                      color: palette.textPrimary,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600,
+                                  Flexible(
+                                    child: Text(
+                                      'Verificar filtraciones (online)',
+                                      style: TextStyle(
+                                        color: palette.textPrimary,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w600,
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(width: 4),
