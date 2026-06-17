@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/services/autofill_service.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 
 /// Onboarding screen that guides the user through activating SoloKey
 /// as the system Autofill provider in Android settings.
@@ -59,6 +60,7 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Scaffold(
       appBar: const VaultAppBar(title: 'Autocompletado'),
       body: SingleChildScrollView(
@@ -81,8 +83,8 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
               _isEnabled
                   ? '¡SoloKey está activo!'
                   : 'Activa el autocompletado',
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: palette.textPrimary,
                 fontSize: 22,
                 fontWeight: FontWeight.w700,
               ),
@@ -97,8 +99,8 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
                     'cualquier app o navegador de tu dispositivo.'
                   : 'Permite que SoloKey complete tus contraseñas\n'
                     'automáticamente en apps y navegadores.',
-              style: const TextStyle(
-                color: Color(0xFF9E9EBF),
+              style: TextStyle(
+                color: palette.textMuted,
                 fontSize: 14,
                 height: 1.5,
               ),
@@ -115,8 +117,8 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
                 label: const Text('Abrir ajustes de Autocompletado'),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
-                  backgroundColor: const Color(0xFF6C63FF),
-                  foregroundColor: Colors.white,
+                  backgroundColor: palette.accent,
+                  foregroundColor: palette.onPrimary,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(14),
                   ),
@@ -125,26 +127,26 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
               const SizedBox(height: 12),
               TextButton(
                 onPressed: _checkStatus,
-                child: const Text(
+                child: Text(
                   'Ya lo activé, verificar estado',
-                  style: TextStyle(color: Color(0xFF9E9EBF)),
+                  style: TextStyle(color: palette.textMuted),
                 ),
               ),
             ],
 
             if (_isEnabled) ...[
               const SizedBox(height: 32),
-              _FeatureChip(
+              const _FeatureChip(
                 icon: Icons.bolt_rounded,
                 label: 'Detección automática de formularios de login',
               ),
               const SizedBox(height: 10),
-              _FeatureChip(
+              const _FeatureChip(
                 icon: Icons.lock_rounded,
                 label: 'Solo funciona con la bóveda desbloqueada',
               ),
               const SizedBox(height: 10),
-              _FeatureChip(
+              const _FeatureChip(
                 icon: Icons.shield_rounded,
                 label: 'Credenciales nunca expuestas al SO',
               ),
@@ -165,19 +167,20 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     if (loading) {
-      return const Center(
+      return Center(
         child: SizedBox(
           width: 24,
           height: 24,
           child: CircularProgressIndicator(
             strokeWidth: 2,
-            color: Color(0xFF6C63FF),
+            color: palette.accent,
           ),
         ),
       );
     }
-    final color = enabled ? const Color(0xFF4CAF50) : const Color(0xFFCF6679);
+    final color = enabled ? palette.success : palette.danger;
     final label = enabled ? 'Activo' : 'Inactivo';
     final icon  = enabled ? Icons.check_circle_rounded : Icons.cancel_rounded;
 
@@ -212,11 +215,12 @@ class _StatusBadge extends StatelessWidget {
 class _IllustrationBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Container(
       height: 140,
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF16213E), Color(0xFF1A1A2E)],
+        gradient: LinearGradient(
+          colors: [palette.card, palette.drawer],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
@@ -233,7 +237,7 @@ class _IllustrationBox extends StatelessWidget {
               width: 60,
               height: 60,
               decoration: BoxDecoration(
-                color: const Color(0xFF6C63FF).withValues(alpha: 0.08),
+                color: palette.accent.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
             ),
@@ -245,16 +249,16 @@ class _IllustrationBox extends StatelessWidget {
               width: 40,
               height: 40,
               decoration: BoxDecoration(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.08),
+                color: palette.success.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
             ),
           ),
           // Main icon
-          const Icon(
+          Icon(
             Icons.auto_fix_high_rounded,
             size: 64,
-            color: Color(0xFF6C63FF),
+            color: palette.accent,
           ),
         ],
       ),
@@ -267,6 +271,7 @@ class _StepList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final steps = [
       (
         '1',
@@ -297,14 +302,14 @@ class _StepList extends StatelessWidget {
                 width: 28,
                 height: 28,
                 alignment: Alignment.center,
-                decoration: const BoxDecoration(
-                  color: Color(0xFF6C63FF),
+                decoration: BoxDecoration(
+                  color: palette.accent,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   num,
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: palette.onPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
@@ -317,16 +322,16 @@ class _StepList extends StatelessWidget {
                   children: [
                     Text(
                       title,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: palette.textPrimary,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                     Text(
                       sub,
-                      style: const TextStyle(
-                        color: Color(0xFF9E9EBF),
+                      style: TextStyle(
+                        color: palette.textMuted,
                         fontSize: 12,
                       ),
                     ),
@@ -348,20 +353,21 @@ class _FeatureChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: palette.card,
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF6C63FF), size: 20),
+          Icon(icon, color: palette.accent, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Text(
               label,
-              style: const TextStyle(color: Color(0xFF9E9EBF), fontSize: 13),
+              style: TextStyle(color: palette.textMuted, fontSize: 13),
             ),
           ),
         ],

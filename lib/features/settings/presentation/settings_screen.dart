@@ -15,6 +15,7 @@ import '../../vault_access/application/vault_state_provider.dart';
 import '../domain/entities/app_security_settings.dart';
 import '../domain/repositories/i_settings_repository.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
+import '../../../theme/app_palette.dart';
 
 part 'settings_screen.g.dart';
 
@@ -78,7 +79,7 @@ class SettingsScreen extends ConsumerWidget {
       appBar: const VaultAppBar(title: 'Ajustes de seguridad'),
       body: settingsAsync.when(
         loading: () =>
-            const Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF))),
+            Center(child: CircularProgressIndicator(color: context.palette.accent)),
         error: (e, _) => Center(child: Text('Error: $e')),
         data: (settings) => _SettingsBody(
           settings: settings,
@@ -101,7 +102,7 @@ class _SettingsBody extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
-        _SectionHeader(label: 'Bloqueo automático'),
+        const _SectionHeader(label: 'Bloqueo automático'),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
@@ -120,7 +121,7 @@ class _SettingsBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        _SectionHeader(label: 'Portapapeles'),
+        const _SectionHeader(label: 'Portapapeles'),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
@@ -139,7 +140,7 @@ class _SettingsBody extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 24),
-        _SectionHeader(label: 'Privacidad'),
+        const _SectionHeader(label: 'Privacidad'),
         const SizedBox(height: 8),
         _SettingsCard(
           children: [
@@ -181,8 +182,8 @@ class _SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       label.toUpperCase(),
-      style: const TextStyle(
-        color: Color(0xFF9E9EBF),
+      style: TextStyle(
+        color: context.palette.textMuted,
         fontSize: 11,
         fontWeight: FontWeight.w700,
         letterSpacing: 1.2,
@@ -199,7 +200,7 @@ class _SettingsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: context.palette.card,
         borderRadius: BorderRadius.circular(16),
       ),
       child: Column(children: children),
@@ -230,30 +231,31 @@ class _SliderTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 4),
       child: Column(
         children: [
           Row(
             children: [
-              Icon(icon, color: const Color(0xFF6C63FF), size: 20),
+              Icon(icon, color: palette.accent, size: 20),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
                   label,
-                  style: const TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6C63FF).withValues(alpha: 0.15),
+                  color: palette.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
                   valueLabel,
-                  style: const TextStyle(
-                    color: Color(0xFF6C63FF),
+                  style: TextStyle(
+                    color: palette.accent,
                     fontSize: 13,
                     fontWeight: FontWeight.w700,
                   ),
@@ -262,11 +264,11 @@ class _SliderTile extends StatelessWidget {
             ],
           ),
           SliderTheme(
-            data: const SliderThemeData(
-              activeTrackColor: Color(0xFF6C63FF),
-              thumbColor: Color(0xFF6C63FF),
-              inactiveTrackColor: Color(0xFF2A2A4A),
-              overlayColor: Color(0x206C63FF),
+            data: SliderThemeData(
+              activeTrackColor: palette.accent,
+              thumbColor: palette.accent,
+              inactiveTrackColor: palette.divider,
+              overlayColor: palette.accent.withValues(alpha: 0.125),
             ),
             child: Slider(
               value: value,
@@ -299,11 +301,12 @@ class _ToggleTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Row(
         children: [
-          Icon(icon, color: const Color(0xFF6C63FF), size: 20),
+          Icon(icon, color: palette.accent, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -311,16 +314,16 @@ class _ToggleTile extends StatelessWidget {
               children: [
                 Text(label,
                     style:
-                        const TextStyle(color: Colors.white, fontSize: 14)),
+                        TextStyle(color: palette.textPrimary, fontSize: 14)),
                 Text(subtitle,
-                    style: const TextStyle(
-                        color: Color(0xFF9E9EBF), fontSize: 11)),
+                    style: TextStyle(
+                        color: palette.textMuted, fontSize: 11)),
               ],
             ),
           ),
           Switch(
             value: value,
-            activeTrackColor: const Color(0xFF6C63FF),
+            activeTrackColor: palette.accent,
             onChanged: onChanged,
           ),
         ],
@@ -334,11 +337,11 @@ class _Divider extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Divider(
+    return Divider(
       height: 1,
       indent: 48,
       endIndent: 16,
-      color: Color(0xFF2A2A4A),
+      color: context.palette.divider,
     );
   }
 }
@@ -348,6 +351,7 @@ class _Divider extends StatelessWidget {
 class _DataManagementSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -355,101 +359,101 @@ class _DataManagementSection extends StatelessWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF16213E),
+            color: palette.card,
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
               if (!ResponsiveLayout.isDesktop(context)) ...[
                 ListTile(
-                  leading: const Icon(
+                  leading: Icon(
                     Icons.sync_rounded,
-                    color: Color(0xFF6C63FF),
+                    color: palette.accent,
                   ),
-                  title: const Text(
+                  title: Text(
                     'Sincronizar Computadora',
-                    style: TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 14),
                   ),
-                  subtitle: const Text(
+                  subtitle: Text(
                     'Vincula con SoloKey de escritorio',
-                    style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                    style: TextStyle(color: palette.textMuted, fontSize: 12),
                   ),
-                  trailing: const Icon(
+                  trailing: Icon(
                     Icons.chevron_right_rounded,
-                    color: Color(0xFF5C5C7A),
+                    color: palette.textDisabled,
                   ),
                   onTap: () => context.push(AppRoutes.sync),
                 ),
-                const Divider(
+                Divider(
                   height: 1,
                   indent: 56,
-                  color: Color(0xFF2A2A4A),
+                  color: palette.divider,
                 ),
               ],
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.sync_alt_rounded,
-                  color: Color(0xFF6C63FF),
+                  color: palette.accent,
                 ),
-                title: const Text(
+                title: Text(
                   'Exportar / Importar',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
                 ),
-                subtitle: const Text(
+                subtitle: Text(
                   'Haz backups cifrados de tu bóveda',
-                  style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12),
                 ),
-                trailing: const Icon(
+                trailing: Icon(
                   Icons.chevron_right_rounded,
-                  color: Color(0xFF5C5C7A),
+                  color: palette.textDisabled,
                 ),
                 onTap: () => context.push(AppRoutes.transfer),
               ),
-              const Divider(
+              Divider(
                 height: 1,
                 indent: 56,
-                color: Color(0xFF2A2A4A),
+                color: palette.divider,
               ),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.auto_fix_high_rounded,
-                  color: Color(0xFF6C63FF),
+                  color: palette.accent,
                 ),
-                title: const Text(
+                title: Text(
                   'Autocompletado del sistema',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
                 ),
-                subtitle: const Text(
+                subtitle: Text(
                   'Completa contraseñas en otras apps',
-                  style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12),
                 ),
-                trailing: const Icon(
+                trailing: Icon(
                   Icons.chevron_right_rounded,
-                  color: Color(0xFF5C5C7A),
+                  color: palette.textDisabled,
                 ),
                 onTap: () => context.push(AppRoutes.autofillOnboarding),
               ),
-              const Divider(
+              Divider(
                 height: 1,
                 indent: 56,
-                color: Color(0xFF2A2A4A),
+                color: palette.divider,
               ),
               ListTile(
-                leading: const Icon(
+                leading: Icon(
                   Icons.fingerprint_rounded,
-                  color: Color(0xFF4CAF50),
+                  color: palette.typePasskey,
                 ),
-                title: const Text(
-                  'Passkeys',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+                title: Text(
+                  'Respaldo de Passkeys',
+                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
                 ),
-                subtitle: const Text(
-                  'Gestiona tus llaves FIDO2 / WebAuthn',
-                  style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                subtitle: Text(
+                  'Guarda tus respaldos de passkey',
+                  style: TextStyle(color: palette.textMuted, fontSize: 12),
                 ),
-                trailing: const Icon(
+                trailing: Icon(
                   Icons.chevron_right_rounded,
-                  color: Color(0xFF5C5C7A),
+                  color: palette.textDisabled,
                 ),
                 onTap: () => context.push(AppRoutes.passkeys),
               ),
@@ -464,6 +468,7 @@ class _DataManagementSection extends StatelessWidget {
 class _DangerZone extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -471,18 +476,18 @@ class _DangerZone extends ConsumerWidget {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: const Color(0xFF16213E),
+            color: palette.card,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(
-                color: const Color(0xFFCF6679).withValues(alpha: 0.3)),
+                color: palette.danger.withValues(alpha: 0.3)),
           ),
           child: ListTile(
-            leading: const Icon(Icons.lock_reset_rounded,
-                color: Color(0xFFCF6679)),
-            title: const Text('Bloquear ahora',
-                style: TextStyle(color: Color(0xFFCF6679))),
-            subtitle: const Text('Cierra la sesión inmediatamente',
-                style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12)),
+            leading: Icon(Icons.lock_reset_rounded,
+                color: palette.danger),
+            title: Text('Bloquear ahora',
+                style: TextStyle(color: palette.danger)),
+            subtitle: Text('Cierra la sesión inmediatamente',
+                style: TextStyle(color: palette.textMuted, fontSize: 12)),
             onTap: () {
               ref.read(vaultNotifierProvider.notifier).lock();
               Navigator.of(context).popUntil((r) => r.isFirst);
