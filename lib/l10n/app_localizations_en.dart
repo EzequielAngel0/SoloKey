@@ -637,4 +637,282 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passkeysDeleteAuthReason => 'Verify to delete this passkey';
+
+  @override
+  String get formNewTitle => 'New credential';
+
+  @override
+  String get formEditTitle => 'Edit credential';
+
+  @override
+  String get formCreated => 'Credential created';
+
+  @override
+  String get formSaved => 'Changes saved';
+
+  @override
+  String get formSaveChanges => 'Save changes';
+
+  @override
+  String get formCreateCredential => 'Create credential';
+
+  @override
+  String get formFieldRequired => 'Required field';
+
+  @override
+  String get formErrPinRequiredEnable =>
+      'You must enter a secondary PIN for double encryption';
+
+  @override
+  String get formErrPinRequiredDisable =>
+      'Enter the secondary PIN to disable double encryption';
+
+  @override
+  String get formQrNotTotp => 'The QR code is not a valid TOTP.';
+
+  @override
+  String get formQrScanned => 'QR code scanned successfully';
+
+  @override
+  String get formQrNoSecret => 'No secret key was found in the QR.';
+
+  @override
+  String get formQrReadError => 'Error reading the QR code.';
+
+  @override
+  String get formSshGenerated => 'Ed25519 key pair generated';
+
+  @override
+  String get formSshGenError => 'Error generating the SSH key.';
+
+  @override
+  String get formCustomFieldsTitle => 'Custom fields';
+
+  @override
+  String get formNoCustomFields => 'No custom fields.';
+
+  @override
+  String get formAddField => 'Add field';
+
+  @override
+  String get formEditField => 'Edit field';
+
+  @override
+  String get formNewCustomField => 'New custom field';
+
+  @override
+  String get formFieldNameLabel => 'Field name';
+
+  @override
+  String get formFieldNameHint => 'e.g. PIN, Security question';
+
+  @override
+  String get formNameRequired => 'Name required';
+
+  @override
+  String get formFieldValueLabel => 'Field value';
+
+  @override
+  String get formFieldValueHint => 'e.g. 1234, Home town';
+
+  @override
+  String get formValueRequired => 'Value required';
+
+  @override
+  String get formSecretField => 'Secret field';
+
+  @override
+  String get formSecretBadge => 'SECRET';
+
+  @override
+  String get formSecretFieldSub => 'Hides the value by default in the details.';
+
+  @override
+  String get formAdd => 'Add';
+
+  @override
+  String get formSectionIdentification => 'Identification';
+
+  @override
+  String get formTitleLabel => 'Title';
+
+  @override
+  String get formSectionContent => 'Content';
+
+  @override
+  String get formSectionNotes => 'Notes';
+
+  @override
+  String get formSecureContentLabel => 'Secure content';
+
+  @override
+  String get formNotesLabel => 'Additional notes';
+
+  @override
+  String get formSecureContentHint => 'Write your private note here…';
+
+  @override
+  String get formNotesHint => 'Optional — add context or reminders';
+
+  @override
+  String get formContentRequired => 'Content is required';
+
+  @override
+  String get formSectionOrganization => 'Organisation';
+
+  @override
+  String get formFolderLabel => 'Folder';
+
+  @override
+  String get formMainVault => 'Main vault';
+
+  @override
+  String get formHintPassword => 'e.g. Netflix, GitHub, Gmail';
+
+  @override
+  String get formHintApiKey => 'e.g. OpenAI, Stripe, AWS';
+
+  @override
+  String get formHintSecureNote => 'e.g. Server keys, Seeds';
+
+  @override
+  String get formHintTotp => 'e.g. GitHub 2FA, Google';
+
+  @override
+  String get formHintPasskey => 'e.g. google.com Passkey';
+
+  @override
+  String get formHintSshKey => 'e.g. Production Server, GitHub SSH Key';
+
+  @override
+  String get formSectionLogin => 'Login credentials';
+
+  @override
+  String get formUserEmailLabel => 'Username / Email';
+
+  @override
+  String get formUserEmailHint => 'user@example.com';
+
+  @override
+  String get formWebsiteLabel => 'Website / URL';
+
+  @override
+  String get formWebsiteHint => 'https://example.com';
+
+  @override
+  String get formSectionApi => 'API details';
+
+  @override
+  String get formServiceNameLabel => 'Service name';
+
+  @override
+  String get formServiceNameHint => 'e.g. OpenAI, Stripe, Supabase';
+
+  @override
+  String get formApiKeyLabel => 'API Key / Token';
+
+  @override
+  String get formEndpointLabel => 'Endpoint URL';
+
+  @override
+  String get formScopesLabel => 'Permissions / Scopes';
+
+  @override
+  String get formSection2fa => '2FA setup';
+
+  @override
+  String get formTotpDesc =>
+      'Enter the TOTP secret key (Base32) of your account. You\'ll find it when enabling 2FA on the website, or you can scan the QR code directly.';
+
+  @override
+  String get formScanQr => 'Scan QR code';
+
+  @override
+  String get formOrManually => 'or enter manually';
+
+  @override
+  String get formAccountIssuerLabel => 'Account / Issuer';
+
+  @override
+  String get formAccountIssuerHint => 'e.g. GitHub, Google, AWS';
+
+  @override
+  String get formTotpSecretLabel => 'TOTP secret key (Base32)';
+
+  @override
+  String get formSectionPasskey => 'Passkey (FIDO2)';
+
+  @override
+  String get formPasskeyDesc =>
+      'Passkeys are registered directly with the device\'s FIDO2 platform.';
+
+  @override
+  String get formPasskeyHint =>
+      'Use the Passkeys screen in Settings to register or manage your passkeys.';
+
+  @override
+  String get formSectionSsh => 'SSH key configuration';
+
+  @override
+  String get formGenerateSsh => 'Generate Ed25519 key pair';
+
+  @override
+  String get formPrivateKeyRequired => 'The private key is required';
+
+  @override
+  String get formPublicKeyOptional => 'Public key (Optional)';
+
+  @override
+  String get formKeyPassphraseOptional => 'Key passphrase (Optional)';
+
+  @override
+  String get formSectionDoubleEnc => 'Double-envelope encryption';
+
+  @override
+  String get formEnableDoubleEnc => 'Enable double encryption';
+
+  @override
+  String get formDoubleEncDesc =>
+      'Protects this entry\'s secrets with a secondary PIN. They will be encrypted additionally.';
+
+  @override
+  String get formPinSecondaryEditLabel =>
+      'Secondary PIN (Leave empty to keep current, or enter to change)';
+
+  @override
+  String get formPinSecondaryLabel => 'Secondary PIN';
+
+  @override
+  String get formPinSecondaryRequired => 'The secondary PIN is required';
+
+  @override
+  String get formBiometricUnlock => 'Biometric unlock';
+
+  @override
+  String get formBiometricUnlockSub =>
+      'Store the encrypted PIN to unlock quickly with fingerprint/face.';
+
+  @override
+  String get formSectionRotation => 'Rotation reminder';
+
+  @override
+  String get formRotationLabel => 'Remind to change password';
+
+  @override
+  String get formRotNone => 'Don\'t remind';
+
+  @override
+  String get formRotMonthly => 'Every month';
+
+  @override
+  String get formRotCustom => 'Custom (days)';
+
+  @override
+  String get formCustomDaysLabel => 'Days to remind';
+
+  @override
+  String get formCustomDaysRequired => 'You must enter the number of days';
+
+  @override
+  String get formCustomDaysInvalid => 'Enter a valid number of days';
 }

@@ -1261,6 +1261,546 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify to delete this passkey'**
   String get passkeysDeleteAuthReason;
+
+  /// No description provided for @formNewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'New credential'**
+  String get formNewTitle;
+
+  /// No description provided for @formEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit credential'**
+  String get formEditTitle;
+
+  /// No description provided for @formCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential created'**
+  String get formCreated;
+
+  /// No description provided for @formSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved'**
+  String get formSaved;
+
+  /// No description provided for @formSaveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get formSaveChanges;
+
+  /// No description provided for @formCreateCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'Create credential'**
+  String get formCreateCredential;
+
+  /// No description provided for @formFieldRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required field'**
+  String get formFieldRequired;
+
+  /// No description provided for @formErrPinRequiredEnable.
+  ///
+  /// In en, this message translates to:
+  /// **'You must enter a secondary PIN for double encryption'**
+  String get formErrPinRequiredEnable;
+
+  /// No description provided for @formErrPinRequiredDisable.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the secondary PIN to disable double encryption'**
+  String get formErrPinRequiredDisable;
+
+  /// No description provided for @formQrNotTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'The QR code is not a valid TOTP.'**
+  String get formQrNotTotp;
+
+  /// No description provided for @formQrScanned.
+  ///
+  /// In en, this message translates to:
+  /// **'QR code scanned successfully'**
+  String get formQrScanned;
+
+  /// No description provided for @formQrNoSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'No secret key was found in the QR.'**
+  String get formQrNoSecret;
+
+  /// No description provided for @formQrReadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error reading the QR code.'**
+  String get formQrReadError;
+
+  /// No description provided for @formSshGenerated.
+  ///
+  /// In en, this message translates to:
+  /// **'Ed25519 key pair generated'**
+  String get formSshGenerated;
+
+  /// No description provided for @formSshGenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Error generating the SSH key.'**
+  String get formSshGenError;
+
+  /// No description provided for @formCustomFieldsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom fields'**
+  String get formCustomFieldsTitle;
+
+  /// No description provided for @formNoCustomFields.
+  ///
+  /// In en, this message translates to:
+  /// **'No custom fields.'**
+  String get formNoCustomFields;
+
+  /// No description provided for @formAddField.
+  ///
+  /// In en, this message translates to:
+  /// **'Add field'**
+  String get formAddField;
+
+  /// No description provided for @formEditField.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit field'**
+  String get formEditField;
+
+  /// No description provided for @formNewCustomField.
+  ///
+  /// In en, this message translates to:
+  /// **'New custom field'**
+  String get formNewCustomField;
+
+  /// No description provided for @formFieldNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Field name'**
+  String get formFieldNameLabel;
+
+  /// No description provided for @formFieldNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. PIN, Security question'**
+  String get formFieldNameHint;
+
+  /// No description provided for @formNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Name required'**
+  String get formNameRequired;
+
+  /// No description provided for @formFieldValueLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Field value'**
+  String get formFieldValueLabel;
+
+  /// No description provided for @formFieldValueHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. 1234, Home town'**
+  String get formFieldValueHint;
+
+  /// No description provided for @formValueRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Value required'**
+  String get formValueRequired;
+
+  /// No description provided for @formSecretField.
+  ///
+  /// In en, this message translates to:
+  /// **'Secret field'**
+  String get formSecretField;
+
+  /// No description provided for @formSecretBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'SECRET'**
+  String get formSecretBadge;
+
+  /// No description provided for @formSecretFieldSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Hides the value by default in the details.'**
+  String get formSecretFieldSub;
+
+  /// No description provided for @formAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get formAdd;
+
+  /// No description provided for @formSectionIdentification.
+  ///
+  /// In en, this message translates to:
+  /// **'Identification'**
+  String get formSectionIdentification;
+
+  /// No description provided for @formTitleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get formTitleLabel;
+
+  /// No description provided for @formSectionContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get formSectionContent;
+
+  /// No description provided for @formSectionNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get formSectionNotes;
+
+  /// No description provided for @formSecureContentLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure content'**
+  String get formSecureContentLabel;
+
+  /// No description provided for @formNotesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Additional notes'**
+  String get formNotesLabel;
+
+  /// No description provided for @formSecureContentHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write your private note here…'**
+  String get formSecureContentHint;
+
+  /// No description provided for @formNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional — add context or reminders'**
+  String get formNotesHint;
+
+  /// No description provided for @formContentRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Content is required'**
+  String get formContentRequired;
+
+  /// No description provided for @formSectionOrganization.
+  ///
+  /// In en, this message translates to:
+  /// **'Organisation'**
+  String get formSectionOrganization;
+
+  /// No description provided for @formFolderLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder'**
+  String get formFolderLabel;
+
+  /// No description provided for @formMainVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Main vault'**
+  String get formMainVault;
+
+  /// No description provided for @formHintPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Netflix, GitHub, Gmail'**
+  String get formHintPassword;
+
+  /// No description provided for @formHintApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. OpenAI, Stripe, AWS'**
+  String get formHintApiKey;
+
+  /// No description provided for @formHintSecureNote.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Server keys, Seeds'**
+  String get formHintSecureNote;
+
+  /// No description provided for @formHintTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. GitHub 2FA, Google'**
+  String get formHintTotp;
+
+  /// No description provided for @formHintPasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. google.com Passkey'**
+  String get formHintPasskey;
+
+  /// No description provided for @formHintSshKey.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. Production Server, GitHub SSH Key'**
+  String get formHintSshKey;
+
+  /// No description provided for @formSectionLogin.
+  ///
+  /// In en, this message translates to:
+  /// **'Login credentials'**
+  String get formSectionLogin;
+
+  /// No description provided for @formUserEmailLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username / Email'**
+  String get formUserEmailLabel;
+
+  /// No description provided for @formUserEmailHint.
+  ///
+  /// In en, this message translates to:
+  /// **'user@example.com'**
+  String get formUserEmailHint;
+
+  /// No description provided for @formWebsiteLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Website / URL'**
+  String get formWebsiteLabel;
+
+  /// No description provided for @formWebsiteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'https://example.com'**
+  String get formWebsiteHint;
+
+  /// No description provided for @formSectionApi.
+  ///
+  /// In en, this message translates to:
+  /// **'API details'**
+  String get formSectionApi;
+
+  /// No description provided for @formServiceNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Service name'**
+  String get formServiceNameLabel;
+
+  /// No description provided for @formServiceNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. OpenAI, Stripe, Supabase'**
+  String get formServiceNameHint;
+
+  /// No description provided for @formApiKeyLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'API Key / Token'**
+  String get formApiKeyLabel;
+
+  /// No description provided for @formEndpointLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Endpoint URL'**
+  String get formEndpointLabel;
+
+  /// No description provided for @formScopesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Permissions / Scopes'**
+  String get formScopesLabel;
+
+  /// No description provided for @formSection2fa.
+  ///
+  /// In en, this message translates to:
+  /// **'2FA setup'**
+  String get formSection2fa;
+
+  /// No description provided for @formTotpDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the TOTP secret key (Base32) of your account. You\'ll find it when enabling 2FA on the website, or you can scan the QR code directly.'**
+  String get formTotpDesc;
+
+  /// No description provided for @formScanQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get formScanQr;
+
+  /// No description provided for @formOrManually.
+  ///
+  /// In en, this message translates to:
+  /// **'or enter manually'**
+  String get formOrManually;
+
+  /// No description provided for @formAccountIssuerLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Account / Issuer'**
+  String get formAccountIssuerLabel;
+
+  /// No description provided for @formAccountIssuerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'e.g. GitHub, Google, AWS'**
+  String get formAccountIssuerHint;
+
+  /// No description provided for @formTotpSecretLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP secret key (Base32)'**
+  String get formTotpSecretLabel;
+
+  /// No description provided for @formSectionPasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey (FIDO2)'**
+  String get formSectionPasskey;
+
+  /// No description provided for @formPasskeyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are registered directly with the device\'s FIDO2 platform.'**
+  String get formPasskeyDesc;
+
+  /// No description provided for @formPasskeyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the Passkeys screen in Settings to register or manage your passkeys.'**
+  String get formPasskeyHint;
+
+  /// No description provided for @formSectionSsh.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH key configuration'**
+  String get formSectionSsh;
+
+  /// No description provided for @formGenerateSsh.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Ed25519 key pair'**
+  String get formGenerateSsh;
+
+  /// No description provided for @formPrivateKeyRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'The private key is required'**
+  String get formPrivateKeyRequired;
+
+  /// No description provided for @formPublicKeyOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key (Optional)'**
+  String get formPublicKeyOptional;
+
+  /// No description provided for @formKeyPassphraseOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Key passphrase (Optional)'**
+  String get formKeyPassphraseOptional;
+
+  /// No description provided for @formSectionDoubleEnc.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-envelope encryption'**
+  String get formSectionDoubleEnc;
+
+  /// No description provided for @formEnableDoubleEnc.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable double encryption'**
+  String get formEnableDoubleEnc;
+
+  /// No description provided for @formDoubleEncDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Protects this entry\'s secrets with a secondary PIN. They will be encrypted additionally.'**
+  String get formDoubleEncDesc;
+
+  /// No description provided for @formPinSecondaryEditLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary PIN (Leave empty to keep current, or enter to change)'**
+  String get formPinSecondaryEditLabel;
+
+  /// No description provided for @formPinSecondaryLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Secondary PIN'**
+  String get formPinSecondaryLabel;
+
+  /// No description provided for @formPinSecondaryRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'The secondary PIN is required'**
+  String get formPinSecondaryRequired;
+
+  /// No description provided for @formBiometricUnlock.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric unlock'**
+  String get formBiometricUnlock;
+
+  /// No description provided for @formBiometricUnlockSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Store the encrypted PIN to unlock quickly with fingerprint/face.'**
+  String get formBiometricUnlockSub;
+
+  /// No description provided for @formSectionRotation.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotation reminder'**
+  String get formSectionRotation;
+
+  /// No description provided for @formRotationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Remind to change password'**
+  String get formRotationLabel;
+
+  /// No description provided for @formRotNone.
+  ///
+  /// In en, this message translates to:
+  /// **'Don\'t remind'**
+  String get formRotNone;
+
+  /// No description provided for @formRotMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every month'**
+  String get formRotMonthly;
+
+  /// No description provided for @formRotCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom (days)'**
+  String get formRotCustom;
+
+  /// No description provided for @formCustomDaysLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Days to remind'**
+  String get formCustomDaysLabel;
+
+  /// No description provided for @formCustomDaysRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'You must enter the number of days'**
+  String get formCustomDaysRequired;
+
+  /// No description provided for @formCustomDaysInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number of days'**
+  String get formCustomDaysInvalid;
 }
 
 class _AppLocalizationsDelegate

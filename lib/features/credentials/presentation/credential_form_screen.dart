@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_colors.dart';
@@ -310,6 +311,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context);
     await _saveAnimCtrl.forward();
     await _saveAnimCtrl.reverse();
     setState(() => _isLoading = true);
@@ -319,7 +321,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       if (_isDoubleEncrypted) {
         final pin = _secondaryPinCtrl.text.trim();
         if (pin.isEmpty && _existing == null) {
-          throw Exception('Debes ingresar un PIN secundario para el cifrado doble');
+          throw Exception(l10n.formErrPinRequiredEnable);
         }
         
         if (pin.isNotEmpty) {
@@ -383,7 +385,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         if (_existing?.isDoubleEncrypted == true) {
           final pin = _secondaryPinCtrl.text.trim();
           if (pin.isEmpty) {
-            throw Exception('Ingresa el PIN secundario para desactivar el cifrado doble');
+            throw Exception(l10n.formErrPinRequiredDisable);
           }
           final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
           
@@ -450,7 +452,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                 const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
                 const SizedBox(width: 8),
                 Text(
-                  _existing == null ? 'Credencial creada' : 'Cambios guardados',
+                  _existing == null ? l10n.formCreated : l10n.formSaved,
                   style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
               ],
@@ -473,7 +475,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error: $e'),
+            content: Text(l10n.commonErrorDetail('$e')),
             backgroundColor: AppColors.danger,
             behavior: SnackBarBehavior.floating,
           ),
@@ -485,15 +487,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Future<void> _scanQr() async {
+    final l10n = AppLocalizations.of(context);
     final code = await Navigator.of(context).push<String>(
       MaterialPageRoute(builder: (_) => const QrScannerScreen()),
     );
     if (code == null) return;
-    
+
     try {
       final uri = Uri.parse(code);
       if (uri.scheme.toLowerCase() != 'otpauth') {
-        _showError('El código QR no es un TOTP válido.');
+        _showError(l10n.formQrNotTotp);
         return;
       }
       
@@ -525,11 +528,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.qr_code_rounded, color: Colors.white, size: 18),
-                SizedBox(width: 8),
-                Text('Código QR escaneado con éxito'),
+                const Icon(Icons.qr_code_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text(l10n.formQrScanned),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -538,10 +541,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           ),
         );
       } else {
-        _showError('No se encontró una clave secreta en el QR.');
+        _showError(l10n.formQrNoSecret);
       }
     } catch (e) {
-      _showError('Error al leer el código QR.');
+      _showError(l10n.formQrReadError);
     }
   }
 
@@ -558,6 +561,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Future<void> _generateSshKey() async {
+    final l10n = AppLocalizations.of(context);
     setState(() => _isGeneratingSshKey = true);
     HapticFeedback.mediumImpact();
     try {
@@ -574,11 +578,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         });
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Row(
+            content: Row(
               children: [
-                Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
-                SizedBox(width: 8),
-                Text('Par de llaves Ed25519 generado'),
+                const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
+                const SizedBox(width: 8),
+                Text(l10n.formSshGenerated),
               ],
             ),
             backgroundColor: AppColors.success,
@@ -588,7 +592,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         );
       }
     } catch (e) {
-      _showError('Error al generar la llave SSH.');
+      _showError(l10n.formSshGenError);
     } finally {
       if (mounted) {
         setState(() => _isGeneratingSshKey = false);
@@ -600,18 +604,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     if (_type == CredentialType.passkey) return const SizedBox.shrink();
 
     final typeColor = _typeColor(_type);
+    final l10n = AppLocalizations.of(context);
 
     return FormSection(
       icon: Icons.add_circle_outline_rounded,
       accentColor: typeColor,
-      title: 'Campos Personalizados',
+      title: l10n.formCustomFieldsTitle,
       children: [
         if (_customFields.isEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 8.0),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
-              'No hay campos personalizados.',
-              style: TextStyle(color: AppColors.textDisabled, fontSize: 13),
+              l10n.formNoCustomFields,
+              style: const TextStyle(color: AppColors.textDisabled, fontSize: 13),
             ),
           ),
         ...List.generate(_customFields.length, (index) {
@@ -647,7 +652,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                                 borderRadius: BorderRadius.circular(4),
                               ),
                               child: Text(
-                                'SECRETO',
+                                l10n.formSecretBadge,
                                 style: TextStyle(
                                   color: typeColor,
                                   fontSize: 8,
@@ -692,7 +697,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           child: OutlinedButton.icon(
             onPressed: _showCustomFieldDialog,
             icon: const Icon(Icons.add_rounded, size: 16),
-            label: const Text('Añadir campo'),
+            label: Text(l10n.formAddField),
             style: OutlinedButton.styleFrom(
               foregroundColor: typeColor,
               side: BorderSide(color: typeColor, width: 1.2),
@@ -706,6 +711,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Future<void> _showCustomFieldDialog({int? index}) async {
+    final l10n = AppLocalizations.of(context);
     final isEditing = index != null;
     final labelCtrl = TextEditingController(text: isEditing ? _customFields[index].label : '');
     final valueCtrl = TextEditingController(text: isEditing ? _customFields[index].value : '');
@@ -738,7 +744,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               backgroundColor: AppColors.drawer,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               title: Text(
-                isEditing ? 'Editar campo' : 'Nuevo campo personalizado',
+                isEditing ? l10n.formEditField : l10n.formNewCustomField,
                 style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
               ),
               content: Form(
@@ -749,32 +755,32 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     TextFormField(
                       controller: labelCtrl,
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Nombre del campo',
-                        hintText: 'ej. PIN, Pregunta de Seguridad',
+                      decoration: InputDecoration(
+                        labelText: l10n.formFieldNameLabel,
+                        hintText: l10n.formFieldNameHint,
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Nombre requerido' : null,
+                      validator: (v) => v == null || v.trim().isEmpty ? l10n.formNameRequired : null,
                       textCapitalization: TextCapitalization.sentences,
                     ),
                     const SizedBox(height: 14),
                     TextFormField(
                       controller: valueCtrl,
                       style: const TextStyle(color: Colors.white),
-                      decoration: const InputDecoration(
-                        labelText: 'Valor del campo',
-                        hintText: 'ej. 1234, Ciudad natal',
+                      decoration: InputDecoration(
+                        labelText: l10n.formFieldValueLabel,
+                        hintText: l10n.formFieldValueHint,
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? 'Valor requerido' : null,
+                      validator: (v) => v == null || v.trim().isEmpty ? l10n.formValueRequired : null,
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
                       value: isSecret,
                       activeColor: _typeColor(_type),
                       contentPadding: EdgeInsets.zero,
-                      title: const Text('Campo secreto', style: TextStyle(color: Colors.white, fontSize: 14)),
-                      subtitle: const Text(
-                        'Ocultará el valor por defecto en los detalles.',
-                        style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                      title: Text(l10n.formSecretField, style: const TextStyle(color: Colors.white, fontSize: 14)),
+                      subtitle: Text(
+                        l10n.formSecretFieldSub,
+                        style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
                       ),
                       onChanged: (v) {
                         HapticFeedback.selectionClick();
@@ -787,7 +793,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: const Text('Cancelar', style: TextStyle(color: AppColors.textDisabled)),
+                  child: Text(l10n.commonCancel, style: const TextStyle(color: AppColors.textDisabled)),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
@@ -815,7 +821,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     HapticFeedback.mediumImpact();
                     Navigator.pop(context);
                   },
-                  child: Text(isEditing ? 'Guardar' : 'Agregar'),
+                  child: Text(isEditing ? l10n.commonSave : l10n.formAdd),
                 ),
               ],
             );
@@ -832,10 +838,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   Widget build(BuildContext context) {
     final isEdit = _existing != null;
     final typeColor = _typeColor(_type);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: VaultAppBar(
-        title: isEdit ? 'Editar credencial' : 'Nueva credencial',
+        title: isEdit ? l10n.formEditTitle : l10n.formNewTitle,
         leading: ResponsiveLayout.isDesktop(context)
             ? IconButton(
                 icon: const Icon(Icons.close_rounded),
@@ -854,7 +861,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               onPressed: _save,
               icon: const Icon(Icons.check_rounded, size: 18),
               label: Text(
-                isEdit ? 'Guardar' : 'Crear',
+                isEdit ? l10n.commonSave : l10n.commonCreate,
                 style: const TextStyle(fontWeight: FontWeight.w600),
               ),
               style: TextButton.styleFrom(
@@ -881,18 +888,18 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             FormSection(
               icon: Icons.badge_rounded,
               accentColor: typeColor,
-              title: 'Identificación',
+              title: l10n.formSectionIdentification,
               children: [
                 TextFormField(
                   controller: _titleCtrl,
                   style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500),
                   decoration: InputDecoration(
-                    labelText: 'Título',
-                    hintText: _titleHint,
+                    labelText: l10n.formTitleLabel,
+                    hintText: _titleHintFor(l10n),
                     prefixIcon: Icon(_typeIcon(_type), size: 18, color: typeColor.withValues(alpha: 0.7)),
                   ),
                   validator: (v) =>
-                      v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+                      v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
                   textCapitalization: TextCapitalization.sentences,
                 ),
                 const SizedBox(height: 12),
@@ -914,7 +921,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               FormSection(
                 icon: Icons.notes_rounded,
                 accentColor: typeColor,
-                title: _type == CredentialType.secureNote ? 'Contenido' : 'Notas',
+                title: _type == CredentialType.secureNote ? l10n.formSectionContent : l10n.formSectionNotes,
                 children: [
                   TextFormField(
                     controller: _notesCtrl,
@@ -922,16 +929,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     maxLines: _type == CredentialType.secureNote ? 10 : 4,
                     decoration: InputDecoration(
                       labelText: _type == CredentialType.secureNote
-                          ? 'Contenido seguro'
-                          : 'Notas adicionales',
+                          ? l10n.formSecureContentLabel
+                          : l10n.formNotesLabel,
                       hintText: _type == CredentialType.secureNote
-                          ? 'Escribe tu nota privada aquí…'
-                          : 'Opcional — agregar contexto o recordatorios',
+                          ? l10n.formSecureContentHint
+                          : l10n.formNotesHint,
                       alignLabelWithHint: true,
                     ),
                     validator: _type == CredentialType.secureNote
                         ? (v) => v == null || v.trim().isEmpty
-                            ? 'El contenido es requerido'
+                            ? l10n.formContentRequired
                             : null
                         : null,
                   ),
@@ -952,7 +959,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             FormSection(
               icon: Icons.folder_rounded,
               accentColor: AppColors.textMuted,
-              title: 'Organización',
+              title: l10n.formSectionOrganization,
               children: [
                 Consumer(
                   builder: (context, ref, _) {
@@ -975,16 +982,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                       },
                       borderRadius: BorderRadius.circular(12),
                       child: InputDecorator(
-                        decoration: const InputDecoration(
-                          labelText: 'Carpeta',
-                          prefixIcon: Icon(Icons.folder_outlined, color: AppColors.textMuted),
+                        decoration: InputDecoration(
+                          labelText: l10n.formFolderLabel,
+                          prefixIcon: const Icon(Icons.folder_outlined, color: AppColors.textMuted),
                         ),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                               child: Text(
-                                currentFolder?.name ?? 'Bóveda principal',
+                                currentFolder?.name ?? l10n.formMainVault,
                                 style: TextStyle(
                                   color: currentFolder == null ? AppColors.textMuted : Colors.white,
                                 ),
@@ -1010,7 +1017,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                       child: CircularProgressIndicator(color: AppColors.accent),
                     )
                   : SaveButton(
-                      label: isEdit ? 'Guardar cambios' : 'Crear credencial',
+                      label: isEdit ? l10n.formSaveChanges : l10n.formCreateCredential,
                       color: typeColor,
                       onPressed: _save,
                       icon: isEdit ? Icons.save_rounded : Icons.add_rounded,
@@ -1022,13 +1029,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     );
   }
 
-  String get _titleHint => switch (_type) {
-    CredentialType.password   => 'ej. Netflix, GitHub, Gmail',
-    CredentialType.apiKey     => 'ej. OpenAI, Stripe, AWS',
-    CredentialType.secureNote => 'ej. Llaves del servidor, Seeds',
-    CredentialType.totp       => 'ej. GitHub 2FA, Google',
-    CredentialType.passkey    => 'ej. google.com Passkey',
-    CredentialType.sshKey     => 'ej. Servidor Produccion, GitHub SSH Key',
+  String _titleHintFor(AppLocalizations l10n) => switch (_type) {
+    CredentialType.password   => l10n.formHintPassword,
+    CredentialType.apiKey     => l10n.formHintApiKey,
+    CredentialType.secureNote => l10n.formHintSecureNote,
+    CredentialType.totp       => l10n.formHintTotp,
+    CredentialType.passkey    => l10n.formHintPasskey,
+    CredentialType.sshKey     => l10n.formHintSshKey,
   };
 
   IconData _typeIcon(CredentialType t) => switch (t) {
@@ -1079,25 +1086,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildPasswordFields() {
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.lock_rounded,
       accentColor: AppColors.typePassword,
-      title: 'Credenciales de acceso',
+      title: l10n.formSectionLogin,
       children: [
         TextFormField(
           controller: _usernameCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Usuario / Email',
-            hintText: 'usuario@ejemplo.com',
-            prefixIcon: Icon(Icons.person_outline_rounded, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.formUserEmailLabel,
+            hintText: l10n.formUserEmailHint,
+            prefixIcon: const Icon(Icons.person_outline_rounded, size: 18, color: AppColors.textMuted),
           ),
           keyboardType: TextInputType.emailAddress,
         ),
         const SizedBox(height: 14),
         PasswordRowWidget(
           ctrl: _passwordCtrl,
-          label: 'Contraseña',
+          label: l10n.fieldPassword,
           showGenerator: _showGenerator,
           onToggleGenerator: (v) => setState(() => _showGenerator = v),
         ),
@@ -1106,10 +1114,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           controller: _websiteCtrl,
           style: const TextStyle(color: Colors.white),
           keyboardType: TextInputType.url,
-          decoration: const InputDecoration(
-            labelText: 'Sitio web / URL',
-            hintText: 'https://ejemplo.com',
-            prefixIcon: Icon(Icons.language_rounded, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.formWebsiteLabel,
+            hintText: l10n.formWebsiteHint,
+            prefixIcon: const Icon(Icons.language_rounded, size: 18, color: AppColors.textMuted),
           ),
         ),
       ],
@@ -1117,50 +1125,51 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildApiKeyFields() {
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.key_rounded,
       accentColor: AppColors.typeApiKey,
-      title: 'Detalles de la API',
+      title: l10n.formSectionApi,
       children: [
         TextFormField(
           controller: _serviceCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Nombre del servicio',
-            hintText: 'ej. OpenAI, Stripe, Supabase',
-            prefixIcon: Icon(Icons.cloud_rounded, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.formServiceNameLabel,
+            hintText: l10n.formServiceNameHint,
+            prefixIcon: const Icon(Icons.cloud_rounded, size: 18, color: AppColors.textMuted),
           ),
           validator: (v) =>
-              v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+              v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
         ),
         const SizedBox(height: 14),
         PasswordRowWidget(
           ctrl: _apiKeyCtrl,
-          label: 'API Key / Token',
+          label: l10n.formApiKeyLabel,
           showGenerator: _showGenerator,
           onToggleGenerator: (v) => setState(() => _showGenerator = v),
           validator: (v) =>
-              v == null || v.isEmpty ? 'Campo requerido' : null,
+              v == null || v.isEmpty ? l10n.formFieldRequired : null,
         ),
         const SizedBox(height: 14),
         TextFormField(
           controller: _endpointCtrl,
           style: const TextStyle(color: Colors.white),
           keyboardType: TextInputType.url,
-          decoration: const InputDecoration(
-            labelText: 'Endpoint URL',
+          decoration: InputDecoration(
+            labelText: l10n.formEndpointLabel,
             hintText: 'https://api.example.com/v1',
-            prefixIcon: Icon(Icons.link_rounded, size: 18, color: AppColors.textMuted),
+            prefixIcon: const Icon(Icons.link_rounded, size: 18, color: AppColors.textMuted),
           ),
         ),
         const SizedBox(height: 14),
         TextFormField(
           controller: _scopesCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Permisos / Scopes',
+          decoration: InputDecoration(
+            labelText: l10n.formScopesLabel,
             hintText: 'read:user, write:repo…',
-            prefixIcon: Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
+            prefixIcon: const Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
           ),
         ),
       ],
@@ -1168,10 +1177,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildTotpFields() {
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.access_time_rounded,
       accentColor: AppColors.typeTotp,
-      title: 'Configuración 2FA',
+      title: l10n.formSection2fa,
       children: [
         Container(
           padding: const EdgeInsets.all(12),
@@ -1187,12 +1197,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             children: [
               Icon(Icons.info_outline_rounded, size: 16, color: AppColors.typeTotp.withValues(alpha: 0.8)),
               const SizedBox(width: 10),
-              const Expanded(
+              Expanded(
                 child: Text(
-                  'Ingresa la clave secreta TOTP (Base32) de tu cuenta. '
-                  'La encontrarás al activar 2FA en el sitio web, '
-                  'o puedes escanear el código QR directamente.',
-                  style: TextStyle(
+                  l10n.formTotpDesc,
+                  style: const TextStyle(
                     color: AppColors.textMuted,
                     fontSize: 12,
                     height: 1.5,
@@ -1218,14 +1226,14 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   color: AppColors.typeTotp.withValues(alpha: 0.25),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.qr_code_scanner_rounded, color: AppColors.typeTotp, size: 22),
-                  SizedBox(width: 10),
+                  const Icon(Icons.qr_code_scanner_rounded, color: AppColors.typeTotp, size: 22),
+                  const SizedBox(width: 10),
                   Text(
-                    'Escanear código QR',
-                    style: TextStyle(
+                    l10n.formScanQr,
+                    style: const TextStyle(
                       color: AppColors.typeTotp,
                       fontSize: 15,
                       fontWeight: FontWeight.w600,
@@ -1241,9 +1249,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         Row(
           children: [
             Expanded(child: Divider(color: AppColors.divider.withValues(alpha: 0.5))),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Text('o ingresa manualmente', style: TextStyle(color: AppColors.textDisabled, fontSize: 11)),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(l10n.formOrManually, style: const TextStyle(color: AppColors.textDisabled, fontSize: 11)),
             ),
             Expanded(child: Divider(color: AppColors.divider.withValues(alpha: 0.5))),
           ],
@@ -1253,28 +1261,29 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         TextFormField(
           controller: _totpIssuerCtrl,
           style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            labelText: 'Cuenta / Emisor',
-            hintText: 'ej. GitHub, Google, AWS',
-            prefixIcon: Icon(Icons.account_circle_outlined, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.formAccountIssuerLabel,
+            hintText: l10n.formAccountIssuerHint,
+            prefixIcon: const Icon(Icons.account_circle_outlined, size: 18, color: AppColors.textMuted),
           ),
         ),
         const SizedBox(height: 14),
         SecureTextField(
           controller: _totpSecretCtrl,
-          label: 'Clave secreta TOTP (Base32)',
+          label: l10n.formTotpSecretLabel,
           validator: (v) =>
-              v == null || v.trim().isEmpty ? 'Campo requerido' : null,
+              v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
         ),
       ],
     );
   }
 
   Widget _buildPasskeyInfo() {
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.fingerprint_rounded,
       accentColor: AppColors.typePasskey,
-      title: 'Passkey (FIDO2)',
+      title: l10n.formSectionPasskey,
       children: [
         Container(
           padding: const EdgeInsets.all(16),
@@ -1285,20 +1294,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               color: AppColors.typePasskey.withValues(alpha: 0.2),
             ),
           ),
-          child: const Column(
+          child: Column(
             children: [
-              Icon(Icons.fingerprint_rounded, color: AppColors.typePasskey, size: 32),
-              SizedBox(height: 12),
+              const Icon(Icons.fingerprint_rounded, color: AppColors.typePasskey, size: 32),
+              const SizedBox(height: 12),
               Text(
-                'Las Passkeys se registran directamente con la plataforma '
-                'FIDO2 del dispositivo.',
-                style: TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.5),
+                l10n.formPasskeyDesc,
+                style: const TextStyle(color: AppColors.textMuted, fontSize: 13, height: 1.5),
                 textAlign: TextAlign.center,
               ),
-              SizedBox(height: 8),
+              const SizedBox(height: 8),
               Text(
-                'Usa la pantalla de Passkeys en Ajustes para registrar o gestionar tus passkeys.',
-                style: TextStyle(color: AppColors.textDisabled, fontSize: 12, height: 1.4),
+                l10n.formPasskeyHint,
+                style: const TextStyle(color: AppColors.textDisabled, fontSize: 12, height: 1.4),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -1309,18 +1317,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildSshKeyFields() {
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.terminal_rounded,
       accentColor: AppColors.typeSshKey,
-      title: 'Configuracion de Llave SSH',
+      title: l10n.formSectionSsh,
       children: [
         DropdownButtonFormField<String>(
           value: _sshKeyType,
           style: const TextStyle(color: Colors.white),
           dropdownColor: AppColors.drawer,
-          decoration: const InputDecoration(
-            labelText: 'Tipo de Llave',
-            prefixIcon: Icon(Icons.vpn_key_outlined, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.fieldKeyType,
+            prefixIcon: const Icon(Icons.vpn_key_outlined, size: 18, color: AppColors.textMuted),
           ),
           items: const [
             DropdownMenuItem(value: 'Ed25519', child: Text('Ed25519')),
@@ -1345,7 +1354,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                 : OutlinedButton.icon(
                     onPressed: _generateSshKey,
                     icon: const Icon(Icons.auto_awesome_rounded, size: 16),
-                    label: const Text('Generar par de llaves Ed25519'),
+                    label: Text(l10n.formGenerateSsh),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: AppColors.typeSshKey,
                       side: const BorderSide(color: AppColors.typeSshKey, width: 1.5),
@@ -1360,31 +1369,31 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           controller: _sshPrivateKeyCtrl,
           style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 13),
           maxLines: 6,
-          decoration: const InputDecoration(
-            labelText: 'Llave Privada',
+          decoration: InputDecoration(
+            labelText: l10n.fieldPrivateKey,
             hintText: '-----BEGIN OPENSSH PRIVATE KEY-----\n...',
             alignLabelWithHint: true,
-            prefixIcon: Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
+            prefixIcon: const Icon(Icons.security_rounded, size: 18, color: AppColors.textMuted),
           ),
           validator: (v) =>
-              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty) ? 'La llave privada es requerida' : null,
+              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty) ? l10n.formPrivateKeyRequired : null,
         ),
         const SizedBox(height: 14),
         TextFormField(
           controller: _sshPublicKeyCtrl,
           style: const TextStyle(color: Colors.white, fontFamily: 'monospace', fontSize: 13),
           maxLines: 4,
-          decoration: const InputDecoration(
-            labelText: 'Llave Publica (Opcional)',
+          decoration: InputDecoration(
+            labelText: l10n.formPublicKeyOptional,
             hintText: 'ssh-ed25519 AAAA...',
             alignLabelWithHint: true,
-            prefixIcon: Icon(Icons.public_rounded, size: 18, color: AppColors.textMuted),
+            prefixIcon: const Icon(Icons.public_rounded, size: 18, color: AppColors.textMuted),
           ),
         ),
         const SizedBox(height: 14),
         SecureTextField(
           controller: _sshPassphraseCtrl,
-          label: 'Passphrase de la Llave (Opcional)',
+          label: l10n.formKeyPassphraseOptional,
         ),
       ],
     );
@@ -1393,10 +1402,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   Widget _buildDoubleEncryptionSection() {
     if (_type == CredentialType.passkey) return const SizedBox.shrink();
 
+    final l10n = AppLocalizations.of(context);
     return FormSection(
       icon: Icons.enhanced_encryption_rounded,
       accentColor: AppColors.secondary,
-      title: 'Cifrado de Sobre Doble',
+      title: l10n.formSectionDoubleEnc,
       children: [
         SwitchListTile(
           value: _isDoubleEncrypted,
@@ -1410,10 +1420,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               }
             });
           },
-          title: const Text('Activar Cifrado Doble', style: TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
-          subtitle: const Text(
-            'Protege los secretos de este registro con un PIN secundario. Se cifraran adicionalmente.',
-            style: TextStyle(color: AppColors.textMuted, fontSize: 12),
+          title: Text(l10n.formEnableDoubleEnc, style: const TextStyle(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600)),
+          subtitle: Text(
+            l10n.formDoubleEncDesc,
+            style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
           activeColor: AppColors.secondary,
           contentPadding: EdgeInsets.zero,
@@ -1423,13 +1433,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           SecureTextField(
             controller: _secondaryPinCtrl,
             label: _existing?.isDoubleEncrypted == true
-                ? 'PIN Secundario (Dejar vacio para mantener actual o ingresar para cambiar)'
-                : 'PIN Secundario',
+                ? l10n.formPinSecondaryEditLabel
+                : l10n.formPinSecondaryLabel,
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (v) {
               if (_isDoubleEncrypted && _existing == null && (v == null || v.trim().isEmpty)) {
-                return 'El PIN secundario es requerido';
+                return l10n.formPinSecondaryRequired;
               }
               return null;
             },
@@ -1441,10 +1451,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               HapticFeedback.selectionClick();
               setState(() => _savePinBiometrically = v);
             },
-            title: const Text('Desbloqueo biometrico', style: TextStyle(color: Colors.white, fontSize: 13)),
-            subtitle: const Text(
-              'Guardar el PIN cifrado para desbloquear rapidamente con huella/rostro.',
-              style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+            title: Text(l10n.formBiometricUnlock, style: const TextStyle(color: Colors.white, fontSize: 13)),
+            subtitle: Text(
+              l10n.formBiometricUnlockSub,
+              style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
             ),
             activeColor: AppColors.secondary,
             contentPadding: EdgeInsets.zero,
@@ -1462,26 +1472,27 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     }
 
     final typeColor = _typeColor(_type);
+    final l10n = AppLocalizations.of(context);
 
     return FormSection(
       icon: Icons.update_rounded,
       accentColor: typeColor,
-      title: 'Recordatorio de Rotación',
+      title: l10n.formSectionRotation,
       children: [
         DropdownButtonFormField<String>(
           value: _rotationInterval,
           style: const TextStyle(color: Colors.white),
           dropdownColor: AppColors.drawer,
-          decoration: const InputDecoration(
-            labelText: 'Recordar cambiar contraseña',
-            prefixIcon: Icon(Icons.alarm_rounded, size: 18, color: AppColors.textMuted),
+          decoration: InputDecoration(
+            labelText: l10n.formRotationLabel,
+            prefixIcon: const Icon(Icons.alarm_rounded, size: 18, color: AppColors.textMuted),
           ),
-          items: const [
-            DropdownMenuItem(value: 'none', child: Text('No recordar')),
-            DropdownMenuItem(value: 'monthly', child: Text('Cada mes')),
-            DropdownMenuItem(value: 'quarterly', child: Text('Cada 3 meses')),
-            DropdownMenuItem(value: 'semiAnnually', child: Text('Cada 6 meses')),
-            DropdownMenuItem(value: 'custom', child: Text('Personalizado (días)')),
+          items: [
+            DropdownMenuItem(value: 'none', child: Text(l10n.formRotNone)),
+            DropdownMenuItem(value: 'monthly', child: Text(l10n.formRotMonthly)),
+            DropdownMenuItem(value: 'quarterly', child: Text(l10n.rotationQuarterly)),
+            DropdownMenuItem(value: 'semiAnnually', child: Text(l10n.rotationSemiAnnually)),
+            DropdownMenuItem(value: 'custom', child: Text(l10n.formRotCustom)),
           ],
           onChanged: (val) {
             if (val != null) {
@@ -1502,19 +1513,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             style: const TextStyle(color: Colors.white),
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-            decoration: const InputDecoration(
-              labelText: 'Días para recordar',
+            decoration: InputDecoration(
+              labelText: l10n.formCustomDaysLabel,
               hintText: 'ej. 45, 90',
-              prefixIcon: Icon(Icons.date_range_rounded, size: 18, color: AppColors.textMuted),
+              prefixIcon: const Icon(Icons.date_range_rounded, size: 18, color: AppColors.textMuted),
             ),
             validator: (v) {
               if (_rotationInterval == 'custom') {
                 if (v == null || v.trim().isEmpty) {
-                  return 'Debe ingresar el número de días';
+                  return l10n.formCustomDaysRequired;
                 }
                 final days = int.tryParse(v);
                 if (days == null || days <= 0) {
-                  return 'Ingrese un número válido de días';
+                  return l10n.formCustomDaysInvalid;
                 }
               }
               return null;
