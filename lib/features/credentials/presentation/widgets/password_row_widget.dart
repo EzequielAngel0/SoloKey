@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_palette.dart';
 import '../../../../shared/widgets/secure_text_field.dart';
 import 'password_generator_widget.dart';
 
@@ -22,6 +22,7 @@ class PasswordRowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
@@ -40,12 +41,12 @@ class PasswordRowWidget extends StatelessWidget {
               margin: const EdgeInsets.only(top: 8),
               decoration: BoxDecoration(
                 color: showGenerator
-                    ? AppColors.accent.withValues(alpha: 0.2)
-                    : AppColors.card,
+                    ? palette.accent.withValues(alpha: 0.2)
+                    : palette.card,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: showGenerator
-                      ? AppColors.accent.withValues(alpha: 0.5)
+                      ? palette.accent.withValues(alpha: 0.5)
                       : Colors.transparent,
                 ),
               ),
@@ -53,8 +54,8 @@ class PasswordRowWidget extends StatelessWidget {
                 icon: Icon(
                   Icons.auto_fix_high_rounded,
                   color: showGenerator
-                      ? AppColors.accent
-                      : AppColors.textMuted,
+                      ? palette.accent
+                      : palette.textMuted,
                 ),
                 onPressed: () {
                   HapticFeedback.selectionClick();

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_palette.dart';
 
 class FormSection extends StatelessWidget {
   const FormSection({
@@ -20,7 +20,7 @@ class FormSection extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: AppColors.card,
+        color: context.palette.card,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: accentColor.withValues(alpha: 0.12),

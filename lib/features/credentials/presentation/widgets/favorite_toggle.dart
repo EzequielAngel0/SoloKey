@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_palette.dart';
 
 class FavoriteToggle extends StatelessWidget {
   const FavoriteToggle({
@@ -13,6 +13,7 @@ class FavoriteToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return InkWell(
       onTap: () => onChanged(!value),
       borderRadius: BorderRadius.circular(10),
@@ -25,20 +26,20 @@ class FavoriteToggle extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               child: Icon(
                 value ? Icons.star_rounded : Icons.star_border_rounded,
-                color: value ? AppColors.warning : AppColors.textMuted,
+                color: value ? palette.warning : palette.textMuted,
                 size: 20,
               ),
             ),
             const SizedBox(width: 10),
-            const Text(
+            Text(
               'Marcar como favorita',
-              style: TextStyle(color: Colors.white, fontSize: 13),
+              style: TextStyle(color: palette.textPrimary, fontSize: 13),
             ),
             const Spacer(),
             Switch(
               value: value,
               onChanged: onChanged,
-              activeTrackColor: AppColors.warning,
+              activeTrackColor: palette.warning,
             ),
           ],
         ),
