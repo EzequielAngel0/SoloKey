@@ -15,6 +15,9 @@ class AppSecuritySettings with _$AppSecuritySettings {
     @Default(0) int wipeAfterFailedAttempts,
     // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
     @Default(false) bool autostartEnabled,
+    // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
+    @Default(0) int scheduledBackupIntervalDays,
+    String? backupDirectory,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>

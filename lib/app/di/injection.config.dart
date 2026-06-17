@@ -34,6 +34,7 @@ import '../../core/services/brute_force_guard.dart' as _i714;
 import '../../core/services/csv_import_service.dart' as _i764;
 import '../../core/services/notification_service.dart' as _i4;
 import '../../core/services/recovery_service.dart' as _i323;
+import '../../core/services/scheduled_backup_service.dart' as _i1009;
 import '../../core/services/security_audit_service.dart' as _i400;
 import '../../core/services/ssh_key_generator_service.dart' as _i972;
 import '../../core/services/vault_export_service.dart' as _i332;
@@ -211,6 +212,14 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1023.ISecurityService>(),
         gh<_i795.SessionManager>(),
         gh<_i286.IVaultRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i1009.ScheduledBackupService>(
+      () => _i1009.ScheduledBackupService(
+        gh<_i332.VaultExportService>(),
+        gh<_i657.ISettingsRepository>(),
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i795.SessionManager>(),
       ),
     );
     return this;

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,6 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../../core/services/scheduled_backup_service.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../vault_access/application/vault_state_provider.dart';
@@ -771,10 +773,159 @@ class _DataManagementSection extends StatelessWidget {
                 ),
                 onTap: () => context.push(AppRoutes.passkeys),
               ),
+              Divider(height: 1, indent: 56, color: palette.divider),
+              const _ScheduledBackupTile(),
             ],
           ),
         ),
       ],
+    );
+  }
+}
+
+/// Configures automatic encrypted backups (interval + destination folder +
+/// backup password). Backup password is kept in the Keystore, not in settings.
+class _ScheduledBackupTile extends ConsumerWidget {
+  const _ScheduledBackupTile();
+
+  static const _intervals = [0, 1, 7, 30];
+
+  String _intervalLabel(int days) => switch (days) {
+        0 => 'Desactivado',
+        1 => 'Diario',
+        7 => 'Semanal',
+        30 => 'Mensual',
+        _ => 'Cada $days días',
+      };
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
+    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final interval = settings?.scheduledBackupIntervalDays ?? 0;
+    final dir = settings?.backupDirectory;
+    final subtitle = interval <= 0
+        ? 'Desactivado'
+        : '${_intervalLabel(interval)} → ${dir == null ? 'sin carpeta' : dir.split(RegExp(r'[\\/]')).last}';
+    return ListTile(
+      leading: Icon(Icons.backup_rounded, color: palette.accent),
+      title: Text('Backup automático',
+          style: TextStyle(color: palette.textPrimary, fontSize: 14)),
+      subtitle: Text(subtitle,
+          style: TextStyle(color: palette.textMuted, fontSize: 12),
+          overflow: TextOverflow.ellipsis),
+      trailing:
+          Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
+      onTap: () => _showConfig(context, ref, settings),
+    );
+  }
+
+  Future<void> _showConfig(
+      BuildContext context, WidgetRef ref, AppSecuritySettings? settings) async {
+    final palette = context.palette;
+    var interval = settings?.scheduledBackupIntervalDays ?? 0;
+    var dir = settings?.backupDirectory;
+    final pwdCtrl = TextEditingController();
+    final hasPwd =
+        await getIt<ScheduledBackupService>().hasBackupPassword();
+    if (!context.mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (dialogContext, setLocal) => AlertDialog(
+          backgroundColor: palette.drawer,
+          title: Text('Backup automático',
+              style: TextStyle(color: palette.textPrimary, fontSize: 18)),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Frecuencia',
+                    style: TextStyle(color: palette.textMuted, fontSize: 12)),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: _intervals.map((n) {
+                    final sel = n == interval;
+                    return GestureDetector(
+                      onTap: () => setLocal(() => interval = n),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 7),
+                        decoration: BoxDecoration(
+                          color: sel
+                              ? palette.accent.withValues(alpha: 0.15)
+                              : palette.surface,
+                          borderRadius: BorderRadius.circular(9),
+                          border: Border.all(
+                              color: sel ? palette.accent : palette.divider),
+                        ),
+                        child: Text(_intervalLabel(n),
+                            style: TextStyle(
+                                color: sel ? palette.accent : palette.textMuted,
+                                fontSize: 12)),
+                      ),
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    final picked =
+                        await FilePicker.platform.getDirectoryPath();
+                    if (picked != null) setLocal(() => dir = picked);
+                  },
+                  icon: const Icon(Icons.folder_open_rounded, size: 18),
+                  label: Text(
+                    dir == null ? 'Elegir carpeta destino' : dir!,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: pwdCtrl,
+                  obscureText: true,
+                  style: TextStyle(color: palette.textPrimary),
+                  decoration: InputDecoration(
+                    labelText: hasPwd
+                        ? 'Contraseña del backup (dejar vacío = mantener)'
+                        : 'Contraseña del backup',
+                    labelStyle: TextStyle(color: palette.textMuted),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Cancelar'),
+            ),
+            TextButton(
+              onPressed: () async {
+                final svc = getIt<ScheduledBackupService>();
+                if (pwdCtrl.text.isNotEmpty) {
+                  await svc.setBackupPassword(pwdCtrl.text);
+                }
+                final base = settings ?? AppSecuritySettings.defaults();
+                await ref.read(settingsNotifierProvider.notifier).save(
+                      base.copyWith(
+                        scheduledBackupIntervalDays: interval,
+                        backupDirectory: dir,
+                      ),
+                    );
+                if (dialogContext.mounted) Navigator.pop(dialogContext);
+                // Dispara un backup de inmediato si ya esta todo configurado.
+                await svc.runIfDue();
+              },
+              child: const Text('Guardar'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -7,6 +7,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
+import '../core/services/scheduled_backup_service.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
 import '../router/app_router.dart';
@@ -148,6 +149,14 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   @override
   Widget build(BuildContext context) {
     final router = ref.read(appRouterProvider);
+
+    // Backup automatico: al desbloquear, corre un export si esta vencido.
+    ref.listen(vaultNotifierProvider, (prev, next) {
+      next.maybeWhen(
+        unlocked: (_) => getIt<ScheduledBackupService>().runIfDue(),
+        orElse: () {},
+      );
+    });
 
     // Resolve the active theme reactively from the persisted settings. While the
     // settings are still loading we fall back to the historical dark default.

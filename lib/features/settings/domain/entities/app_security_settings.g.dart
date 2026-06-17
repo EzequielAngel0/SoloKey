@@ -17,6 +17,9 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   wipeAfterFailedAttempts:
       (json['wipeAfterFailedAttempts'] as num?)?.toInt() ?? 0,
   autostartEnabled: json['autostartEnabled'] as bool? ?? false,
+  scheduledBackupIntervalDays:
+      (json['scheduledBackupIntervalDays'] as num?)?.toInt() ?? 0,
+  backupDirectory: json['backupDirectory'] as String?,
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -29,4 +32,6 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'themeMode': instance.themeMode,
   'wipeAfterFailedAttempts': instance.wipeAfterFailedAttempts,
   'autostartEnabled': instance.autostartEnabled,
+  'scheduledBackupIntervalDays': instance.scheduledBackupIntervalDays,
+  'backupDirectory': instance.backupDirectory,
 };

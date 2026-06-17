@@ -29,7 +29,10 @@ mixin _$AppSecuritySettings {
       throw _privateConstructorUsedError; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   int get wipeAfterFailedAttempts =>
       throw _privateConstructorUsedError; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
-  bool get autostartEnabled => throw _privateConstructorUsedError;
+  bool get autostartEnabled =>
+      throw _privateConstructorUsedError; // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
+  int get scheduledBackupIntervalDays => throw _privateConstructorUsedError;
+  String? get backupDirectory => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -56,6 +59,8 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     String themeMode,
     int wipeAfterFailedAttempts,
     bool autostartEnabled,
+    int scheduledBackupIntervalDays,
+    String? backupDirectory,
   });
 }
 
@@ -81,6 +86,8 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? themeMode = null,
     Object? wipeAfterFailedAttempts = null,
     Object? autostartEnabled = null,
+    Object? scheduledBackupIntervalDays = null,
+    Object? backupDirectory = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -112,6 +119,14 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.autostartEnabled
                 : autostartEnabled // ignore: cast_nullable_to_non_nullable
                       as bool,
+            scheduledBackupIntervalDays: null == scheduledBackupIntervalDays
+                ? _value.scheduledBackupIntervalDays
+                : scheduledBackupIntervalDays // ignore: cast_nullable_to_non_nullable
+                      as int,
+            backupDirectory: freezed == backupDirectory
+                ? _value.backupDirectory
+                : backupDirectory // ignore: cast_nullable_to_non_nullable
+                      as String?,
           )
           as $Val,
     );
@@ -135,6 +150,8 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     String themeMode,
     int wipeAfterFailedAttempts,
     bool autostartEnabled,
+    int scheduledBackupIntervalDays,
+    String? backupDirectory,
   });
 }
 
@@ -159,6 +176,8 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? themeMode = null,
     Object? wipeAfterFailedAttempts = null,
     Object? autostartEnabled = null,
+    Object? scheduledBackupIntervalDays = null,
+    Object? backupDirectory = freezed,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -190,6 +209,14 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.autostartEnabled
             : autostartEnabled // ignore: cast_nullable_to_non_nullable
                   as bool,
+        scheduledBackupIntervalDays: null == scheduledBackupIntervalDays
+            ? _value.scheduledBackupIntervalDays
+            : scheduledBackupIntervalDays // ignore: cast_nullable_to_non_nullable
+                  as int,
+        backupDirectory: freezed == backupDirectory
+            ? _value.backupDirectory
+            : backupDirectory // ignore: cast_nullable_to_non_nullable
+                  as String?,
       ),
     );
   }
@@ -206,6 +233,8 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.themeMode = 'system',
     this.wipeAfterFailedAttempts = 0,
     this.autostartEnabled = false,
+    this.scheduledBackupIntervalDays = 0,
+    this.backupDirectory,
   });
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -234,10 +263,16 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final bool autostartEnabled;
+  // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
+  @override
+  @JsonKey()
+  final int scheduledBackupIntervalDays;
+  @override
+  final String? backupDirectory;
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory)';
   }
 
   @override
@@ -261,7 +296,15 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
                 ) ||
                 other.wipeAfterFailedAttempts == wipeAfterFailedAttempts) &&
             (identical(other.autostartEnabled, autostartEnabled) ||
-                other.autostartEnabled == autostartEnabled));
+                other.autostartEnabled == autostartEnabled) &&
+            (identical(
+                  other.scheduledBackupIntervalDays,
+                  scheduledBackupIntervalDays,
+                ) ||
+                other.scheduledBackupIntervalDays ==
+                    scheduledBackupIntervalDays) &&
+            (identical(other.backupDirectory, backupDirectory) ||
+                other.backupDirectory == backupDirectory));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -275,6 +318,8 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     themeMode,
     wipeAfterFailedAttempts,
     autostartEnabled,
+    scheduledBackupIntervalDays,
+    backupDirectory,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -303,6 +348,8 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final String themeMode,
     final int wipeAfterFailedAttempts,
     final bool autostartEnabled,
+    final int scheduledBackupIntervalDays,
+    final String? backupDirectory,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -321,7 +368,11 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   int get wipeAfterFailedAttempts; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
   @override
-  bool get autostartEnabled;
+  bool get autostartEnabled; // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
+  @override
+  int get scheduledBackupIntervalDays;
+  @override
+  String? get backupDirectory;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

@@ -67,6 +67,57 @@ class VaultExportService {
     required String exportPassword,
     Set<CredentialType>? typeFilter,
   }) async {
+    final built = await _buildEncryptedBackup(
+      exportPassword: exportPassword,
+      typeFilter: typeFilter,
+    );
+
+    final dir = await getTemporaryDirectory();
+    final ts = DateTime.now().millisecondsSinceEpoch;
+    final file = File('${dir.path}/solokey_$ts.skvault');
+    await file.writeAsBytes(built.bytes);
+
+    // SEC-002: Delete temp file after sharing
+    try {
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [XFile(file.path)],
+          subject: 'SoloKey Backup',
+        ),
+      );
+    } finally {
+      if (await file.exists()) await file.delete();
+    }
+
+    return built.summary;
+  }
+
+  /// Writes an encrypted `.skvault` backup directly into [directoryPath] (no
+  /// share sheet). Used by the scheduled-backup service. Returns the file path.
+  Future<String> exportVaultToDirectory({
+    required String exportPassword,
+    required String directoryPath,
+    Set<CredentialType>? typeFilter,
+  }) async {
+    final built = await _buildEncryptedBackup(
+      exportPassword: exportPassword,
+      typeFilter: typeFilter,
+    );
+    final ts = DateTime.now();
+    final stamp = '${ts.year}${_two(ts.month)}${_two(ts.day)}-'
+        '${_two(ts.hour)}${_two(ts.minute)}${_two(ts.second)}';
+    final file = File('$directoryPath/SoloKey-backup-$stamp.skvault');
+    await file.writeAsBytes(built.bytes);
+    return file.path;
+  }
+
+  static String _two(int n) => n.toString().padLeft(2, '0');
+
+  /// Builds the encrypted backup bytes (magic|salt|AES-GCM blob) + a summary.
+  Future<({Uint8List bytes, ExportSummary summary})> _buildEncryptedBackup({
+    required String exportPassword,
+    Set<CredentialType>? typeFilter,
+  }) async {
     if (exportPassword.isEmpty) throw ArgumentError('Export password required');
 
     final allCredentials = await _credRepo.getAll();
@@ -109,38 +160,23 @@ class VaultExportService {
 
     // Build file: magic(8) | salt(32) | encrypted blob
     final magic = utf8.encode(_magicV2);
-    final fileBytes =
-        Uint8List(magic.length + _saltLen + encrypted.length);
+    final fileBytes = Uint8List(magic.length + _saltLen + encrypted.length);
     fileBytes.setAll(0, magic);
     fileBytes.setAll(magic.length, saltBytes);
     fileBytes.setAll(magic.length + _saltLen, encrypted);
-
-    final dir = await getTemporaryDirectory();
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    final file = File('${dir.path}/solokey_$ts.skvault');
-    await file.writeAsBytes(fileBytes);
-
-    // SEC-002: Delete temp file after sharing
-    try {
-      await SharePlus.instance.share(
-        ShareParams(
-          files: [XFile(file.path)],
-          subject: 'SoloKey Backup',
-        ),
-      );
-    } finally {
-      if (await file.exists()) await file.delete();
-    }
 
     final countsByType = <CredentialType, int>{};
     for (final c in credentials) {
       countsByType[c.type] = (countsByType[c.type] ?? 0) + 1;
     }
 
-    return ExportSummary(
-      totalCredentials: credentials.length,
-      totalFolders: folders.length,
-      countsByType: countsByType,
+    return (
+      bytes: fileBytes,
+      summary: ExportSummary(
+        totalCredentials: credentials.length,
+        totalFolders: folders.length,
+        countsByType: countsByType,
+      ),
     );
   }
 
