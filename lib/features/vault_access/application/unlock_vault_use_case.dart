@@ -85,12 +85,12 @@ class UnlockVaultUseCase {
     if (settings.biometricEnabled) {
       await getIt<FlutterSecureStorage>()
           .write(key: 'bio_master_key', value: base64Encode(keyBytes));
-      await getIt<FlutterSecureStorage>()
-          .write(key: 'master_password', value: masterPassword);
     } else {
       await getIt<FlutterSecureStorage>().delete(key: 'bio_master_key');
-      await getIt<FlutterSecureStorage>().delete(key: 'master_password');
     }
+    // El WiFi-unlock ya NO usa la contrasena en texto plano (usa un token DUK);
+    // limpiamos cualquier 'master_password' heredado de versiones anteriores.
+    await getIt<FlutterSecureStorage>().delete(key: 'master_password');
 
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
   }
@@ -106,6 +106,26 @@ class UnlockVaultUseCase {
     final keyBytes = base64Decode(keyBase64);
     _session.storeKey(keyBytes);
 
+    return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
+  }
+
+  /// Unlocks the vault with a raw master key (e.g. from a WiFi remote-unlock DUK
+  /// that decrypted the locally-wrapped key). Verifies the key against the
+  /// stored verification data before storing it in the session.
+  Future<VaultSession> executeWithRawKey(Uint8List keyBytes) async {
+    final config = await _vaultRepo.getMasterKeyConfig();
+    if (config == null) throw StateError('Vault not initialized');
+
+    final isValid = await _security.verifyKey(keyBytes, config.verificationData);
+    if (!isValid) {
+      keyBytes.fillRange(0, keyBytes.length, 0);
+      throw ArgumentError('Invalid master key');
+    }
+
+    await _guard.recordSuccess();
+    _session.storeKey(keyBytes);
+
+    final settings = await _settingsRepo.getSettings();
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
   }
 

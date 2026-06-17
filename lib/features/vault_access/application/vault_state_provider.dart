@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -75,6 +77,18 @@ class VaultNotifier extends _$VaultNotifier {
       state = VaultState.unlocked(session);
     } catch (e) {
       state = const VaultState.error('Autenticación biométrica fallida o no configurada.');
+    }
+  }
+
+  /// Unlocks with a raw master key obtained via WiFi remote-unlock (DUK).
+  Future<void> unlockWithRawKey(Uint8List key) async {
+    state = const VaultState.loading();
+    try {
+      final useCase = ref.read(unlockVaultUseCaseProvider);
+      final session = await useCase.executeWithRawKey(key);
+      state = VaultState.unlocked(session);
+    } catch (e) {
+      state = const VaultState.error('Desbloqueo remoto fallido.');
     }
   }
 

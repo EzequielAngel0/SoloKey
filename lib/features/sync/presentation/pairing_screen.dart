@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../app/di/injection.dart';
@@ -532,10 +531,10 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   /// Sends a WiFi unlock request to the paired desktop.
   ///
   /// Flow:
-  /// 1. Prompt biometric authentication.
-  /// 2. Retrieve the stored master password from flutter_secure_storage.
-  /// 3. Send it encrypted to the desktop via the E2EE WebSocket channel.
-  /// 4. Zero the password buffer immediately after sending.
+  /// 1. Verify this phone holds a WiFi-unlock token (DUK).
+  /// 2. Prompt biometric authentication.
+  /// 3. Send the DUK over the E2EE channel — the desktop decrypts its own master
+  ///    key with it. The master PASSWORD never leaves this device.
   Future<void> _sendRemoteUnlock() async {
     setState(() {
       _isSendingUnlock = true;
@@ -543,7 +542,20 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
     });
 
     try {
-      // 1. Require biometric authentication
+      final syncService = getIt<SyncService>();
+
+      // 1. Need a registered token (issued when pairing with vault unlocked).
+      if (!await syncService.hasRemoteUnlockToken()) {
+        if (mounted) {
+          setState(() {
+            _isSendingUnlock = false;
+            _unlockResult = 'no_token';
+          });
+        }
+        return;
+      }
+
+      // 2. Require biometric authentication
       final biometricService = getIt<BiometricAuthService>();
       final authenticated = await biometricService.authenticate(
         reason: 'Autentícate para desbloquear tu computadora',
@@ -559,24 +571,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
         return;
       }
 
-      // 2. Retrieve the master password from secure storage
-      final storage = getIt<FlutterSecureStorage>();
-      final masterPassword = await storage.read(key: 'master_password');
-
-      if (masterPassword == null || masterPassword.isEmpty) {
-        if (mounted) {
-          setState(() {
-            _isSendingUnlock = false;
-            _unlockResult = 'no_password';
-          });
-        }
-        return;
-      }
-
-      // 3. Send the unlock request
-      final syncService = getIt<SyncService>();
-      final success =
-          await syncService.sendRemoteUnlockRequest(masterPassword);
+      // 3. Send the unlock request (DUK token).
+      final success = await syncService.sendRemoteUnlockRequest();
 
       if (mounted) {
         setState(() {
@@ -811,11 +807,11 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
         color = palette.textMuted;
         message = 'Autenticación biométrica cancelada.';
         break;
-      case 'no_password':
+      case 'no_token':
         icon = Icons.warning_amber_rounded;
         color = palette.warning;
-        message = 'Desbloquea esta app con tu contraseña maestra (no huella) '
-            'una vez para habilitar el desbloqueo remoto.';
+        message = 'Vincula de nuevo con el escritorio DESBLOQUEADO para '
+            'habilitar el desbloqueo remoto.';
         break;
       case 'failed':
       case 'error':

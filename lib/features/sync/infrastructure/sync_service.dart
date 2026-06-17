@@ -34,6 +34,11 @@ class SyncService {
   static const String _kSyncKeyName = 'solokey_sync_key';
   static const String _kSyncDevicesName = 'solokey_sync_devices';
   static const String _kDeviceIdName = 'solokey_device_id';
+  // WiFi-unlock (token DUK): el escritorio guarda su master key CIFRADA con el
+  // DUK; el movil guarda el DUK que la desbloquea. Asi nunca viaja ni se
+  // almacena la contrasena maestra en texto plano.
+  static const String _kWrappedKeyName = 'solokey_remote_unlock_wrapped';
+  static const String _kRemoteUnlockToken = 'solokey_remote_unlock_token';
 
   // Desktop Server State
   HttpServer? _server;
@@ -237,10 +242,18 @@ class SyncService {
       // keeps its own salt/master key; credential payloads are re-keyed in
       // transit (see DeltaSyncManager). Adopting a foreign salt would make the
       // device's pre-existing credentials undecryptable.
-      ws.sink.add(jsonEncode({
+      final response = <String, dynamic>{
         'type': 'ecdh_response',
         'signature': base64Encode(responseMac.bytes),
-      }));
+      };
+
+      // WiFi-unlock: si la boveda esta desbloqueada, registra un DUK para que
+      // ESTE telefono pueda desbloquear el escritorio remotamente sin la
+      // contrasena. Devolvemos el DUK; el escritorio solo guarda la key envuelta.
+      final duk = await _registerRemoteUnlock();
+      if (duk != null) response['duk'] = duk;
+
+      ws.sink.add(jsonEncode(response));
       _serverEventController.add('paired');
       _serverEventController.add('devices_changed');
     } else {
@@ -392,28 +405,50 @@ class SyncService {
   // DESKTOP SERVER: WiFi Unlock Handler
   // ─────────────────────────────────────────────────────────────────────────
 
-  /// Handles the remote unlock request from the mobile device.
-  /// The mobile device sends the master password encrypted with K_sync.
-  /// We emit a `remote_unlock:<password>` event for the UnlockScreen to
-  /// pick up and use to unlock the vault.
+  /// Registers WiFi-unlock for the currently-connected phone: wraps the desktop
+  /// master key with a fresh random DUK, persists ONLY the wrapped key, and
+  /// returns the DUK (base64) to hand to the phone. Returns null if the vault is
+  /// locked (nothing to wrap). The desktop never stores the DUK.
+  Future<String?> _registerRemoteUnlock() async {
+    final masterKey = _sessionManager.getKeyCopy();
+    if (masterKey == null) return null;
+    final duk = _cryptoRandomBytes(32);
+    final wrapped = await _securityService.encrypt(masterKey, duk);
+    await _storage.write(
+        key: _kWrappedKeyName, value: base64Encode(wrapped));
+    zeroBuffer(masterKey);
+    final dukB64 = base64Encode(duk);
+    zeroBuffer(duk);
+    return dukB64;
+  }
+
+  /// Handles the remote unlock request from the mobile device. The phone sends
+  /// its DUK (one-time unlock token); we use it to decrypt the stored wrapped
+  /// master key and emit `remote_unlock_key:<base64 key>` for the UnlockScreen.
+  /// The master PASSWORD never travels nor is stored.
   Future<void> _handleWifiUnlock(
       WebSocketChannel ws, Map<String, dynamic> msg, _ServerPeer peer) async {
     try {
-      final masterPassword = msg['master_password'] as String?;
+      final dukB64 = msg['duk'] as String?;
+      final wrappedB64 = await _storage.read(key: _kWrappedKeyName);
 
-      if (masterPassword == null || masterPassword.isEmpty) {
+      if (dukB64 == null || dukB64.isEmpty || wrappedB64 == null) {
         await _sendEncryptedMessage(ws, {
           'action': 'wifi_unlock_response',
-          'payload': {'success': false, 'error': 'Missing master password'},
+          'payload': {'success': false, 'error': 'not_registered'},
         }, peer);
         return;
       }
 
-      // Emit the event for the desktop UI to unlock.
-      // The UnlockScreen listener will pick this up.
-      _serverEventController.add('remote_unlock:$masterPassword');
+      final duk = base64Decode(dukB64);
+      final wrapped = base64Decode(wrappedB64);
+      final masterKey = await _securityService.decrypt(wrapped, duk);
+      zeroBuffer(duk);
 
-      // Respond to mobile that the unlock request was forwarded.
+      // Emit the event for the desktop UI to unlock with the raw key.
+      _serverEventController.add('remote_unlock_key:${base64Encode(masterKey)}');
+      zeroBuffer(masterKey);
+
       await _sendEncryptedMessage(ws, {
         'action': 'wifi_unlock_response',
         'payload': {'success': true},
@@ -422,7 +457,7 @@ class SyncService {
       debugPrint('[SyncService] WiFi unlock error: $e');
       await _sendEncryptedMessage(ws, {
         'action': 'wifi_unlock_response',
-        'payload': {'success': false, 'error': 'Server error'},
+        'payload': {'success': false, 'error': 'server_error'},
       }, peer);
     }
   }
@@ -542,6 +577,13 @@ class SyncService {
               // NOTE: We no longer adopt the remote MasterKeyConfig. Each device
               // keeps its own salt/master key; payloads are re-keyed in transit
               // (DeltaSyncManager). Adopting a foreign salt corrupted local data.
+
+              // WiFi-unlock: store the DUK (one-time unlock token) the desktop
+              // issued, so this phone can later unlock it without the password.
+              final duk = data['duk'] as String?;
+              if (duk != null && duk.isNotEmpty) {
+                await _storage.write(key: _kRemoteUnlockToken, value: duk);
+              }
 
               _clientEventController.add('paired');
               responseCompleter.complete(true);
@@ -725,16 +767,23 @@ class SyncService {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // MOBILE: WiFi Unlock (Send master password to desktop)
+  // MOBILE: WiFi Unlock (send the one-time DUK token, never the password)
   // ─────────────────────────────────────────────────────────────────────────
 
-  /// Sends a remote unlock request from mobile to the paired desktop.
-  ///
-  /// The master password is retrieved from secure storage (stored when
-  /// biometric lock was enabled), encrypted with K_sync via AES-256-GCM,
-  /// and sent over the E2EE WebSocket channel. The password buffer is
-  /// zeroed immediately after encryption.
-  Future<bool> sendRemoteUnlockRequest(String masterPassword) async {
+  /// True if this phone holds a WiFi-unlock token (DUK) for the paired desktop.
+  Future<bool> hasRemoteUnlockToken() async =>
+      (await _storage.read(key: _kRemoteUnlockToken)) != null;
+
+  /// Sends a remote unlock request: transmits the stored DUK over the E2EE
+  /// channel so the desktop can decrypt its own master key. The master password
+  /// is never sent nor stored on the phone.
+  Future<bool> sendRemoteUnlockRequest() async {
+    final duk = await _storage.read(key: _kRemoteUnlockToken);
+    if (duk == null) {
+      _clientEventController.add('error: no_token');
+      return false;
+    }
+
     if (_syncKey == null) {
       final saved = await _storage.read(key: _kSyncKeyName);
       if (saved != null) {
@@ -754,9 +803,8 @@ class SyncService {
     try {
       await _sendEncryptedClientMessage({
         'action': 'wifi_unlock',
-        'master_password': masterPassword,
+        'duk': duk,
       });
-
       return true;
     } catch (e) {
       _clientEventController.add('error: WiFi unlock failed: $e');
@@ -823,6 +871,8 @@ class SyncService {
   Future<void> removePairingKey() async {
     await _storage.delete(key: _kSyncKeyName);
     await _storage.delete(key: _kSyncDevicesName);
+    await _storage.delete(key: _kWrappedKeyName);
+    await _storage.delete(key: _kRemoteUnlockToken);
     for (final p in _peers) {
       if (p.key != null) zeroBuffer(p.key!);
     }

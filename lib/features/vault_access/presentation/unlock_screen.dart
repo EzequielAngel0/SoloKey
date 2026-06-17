@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -95,9 +96,11 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       _remoteUnlockSub = syncService.serverEvents.listen((event) {
         if (!mounted) return;
 
-        if (event.startsWith('remote_unlock:')) {
-          final password = event.replaceFirst('remote_unlock:', '');
-          _handleRemoteUnlock(password);
+        // WiFi-unlock: the desktop already decrypted its master key from the
+        // phone's DUK and emits it (base64) here — never a password.
+        if (event.startsWith('remote_unlock_key:')) {
+          final keyB64 = event.replaceFirst('remote_unlock_key:', '');
+          _handleRemoteUnlock(keyB64);
         }
       });
     } catch (_) {
@@ -105,17 +108,17 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
   }
 
-  /// Handles the remote unlock by using the received password to unlock
-  /// the vault. The password string is wiped from memory immediately after
-  /// it's consumed by the unlock use case.
-  Future<void> _handleRemoteUnlock(String password) async {
+  /// Handles the remote unlock with the raw master key (base64) decrypted from
+  /// the phone's DUK. The key buffer is zeroed right after the use case stores it.
+  Future<void> _handleRemoteUnlock(String keyB64) async {
     if (_isRemoteUnlocking || !mounted) return;
 
     setState(() => _isRemoteUnlocking = true);
 
     try {
-      // Use the received password to unlock
-      await ref.read(vaultNotifierProvider.notifier).unlock(password);
+      final key = Uint8List.fromList(base64Decode(keyB64));
+      await ref.read(vaultNotifierProvider.notifier).unlockWithRawKey(key);
+      key.fillRange(0, key.length, 0);
 
       if (!mounted) return;
 
