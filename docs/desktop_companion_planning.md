@@ -90,7 +90,7 @@ Para maximizar la comodidad del usuario sin comprometer la seguridad (evitando e
 Para asegurar un desarrollo incremental controlado, se propone dividir el desarrollo en 3 fases:
 
 ### Fase 1: Core de Escritorio Local (Independiente)
-*   Habilitar compilación de Flutter para Desktop (Windows/macOS) en el repositorio actual.
+*   Habilitar compilación de Flutter para Desktop (Windows/macOS/Linux) en el repositorio actual.
 *   Configurar persistencia con Drift (SQLite) en directorios locales seguros (`AppData` / `Application Support`).
 *   Implementar integración nativa con el almacenamiento de claves seguro del SO para resguardar la sal y la clave local.
 *   Importar las pantallas de Login, Desbloqueo y Formulario adaptadas a layouts responsivos (Master-Detail).
