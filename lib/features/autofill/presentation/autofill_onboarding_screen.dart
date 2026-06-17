@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../app/di/injection.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../infrastructure/autofill_settings_service.dart';
@@ -61,8 +62,9 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
-      appBar: const VaultAppBar(title: 'Autocompletado'),
+      appBar: VaultAppBar(title: l10n.autofillOnboardingTitle),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(
@@ -81,8 +83,8 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
             // Title
             Text(
               _isEnabled
-                  ? '¡SoloKey está activo!'
-                  : 'Activa el autocompletado',
+                  ? l10n.autofillActiveTitle
+                  : l10n.autofillEnableTitle,
               style: TextStyle(
                 color: palette.textPrimary,
                 fontSize: 22,
@@ -94,11 +96,7 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
             const SizedBox(height: 12),
 
             Text(
-              _isEnabled
-                  ? 'SoloKey completará automáticamente tus contraseñas en\n'
-                    'cualquier app o navegador de tu dispositivo.'
-                  : 'Permite que SoloKey complete tus contraseñas\n'
-                    'automáticamente en apps y navegadores.',
+              _isEnabled ? l10n.autofillActiveDesc : l10n.autofillEnableDesc,
               style: TextStyle(
                 color: palette.textMuted,
                 fontSize: 14,
@@ -114,7 +112,7 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
               ElevatedButton.icon(
                 onPressed: _openSettings,
                 icon: const Icon(Icons.open_in_new_rounded, size: 18),
-                label: const Text('Abrir ajustes de Autocompletado'),
+                label: Text(l10n.autofillOpenSettings),
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size.fromHeight(52),
                   backgroundColor: palette.accent,
@@ -128,7 +126,7 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
               TextButton(
                 onPressed: _checkStatus,
                 child: Text(
-                  'Ya lo activé, verificar estado',
+                  l10n.autofillVerifyStatus,
                   style: TextStyle(color: palette.textMuted),
                 ),
               ),
@@ -136,19 +134,19 @@ class _AutofillOnboardingScreenState extends State<AutofillOnboardingScreen>
 
             if (_isEnabled) ...[
               const SizedBox(height: 32),
-              const _FeatureChip(
+              _FeatureChip(
                 icon: Icons.bolt_rounded,
-                label: 'Detección automática de formularios de login',
+                label: l10n.autofillFeatureDetection,
               ),
               const SizedBox(height: 10),
-              const _FeatureChip(
+              _FeatureChip(
                 icon: Icons.fingerprint_rounded,
-                label: 'Pide tu huella antes de rellenar (biometría)',
+                label: l10n.autofillFeatureBiometric,
               ),
               const SizedBox(height: 10),
-              const _FeatureChip(
+              _FeatureChip(
                 icon: Icons.shield_rounded,
-                label: 'Credenciales nunca expuestas al SO',
+                label: l10n.autofillFeatureNeverExposed,
               ),
             ],
           ],
@@ -180,8 +178,9 @@ class _StatusBadge extends StatelessWidget {
         ),
       );
     }
+    final l10n = AppLocalizations.of(context);
     final color = enabled ? palette.success : palette.danger;
-    final label = enabled ? 'Activo' : 'Inactivo';
+    final label = enabled ? l10n.autofillStatusActive : l10n.autofillStatusInactive;
     final icon  = enabled ? Icons.check_circle_rounded : Icons.cancel_rounded;
 
     return Center(
@@ -272,22 +271,11 @@ class _StepList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final steps = [
-      (
-        '1',
-        'Toca "Abrir ajustes de Autocompletado"',
-        'Se abrirá la configuración del sistema',
-      ),
-      (
-        '2',
-        'Selecciona "SoloKey" como proveedor',
-        'Busca SoloKey en la lista de apps',
-      ),
-      (
-        '3',
-        'Confirma y regresa a la app',
-        'El autocompletado quedará activado',
-      ),
+      ('1', l10n.autofillStep1Title, l10n.autofillStep1Sub),
+      ('2', l10n.autofillStep2Title, l10n.autofillStep2Sub),
+      ('3', l10n.autofillStep3Title, l10n.autofillStep3Sub),
     ];
 
     return Column(

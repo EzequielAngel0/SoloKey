@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
 import '../../../theme/app_palette.dart';
 import '../../credentials/application/credentials_provider.dart';
@@ -74,6 +75,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final credentialsAsync = ref.watch(credentialsNotifierProvider);
 
     return Scaffold(
@@ -83,7 +85,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
         elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.close_rounded, color: palette.textMuted),
-          tooltip: 'Cerrar (Esc)',
+          tooltip: l10n.quickFillCloseTooltip,
           onPressed: _close,
         ),
         title: Row(
@@ -91,7 +93,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
             Icon(Icons.bolt_rounded, color: palette.accent, size: 20),
             const SizedBox(width: 8),
             Text(
-              'Autocompletado rápido',
+              l10n.quickFillTitle,
               style: TextStyle(
                 color: palette.textPrimary,
                 fontSize: 16,
@@ -115,13 +117,13 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
                   credentialsAsync.asData?.value ?? const [],
                 );
                 if (list.isNotEmpty) {
-                  _copy('Contraseña', list.first.password ?? '');
+                  _copy(l10n.fieldPassword, list.first.password ?? '');
                 }
               },
               onChanged: (v) => setState(() => _query = v),
               style: TextStyle(color: palette.textPrimary),
               decoration: InputDecoration(
-                hintText: 'Buscar credencial…',
+                hintText: l10n.quickFillSearchHint,
                 hintStyle: TextStyle(color: palette.textMuted),
                 prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted),
                 filled: true,
@@ -138,7 +140,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
               loading: () => const Center(child: CircularProgressIndicator()),
               error: (e, _) => Center(
                 child: Text(
-                  'No se pudieron cargar las credenciales',
+                  l10n.quickFillLoadError,
                   style: TextStyle(color: palette.textMuted),
                 ),
               ),
@@ -147,7 +149,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
                 if (list.isEmpty) {
                   return Center(
                     child: Text(
-                      'Sin coincidencias',
+                      l10n.quickFillNoMatches,
                       style: TextStyle(color: palette.textMuted),
                     ),
                   );
@@ -159,9 +161,9 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
                   itemBuilder: (_, i) => _QuickFillTile(
                     credential: list[i],
                     onCopyUser: () =>
-                        _copy('Usuario', list[i].username ?? ''),
+                        _copy(l10n.fieldUsername, list[i].username ?? ''),
                     onCopyPassword: () =>
-                        _copy('Contraseña', list[i].password ?? ''),
+                        _copy(l10n.fieldPassword, list[i].password ?? ''),
                   ),
                 );
               },
@@ -170,7 +172,7 @@ class _QuickFillScreenState extends ConsumerState<QuickFillScreen> {
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Copia el dato y pégalo (Ctrl+V) en el campo · se limpia solo del portapapeles',
+              l10n.quickFillFooter,
               textAlign: TextAlign.center,
               style: TextStyle(color: palette.textMuted, fontSize: 11),
             ),
@@ -195,6 +197,7 @@ class _QuickFillTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final hasUser = (credential.username ?? '').isNotEmpty;
     final hasPass = (credential.password ?? '').isNotEmpty;
 
@@ -239,13 +242,13 @@ class _QuickFillTile extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.person_outline_rounded, size: 20),
             color: palette.textMuted,
-            tooltip: 'Copiar usuario',
+            tooltip: l10n.quickFillCopyUser,
             onPressed: hasUser ? onCopyUser : null,
           ),
           IconButton(
             icon: const Icon(Icons.key_outlined, size: 20),
             color: palette.accent,
-            tooltip: 'Copiar contraseña',
+            tooltip: l10n.quickFillCopyPassword,
             onPressed: hasPass ? onCopyPassword : null,
           ),
         ],

@@ -449,4 +449,88 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recoveryCodeSavedContinue => 'Ya lo guardé, continuar';
+
+  @override
+  String get autofillOnboardingTitle => 'Autocompletado';
+
+  @override
+  String get autofillActiveTitle => '¡SoloKey está activo!';
+
+  @override
+  String get autofillEnableTitle => 'Activa el autocompletado';
+
+  @override
+  String get autofillActiveDesc =>
+      'SoloKey completará automáticamente tus contraseñas en cualquier app o navegador de tu dispositivo.';
+
+  @override
+  String get autofillEnableDesc =>
+      'Permite que SoloKey complete tus contraseñas automáticamente en apps y navegadores.';
+
+  @override
+  String get autofillOpenSettings => 'Abrir ajustes de Autocompletado';
+
+  @override
+  String get autofillVerifyStatus => 'Ya lo activé, verificar estado';
+
+  @override
+  String get autofillFeatureDetection =>
+      'Detección automática de formularios de login';
+
+  @override
+  String get autofillFeatureBiometric =>
+      'Pide tu huella antes de rellenar (biometría)';
+
+  @override
+  String get autofillFeatureNeverExposed =>
+      'Credenciales nunca expuestas al SO';
+
+  @override
+  String get autofillStatusActive => 'Activo';
+
+  @override
+  String get autofillStatusInactive => 'Inactivo';
+
+  @override
+  String get autofillStep1Title => 'Toca \"Abrir ajustes de Autocompletado\"';
+
+  @override
+  String get autofillStep1Sub => 'Se abrirá la configuración del sistema';
+
+  @override
+  String get autofillStep2Title => 'Selecciona \"SoloKey\" como proveedor';
+
+  @override
+  String get autofillStep2Sub => 'Busca SoloKey en la lista de apps';
+
+  @override
+  String get autofillStep3Title => 'Confirma y regresa a la app';
+
+  @override
+  String get autofillStep3Sub => 'El autocompletado quedará activado';
+
+  @override
+  String get quickFillTitle => 'Autocompletado rápido';
+
+  @override
+  String get quickFillCloseTooltip => 'Cerrar (Esc)';
+
+  @override
+  String get quickFillSearchHint => 'Buscar credencial…';
+
+  @override
+  String get quickFillLoadError => 'No se pudieron cargar las credenciales';
+
+  @override
+  String get quickFillNoMatches => 'Sin coincidencias';
+
+  @override
+  String get quickFillFooter =>
+      'Copia el dato y pégalo (Ctrl+V) en el campo · se limpia solo del portapapeles';
+
+  @override
+  String get quickFillCopyUser => 'Copiar usuario';
+
+  @override
+  String get quickFillCopyPassword => 'Copiar contraseña';
 }

@@ -446,4 +446,87 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryCodeSavedContinue => 'I saved it, continue';
+
+  @override
+  String get autofillOnboardingTitle => 'Autofill';
+
+  @override
+  String get autofillActiveTitle => 'SoloKey is active!';
+
+  @override
+  String get autofillEnableTitle => 'Enable autofill';
+
+  @override
+  String get autofillActiveDesc =>
+      'SoloKey will automatically fill your passwords in any app or browser on your device.';
+
+  @override
+  String get autofillEnableDesc =>
+      'Let SoloKey fill your passwords automatically in apps and browsers.';
+
+  @override
+  String get autofillOpenSettings => 'Open Autofill settings';
+
+  @override
+  String get autofillVerifyStatus => 'I enabled it, check status';
+
+  @override
+  String get autofillFeatureDetection => 'Automatic login form detection';
+
+  @override
+  String get autofillFeatureBiometric =>
+      'Asks for your fingerprint before filling (biometrics)';
+
+  @override
+  String get autofillFeatureNeverExposed =>
+      'Credentials never exposed to the OS';
+
+  @override
+  String get autofillStatusActive => 'Active';
+
+  @override
+  String get autofillStatusInactive => 'Inactive';
+
+  @override
+  String get autofillStep1Title => 'Tap \"Open Autofill settings\"';
+
+  @override
+  String get autofillStep1Sub => 'The system settings will open';
+
+  @override
+  String get autofillStep2Title => 'Select \"SoloKey\" as the provider';
+
+  @override
+  String get autofillStep2Sub => 'Find SoloKey in the list of apps';
+
+  @override
+  String get autofillStep3Title => 'Confirm and return to the app';
+
+  @override
+  String get autofillStep3Sub => 'Autofill will be enabled';
+
+  @override
+  String get quickFillTitle => 'Quick-Fill';
+
+  @override
+  String get quickFillCloseTooltip => 'Close (Esc)';
+
+  @override
+  String get quickFillSearchHint => 'Search credential…';
+
+  @override
+  String get quickFillLoadError => 'Could not load credentials';
+
+  @override
+  String get quickFillNoMatches => 'No matches';
+
+  @override
+  String get quickFillFooter =>
+      'Copy the value and paste it (Ctrl+V) into the field · it clears itself from the clipboard';
+
+  @override
+  String get quickFillCopyUser => 'Copy username';
+
+  @override
+  String get quickFillCopyPassword => 'Copy password';
 }

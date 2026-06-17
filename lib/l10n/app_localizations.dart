@@ -907,6 +907,162 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I saved it, continue'**
   String get recoveryCodeSavedContinue;
+
+  /// No description provided for @autofillOnboardingTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill'**
+  String get autofillOnboardingTitle;
+
+  /// No description provided for @autofillActiveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'SoloKey is active!'**
+  String get autofillActiveTitle;
+
+  /// No description provided for @autofillEnableTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enable autofill'**
+  String get autofillEnableTitle;
+
+  /// No description provided for @autofillActiveDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'SoloKey will automatically fill your passwords in any app or browser on your device.'**
+  String get autofillActiveDesc;
+
+  /// No description provided for @autofillEnableDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Let SoloKey fill your passwords automatically in apps and browsers.'**
+  String get autofillEnableDesc;
+
+  /// No description provided for @autofillOpenSettings.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Autofill settings'**
+  String get autofillOpenSettings;
+
+  /// No description provided for @autofillVerifyStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'I enabled it, check status'**
+  String get autofillVerifyStatus;
+
+  /// No description provided for @autofillFeatureDetection.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic login form detection'**
+  String get autofillFeatureDetection;
+
+  /// No description provided for @autofillFeatureBiometric.
+  ///
+  /// In en, this message translates to:
+  /// **'Asks for your fingerprint before filling (biometrics)'**
+  String get autofillFeatureBiometric;
+
+  /// No description provided for @autofillFeatureNeverExposed.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials never exposed to the OS'**
+  String get autofillFeatureNeverExposed;
+
+  /// No description provided for @autofillStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get autofillStatusActive;
+
+  /// No description provided for @autofillStatusInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get autofillStatusInactive;
+
+  /// No description provided for @autofillStep1Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap \"Open Autofill settings\"'**
+  String get autofillStep1Title;
+
+  /// No description provided for @autofillStep1Sub.
+  ///
+  /// In en, this message translates to:
+  /// **'The system settings will open'**
+  String get autofillStep1Sub;
+
+  /// No description provided for @autofillStep2Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Select \"SoloKey\" as the provider'**
+  String get autofillStep2Title;
+
+  /// No description provided for @autofillStep2Sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Find SoloKey in the list of apps'**
+  String get autofillStep2Sub;
+
+  /// No description provided for @autofillStep3Title.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm and return to the app'**
+  String get autofillStep3Title;
+
+  /// No description provided for @autofillStep3Sub.
+  ///
+  /// In en, this message translates to:
+  /// **'Autofill will be enabled'**
+  String get autofillStep3Sub;
+
+  /// No description provided for @quickFillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick-Fill'**
+  String get quickFillTitle;
+
+  /// No description provided for @quickFillCloseTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Close (Esc)'**
+  String get quickFillCloseTooltip;
+
+  /// No description provided for @quickFillSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search credential…'**
+  String get quickFillSearchHint;
+
+  /// No description provided for @quickFillLoadError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load credentials'**
+  String get quickFillLoadError;
+
+  /// No description provided for @quickFillNoMatches.
+  ///
+  /// In en, this message translates to:
+  /// **'No matches'**
+  String get quickFillNoMatches;
+
+  /// No description provided for @quickFillFooter.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy the value and paste it (Ctrl+V) into the field · it clears itself from the clipboard'**
+  String get quickFillFooter;
+
+  /// No description provided for @quickFillCopyUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy username'**
+  String get quickFillCopyUser;
+
+  /// No description provided for @quickFillCopyPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy password'**
+  String get quickFillCopyPassword;
 }
 
 class _AppLocalizationsDelegate
