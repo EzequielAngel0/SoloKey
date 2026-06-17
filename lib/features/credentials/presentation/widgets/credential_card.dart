@@ -10,6 +10,7 @@ import '../../../../core/utils/auth_helper.dart';
 import '../../../../router/app_router.dart';
 import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
+import 'credential_icon.dart';
 import '../../../folders/application/folders_provider.dart';
 
 class CredentialCard extends ConsumerWidget {
@@ -280,14 +281,10 @@ class CredentialCard extends ConsumerWidget {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(
               children: [
-                Container(
-                  width: 46,
-                  height: 46,
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Icon(icon, color: color, size: 22),
+                CredentialIcon(
+                  credential: credential,
+                  defaultIcon: icon,
+                  color: color,
                 ),
                 const SizedBox(width: 14),
                 Expanded(
