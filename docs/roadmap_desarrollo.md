@@ -188,7 +188,14 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 ## 5. Seguridad (lote posterior)
 
-- ⬜ **Anti-fuerza bruta**: contador de intentos fallidos en `UnlockScreen` con bloqueo escalonado (backoff) y **wipe opcional** tras N intentos (configurable en Settings).
+- ✅ **Anti-fuerza bruta (2026-06-17)**: `BruteForceGuard` (`@lazySingleton`) cuenta intentos
+  fallidos y aplica **backoff escalonado persistido** en Keystore (sobrevive reinicios): 1-4
+  libres · 5º=15s · 6º=30s · 7º=60s · … duplicando hasta tope de 15min. El `UnlockVaultUseCase`
+  rechaza intentos durante el lockout (`VaultLockedOutException`), registra fallo/éxito, y si se
+  alcanza el umbral configurable hace **wipe** de la bóveda (`WipeVaultUseCase`: `db.wipeAllData()`
+  + `secureStorage.deleteAll()`). UI: banner de lockout con cuenta regresiva en `UnlockScreen` +
+  selector "Borrar bóveda tras N intentos" (Off/5/10/15/20) en Ajustes (`AppSecuritySettings.wipeAfterFailedAttempts`).
+  Lógica del backoff cubierta con unit tests (7).
 - ⬜ **Backup cifrado programado**: export `.skvault` automático al almacenamiento elegido por el usuario (no servidor propio), con `share_plus`/`file_picker` ya presentes.
 - ⬜ **Endurecer sync WiFi-unlock**: dejar de enviar la master password al escritorio; enviar un **token de desbloqueo de un solo uso**. Opcional: `wss://` con TLS autofirmado para ocultar metadata.
 
@@ -231,7 +238,7 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 8 | Escritorio: autostart al tray | 🔴 | Features C | ⬜ |
 | 9 | Escritorio: hotkey global | 🔴 | Features C | ⬜ |
 | 10 | Escritorio: instalador (Inno Setup, no MSIX) | 🔴 | Features C | ✅ |
-| 11 | Seguridad: anti-fuerza bruta | 🟡 | Features D | ⬜ |
+| 11 | Seguridad: anti-fuerza bruta | 🟡 | Features D | ✅ |
 | 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ⬜ |
 | 13 | Sync: endurecer WiFi-unlock (+wss) | 🟢 | Features D | ⬜ |
 | 14 | i18n (es/en) | 🟡 | Final | ⬜ |
