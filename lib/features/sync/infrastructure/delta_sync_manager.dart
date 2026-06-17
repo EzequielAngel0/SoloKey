@@ -2,7 +2,10 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
+import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
+import '../../../core/infrastructure/security/i_security_service.dart';
+import '../../../core/infrastructure/security/session_manager.dart';
 
 /// DTO exchanged over the E2EE WebSocket channel for delta-sync.
 /// Each item carries enough metadata for LWW comparison plus the
@@ -76,40 +79,50 @@ class DeltaSyncResult {
 /// **Conflict resolution:** Last-Write-Wins (LWW) on `updatedAt` timestamps.
 /// Tie-breaker: alphabetically smaller UUID wins (deterministic on both sides).
 class DeltaSyncManager {
-  DeltaSyncManager(this._db);
+  DeltaSyncManager(this._db, this._securityService, this._sessionManager);
 
   final AppDatabase _db;
+  final ISecurityService _securityService;
+  final SessionManager _sessionManager;
+
+  /// Returns the in-RAM master key, or throws if the vault is locked.
+  /// Required to re-encrypt credential payloads from the wire format to the
+  /// local vault key (and vice-versa). See [_credentialEntryToJson].
+  Uint8List _requireMasterKey() {
+    final key = _sessionManager.getKeyCopy();
+    if (key == null) {
+      throw StateError(
+          'La boveda debe estar desbloqueada para sincronizar credenciales.');
+    }
+    return key;
+  }
 
   // ─────────────────────────────────────────────────────────────────────────
   // Building the local manifest
   // ─────────────────────────────────────────────────────────────────────────
 
-  /// Builds a manifest of all local credential entries.
-  Future<List<SyncManifestItem>> buildCredentialManifest({
-    bool includeRowData = false,
-  }) async {
+  /// Builds a manifest of all local credential entries. The manifest only
+  /// carries `{id, updatedAt, isDeleted}`; full (re-keyed) rows are exchanged
+  /// later via the delta/push steps.
+  Future<List<SyncManifestItem>> buildCredentialManifest() async {
     final rows = await _db.credentialEntries.select().get();
     return rows.map((row) {
       return SyncManifestItem(
         id: row.id,
         updatedAt: row.updatedAt,
         isDeleted: false,
-        rowData: includeRowData ? _credentialEntryToJson(row) : null,
       );
     }).toList();
   }
 
   /// Builds a manifest of all local folder entries.
-  Future<List<SyncManifestItem>> buildFolderManifest({
-    bool includeRowData = false,
-  }) async {
+  Future<List<SyncManifestItem>> buildFolderManifest() async {
     final rows = await _db.folderEntries.select().get();
     return rows.map((row) {
       return SyncManifestItem(
         id: row.id,
         updatedAt: row.createdAt, // Folders use createdAt as the version field
         isDeleted: false,
-        rowData: includeRowData ? _folderEntryToJson(row) : null,
       );
     }).toList();
   }
@@ -164,7 +177,7 @@ class DeltaSyncManager {
             id: local.id,
             updatedAt: local.updatedAt,
             isDeleted: false,
-            rowData: _credentialEntryToJson(local),
+            rowData: await _credentialEntryToJson(local),
           ));
         }
       }
@@ -177,7 +190,7 @@ class DeltaSyncManager {
           id: entry.value.id,
           updatedAt: entry.value.updatedAt,
           isDeleted: false,
-          rowData: _credentialEntryToJson(entry.value),
+          rowData: await _credentialEntryToJson(entry.value),
         ));
       }
     }
@@ -261,11 +274,37 @@ class DeltaSyncManager {
         continue;
       }
 
-      final companion = _jsonToCredentialCompanion(item.rowData!);
+      final companion = await _jsonToCredentialCompanion(item.rowData!);
       await _db.credentialDao.upsert(companion);
       applied++;
     }
     return applied;
+  }
+
+  /// Builds a single push item for a requested credential id, re-keying its
+  /// payload to the wire format. Returns null if the row no longer exists.
+  Future<SyncManifestItem?> buildCredentialPushItem(String id) async {
+    final row = await _db.credentialDao.getById(id);
+    if (row == null) return null;
+    return SyncManifestItem(
+      id: row.id,
+      updatedAt: row.updatedAt,
+      isDeleted: false,
+      rowData: await _credentialEntryToJson(row),
+    );
+  }
+
+  /// Builds a single push item for a requested folder id. Folders are not
+  /// encrypted, so no re-keying is needed.
+  Future<SyncManifestItem?> buildFolderPushItem(String id) async {
+    final row = await _db.folderDao.getById(id);
+    if (row == null) return null;
+    return SyncManifestItem(
+      id: row.id,
+      updatedAt: row.createdAt,
+      isDeleted: false,
+      rowData: _folderEntryToJson(row),
+    );
   }
 
   /// Applies a list of full folder rows received from the remote device.
@@ -310,24 +349,45 @@ class DeltaSyncManager {
   // Row ↔ JSON serialization helpers
   // ─────────────────────────────────────────────────────────────────────────
 
-  Map<String, dynamic> _credentialEntryToJson(CredentialEntry row) => {
-        'id': row.id,
-        'title': row.title,
-        'type': row.type,
-        'category_id': row.categoryId,
-        'folder_id': row.folderId,
-        'is_favorite': row.isFavorite,
-        'is_double_encrypted': row.isDoubleEncrypted,
-        'encrypted_payload': base64Encode(row.encryptedPayload),
-        'created_at': row.createdAt,
-        'updated_at': row.updatedAt,
-        'rotation_interval': row.rotationInterval,
-        'custom_rotation_days': row.customRotationDays,
-        'last_rotation_prompted_at': row.lastRotationPromptedAt,
-      };
+  /// Serializes a credential row for the wire. The encrypted payload is
+  /// **re-keyed**: decrypted with the LOCAL master key and sent as `payload_plain`
+  /// (plaintext bytes, base64). The whole sync message is itself AES-256-GCM
+  /// encrypted with K_sync over the wire, so the plaintext never travels in the
+  /// clear. The receiver re-encrypts it under ITS own master key. This decouples
+  /// the two devices' vault keys (they have different random salts) so a synced
+  /// credential is always decryptable on the device that stores it.
+  Future<Map<String, dynamic>> _credentialEntryToJson(
+      CredentialEntry row) async {
+    final key = _requireMasterKey();
+    final plain = await _securityService.decrypt(row.encryptedPayload, key);
+    final payloadPlain = base64Encode(plain);
+    zeroBuffer(key);
+    zeroBuffer(plain);
+    return {
+      'id': row.id,
+      'title': row.title,
+      'type': row.type,
+      'category_id': row.categoryId,
+      'folder_id': row.folderId,
+      'is_favorite': row.isFavorite,
+      'is_double_encrypted': row.isDoubleEncrypted,
+      'payload_plain': payloadPlain,
+      'created_at': row.createdAt,
+      'updated_at': row.updatedAt,
+      'rotation_interval': row.rotationInterval,
+      'custom_rotation_days': row.customRotationDays,
+      'last_rotation_prompted_at': row.lastRotationPromptedAt,
+    };
+  }
 
-  CredentialEntriesCompanion _jsonToCredentialCompanion(
-      Map<String, dynamic> json) {
+  Future<CredentialEntriesCompanion> _jsonToCredentialCompanion(
+      Map<String, dynamic> json) async {
+    final key = _requireMasterKey();
+    final plain = Uint8List.fromList(
+        base64Decode(json['payload_plain'] as String));
+    final encryptedPayload = await _securityService.encrypt(plain, key);
+    zeroBuffer(key);
+    zeroBuffer(plain);
     return CredentialEntriesCompanion(
       id: Value(json['id'] as String),
       title: Value(json['title'] as String),
@@ -336,8 +396,7 @@ class DeltaSyncManager {
       folderId: Value(json['folder_id'] as String?),
       isFavorite: Value(json['is_favorite'] as bool? ?? false),
       isDoubleEncrypted: Value(json['is_double_encrypted'] as bool? ?? false),
-      encryptedPayload:
-          Value(Uint8List.fromList(base64Decode(json['encrypted_payload'] as String))),
+      encryptedPayload: Value(encryptedPayload),
       createdAt: Value(json['created_at'] as int),
       updatedAt: Value(json['updated_at'] as int),
       rotationInterval: Value(json['rotation_interval'] as String? ?? 'none'),

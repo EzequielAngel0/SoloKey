@@ -16,19 +16,19 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
-import '../../vault_access/domain/entities/master_key_config.dart';
-import '../../vault_access/domain/repositories/i_vault_repository.dart';
+import '../../../core/infrastructure/security/session_manager.dart';
 import '../domain/pairing_payload.dart';
 import 'delta_sync_manager.dart';
 
 @lazySingleton
 class SyncService {
-  SyncService(this._storage, this._db, this._securityService, this._vaultRepo);
+  SyncService(
+      this._storage, this._db, this._securityService, this._sessionManager);
 
   final FlutterSecureStorage _storage;
   final AppDatabase _db;
   final ISecurityService _securityService;
-  final IVaultRepository _vaultRepo;
+  final SessionManager _sessionManager;
 
   static const String _serviceType = '_solokey-sync._tcp';
   static const String _kSyncKeyName = 'solokey_sync_key';
@@ -53,7 +53,8 @@ class SyncService {
   bool get isServerRunning => _server != null;
   bool get isClientConnected => _clientChannel != null;
 
-  late final DeltaSyncManager _deltaSyncManager = DeltaSyncManager(_db);
+  late final DeltaSyncManager _deltaSyncManager =
+      DeltaSyncManager(_db, _securityService, _sessionManager);
 
   // ───────────────────────────────────────────────────────────────────────────
   // DESKTOP: Server Operations
@@ -200,18 +201,14 @@ class SyncService {
         secretKey: crypto.SecretKey(_syncKey!),
       );
 
-      // Include MasterKeyConfig so the remote device derives the same
-      // vault master key (same salt + KDF params → same AES key).
-      final masterConfig = await _vaultRepo.getMasterKeyConfig();
-      final responsePayload = <String, dynamic>{
+      // NOTE: We intentionally DO NOT share the MasterKeyConfig. Each device
+      // keeps its own salt/master key; credential payloads are re-keyed in
+      // transit (see DeltaSyncManager). Adopting a foreign salt would make the
+      // device's pre-existing credentials undecryptable.
+      ws.sink.add(jsonEncode({
         'type': 'ecdh_response',
         'signature': base64Encode(responseMac.bytes),
-      };
-      if (masterConfig != null) {
-        responsePayload['master_key_config'] = masterConfig.toJson();
-      }
-
-      ws.sink.add(jsonEncode(responsePayload));
+      }));
       _serverEventController.add('paired');
     } else {
       ws.sink.add(jsonEncode(
@@ -503,15 +500,9 @@ class SyncService {
                   key: _kSyncKeyName,
                   value: base64Encode(_syncKey!));
 
-              // Adopt the server's MasterKeyConfig so both devices
-              // derive the same vault AES key from the same salt.
-              final remoteConfig = data['master_key_config'];
-              if (remoteConfig != null) {
-                final config = MasterKeyConfig.fromJson(
-                    remoteConfig as Map<String, dynamic>);
-                await _vaultRepo.saveMasterKeyConfig(config);
-                debugPrint('[SyncService] Adopted remote MasterKeyConfig');
-              }
+              // NOTE: We no longer adopt the remote MasterKeyConfig. Each device
+              // keeps its own salt/master key; payloads are re-keyed in transit
+              // (DeltaSyncManager). Adopting a foreign salt corrupted local data.
 
               _clientEventController.add('paired');
               responseCompleter.complete(true);
@@ -648,28 +639,14 @@ class SyncService {
 
       final credsToSend = <SyncManifestItem>[];
       for (final id in requestedCredIds) {
-        final row = await _db.credentialDao.getById(id);
-        if (row != null) {
-          credsToSend.add(SyncManifestItem(
-            id: row.id,
-            updatedAt: row.updatedAt,
-            isDeleted: false,
-            rowData: _credentialEntryToJson(row),
-          ));
-        }
+        final item = await _deltaSyncManager.buildCredentialPushItem(id);
+        if (item != null) credsToSend.add(item);
       }
 
       final foldersToSend = <SyncManifestItem>[];
       for (final id in requestedFolderIds) {
-        final row = await _db.folderDao.getById(id);
-        if (row != null) {
-          foldersToSend.add(SyncManifestItem(
-            id: row.id,
-            updatedAt: row.createdAt,
-            isDeleted: false,
-            rowData: _folderEntryToJson(row),
-          ));
-        }
+        final item = await _deltaSyncManager.buildFolderPushItem(id);
+        if (item != null) foldersToSend.add(item);
       }
 
       // Push the requested rows to the server
@@ -885,36 +862,6 @@ class SyncService {
     return Uint8List.fromList(
         List.generate(size, (_) => random.nextInt(256)));
   }
-
-  // ─────────────────────────────────────────────────────────────────────────
-  // Row serialization helpers (reused from DeltaSyncManager for client-side)
-  // ─────────────────────────────────────────────────────────────────────────
-
-  Map<String, dynamic> _credentialEntryToJson(CredentialEntry row) => {
-        'id': row.id,
-        'title': row.title,
-        'type': row.type,
-        'category_id': row.categoryId,
-        'folder_id': row.folderId,
-        'is_favorite': row.isFavorite,
-        'is_double_encrypted': row.isDoubleEncrypted,
-        'encrypted_payload': base64Encode(row.encryptedPayload),
-        'created_at': row.createdAt,
-        'updated_at': row.updatedAt,
-        'rotation_interval': row.rotationInterval,
-        'custom_rotation_days': row.customRotationDays,
-        'last_rotation_prompted_at': row.lastRotationPromptedAt,
-      };
-
-  Map<String, dynamic> _folderEntryToJson(FolderEntry row) => {
-        'id': row.id,
-        'parent_id': row.parentId,
-        'name': row.name,
-        'icon': row.icon,
-        'color_hex': row.colorHex,
-        'is_favorite': row.isFavorite,
-        'created_at': row.createdAt,
-      };
 
   /// Dispose resources when the service is torn down.
   Future<void> dispose() async {
