@@ -6,6 +6,7 @@ import '../../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/extensions/color_extensions.dart';
+import '../../../../theme/app_palette.dart';
 import '../../../folders/application/folders_provider.dart';
 import '../../../folders/domain/entities/folder.dart';
 import '../../domain/entities/credential.dart';
@@ -35,6 +36,7 @@ class FolderListView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final rootFolders = folders.where((f) => f.parentId == null).toList();
     final noFolderCreds = credentials.where((c) => c.categoryId == null).toList();
 
@@ -47,11 +49,11 @@ class FolderListView extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.folder_open_rounded, size: 72, color: Color(0xFF2A2A4A)),
+                Icon(Icons.folder_open_rounded, size: 72, color: palette.textEmpty),
                 const SizedBox(height: 20),
-                const Text('Sin carpetas', style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w600)),
+                Text('Sin carpetas', style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.w600)),
                 const SizedBox(height: 8),
-                const Text('Organiza tus credenciales', style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14)),
+                Text('Organiza tus credenciales', style: TextStyle(color: palette.textMuted, fontSize: 14)),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
                   onPressed: () => _createFolder(context, ref, null),
@@ -75,8 +77,8 @@ class FolderListView extends ConsumerWidget {
             alignment: Alignment.centerRight,
             child: TextButton.icon(
               onPressed: () => _createFolder(context, ref, null),
-              icon: const Icon(Icons.create_new_folder_rounded, color: Color(0xFF6C63FF)),
-              label: const Text('Nueva carpeta raíz', style: TextStyle(color: Color(0xFF6C63FF))),
+              icon: Icon(Icons.create_new_folder_rounded, color: palette.accent),
+              label: Text('Nueva carpeta raíz', style: TextStyle(color: palette.accent)),
             ),
           ),
         ),
@@ -92,20 +94,20 @@ class FolderListView extends ConsumerWidget {
                   }
                 },
                 onLongPress: () => _showFolderOptionsSheet(context, ref, f),
-                tileColor: const Color(0xFF16213E),
+                tileColor: palette.card,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 leading: Icon(
-                  f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, 
-                  color: f.colorHex.toColor()
+                  f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded,
+                  color: f.colorHex.toColor(),
                 ),
-                title: Text(f.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF5C5C7A)),
+                title: Text(f.name, style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500)),
+                trailing: Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
               ),
             )),
         if (noFolderCreds.isNotEmpty)
-          const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Text('Sin carpeta asignada', style: TextStyle(color: Color(0xFF5C5C7A), fontSize: 13, fontWeight: FontWeight.bold)),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16),
+            child: Text('Sin carpeta asignada', style: TextStyle(color: palette.textDisabled, fontSize: 13, fontWeight: FontWeight.bold)),
           ),
         ...noFolderCreds.map((c) => Padding(
               padding: const EdgeInsets.only(bottom: 10),
@@ -116,16 +118,17 @@ class FolderListView extends ConsumerWidget {
   }
 
   Future<void> _createFolder(BuildContext context, WidgetRef ref, String? parentId) async {
+    final palette = context.palette;
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(
             labelText: 'Nombre de la carpeta',
             hintText: 'ej. Trabajo, Sociales…',
@@ -143,43 +146,45 @@ class FolderListView extends ConsumerWidget {
   }
 
   Future<void> _deleteFolder(BuildContext context, WidgetRef ref, Folder folder) async {
+    final palette = context.palette;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Eliminar carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Eliminar carpeta', style: TextStyle(color: palette.textPrimary)),
         content: Text(
           '¿Eliminar "${folder.name}"? Sus subcarpetas o credenciales quedarán liberadas.',
-          style: const TextStyle(color: Color(0xFF9E9EBF)),
+          style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Eliminar', style: TextStyle(color: Color(0xFFCF6679)))),
+          TextButton(onPressed: () => Navigator.pop(context, true), child: Text('Eliminar', style: TextStyle(color: palette.danger))),
         ],
       ),
     );
     if (confirmed == true) {
       await ref.read(foldersNotifierProvider.notifier).deleteFolder(folder.id);
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Carpeta eliminada'),
-          backgroundColor: Color(0xFF4CAF50),
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: const Text('Carpeta eliminada'),
+          backgroundColor: palette.success,
         ));
       }
     }
   }
 
   Future<void> _renameFolder(BuildContext context, WidgetRef ref, Folder folder) async {
+    final palette = context.palette;
     final ctrl = TextEditingController(text: folder.name);
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Renombrar carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Renombrar carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(labelText: 'Nuevo nombre'),
         ),
         actions: [

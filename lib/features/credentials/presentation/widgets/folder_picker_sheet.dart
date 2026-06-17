@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_palette.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../folders/application/folders_provider.dart';
 import '../../../folders/domain/entities/folder.dart';
@@ -14,16 +14,17 @@ class FolderPickerSheet extends ConsumerWidget {
   final String? selectedFolderId;
 
   Future<void> _createNewFolder(BuildContext context, WidgetRef ref, String? parentId) async {
+    final palette = context.palette;
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: AppColors.drawer,
-        title: const Text('Nueva carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Nueva carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(labelText: 'Nombre de la carpeta'),
         ),
         actions: [
@@ -39,6 +40,7 @@ class FolderPickerSheet extends ConsumerWidget {
   }
 
   Widget _buildNode(BuildContext context, WidgetRef ref, List<Folder> all, Folder f, int depth) {
+    final palette = context.palette;
     final sub = all.where((sub) => sub.parentId == f.id).toList();
     final isSelected = selectedFolderId == f.id;
     return Theme(
@@ -55,14 +57,14 @@ class FolderPickerSheet extends ConsumerWidget {
                 child: Text(
                   f.name,
                   style: TextStyle(
-                    color: isSelected ? AppColors.accent : Colors.white,
+                    color: isSelected ? palette.accent : palette.textPrimary,
                     fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
               ),
               if (isSelected) ...[
                 const SizedBox(width: 8),
-                const Icon(Icons.check_circle_rounded, color: AppColors.accent, size: 16),
+                Icon(Icons.check_circle_rounded, color: palette.accent, size: 16),
               ]
             ],
           ),
@@ -72,12 +74,12 @@ class FolderPickerSheet extends ConsumerWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             IconButton(
-              icon: const Icon(Icons.create_new_folder_outlined, color: AppColors.textMuted),
+              icon: Icon(Icons.create_new_folder_outlined, color: palette.textMuted),
               onPressed: () => _createNewFolder(context, ref, f.id),
               tooltip: 'Añadir subcarpeta',
             ),
             if (sub.isNotEmpty)
-              const Icon(Icons.expand_more, color: AppColors.textDisabled)
+              Icon(Icons.expand_more, color: palette.textDisabled)
             else
               const SizedBox(width: 24),
           ],
@@ -89,6 +91,7 @@ class FolderPickerSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
     final roots = folders.where((f) => f.parentId == null).toList();
 
@@ -102,29 +105,29 @@ class FolderPickerSheet extends ConsumerWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Seleccionar Carpeta', style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
+                Text('Seleccionar Carpeta', style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
                 TextButton.icon(
                   onPressed: () => _createNewFolder(context, ref, null),
-                  icon: const Icon(Icons.create_new_folder_rounded, color: AppColors.accent),
-                  label: const Text('Nueva raíz', style: TextStyle(color: AppColors.accent)),
+                  icon: Icon(Icons.create_new_folder_rounded, color: palette.accent),
+                  label: Text('Nueva raíz', style: TextStyle(color: palette.accent)),
                 ),
               ],
             ),
           ),
-          const Divider(color: AppColors.divider),
+          Divider(color: palette.divider),
           Expanded(
             child: ListView(
               children: [
                 ListTile(
-                  leading: const Icon(Icons.inventory_2_outlined, color: AppColors.textMuted),
+                  leading: Icon(Icons.inventory_2_outlined, color: palette.textMuted),
                   title: Text(
                     'Ninguna (Bóveda principal)',
                     style: TextStyle(
-                      color: selectedFolderId == null ? AppColors.accent : Colors.white,
+                      color: selectedFolderId == null ? palette.accent : palette.textPrimary,
                       fontWeight: selectedFolderId == null ? FontWeight.bold : FontWeight.normal,
                     ),
                   ),
-                  trailing: selectedFolderId == null ? const Icon(Icons.check_circle_rounded, color: AppColors.accent) : null,
+                  trailing: selectedFolderId == null ? Icon(Icons.check_circle_rounded, color: palette.accent) : null,
                   onTap: () => Navigator.pop(context, <String?>[null]),
                 ),
                 ...roots.map((r) => _buildNode(context, ref, folders, r, 0)),
