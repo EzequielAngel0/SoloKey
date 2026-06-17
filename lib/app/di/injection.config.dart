@@ -33,6 +33,7 @@ import '../../core/services/biometric_auth_service.dart' as _i455;
 import '../../core/services/csv_import_service.dart' as _i764;
 import '../../core/services/recovery_service.dart' as _i323;
 import '../../core/services/security_audit_service.dart' as _i400;
+import '../../core/services/ssh_key_generator_service.dart' as _i972;
 import '../../core/services/vault_export_service.dart' as _i332;
 import '../../features/credentials/application/credential_use_cases.dart'
     as _i472;
@@ -76,6 +77,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i455.BiometricAuthService>(
       () => _i455.BiometricAuthService(),
+    );
+    gh.lazySingleton<_i972.SshKeyGeneratorService>(
+      () => _i972.SshKeyGeneratorService(),
     );
     gh.lazySingleton<_i1023.ISecurityService>(
       () => _i1063.SecurityServiceImpl(),

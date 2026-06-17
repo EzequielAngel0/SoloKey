@@ -18,6 +18,7 @@ import 'widgets/favorite_toggle.dart';
 import 'widgets/folder_picker_sheet.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/double_envelope_service.dart';
+import '../../../core/services/ssh_key_generator_service.dart';
 
 class CredentialFormScreen extends ConsumerStatefulWidget {
   const CredentialFormScreen({super.key, this.existingId});
@@ -68,6 +69,8 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   bool _isDoubleEncrypted = false;
   final _secondaryPinCtrl = TextEditingController();
   bool _savePinBiometrically = false;
+
+  bool _isGeneratingSshKey = false;
 
   late AnimationController _saveAnimCtrl;
   late Animation<double> _saveScale;
@@ -448,6 +451,45 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         behavior: SnackBarBehavior.floating,
       ),
     );
+  }
+
+  Future<void> _generateSshKey() async {
+    setState(() => _isGeneratingSshKey = true);
+    HapticFeedback.mediumImpact();
+    try {
+      final generator = getIt<SshKeyGeneratorService>();
+      final result = await generator.generateEd25519KeyPair(
+        comment: _titleCtrl.text.trim().isEmpty
+            ? 'solokey-generated'
+            : _titleCtrl.text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-'),
+      );
+      if (mounted) {
+        setState(() {
+          _sshPrivateKeyCtrl.text = result.privateKey;
+          _sshPublicKeyCtrl.text = result.publicKey;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Row(
+              children: [
+                Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 8),
+                Text('Par de llaves Ed25519 generado'),
+              ],
+            ),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          ),
+        );
+      }
+    } catch (e) {
+      _showError('Error al generar la llave SSH.');
+    } finally {
+      if (mounted) {
+        setState(() => _isGeneratingSshKey = false);
+      }
+    }
   }
 
   @override
@@ -935,6 +977,30 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             if (val != null) setState(() => _sshKeyType = val);
           },
         ),
+        if (_sshKeyType == 'Ed25519') ...[
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: _isGeneratingSshKey
+                ? const Center(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      child: CircularProgressIndicator(color: AppColors.typeSshKey, strokeWidth: 2.5),
+                    ),
+                  )
+                : OutlinedButton.icon(
+                    onPressed: _generateSshKey,
+                    icon: const Icon(Icons.auto_awesome_rounded, size: 16),
+                    label: const Text('Generar par de llaves Ed25519'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.typeSshKey,
+                      side: const BorderSide(color: AppColors.typeSshKey, width: 1.5),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                  ),
+          ),
+        ],
         const SizedBox(height: 14),
         TextFormField(
           controller: _sshPrivateKeyCtrl,
