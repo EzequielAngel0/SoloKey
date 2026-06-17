@@ -55,3 +55,32 @@ CLAUDE.md
 GEMINI.md
 AGENTS.md
 assets/logo/Gemini_Generated_Image_7oldjg7oldjg7old.png
+
+# ── SoloKey: reglas anadidas por features desarrolladas ──
+
+# Seguridad: llaves de firma Android/iOS (NUNCA versionar)
+**/key.properties
+*.jks
+*.keystore
+*.p12
+*.pepk
+
+# Datos sensibles: bovedas exportadas / backups locales (export/import)
+*.skvault
+*.vgvault
+*.vault
+
+# Bases de datos locales y artefactos de pruebas (drift/sqlite)
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+vault_guard_db*
+
+# Flutter: companion deprecado de plugins
+.flutter-plugins
+
+# iOS / CocoaPods (para cuando se agregue soporte iOS)
+**/ios/Pods/
+**/ios/.symlinks/
+**/ios/Flutter/ephemeral/
