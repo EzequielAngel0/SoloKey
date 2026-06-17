@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
+import '../../../theme/app_palette.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../application/credentials_provider.dart';
@@ -49,12 +50,13 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
     final foldersAsync = ref.watch(foldersNotifierProvider);
 
     final credentials = credentialsAsync.valueOrNull ?? [];
     List<Credential> filtered = [];
-    
+
     if (_currentIndex == 0) {
       filtered = credentials;
     } else if (_currentIndex == 2) {
@@ -66,7 +68,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         title: 'SoloKey',
         actions: [
           IconButton(
-            icon: const Icon(Icons.lock_rounded, color: Color(0xFFCF6679)),
+            icon: Icon(Icons.lock_rounded, color: palette.danger),
             tooltip: 'Bloquear',
             onPressed: () {
               HapticFeedback.heavyImpact();
@@ -75,30 +77,30 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
             },
           ),
           PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert_rounded, color: Colors.white),
-            color: const Color(0xFF1A1A2E),
+            icon: Icon(Icons.more_vert_rounded, color: palette.textPrimary),
+            color: palette.drawer,
             onSelected: (val) {
               if (val == 'audit') context.push(AppRoutes.securityAudit);
               if (val == 'settings') context.push(AppRoutes.settings);
             },
             itemBuilder: (_) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'audit',
                 child: Row(
                   children: [
-                    Icon(Icons.security_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: 12),
-                    Text('Auditoría', style: TextStyle(color: Colors.white)),
+                    Icon(Icons.security_rounded, color: palette.textPrimary, size: 20),
+                    const SizedBox(width: 12),
+                    Text('Auditoría', style: TextStyle(color: palette.textPrimary)),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'settings',
                 child: Row(
                   children: [
-                    Icon(Icons.settings_rounded, color: Colors.white, size: 20),
-                    SizedBox(width: 12),
-                    Text('Ajustes', style: TextStyle(color: Colors.white)),
+                    Icon(Icons.settings_rounded, color: palette.textPrimary, size: 20),
+                    const SizedBox(width: 12),
+                    Text('Ajustes', style: TextStyle(color: palette.textPrimary)),
                   ],
                 ),
               ),
@@ -112,13 +114,13 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
             child: TextField(
               controller: _searchCtrl,
               onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: palette.textPrimary),
               decoration: InputDecoration(
                 hintText: 'Buscar credenciales…',
-                prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9E9EBF)),
+                prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted),
                 suffixIcon: _searchCtrl.text.isNotEmpty
                     ? IconButton(
-                        icon: const Icon(Icons.close_rounded, color: Color(0xFF9E9EBF)),
+                        icon: Icon(Icons.close_rounded, color: palette.textMuted),
                         onPressed: () {
                           _searchCtrl.clear();
                           ref.read(credentialSearchNotifierProvider.notifier).update('');
@@ -126,7 +128,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                       )
                     : null,
                 filled: true,
-                fillColor: const Color(0xFF16213E),
+                fillColor: palette.card,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -143,20 +145,20 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
               onPressed: _currentIndex == 1
                   ? () => _createRootFolder(context, ref)
                   : () => context.push(AppRoutes.credentialCreate),
-              backgroundColor: const Color(0xFF6C63FF),
+              backgroundColor: palette.accent,
               icon: Icon(
                 _currentIndex == 1 ? Icons.create_new_folder_rounded : Icons.add_rounded,
-                color: Colors.white,
+                color: palette.onPrimary,
               ),
               label: Text(
                 _currentIndex == 1 ? 'Carpeta' : 'Nueva',
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+                style: TextStyle(color: palette.onPrimary, fontWeight: FontWeight.w600),
               ),
             ),
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: const Color(0xFF0F0E17),
-        selectedItemColor: const Color(0xFF6C63FF),
-        unselectedItemColor: const Color(0xFF5C5C7A),
+        backgroundColor: palette.background,
+        selectedItemColor: palette.accent,
+        unselectedItemColor: palette.textDisabled,
         currentIndex: _currentIndex,
         onTap: (i) => setState(() => _currentIndex = i),
         items: const [
@@ -166,8 +168,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         ],
       ),
       body: RefreshIndicator(
-        color: const Color(0xFF6C63FF),
-        backgroundColor: const Color(0xFF1A1A2E),
+        color: palette.accent,
+        backgroundColor: palette.drawer,
         onRefresh: () async {
           await ref.read(credentialsNotifierProvider.notifier).refresh();
           await ref.read(foldersNotifierProvider.notifier).refresh();
@@ -178,7 +180,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                 ? Center(
                     child: Text(
                       'Error: ${credentialsAsync.error}',
-                      style: const TextStyle(color: Color(0xFFCF6679)),
+                      style: TextStyle(color: palette.danger),
                     ),
                   )
                 : (_currentIndex == 1)
@@ -202,16 +204,17 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   }
 
   Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {
+    final palette = context.palette;
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(
             labelText: 'Nombre de la carpeta',
             hintText: 'ej. Trabajo, Sociales…',
