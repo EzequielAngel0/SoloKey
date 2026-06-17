@@ -171,7 +171,18 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 - ⬜ **Autostart al tray**: `launch_at_startup` + arranque minimizado; toggle en Settings. Es lo que hace ÚTILES las notificaciones de rotación en desktop (hoy solo corren si la app está abierta).
 - ⬜ **Hotkey global tipo spotlight**: `hotkey_manager` para buscar/copiar sin abrir la ventana.
-- ⬜ **Instalador MSIX**: `msix` (dev dep) + config en `pubspec.yaml`; arregla ícono/título de los toasts de Windows y habilita distribución (requiere certificado para firmar).
+- ✅ **Instalador de escritorio (2026-06-17):** se evaluó MSIX vs Inno Setup y se eligió
+  **Inno Setup** para SoloKey. MSIX exige firma obligatoria (fricción de sideload) y
+  **virtualiza el almacenamiento** (la bóveda quedaría en el contenedor del paquete, en
+  ubicación distinta al `.exe`) — riesgoso para un vault local-first. Inno deja la app
+  **desempaquetada** (bóveda en `%APPDATA%`, igual que el `.exe`) y la firma es opcional.
+  - `installer/SoloKey.iss` (instalación **per-user**, sin UAC) → `dist/SoloKey-<ver>-setup.exe`.
+  - Ejecutable renombrado a **`SoloKey.exe`** (`windows/CMakeLists.txt: BINARY_NAME`) con
+    **ícono SoloKey** (`flutter_launcher_icons` `windows:` → `app_icon.ico`).
+  - **AUMID** fijado en el runner (`SetCurrentProcessExplicitAppUserModelID` +
+    `shell32.lib`) y en el acceso directo del instalador, para que los **toasts** de
+    rotación salgan con ícono/título "SoloKey" (lo único que MSIX hubiera dado gratis).
+  - Tooling: `build_release.ps1 -Target inno` (compila Windows + corre ISCC). MSIX removido.
 
 ---
 
@@ -219,7 +230,7 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 7 | Móvil: autofill inline + biometría | 🔴 | Features B | ⬜ |
 | 8 | Escritorio: autostart al tray | 🔴 | Features C | ⬜ |
 | 9 | Escritorio: hotkey global | 🔴 | Features C | ⬜ |
-| 10 | Escritorio: instalador MSIX | 🔴 | Features C | ⬜ |
+| 10 | Escritorio: instalador (Inno Setup, no MSIX) | 🔴 | Features C | ✅ |
 | 11 | Seguridad: anti-fuerza bruta | 🟡 | Features D | ⬜ |
 | 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ⬜ |
 | 13 | Sync: endurecer WiFi-unlock (+wss) | 🟢 | Features D | ⬜ |
