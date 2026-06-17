@@ -7,6 +7,7 @@ import '../../../core/services/recovery_service.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
+import '../../../theme/app_palette.dart';
 
 /// Recovery Step 1: Enter recovery code → unlock.
 /// Recovery Step 2: Set new master password.
@@ -86,9 +87,9 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
       await getIt<RecoveryService>().resetMasterPassword(pwd);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Contraseña maestra actualizada exitosamente'),
-            backgroundColor: Color(0xFF4CAF50),
+          SnackBar(
+            content: const Text('Contraseña maestra actualizada exitosamente'),
+            backgroundColor: context.palette.success,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -104,7 +105,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: VaultAppBar(title: 'Recuperar acceso'),
+      appBar: const VaultAppBar(title: 'Recuperar acceso'),
       body: AnimatedSwitcher(
         duration: const Duration(milliseconds: 350),
         child: _step == 1 ? _buildStepOne() : _buildStepTwo(),
@@ -113,6 +114,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   }
 
   Widget _buildStepOne() {
+    final palette = context.palette;
     return SingleChildScrollView(
       key: const ValueKey(1),
       padding: const EdgeInsets.all(24),
@@ -123,29 +125,29 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: const Color(0xFFFFB74D).withValues(alpha: 0.08),
+              color: palette.warning.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: const Color(0xFFFFB74D).withValues(alpha: 0.3),
+                color: palette.warning.withValues(alpha: 0.3),
               ),
             ),
-            child: const Column(
+            child: Column(
               children: [
-                Icon(Icons.key_rounded, color: Color(0xFFFFB74D), size: 40),
-                SizedBox(height: 12),
+                Icon(Icons.key_rounded, color: palette.warning, size: 40),
+                const SizedBox(height: 12),
                 Text(
                   'Código de recuperación',
                   style: TextStyle(
-                    color: Colors.white,
+                    color: palette.textPrimary,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 8),
+                const SizedBox(height: 8),
                 Text(
                   'El código de recuperación fue generado al configurar tu bóveda. '
                   'Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.',
-                  style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 13),
+                  style: TextStyle(color: palette.textMuted, fontSize: 13),
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -156,17 +158,17 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           // Code input
           TextFormField(
             controller: _codeCtrl,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: palette.textPrimary,
               fontFamily: 'monospace',
               letterSpacing: 1.5,
               fontSize: 14,
             ),
             maxLines: 3,
-            decoration: const InputDecoration(
+            decoration: InputDecoration(
               labelText: 'Código de recuperación',
               hintText: 'XXXX-XXXX-XXXX-XXXX-…',
-              prefixIcon: Icon(Icons.vpn_key_rounded, color: Color(0xFF9E9EBF)),
+              prefixIcon: Icon(Icons.vpn_key_rounded, color: palette.textMuted),
             ),
           ),
 
@@ -175,20 +177,20 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFCF6679).withValues(alpha: 0.1),
+                color: palette.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 _error!,
-                style: const TextStyle(color: Color(0xFFCF6679), fontSize: 13),
+                style: TextStyle(color: palette.danger, fontSize: 13),
               ),
             ),
           ],
           const SizedBox(height: 24),
 
           _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+              ? Center(
+                  child: CircularProgressIndicator(color: palette.accent),
                 )
               : ElevatedButton.icon(
                   onPressed: _verifyCode,
@@ -201,6 +203,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   }
 
   Widget _buildStepTwo() {
+    final palette = context.palette;
     return SingleChildScrollView(
       key: const ValueKey(2),
       padding: const EdgeInsets.all(24),
@@ -210,20 +213,20 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: const Color(0xFF4CAF50).withValues(alpha: 0.08),
+              color: palette.success.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
-                color: const Color(0xFF4CAF50).withValues(alpha: 0.3),
+                color: palette.success.withValues(alpha: 0.3),
               ),
             ),
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.check_circle_rounded, color: Color(0xFF4CAF50)),
-                SizedBox(width: 12),
+                Icon(Icons.check_circle_rounded, color: palette.success),
+                const SizedBox(width: 12),
                 Expanded(
                   child: Text(
                     'Código verificado. Ahora establece tu nueva contraseña maestra.',
-                    style: TextStyle(color: Colors.white, fontSize: 13),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 13),
                   ),
                 ),
               ],
@@ -246,19 +249,19 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: const Color(0xFFCF6679).withValues(alpha: 0.1),
+                color: palette.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 _error!,
-                style: const TextStyle(color: Color(0xFFCF6679), fontSize: 13),
+                style: TextStyle(color: palette.danger, fontSize: 13),
               ),
             ),
           ],
           const SizedBox(height: 24),
           _isLoading
-              ? const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF6C63FF)),
+              ? Center(
+                  child: CircularProgressIndicator(color: palette.accent),
                 )
               : ElevatedButton.icon(
                   onPressed: _resetPassword,
@@ -283,6 +286,7 @@ class RecoveryCodeDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Código de recuperación'),
@@ -296,21 +300,21 @@ class RecoveryCodeDisplay extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: const Color(0xFFCF6679).withValues(alpha: 0.08),
+                color: palette.danger.withValues(alpha: 0.08),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: const Color(0xFFCF6679).withValues(alpha: 0.4),
+                  color: palette.danger.withValues(alpha: 0.4),
                 ),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.warning_rounded, color: Color(0xFFCF6679)),
-                  SizedBox(width: 10),
+                  Icon(Icons.warning_rounded, color: palette.danger),
+                  const SizedBox(width: 10),
                   Expanded(
                     child: Text(
                       '¡Guarda este código en un lugar seguro! '
                       'Solo se muestra UNA VEZ y no se puede recuperar.',
-                      style: TextStyle(color: Color(0xFFCF6679), fontSize: 13),
+                      style: TextStyle(color: palette.danger, fontSize: 13),
                     ),
                   ),
                 ],
@@ -320,13 +324,13 @@ class RecoveryCodeDisplay extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: palette.card,
                 borderRadius: BorderRadius.circular(14),
               ),
               child: SelectableText(
                 code,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: palette.textPrimary,
                   fontFamily: 'monospace',
                   fontSize: 16,
                   letterSpacing: 1.0,

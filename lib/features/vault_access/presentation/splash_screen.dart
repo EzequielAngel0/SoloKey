@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../router/app_router.dart';
 import '../domain/repositories/i_vault_repository.dart';
 import '../../../app/di/injection.dart';
+import '../../../theme/app_palette.dart';
 
 class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
@@ -51,6 +52,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Scaffold(
       body: Center(
         child: FadeTransition(
@@ -65,12 +67,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   height: 96,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    gradient: const RadialGradient(
-                      colors: [Color(0xFF6C63FF), Color(0xFF3A3080)],
+                    gradient: RadialGradient(
+                      colors: [
+                        palette.accent,
+                        palette.accent.withValues(alpha: 0.7),
+                      ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6C63FF).withValues(alpha: 0.4),
+                        color: palette.accent.withValues(alpha: 0.4),
                         blurRadius: 32,
                         spreadRadius: 4,
                       ),
@@ -83,21 +88,21 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
                   ),
                 ),
                 const SizedBox(height: 24),
-                const Text(
+                Text(
                   'SoloKey',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: palette.textPrimary,
                     letterSpacing: 1.2,
                   ),
                 ),
                 const SizedBox(height: 8),
-                const Text(
+                Text(
                   'Tu bóveda segura',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF9E9EBF),
+                    color: palette.textMuted,
                     letterSpacing: 0.5,
                   ),
                 ),

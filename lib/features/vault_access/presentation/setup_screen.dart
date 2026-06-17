@@ -7,6 +7,7 @@ import '../../../router/app_router.dart';
 import '../../../shared/widgets/password_strength_indicator.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../password_generator/domain/password_generator.dart';
+import '../../../theme/app_palette.dart';
 import '../application/vault_state_provider.dart';
 import 'recovery_screen.dart';
 
@@ -61,7 +62,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           ),
         );
       },
-      error: (msg) => _showError(msg),
+      error: _showError,
       orElse: () {},
     );
   }
@@ -70,7 +71,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: const Color(0xFFCF6679),
+        backgroundColor: context.palette.danger,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -78,6 +79,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final vaultState = ref.watch(vaultNotifierProvider);
     final isLoading = vaultState is _Loading;
 
@@ -97,14 +99,17 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                     height: 72,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF6C63FF), Color(0xFF3A3080)],
+                      gradient: LinearGradient(
+                        colors: [
+                          palette.accent,
+                          palette.accent.withValues(alpha: 0.7),
+                        ],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: const Color(0xFF6C63FF).withValues(alpha: 0.35),
+                          color: palette.accent.withValues(alpha: 0.35),
                           blurRadius: 20,
                           spreadRadius: 2,
                         ),
@@ -118,21 +123,21 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
-                const Text(
+                Text(
                   'Crear contraseña\nmaestra',
                   style: TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: palette.textPrimary,
                     height: 1.2,
                   ),
                 ),
                 const SizedBox(height: 10),
-                const Text(
+                Text(
                   'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.',
                   style: TextStyle(
                     fontSize: 14,
-                    color: Color(0xFF9E9EBF),
+                    color: palette.textMuted,
                     height: 1.5,
                   ),
                 ),
@@ -145,7 +150,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   validator: _validatePassword,
                   textInputAction: TextInputAction.next,
                   onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                  style: const TextStyle(color: Colors.white, fontSize: 16, letterSpacing: 1.5),
+                  style: TextStyle(color: palette.textPrimary, fontSize: 16, letterSpacing: 1.5),
                   decoration: const InputDecoration(labelText: 'Contraseña maestra', hintText: 'Mínimo 12 caracteres'),
                 ),
                 const SizedBox(height: 8),
@@ -165,9 +170,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
                   child: isLoading
-                      ? const Center(
+                      ? Center(
                           child: CircularProgressIndicator(
-                            color: Color(0xFF6C63FF),
+                            color: palette.accent,
                           ),
                         )
                       : ElevatedButton(
@@ -203,6 +208,7 @@ class _RequirementsList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final reqs = [
       (label: '12+ caracteres', met: password.length >= 12),
       (label: 'Mayúscula', met: password.contains(RegExp(r'[A-Z]'))),
@@ -226,18 +232,14 @@ class _RequirementsList extends StatelessWidget {
                       ? Icons.check_circle_rounded
                       : Icons.radio_button_unchecked_rounded,
                   size: 14,
-                  color: r.met
-                      ? const Color(0xFF66BB6A)
-                      : const Color(0xFF5C5C7A),
+                  color: r.met ? palette.success : palette.textDisabled,
                 ),
                 const SizedBox(width: 4),
                 Text(
                   r.label,
                   style: TextStyle(
                     fontSize: 12,
-                    color: r.met
-                        ? const Color(0xFF66BB6A)
-                        : const Color(0xFF5C5C7A),
+                    color: r.met ? palette.success : palette.textDisabled,
                   ),
                 ),
               ],

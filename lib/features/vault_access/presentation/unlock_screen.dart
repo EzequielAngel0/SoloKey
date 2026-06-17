@@ -12,6 +12,7 @@ import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
 import '../../sync/infrastructure/sync_service.dart';
+import '../../../theme/app_palette.dart';
 import '../application/vault_state_provider.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
@@ -129,7 +130,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
       ref.read(vaultNotifierProvider).maybeWhen(
             unlocked: (_) => _navigateHome(),
-            error: (msg) => _showError(msg),
+            error: _showError,
             orElse: () {},
           );
     } catch (_) {
@@ -167,7 +168,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
-        backgroundColor: const Color(0xFFCF6679),
+        backgroundColor: context.palette.danger,
         behavior: SnackBarBehavior.floating,
       ),
     );
@@ -175,6 +176,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final isLoading = ref.watch(vaultNotifierProvider).maybeWhen(
           loading: () => true,
           orElse: () => false,
@@ -202,13 +204,15 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                         height: 80,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          gradient: const RadialGradient(
-                            colors: [Color(0xFF6C63FF), Color(0xFF3A3080)],
+                          gradient: RadialGradient(
+                            colors: [
+                              palette.accent,
+                              palette.accent.withValues(alpha: 0.7),
+                            ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: const Color(0xFF6C63FF)
-                                  .withValues(alpha: 0.4),
+                              color: palette.accent.withValues(alpha: 0.4),
                               blurRadius: 28,
                               spreadRadius: 4,
                             ),
@@ -222,22 +226,22 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       ),
                     ),
                     const SizedBox(height: 32),
-                    const Center(
+                    Center(
                       child: Text(
                         'SoloKey',
                         style: TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.w800,
-                          color: Colors.white,
+                          color: palette.textPrimary,
                         ),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Center(
+                    Center(
                       child: Text(
                         'Introduce tu contraseña maestra',
                         style:
-                            TextStyle(color: Color(0xFF9E9EBF), fontSize: 14),
+                            TextStyle(color: palette.textMuted, fontSize: 14),
                       ),
                     ),
 
@@ -260,9 +264,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
                       child: isLoading || _isRemoteUnlocking
-                          ? const Center(
+                          ? Center(
                               child: CircularProgressIndicator(
-                                color: Color(0xFF6C63FF),
+                                color: palette.accent,
                               ),
                             )
                           : ElevatedButton(
@@ -276,13 +280,13 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       Center(
                         child: TextButton.icon(
                           onPressed: _tryBiometric,
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.fingerprint_rounded,
-                            color: Color(0xFF6C63FF),
+                            color: palette.accent,
                           ),
-                          label: const Text(
+                          label: Text(
                             'Usar biometría',
-                            style: TextStyle(color: Color(0xFF6C63FF)),
+                            style: TextStyle(color: palette.accent),
                           ),
                         ),
                       ),
@@ -297,14 +301,14 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                           children: [
                             Icon(
                               Icons.wifi_rounded,
-                              color: const Color(0xFF39FF14).withValues(alpha: 0.5),
+                              color: palette.primary.withValues(alpha: 0.5),
                               size: 14,
                             ),
                             const SizedBox(width: 6),
                             Text(
                               'Desbloqueo WiFi disponible',
                               style: TextStyle(
-                                color: const Color(0xFF39FF14).withValues(alpha: 0.5),
+                                color: palette.primary.withValues(alpha: 0.5),
                                 fontSize: 11,
                                 fontWeight: FontWeight.w500,
                               ),
@@ -318,13 +322,13 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                     Center(
                       child: TextButton(
                         onPressed: () => context.push(AppRoutes.recovery),
-                        child: const Text(
+                        child: Text(
                           '¿Olvidaste tu contraseña maestra?',
                           style: TextStyle(
-                            color: Color(0xFF9E9EBF),
+                            color: palette.textMuted,
                             fontSize: 13,
                             decoration: TextDecoration.underline,
-                            decorationColor: Color(0xFF9E9EBF),
+                            decorationColor: palette.textMuted,
                           ),
                         ),
                       ),
@@ -347,13 +351,14 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 class _RemoteUnlockBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: const Color(0xFF39FF14).withValues(alpha: 0.08),
+        color: palette.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: const Color(0xFF39FF14).withValues(alpha: 0.3),
+          color: palette.primary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -362,24 +367,24 @@ class _RemoteUnlockBanner extends StatelessWidget {
             width: 20,
             height: 20,
             child: CircularProgressIndicator(
-              color: const Color(0xFF39FF14),
+              color: palette.primary,
               strokeWidth: 2,
             ),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Text(
               'Desbloqueando desde dispositivo móvil...',
               style: TextStyle(
-                color: Color(0xFF39FF14),
+                color: palette.primary,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),
             ),
           ),
-          const Icon(
+          Icon(
             Icons.phone_android_rounded,
-            color: Color(0xFF39FF14),
+            color: palette.primary,
             size: 18,
           ),
         ],
@@ -395,33 +400,34 @@ class _SecurePasswordTap extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: const Color(0xFF16213E),
+          color: palette.card,
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
             color: charCount > 0
-                ? const Color(0xFF6C63FF).withValues(alpha: 0.6)
-                : const Color(0xFF2A2A4A),
+                ? palette.accent.withValues(alpha: 0.6)
+                : palette.divider,
           ),
         ),
         child: Row(
           children: [
-            const Icon(Icons.lock_rounded, color: Color(0xFF6C63FF), size: 20),
+            Icon(Icons.lock_rounded, color: palette.accent, size: 20),
             const SizedBox(width: 12),
             Expanded(
               child: charCount == 0
-                  ? const Text(
+                  ? Text(
                       'Toca para ingresar tu contraseña',
-                      style: TextStyle(color: Color(0xFF5C5C7A), fontSize: 14),
+                      style: TextStyle(color: palette.textDisabled, fontSize: 14),
                     )
                   : Text(
                       '●' * charCount,
-                      style: const TextStyle(
-                        color: Colors.white,
+                      style: TextStyle(
+                        color: palette.textPrimary,
                         fontSize: 16,
                         letterSpacing: 3,
                       ),
@@ -430,7 +436,7 @@ class _SecurePasswordTap extends StatelessWidget {
             ),
             Icon(
               Icons.keyboard_rounded,
-              color: const Color(0xFF6C63FF).withValues(alpha: 0.7),
+              color: palette.accent.withValues(alpha: 0.7),
               size: 18,
             ),
           ],
