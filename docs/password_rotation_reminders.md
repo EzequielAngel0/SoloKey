@@ -1,6 +1,6 @@
 # Recordatorios de Rotación de Contraseñas (Granular / Por Credencial)
 
-Este documento detalla la especificación técnica, el diseño de la interfaz y la arquitectura para la funcionalidad de **Recordatorios de Rotación de Contraseñas a nivel granular (individual por credencial)**. 
+Este documento detalla la especificación técnica, el diseño de la interfaz y la arquitectura para la funcionalidad de **Recordatorios de Rotación de Contraseñas a nivel granular (individual por credencial)** y su comportamiento multiplataforma (Móvil y Escritorio).
 
 ---
 
@@ -28,7 +28,21 @@ Al crear o editar una credencial en el formulario (`CredentialFormScreen`), se i
 
 ---
 
-## 3. Flujo de Usuario (UI/UX)
+## 3. Comportamiento Multiplataforma y Sincronización Automática
+
+Dado que SoloKey es un administrador de contraseñas Local-First con sincronización bidireccional, los recordatorios **se ejecutarán y mostrarán tanto en la aplicación móvil como en la de escritorio**.
+
+### Sincronización de Expiraciones (Autosileciado Cruzado)
+1. Si una credencial expira, **ambos dispositivos** pueden mostrar la notificación de forma independiente (según sus propios chequeos locales en segundo plano).
+2. Si el usuario actualiza la contraseña en el celular, la fecha `updatedAt` cambia al timestamp actual.
+3. Al realizar la sincronización por WiFi:
+   * El cambio viaja a la computadora mediante el protocolo Delta-Sync.
+   * La base de datos de escritorio actualiza `updatedAt` y limpia el campo `lastRotationPromptedAt`.
+   * **Resultado:** La computadora detecta automáticamente que la contraseña ya no está obsoleta, **cancelando o previniendo futuras notificaciones** para esa cuenta sin necesidad de que el usuario haga nada más.
+
+---
+
+## 4. Flujo de Usuario (UI/UX)
 
 1. **Creación/Edición:**
    * En el formulario de añadir/editar contraseña, debajo del campo de contraseña, hay un interruptor o selector llamado **"Recordatorio de Rotación"**.
@@ -36,16 +50,17 @@ Al crear o editar una credencial en el formulario (`CredentialFormScreen`), se i
    * Al guardar, los datos se almacenan en el registro de la base de datos de esa credencial.
 
 2. **Notificación Local Dirigida:**
-   * La notificación push local se despacha con el nombre específico de la cuenta que expira:
+   * **En Móvil (Android/iOS):** Lanza una notificación nativa. Al presionarla, abre la app y te lleva a los detalles del elemento.
+   * **En Escritorio (Windows/macOS/Linux):** Muestra un banner nativo del sistema operativo (Action Center en Windows, Notification Center en macOS) a través de `local_notifier`.
      * **Título:** `Rotación de Contraseña Requerida`
-     * **Mensaje:** `Tu contraseña para "[Título de Cuenta/ej: Gmail]" no ha sido actualizada en más de X meses. Cámbiala ahora para mantener tu seguridad.`
+     * **Mensaje:** `Tu contraseña para "[Título de Cuenta]" ha expirado. Cámbiala ahora por seguridad.`
      * **Acciones rápidas:** 
-       * **[Cambiar contraseña]:** Abre el formulario de edición de esta credencial directamente.
-       * **[Posponer]:** Evita volver a notificar por 3 días.
+       * **[Cambiar contraseña]:** Abre la ventana de la aplicación de escritorio y enfoca la pantalla de edición de esa credencial.
+       * **[Posponer]:** Silencia por 3 días.
 
 ---
 
-## 4. Estructura de Base de Datos (Drift / SQLite)
+## 5. Estructura de Base de Datos (Drift / SQLite)
 
 Modificaremos la tabla de credenciales (`CredentialEntries`) en Drift agregando campos para persistir esta configuración a nivel de fila:
 
@@ -68,19 +83,20 @@ class CredentialEntries extends Table {
 
 ---
 
-## 5. Implementación del Worker en Segundo Plano
+## 6. Implementación Técnica en Segundo Plano
 
-La lógica de fondo se ejecuta periódicamente (ej: una vez al día) en el dispositivo a través de `workmanager` (móvil) o el hilo del daemon de bandeja (escritorio):
+La lógica de fondo se ejecuta de la siguiente manera dependiendo de la plataforma:
 
-1. **Lectura:** Obtiene todas las credenciales activas del almacén.
-2. **Cálculo de Expiración:** Para cada credencial con un intervalo asignado:
-   * Calcula la fecha de expiración: `fechaExpiracion = updatedAt + intervalInDays`.
-   * Verifica si la fecha actual supera `fechaExpiracion`.
-3. **Prevención de Alertas Repetitivas:** Compara la fecha actual con `lastRotationPromptedAt` para asegurarse de no molestar al usuario repetidamente si ya se le notificó hace menos de 7 días.
-4. **Despacho:** Lanza una notificación local dirigida para cada credencial expirada.
+### A. En el Móvil (Android/iOS)
+Utilizaremos `workmanager` en conjunto con `flutter_local_notifications` para programar una tarea periódica de fondo (ej. cada 24 horas) con bajo consumo de batería.
+
+### B. En el Escritorio (Windows/macOS/Linux)
+Aprovecharemos que la aplicación de escritorio cuenta con un Daemon en bandeja (`tray_manager` + `window_manager` oculto). 
+* Crearemos un temporizador repetitivo en Dart (`Timer.periodic` cada 6 horas) que se ejecuta en segundo plano mientras la aplicación está minimizada en la bandeja del sistema.
+* Este temporizador consultará las credenciales locales de SQLite y despachará banners locales usando `local_notifier`.
 
 ---
 
-## 6. Panel de Auditoría
+## 7. Panel de Auditoría
 
-En la sección de **Auditoría de Seguridad (Security Audit)** del menú principal, se creará una pestaña o tarjeta llamada **"Contraseñas Expiradas"**. Aquí se listarán de forma prioritaria todas las credenciales que hayan superado su periodo de rotación, con un botón rápido para editarlas y cambiarlas.
+En la sección de **Auditoría de Seguridad (Security Audit)** del menú principal (tanto móvil como escritorio), se creará una pestaña o tarjeta llamada **"Contraseñas Expiradas"**. Aquí se listarán de forma prioritaria todas las credenciales que hayan superado su periodo de rotación, con un botón rápido para editarlas y cambiarlas.
