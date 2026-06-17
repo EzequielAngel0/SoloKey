@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../../theme/app_palette.dart';
+
 /// A secure, on-screen keyboard widget for entering sensitive text.
 ///
 /// Security properties:
@@ -149,8 +151,9 @@ class _SecureKeyboardState extends State<SecureKeyboard>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Container(
-      color: const Color(0xFF0D0D1E),
+      color: palette.background,
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -172,6 +175,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   // ── Handle / header ────────────────────────────────────────────────────────
 
   Widget _buildHandle() {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 10, 16, 4),
       child: Row(
@@ -179,14 +183,14 @@ class _SecureKeyboardState extends State<SecureKeyboard>
           if (widget.onCancel != null)
             GestureDetector(
               onTap: widget.onCancel,
-              child: const Icon(Icons.close, color: Color(0xFF9E9EBF), size: 20),
+              child: Icon(Icons.close, color: palette.textMuted, size: 20),
             )
           else
             const SizedBox(width: 20),
           const Spacer(),
           Text(
             widget.hintText,
-            style: const TextStyle(color: Color(0xFF9E9EBF), fontSize: 13),
+            style: TextStyle(color: palette.textMuted, fontSize: 13),
           ),
           const Spacer(),
           if (widget.mode == SecureKeyboardMode.password)
@@ -196,7 +200,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 _showInput
                     ? Icons.visibility_off_rounded
                     : Icons.visibility_rounded,
-                color: const Color(0xFF9E9EBF),
+                color: palette.textMuted,
                 size: 20,
               ),
             )
@@ -210,6 +214,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   // ── Input display ──────────────────────────────────────────────────────────
 
   Widget _buildInputDisplay() {
+    final palette = context.palette;
     final text = _buffer.map((c) {
       if (widget.mode == SecureKeyboardMode.password && !_showInput) {
         return '●';
@@ -221,12 +226,12 @@ class _SecureKeyboardState extends State<SecureKeyboard>
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 11),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: palette.card,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: _buffer.isEmpty
-              ? const Color(0xFF2A2A4A)
-              : const Color(0xFF6C63FF).withValues(alpha: 0.6),
+              ? palette.divider
+              : palette.accent.withValues(alpha: 0.6),
         ),
       ),
       child: Row(
@@ -235,15 +240,15 @@ class _SecureKeyboardState extends State<SecureKeyboard>
             child: _buffer.isEmpty
                 ? Text(
                     widget.hintText,
-                    style: const TextStyle(
-                      color: Color(0xFF5C5C7A),
+                    style: TextStyle(
+                      color: palette.textDisabled,
                       fontSize: 15,
                     ),
                   )
                 : Text(
                     text,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: palette.textPrimary,
                       fontSize: 18,
                       letterSpacing: 2,
                     ),
@@ -253,7 +258,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
           ),
           Text(
             '${_buffer.length}/${widget.maxLength}',
-            style: const TextStyle(color: Color(0xFF5C5C7A), fontSize: 11),
+            style: TextStyle(color: palette.textDisabled, fontSize: 11),
           ),
         ],
       ),
@@ -270,6 +275,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   };
 
   Widget _buildTabBar() {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8),
       child: Row(
@@ -283,14 +289,10 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 margin: const EdgeInsets.symmetric(horizontal: 3),
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: BoxDecoration(
-                  color: isActive
-                      ? const Color(0xFF6C63FF)
-                      : const Color(0xFF1E1E38),
+                  color: isActive ? palette.accent : palette.surface,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: isActive
-                        ? const Color(0xFF6C63FF)
-                        : const Color(0xFF2A2A4A),
+                    color: isActive ? palette.accent : palette.divider,
                     width: 0.8,
                   ),
                 ),
@@ -298,7 +300,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 child: Text(
                   _tabLabels[tab]!,
                   style: TextStyle(
-                    color: isActive ? Colors.white : const Color(0xFF9E9EBF),
+                    color: isActive ? palette.textPrimary : palette.textMuted,
                     fontSize: 13,
                     fontWeight:
                         isActive ? FontWeight.bold : FontWeight.normal,
@@ -340,6 +342,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   }
 
   Widget _buildKeyTile(String char) {
+    final palette = context.palette;
     final isLastPressed = _lastPressedKey == char;
     return Expanded(
       child: AnimatedBuilder(
@@ -355,25 +358,25 @@ class _SecureKeyboardState extends State<SecureKeyboard>
             margin: const EdgeInsets.all(2.5),
             height: 46,
             decoration: BoxDecoration(
-              color: const Color(0xFF1E1E38),
+              color: palette.surface,
               borderRadius: BorderRadius.circular(8),
               border: Border.all(
-                color: const Color(0xFF2A2A4A),
+                color: palette.divider,
                 width: 0.5,
               ),
-              boxShadow: const [
+              boxShadow: [
                 BoxShadow(
-                  color: Color(0x22000000),
+                  color: palette.scrim,
                   blurRadius: 2,
-                  offset: Offset(0, 1),
+                  offset: const Offset(0, 1),
                 ),
               ],
             ),
             alignment: Alignment.center,
             child: Text(
               char,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: palette.textPrimary,
                 fontSize: 15,
                 fontFamily: 'monospace',
               ),
@@ -387,6 +390,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   // ── Bottom action row ──────────────────────────────────────────────────────
 
   Widget _buildBottomRow() {
+    final palette = context.palette;
     return Padding(
       padding: const EdgeInsets.fromLTRB(4, 4, 4, 2),
       child: Row(
@@ -400,17 +404,17 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 height: 46,
                 margin: const EdgeInsets.all(2.5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF1E1E38),
+                  color: palette.surface,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFF2A2A4A),
+                    color: palette.divider,
                     width: 0.5,
                   ),
                 ),
                 alignment: Alignment.center,
-                child: const Text(
+                child: Text(
                   'Espacio',
-                  style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12),
                 ),
               ),
             ),
@@ -433,17 +437,17 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 height: 46,
                 margin: const EdgeInsets.all(2.5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF241636),
+                  color: palette.drawer,
                   borderRadius: BorderRadius.circular(8),
                   border: Border.all(
-                    color: const Color(0xFF3A2A4A),
+                    color: palette.divider,
                     width: 0.5,
                   ),
                 ),
                 alignment: Alignment.center,
-                child: const Icon(
+                child: Icon(
                   Icons.backspace_rounded,
-                  color: Color(0xFFCF6679),
+                  color: palette.danger,
                   size: 18,
                 ),
               ),
@@ -462,10 +466,13 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                 decoration: BoxDecoration(
                   gradient: _buffer.isEmpty
                       ? null
-                      : const LinearGradient(
-                          colors: [Color(0xFF6C63FF), Color(0xFF5046CC)],
+                      : LinearGradient(
+                          colors: [
+                            palette.accent,
+                            palette.accent.withValues(alpha: 0.7),
+                          ],
                         ),
-                  color: _buffer.isEmpty ? const Color(0xFF1A1A2E) : null,
+                  color: _buffer.isEmpty ? palette.drawer : null,
                   borderRadius: BorderRadius.circular(8),
                 ),
                 alignment: Alignment.center,
@@ -473,8 +480,8 @@ class _SecureKeyboardState extends State<SecureKeyboard>
                   widget.confirmLabel,
                   style: TextStyle(
                     color: _buffer.isEmpty
-                        ? const Color(0xFF5C5C7A)
-                        : Colors.white,
+                        ? palette.textDisabled
+                        : palette.textPrimary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),

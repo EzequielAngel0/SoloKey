@@ -5,21 +5,19 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../router/app_router.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
+import '../../../../theme/app_palette.dart';
 import '../../../../features/credentials/application/credentials_provider.dart';
 import '../../../../features/credentials/presentation/credential_detail_screen.dart';
 import '../../../../features/credentials/presentation/credential_form_screen.dart';
 import '../../../../features/credentials/presentation/security_audit_screen.dart';
-import '../../../../features/credentials/presentation/widgets/credential_list_widget.dart';
 import '../../../../features/credentials/presentation/widgets/credential_card.dart';
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
 import '../../../../features/folders/presentation/folder_screen.dart';
 import '../../../../features/settings/presentation/settings_screen.dart';
 import '../../../../features/vault_access/application/vault_state_provider.dart';
-import '../../../../features/vault_transfer/presentation/transfer_screen.dart';
 import '../../../../features/sync/presentation/pairing_screen.dart';
 import 'desktop_layout_state.dart';
-import 'responsive_layout.dart';
 import 'auto_lock_manager.dart';
 
 class DesktopMainLayout extends ConsumerStatefulWidget {
@@ -40,6 +38,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     final activeTab = ref.watch(desktopSelectedNavigationProvider);
 
     return AutoLockManager(
@@ -51,7 +50,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
             // Vertical divider
             Container(
               width: 1,
-              color: const Color(0xFF222232),
+              color: palette.divider,
             ),
             // Content Area (Middle Column + Right Column)
             Expanded(
@@ -64,6 +63,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   }
 
   Widget _buildContentArea(int tabIndex) {
+    final palette = context.palette;
     // For tabs that take full width (Security Audit, Settings, Sync/Transfer)
     if (tabIndex == 3) {
       return const SecurityAuditScreen();
@@ -84,7 +84,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         // Vertical divider
         Container(
           width: 1,
-          color: const Color(0xFF222232),
+          color: palette.divider,
         ),
         // Column 3: Right Details/Form Pane
         Expanded(
@@ -95,13 +95,14 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   }
 
   Widget _buildMiddleListPane(int tabIndex) {
+    final palette = context.palette;
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
     final foldersAsync = ref.watch(foldersNotifierProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF13131F),
+      backgroundColor: palette.cardDark,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF13131F),
+        backgroundColor: palette.cardDark,
         title: Text(
           tabIndex == 0
               ? 'Credenciales'
@@ -114,13 +115,13 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         actions: [
           if (tabIndex == 1)
             IconButton(
-              icon: const Icon(Icons.create_new_folder_rounded, color: Color(0xFF39FF14)),
+              icon: Icon(Icons.create_new_folder_rounded, color: palette.primary),
               tooltip: 'Nueva carpeta',
               onPressed: () => _createRootFolder(context, ref),
             )
           else
             IconButton(
-              icon: const Icon(Icons.add_rounded, color: Color(0xFF39FF14)),
+              icon: Icon(Icons.add_rounded, color: palette.primary),
               tooltip: 'Nueva credencial',
               onPressed: () {
                 ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
@@ -138,13 +139,13 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                   child: TextField(
                     controller: _searchCtrl,
                     onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
-                    style: const TextStyle(color: Colors.white, fontSize: 14),
+                    style: TextStyle(color: palette.textPrimary, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Buscar...',
-                      prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF9E9EBF), size: 20),
+                      prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted, size: 20),
                       suffixIcon: _searchCtrl.text.isNotEmpty
                           ? IconButton(
-                              icon: const Icon(Icons.close_rounded, color: Color(0xFF9E9EBF), size: 18),
+                              icon: Icon(Icons.close_rounded, color: palette.textMuted, size: 18),
                               onPressed: () {
                                 _searchCtrl.clear();
                                 ref.read(credentialSearchNotifierProvider.notifier).update('');
@@ -152,7 +153,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                             )
                           : null,
                       filled: true,
-                      fillColor: const Color(0xFF1A1A2C),
+                      fillColor: palette.drawer,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(10),
                         borderSide: BorderSide.none,
@@ -168,7 +169,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         error: (e, _) => Center(
           child: Text(
             'Error: $e',
-            style: const TextStyle(color: Color(0xFFFF3366)),
+            style: TextStyle(color: palette.error),
           ),
         ),
         data: (creds) {
@@ -183,9 +184,9 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.folder_open_rounded, size: 48, color: Color(0xFF2A2A4A)),
+                    Icon(Icons.folder_open_rounded, size: 48, color: palette.divider),
                     const SizedBox(height: 12),
-                    const Text('Bóveda vacía', style: TextStyle(color: Colors.white70)),
+                    Text('Bóveda vacía', style: TextStyle(color: palette.textMuted)),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => _createRootFolder(context, ref),
@@ -207,7 +208,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                   try {
                     folderColor = Color(int.parse('FF${f.colorHex.replaceFirst('#', '')}', radix: 16));
                   } catch (_) {
-                    folderColor = const Color(0xFF6C63FF);
+                    folderColor = palette.accent;
                   }
 
                   return Padding(
@@ -218,8 +219,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                         ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
                       },
                       selected: isSelected,
-                      selectedTileColor: const Color(0xFF1E1E2F),
-                      tileColor: const Color(0xFF161622),
+                      selectedTileColor: palette.surface,
+                      tileColor: palette.card,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                       leading: Icon(
                         f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded,
@@ -227,18 +228,18 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                       ),
                       title: Text(
                         f.name,
-                        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14),
+                        style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500, fontSize: 14),
                       ),
                       trailing: const Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 18),
                     ),
                   );
                 }),
                 if (noFolderCreds.isNotEmpty) ...[
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 12),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
                       'Sin carpeta asignada',
-                      style: TextStyle(color: Color(0xFF5C5C7A), fontSize: 11, fontWeight: FontWeight.bold),
+                      style: TextStyle(color: palette.textDisabled, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
                   ...noFolderCreds.map((c) => Padding(
@@ -314,16 +315,17 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   }
 
   Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {
+    final palette = context.palette;
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Carpeta', style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Carpeta', style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(
             labelText: 'Nombre de la carpeta',
             hintText: 'ej. Trabajo, Sociales…',
@@ -346,9 +348,10 @@ class _DesktopSidebar extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final selectedIndex = ref.watch(desktopSelectedNavigationProvider);
 
-    final menuItems = [
+    const menuItems = [
       _SidebarItemData(icon: Icons.lock_rounded, label: 'Credenciales', index: 0),
       _SidebarItemData(icon: Icons.folder_rounded, label: 'Carpetas', index: 1),
       _SidebarItemData(icon: Icons.star_rounded, label: 'Favoritas', index: 2),
@@ -359,7 +362,7 @@ class _DesktopSidebar extends ConsumerWidget {
 
     return Container(
       width: 240,
-      color: const Color(0xFF0C0C14),
+      color: palette.background,
       child: Column(
         children: [
           // Sidebar Header
@@ -370,23 +373,23 @@ class _DesktopSidebar extends ConsumerWidget {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF39FF14).withValues(alpha: 0.15),
+                    color: palette.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.vpn_key_rounded,
-                    color: Color(0xFF39FF14),
+                    color: palette.primary,
                     size: 24,
                   ),
                 ),
                 const SizedBox(width: 12),
-                const Column(
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       'SoloKey',
                       style: TextStyle(
-                        color: Colors.white,
+                        color: palette.textPrimary,
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -395,7 +398,7 @@ class _DesktopSidebar extends ConsumerWidget {
                     Text(
                       'Secure Vault',
                       style: TextStyle(
-                        color: Color(0xFF5C5C7A),
+                        color: palette.textDisabled,
                         fontSize: 11,
                         fontWeight: FontWeight.w500,
                       ),
@@ -442,17 +445,17 @@ class _DesktopSidebar extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: const Color(0xFFFF3366).withValues(alpha: 0.2)),
+                  border: Border.all(color: palette.error.withValues(alpha: 0.2)),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: const Row(
+                child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(Icons.lock_outline_rounded, color: Color(0xFFFF3366), size: 18),
-                    SizedBox(width: 10),
+                    Icon(Icons.lock_outline_rounded, color: palette.error, size: 18),
+                    const SizedBox(width: 10),
                     Text(
                       'Bloquear Bóveda',
-                      style: TextStyle(color: Color(0xFFFF3366), fontWeight: FontWeight.w600, fontSize: 13),
+                      style: TextStyle(color: palette.error, fontWeight: FontWeight.w600, fontSize: 13),
                     ),
                   ],
                 ),
@@ -499,7 +502,8 @@ class _SidebarItemState extends State<_SidebarItem> {
 
   @override
   Widget build(BuildContext context) {
-    final activeColor = const Color(0xFF39FF14);
+    final palette = context.palette;
+    final activeColor = palette.primary;
     final isSelected = widget.isSelected;
 
     return MouseRegion(
@@ -536,8 +540,8 @@ class _SidebarItemState extends State<_SidebarItem> {
                 color: isSelected
                     ? activeColor
                     : _isHovered
-                        ? Colors.white
-                        : const Color(0xFF8E8E9F),
+                        ? palette.textPrimary
+                        : palette.textMuted,
                 size: 20,
               ),
               const SizedBox(width: 12),
@@ -545,10 +549,10 @@ class _SidebarItemState extends State<_SidebarItem> {
                 widget.label,
                 style: TextStyle(
                   color: isSelected
-                      ? Colors.white
+                      ? palette.textPrimary
                       : _isHovered
-                          ? Colors.white
-                          : const Color(0xFF8E8E9F),
+                          ? palette.textPrimary
+                          : palette.textMuted,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                   fontSize: 13.5,
                 ),
@@ -574,6 +578,7 @@ class _EmptyStateRightPane extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -583,20 +588,20 @@ class _EmptyStateRightPane extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: const Color(0xFF161622),
+                color: palette.card,
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 icon,
                 size: 48,
-                color: const Color(0xFF39FF14).withValues(alpha: 0.8),
+                color: palette.primary.withValues(alpha: 0.8),
               ),
             ),
             const SizedBox(height: 24),
             Text(
               title,
-              style: const TextStyle(
-                color: Colors.white,
+              style: TextStyle(
+                color: palette.textPrimary,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
@@ -605,8 +610,8 @@ class _EmptyStateRightPane extends StatelessWidget {
             Text(
               subtitle,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Color(0xFF5C5C7A),
+              style: TextStyle(
+                color: palette.textDisabled,
                 fontSize: 13,
                 height: 1.4,
               ),
