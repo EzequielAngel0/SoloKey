@@ -173,12 +173,8 @@ class DeltaSyncManager {
           }
         } else {
           // Local wins — push to remote
-          toPush.add(SyncManifestItem(
-            id: local.id,
-            updatedAt: local.updatedAt,
-            isDeleted: false,
-            rowData: await _credentialEntryToJson(local),
-          ));
+          final item = await _credentialPushItemOrNull(local);
+          if (item != null) toPush.add(item);
         }
       }
     }
@@ -186,16 +182,29 @@ class DeltaSyncManager {
     // Items only present locally → push to remote
     for (final entry in localMap.entries) {
       if (!seenIds.contains(entry.key)) {
-        toPush.add(SyncManifestItem(
-          id: entry.value.id,
-          updatedAt: entry.value.updatedAt,
-          isDeleted: false,
-          rowData: await _credentialEntryToJson(entry.value),
-        ));
+        final item = await _credentialPushItemOrNull(entry.value);
+        if (item != null) toPush.add(item);
       }
     }
 
     return (toRequest: toRequest, toPush: toPush);
+  }
+
+  /// Builds a push item for [row], re-keying its payload. Returns null if the
+  /// row cannot be decrypted with the local key (e.g. an orphan left by a past
+  /// broken sync) — such rows are skipped instead of aborting the whole sync.
+  Future<SyncManifestItem?> _credentialPushItemOrNull(
+      CredentialEntry row) async {
+    try {
+      return SyncManifestItem(
+        id: row.id,
+        updatedAt: row.updatedAt,
+        isDeleted: false,
+        rowData: await _credentialEntryToJson(row),
+      );
+    } catch (_) {
+      return null;
+    }
   }
 
   /// Same as [computeCredentialDeltas] but for folder entries.
@@ -282,16 +291,12 @@ class DeltaSyncManager {
   }
 
   /// Builds a single push item for a requested credential id, re-keying its
-  /// payload to the wire format. Returns null if the row no longer exists.
+  /// payload to the wire format. Returns null if the row no longer exists or
+  /// cannot be decrypted with the local key.
   Future<SyncManifestItem?> buildCredentialPushItem(String id) async {
     final row = await _db.credentialDao.getById(id);
     if (row == null) return null;
-    return SyncManifestItem(
-      id: row.id,
-      updatedAt: row.updatedAt,
-      isDeleted: false,
-      rowData: await _credentialEntryToJson(row),
-    );
+    return _credentialPushItemOrNull(row);
   }
 
   /// Builds a single push item for a requested folder id. Folders are not
