@@ -13,6 +13,8 @@ class AppSecuritySettings with _$AppSecuritySettings {
     @Default('system') String themeMode,
     // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
     @Default(0) int wipeAfterFailedAttempts,
+    // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
+    @Default(false) bool autostartEnabled,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>

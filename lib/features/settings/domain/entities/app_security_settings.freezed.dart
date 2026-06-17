@@ -27,7 +27,9 @@ mixin _$AppSecuritySettings {
   bool get obscureOnBackground => throw _privateConstructorUsedError;
   String get themeMode =>
       throw _privateConstructorUsedError; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
-  int get wipeAfterFailedAttempts => throw _privateConstructorUsedError;
+  int get wipeAfterFailedAttempts =>
+      throw _privateConstructorUsedError; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
+  bool get autostartEnabled => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -53,6 +55,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     bool obscureOnBackground,
     String themeMode,
     int wipeAfterFailedAttempts,
+    bool autostartEnabled,
   });
 }
 
@@ -77,6 +80,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? obscureOnBackground = null,
     Object? themeMode = null,
     Object? wipeAfterFailedAttempts = null,
+    Object? autostartEnabled = null,
   }) {
     return _then(
       _value.copyWith(
@@ -104,6 +108,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.wipeAfterFailedAttempts
                 : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
                       as int,
+            autostartEnabled: null == autostartEnabled
+                ? _value.autostartEnabled
+                : autostartEnabled // ignore: cast_nullable_to_non_nullable
+                      as bool,
           )
           as $Val,
     );
@@ -126,6 +134,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     bool obscureOnBackground,
     String themeMode,
     int wipeAfterFailedAttempts,
+    bool autostartEnabled,
   });
 }
 
@@ -149,6 +158,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? obscureOnBackground = null,
     Object? themeMode = null,
     Object? wipeAfterFailedAttempts = null,
+    Object? autostartEnabled = null,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -176,6 +186,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.wipeAfterFailedAttempts
             : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
                   as int,
+        autostartEnabled: null == autostartEnabled
+            ? _value.autostartEnabled
+            : autostartEnabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
       ),
     );
   }
@@ -191,6 +205,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.obscureOnBackground = true,
     this.themeMode = 'system',
     this.wipeAfterFailedAttempts = 0,
+    this.autostartEnabled = false,
   });
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -215,10 +230,14 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final int wipeAfterFailedAttempts;
+  // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
+  @override
+  @JsonKey()
+  final bool autostartEnabled;
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled)';
   }
 
   @override
@@ -240,7 +259,9 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
                   other.wipeAfterFailedAttempts,
                   wipeAfterFailedAttempts,
                 ) ||
-                other.wipeAfterFailedAttempts == wipeAfterFailedAttempts));
+                other.wipeAfterFailedAttempts == wipeAfterFailedAttempts) &&
+            (identical(other.autostartEnabled, autostartEnabled) ||
+                other.autostartEnabled == autostartEnabled));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -253,6 +274,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     obscureOnBackground,
     themeMode,
     wipeAfterFailedAttempts,
+    autostartEnabled,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -280,6 +302,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final bool obscureOnBackground,
     final String themeMode,
     final int wipeAfterFailedAttempts,
+    final bool autostartEnabled,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -296,7 +319,9 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   String get themeMode; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   @override
-  int get wipeAfterFailedAttempts;
+  int get wipeAfterFailedAttempts; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
+  @override
+  bool get autostartEnabled;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

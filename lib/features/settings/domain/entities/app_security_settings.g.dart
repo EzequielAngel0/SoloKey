@@ -16,6 +16,7 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   themeMode: json['themeMode'] as String? ?? 'system',
   wipeAfterFailedAttempts:
       (json['wipeAfterFailedAttempts'] as num?)?.toInt() ?? 0,
+  autostartEnabled: json['autostartEnabled'] as bool? ?? false,
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -27,4 +28,5 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'obscureOnBackground': instance.obscureOnBackground,
   'themeMode': instance.themeMode,
   'wipeAfterFailedAttempts': instance.wipeAfterFailedAttempts,
+  'autostartEnabled': instance.autostartEnabled,
 };

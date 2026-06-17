@@ -67,6 +67,7 @@ dependencies:
   flutter_local_notifications: ^20.1.0
   local_notifier: ^0.1.6
   workmanager: ^0.9.0+3
+  launch_at_startup: ^0.5.1
 
 dev_dependencies:
   flutter_test:

@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:workmanager/workmanager.dart';
@@ -27,7 +28,10 @@ void callbackDispatcher() {
   });
 }
 
-Future<void> main() async {
+Future<void> main(List<String> args) async {
+  // Autostart pasa '--minimized' para arrancar oculto en la bandeja.
+  final startMinimized = args.contains('--minimized');
+
   // Capture Flutter framework errors (widget build failures, layout, etc.)
   FlutterError.onError = (details) {
     FlutterError.presentError(details);
@@ -52,6 +56,15 @@ Future<void> main() async {
 
       if (isDesktop) {
         await localNotifier.setup(appName: 'SoloKey');
+
+        // Autostart (registro HKCU\...\Run en Windows). El toggle en Ajustes
+        // llama a enable()/disable(); aqui solo configuramos la ruta + arg.
+        launchAtStartup.setup(
+          appName: 'SoloKey',
+          appPath: Platform.resolvedExecutable,
+          args: ['--minimized'],
+        );
+
         await windowManager.ensureInitialized();
         await windowManager.setPreventClose(true);
         const windowOptions = WindowOptions(
@@ -62,8 +75,13 @@ Future<void> main() async {
           titleBarStyle: TitleBarStyle.normal,
         );
         windowManager.waitUntilReadyToShow(windowOptions, () async {
-          await windowManager.show();
-          await windowManager.focus();
+          if (startMinimized) {
+            // Arranque automatico: queda en la bandeja (icono del tray).
+            await windowManager.hide();
+          } else {
+            await windowManager.show();
+            await windowManager.focus();
+          }
         });
       }
 

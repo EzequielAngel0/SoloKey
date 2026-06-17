@@ -1,9 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
+import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/di/injection.dart';
@@ -59,6 +62,22 @@ class SettingsNotifier extends _$SettingsNotifier {
         previous.obscureOnBackground != settings.obscureOnBackground) {
       await getIt<AppLifecycleObserver>().syncScreenProtection();
     }
+
+    // ── Side-effect: Autostart (escritorio) ──────────────────────────────
+    if (previous != null &&
+        previous.autostartEnabled != settings.autostartEnabled &&
+        !kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+      try {
+        if (settings.autostartEnabled) {
+          await launchAtStartup.enable();
+        } else {
+          await launchAtStartup.disable();
+        }
+      } catch (_) {
+        // No bloquear el guardado si el registro de autostart falla.
+      }
+    }
   }
 }
 
@@ -100,6 +119,8 @@ class _SettingsBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDesktop = !kIsWeb &&
+        (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
@@ -175,6 +196,18 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(obscureOnBackground: v),
               ),
             ),
+            if (isDesktop) ...[
+              const _Divider(),
+              _ToggleTile(
+                icon: Icons.rocket_launch_rounded,
+                label: 'Iniciar con el sistema',
+                subtitle: 'Arranca minimizado en la bandeja al encender el equipo',
+                value: settings.autostartEnabled,
+                onChanged: (v) => onUpdate(
+                  settings.copyWith(autostartEnabled: v),
+                ),
+              ),
+            ],
             const _Divider(),
             _WipeAfterAttemptsTile(
               current: settings.wipeAfterFailedAttempts,
