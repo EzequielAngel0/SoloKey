@@ -6,6 +6,7 @@ import 'package:otp/otp.dart';
 
 import '../../../../app/di/injection.dart';
 import '../../../../core/infrastructure/clipboard/clipboard_service.dart';
+import '../../../../core/utils/auth_helper.dart';
 import '../../../../router/app_router.dart';
 import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
@@ -89,6 +90,12 @@ class CredentialCard extends ConsumerWidget {
               title: const Text('Copiar Contraseña', style: TextStyle(color: Colors.white)),
               onTap: () async {
                 Navigator.pop(context);
+                final auth = await AuthHelper.requireAuth(
+                  context,
+                  reason: 'Autentícate para copiar la contraseña',
+                );
+                if (!auth) return;
+
                 final seconds = await getIt<ClipboardService>().copySecure(credential.password!);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
