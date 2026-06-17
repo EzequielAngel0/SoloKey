@@ -186,6 +186,7 @@ class _TypeBadge extends StatelessWidget {
     CredentialType.apiKey:     'API Key',
     CredentialType.secureNote: 'Nota segura',
     CredentialType.totp:       'TOTP / 2FA',
+    CredentialType.passkey:    'Passkey',
   };
 
   static const _colors = {
@@ -193,6 +194,7 @@ class _TypeBadge extends StatelessWidget {
     CredentialType.apiKey:     Color(0xFF03DAC6),
     CredentialType.secureNote: Color(0xFFFFB74D),
     CredentialType.totp:       Color(0xFFE91E8C),
+    CredentialType.passkey:    Color(0xFF4CAF50),
   };
 
   @override

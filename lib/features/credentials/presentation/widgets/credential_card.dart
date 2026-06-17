@@ -21,6 +21,7 @@ class CredentialCard extends ConsumerWidget {
     CredentialType.apiKey:     Icons.key_rounded,
     CredentialType.secureNote: Icons.note_rounded,
     CredentialType.totp:       Icons.access_time_rounded,
+    CredentialType.passkey:    Icons.fingerprint_rounded,
   };
 
   static const _typeColors = {
@@ -28,6 +29,7 @@ class CredentialCard extends ConsumerWidget {
     CredentialType.apiKey:     Color(0xFF03DAC6),
     CredentialType.secureNote: Color(0xFFFFB74D),
     CredentialType.totp:       Color(0xFFE91E8C),
+    CredentialType.passkey:    Color(0xFF4CAF50),
   };
 
   void _showOptionsSheet(BuildContext context, WidgetRef ref) {
