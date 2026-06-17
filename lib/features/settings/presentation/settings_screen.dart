@@ -364,11 +364,20 @@ class _ThemeModeTile extends StatelessWidget {
   final String current;
   final ValueChanged<String> onChanged;
 
+  /// Palette used to render each mode's live preview swatch.
+  static AppPalette _previewPalette(AppThemeMode m) => switch (m) {
+        AppThemeMode.light => AppPalette.light,
+        AppThemeMode.dark => AppPalette.dark,
+        AppThemeMode.dim => AppPalette.dim,
+        AppThemeMode.oled => AppPalette.oled,
+        AppThemeMode.system => AppPalette.dark,
+      };
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -378,58 +387,157 @@ class _ThemeModeTile extends StatelessWidget {
               const SizedBox(width: 12),
               Text(
                 'Tema de la aplicación',
-                style: TextStyle(color: palette.textPrimary, fontSize: 14),
+                style: TextStyle(
+                    color: palette.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500),
               ),
             ],
           ),
-          const SizedBox(height: 14),
-          Wrap(
-            spacing: 8,
-            runSpacing: 8,
-            children: AppThemeMode.values.map((m) {
-              final selected = m.key == current;
-              return GestureDetector(
-                onTap: () => onChanged(m.key),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 180),
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
-                  decoration: BoxDecoration(
-                    color: selected
-                        ? palette.accent.withValues(alpha: 0.15)
-                        : palette.surface,
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(
-                      color: selected ? palette.accent : palette.divider,
-                      width: selected ? 1.4 : 1,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(
-                        m.icon,
-                        size: 15,
-                        color: selected ? palette.accent : palette.textMuted,
-                      ),
-                      const SizedBox(width: 7),
-                      Text(
-                        m.label,
-                        style: TextStyle(
-                          color: selected ? palette.accent : palette.textMuted,
-                          fontSize: 12.5,
-                          fontWeight:
-                              selected ? FontWeight.w600 : FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            }).toList(),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 96,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              padding: EdgeInsets.zero,
+              itemCount: AppThemeMode.values.length,
+              separatorBuilder: (_, _) => const SizedBox(width: 12),
+              itemBuilder: (_, i) {
+                final m = AppThemeMode.values[i];
+                return _ThemeSwatch(
+                  mode: m,
+                  preview: _previewPalette(m),
+                  selected: m.key == current,
+                  accent: palette.accent,
+                  onTap: () => onChanged(m.key),
+                );
+              },
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+/// A small live preview of a theme variant: shows the real background, a card
+/// surface and an accent dot. `system` renders as a light/dark split.
+class _ThemeSwatch extends StatelessWidget {
+  const _ThemeSwatch({
+    required this.mode,
+    required this.preview,
+    required this.selected,
+    required this.accent,
+    required this.onTap,
+  });
+
+  final AppThemeMode mode;
+  final AppPalette preview;
+  final bool selected;
+  final Color accent;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            width: 66,
+            height: 58,
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                color: selected ? accent : palette.divider,
+                width: selected ? 2 : 1,
+              ),
+            ),
+            child: Stack(
+              children: [
+                Positioned.fill(
+                  child: mode == AppThemeMode.system
+                      ? _buildSystemPreview()
+                      : _buildPreview(preview),
+                ),
+                if (selected)
+                  Positioned(
+                    top: 4,
+                    right: 4,
+                    child: Container(
+                      padding: const EdgeInsets.all(2),
+                      decoration:
+                          BoxDecoration(color: accent, shape: BoxShape.circle),
+                      child: const Icon(Icons.check_rounded,
+                          size: 10, color: Colors.white),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 7),
+          Text(
+            mode.label == 'Seguir el sistema' ? 'Sistema' : mode.label,
+            style: TextStyle(
+              color: selected ? accent : palette.textMuted,
+              fontSize: 11,
+              fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPreview(AppPalette p) {
+    return Container(
+      color: p.background,
+      padding: const EdgeInsets.all(8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            width: 24,
+            height: 6,
+            decoration: BoxDecoration(
+              color: p.accent,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Container(
+            width: 40,
+            height: 8,
+            decoration: BoxDecoration(
+              color: p.card,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Container(
+            width: 30,
+            height: 8,
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: BorderRadius.circular(3),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSystemPreview() {
+    return Row(
+      children: [
+        Expanded(child: _buildPreview(AppPalette.light)),
+        Expanded(child: _buildPreview(AppPalette.dark)),
+      ],
     );
   }
 }
