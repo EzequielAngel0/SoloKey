@@ -225,5 +225,50 @@
   "quickFillNoMatches": "No matches",
   "quickFillFooter": "Copy the value and paste it (Ctrl+V) into the field · it clears itself from the clipboard",
   "quickFillCopyUser": "Copy username",
-  "quickFillCopyPassword": "Copy password"
+  "quickFillCopyPassword": "Copy password",
+
+  "commonGotIt": "Got it",
+
+  "auditTitle": "Security Audit",
+  "auditAnalysisTitle": "Security Analysis",
+  "auditAnalysisDesc": "SoloKey analyses your credentials locally to identify weak, short, reused or old passwords.",
+  "auditBreachCheck": "Check breaches (online)",
+  "auditPrivateBadge": "PRIVATE",
+  "auditBreachDesc": "Uses k-Anonymity (HaveIBeenPwned) to look up exposed passwords without revealing your real password.",
+  "auditAllGoodTitle": "All good!",
+  "auditAllGoodDesc": "No problems were found in your vault.",
+  "auditSeverityCritical": "Critical",
+  "auditSeverityWarning": "Warning",
+  "auditSeverityInfo": "Info",
+
+  "passkeysTitle": "Passkey backups",
+  "passkeysAdd": "Add passkey",
+  "passkeysHowToTitle": "How to register a passkey?",
+  "passkeysHowToBody": "Passkeys are registered directly on each web service (e.g. Google, GitHub, Apple).\n\n1. Go to the service's website\n2. Look for \"Passkeys\" under Security\n3. The system will register and sync the passkey automatically\n\nSoloKey will store the passkey information in your vault, encrypted, so you can manage it.",
+  "passkeysEmptyTitle": "No passkey backups",
+  "passkeysEmptyDesc": "Passkeys are the future of authentication: passwordless, safer and faster. Register them on your favourite services and SoloKey will keep an encrypted backup here.",
+  "passkeysEncryptedBadge": "Encrypted backup in your vault",
+  "passkeysUpdated": "Updated: {date}",
+  "@passkeysUpdated": {
+    "placeholders": { "date": { "type": "String" } }
+  },
+  "passkeysViewDetails": "View details",
+  "passkeyDomain": "Domain (RP ID)",
+  "passkeyService": "Service",
+  "passkeyVerification": "Verification",
+  "passkeyVerificationRequired": "Required (Biometric / PIN)",
+  "passkeyVerificationOptional": "Optional",
+  "passkeyCredentialId": "Credential ID",
+  "passkeyRegistered": "Registered",
+  "passkeyPrivateKeyNote": "The private key never leaves the device. Only the identifying information is stored.",
+  "passkeysDeleteTitle": "Delete passkey",
+  "passkeysDeleteBody": "Delete the passkey \"{title}\"?\n\nNote: you must also remove it from the corresponding web service ({service}).",
+  "@passkeysDeleteBody": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "service": { "type": "String" }
+    }
+  },
+  "passkeysSiteFallback": "the site",
+  "passkeysDeleteAuthReason": "Verify to delete this passkey"
 }

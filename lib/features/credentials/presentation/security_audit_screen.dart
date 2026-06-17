@@ -6,6 +6,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/security_audit_service.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
@@ -29,10 +30,11 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final auditAsync = ref.watch(auditResultsProvider(_checkBreaches));
 
     return Scaffold(
-      appBar: const VaultAppBar(title: 'Auditoría de Seguridad'),
+      appBar: VaultAppBar(title: l10n.auditTitle),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
@@ -55,7 +57,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Análisis de Seguridad',
+                      l10n.auditAnalysisTitle,
                       style: TextStyle(
                         color: palette.textPrimary,
                         fontSize: 18,
@@ -64,7 +66,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'SoloKey analiza tus credenciales localmente para identificar contraseñas débiles, cortas, reutilizadas o antiguas.',
+                      l10n.auditAnalysisDesc,
                       style: TextStyle(color: palette.textMuted, fontSize: 13),
                     ),
                     const SizedBox(height: 16),
@@ -83,7 +85,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
-                                      'Verificar filtraciones (online)',
+                                      l10n.auditBreachCheck,
                                       style: TextStyle(
                                         color: palette.textPrimary,
                                         fontSize: 14,
@@ -99,7 +101,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                                       borderRadius: BorderRadius.circular(4),
                                     ),
                                     child: Text(
-                                      'PRIVADO',
+                                      l10n.auditPrivateBadge,
                                       style: TextStyle(
                                         color: palette.accent,
                                         fontSize: 9,
@@ -111,7 +113,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                               ),
                               const SizedBox(height: 4),
                               Text(
-                                'Usa k-Anonymity (HaveIBeenPwned) para buscar contraseñas expuestas sin revelar tu contraseña real.',
+                                l10n.auditBreachDesc,
                                 style: TextStyle(color: palette.textMuted, fontSize: 11),
                               ),
                             ],
@@ -150,7 +152,7 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Text(
-                    'Error: $e',
+                    l10n.commonErrorDetail('$e'),
                     style: TextStyle(color: palette.danger),
                     textAlign: TextAlign.center,
                   ),
@@ -190,6 +192,7 @@ class _AllGood extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -203,14 +206,14 @@ class _AllGood extends StatelessWidget {
             child: Icon(Icons.verified_rounded, color: palette.success, size: 60),
           ),
           const SizedBox(height: 20),
-          Text('¡Todo en orden!',
+          Text(l10n.auditAllGoodTitle,
               style: TextStyle(
                   color: palette.textPrimary,
                   fontSize: 22,
                   fontWeight: FontWeight.bold)),
           const SizedBox(height: 8),
           Text(
-            'No se encontraron problemas en tu bóveda.',
+            l10n.auditAllGoodDesc,
             style: TextStyle(color: palette.textMuted, fontSize: 14),
             textAlign: TextAlign.center,
           ),
@@ -224,11 +227,18 @@ class _IssueCard extends StatelessWidget {
   const _IssueCard({required this.issue});
   final AuditIssue issue;
 
-  static const _severityMeta = {
-    AuditSeverity.critical: (icon: Icons.error_rounded, label: 'Crítico'),
-    AuditSeverity.warning: (icon: Icons.warning_rounded, label: 'Advertencia'),
-    AuditSeverity.info: (icon: Icons.info_rounded, label: 'Info'),
-  };
+  static IconData _severityIcon(AuditSeverity s) => switch (s) {
+        AuditSeverity.critical => Icons.error_rounded,
+        AuditSeverity.warning => Icons.warning_rounded,
+        AuditSeverity.info => Icons.info_rounded,
+      };
+
+  static String _severityLabel(AppLocalizations l10n, AuditSeverity s) =>
+      switch (s) {
+        AuditSeverity.critical => l10n.auditSeverityCritical,
+        AuditSeverity.warning => l10n.auditSeverityWarning,
+        AuditSeverity.info => l10n.auditSeverityInfo,
+      };
 
   Color _severityColor(AuditSeverity severity, AppPalette p) => switch (severity) {
         AuditSeverity.critical => p.danger,
@@ -239,7 +249,7 @@ class _IssueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final meta = _severityMeta[issue.severity]!;
+    final l10n = AppLocalizations.of(context);
     final color = _severityColor(issue.severity, palette);
     return GestureDetector(
       onTap: () => context.push(AppRoutes.credentialEdit.replaceFirst(':id', issue.credential.id)),
@@ -255,7 +265,7 @@ class _IssueCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(meta.icon, color: color, size: 22),
+            Icon(_severityIcon(issue.severity), color: color, size: 22),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
@@ -271,7 +281,7 @@ class _IssueCard extends StatelessWidget {
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(
-                          meta.label,
+                          _severityLabel(l10n, issue.severity),
                           style: TextStyle(
                             color: color,
                             fontSize: 10,

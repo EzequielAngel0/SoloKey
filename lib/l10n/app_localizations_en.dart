@@ -529,4 +529,112 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get quickFillCopyPassword => 'Copy password';
+
+  @override
+  String get commonGotIt => 'Got it';
+
+  @override
+  String get auditTitle => 'Security Audit';
+
+  @override
+  String get auditAnalysisTitle => 'Security Analysis';
+
+  @override
+  String get auditAnalysisDesc =>
+      'SoloKey analyses your credentials locally to identify weak, short, reused or old passwords.';
+
+  @override
+  String get auditBreachCheck => 'Check breaches (online)';
+
+  @override
+  String get auditPrivateBadge => 'PRIVATE';
+
+  @override
+  String get auditBreachDesc =>
+      'Uses k-Anonymity (HaveIBeenPwned) to look up exposed passwords without revealing your real password.';
+
+  @override
+  String get auditAllGoodTitle => 'All good!';
+
+  @override
+  String get auditAllGoodDesc => 'No problems were found in your vault.';
+
+  @override
+  String get auditSeverityCritical => 'Critical';
+
+  @override
+  String get auditSeverityWarning => 'Warning';
+
+  @override
+  String get auditSeverityInfo => 'Info';
+
+  @override
+  String get passkeysTitle => 'Passkey backups';
+
+  @override
+  String get passkeysAdd => 'Add passkey';
+
+  @override
+  String get passkeysHowToTitle => 'How to register a passkey?';
+
+  @override
+  String get passkeysHowToBody =>
+      'Passkeys are registered directly on each web service (e.g. Google, GitHub, Apple).\n\n1. Go to the service\'s website\n2. Look for \"Passkeys\" under Security\n3. The system will register and sync the passkey automatically\n\nSoloKey will store the passkey information in your vault, encrypted, so you can manage it.';
+
+  @override
+  String get passkeysEmptyTitle => 'No passkey backups';
+
+  @override
+  String get passkeysEmptyDesc =>
+      'Passkeys are the future of authentication: passwordless, safer and faster. Register them on your favourite services and SoloKey will keep an encrypted backup here.';
+
+  @override
+  String get passkeysEncryptedBadge => 'Encrypted backup in your vault';
+
+  @override
+  String passkeysUpdated(String date) {
+    return 'Updated: $date';
+  }
+
+  @override
+  String get passkeysViewDetails => 'View details';
+
+  @override
+  String get passkeyDomain => 'Domain (RP ID)';
+
+  @override
+  String get passkeyService => 'Service';
+
+  @override
+  String get passkeyVerification => 'Verification';
+
+  @override
+  String get passkeyVerificationRequired => 'Required (Biometric / PIN)';
+
+  @override
+  String get passkeyVerificationOptional => 'Optional';
+
+  @override
+  String get passkeyCredentialId => 'Credential ID';
+
+  @override
+  String get passkeyRegistered => 'Registered';
+
+  @override
+  String get passkeyPrivateKeyNote =>
+      'The private key never leaves the device. Only the identifying information is stored.';
+
+  @override
+  String get passkeysDeleteTitle => 'Delete passkey';
+
+  @override
+  String passkeysDeleteBody(String title, String service) {
+    return 'Delete the passkey \"$title\"?\n\nNote: you must also remove it from the corresponding web service ($service).';
+  }
+
+  @override
+  String get passkeysSiteFallback => 'the site';
+
+  @override
+  String get passkeysDeleteAuthReason => 'Verify to delete this passkey';
 }

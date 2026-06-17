@@ -1063,6 +1063,204 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Copy password'**
   String get quickFillCopyPassword;
+
+  /// No description provided for @commonGotIt.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get commonGotIt;
+
+  /// No description provided for @auditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Audit'**
+  String get auditTitle;
+
+  /// No description provided for @auditAnalysisTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Security Analysis'**
+  String get auditAnalysisTitle;
+
+  /// No description provided for @auditAnalysisDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'SoloKey analyses your credentials locally to identify weak, short, reused or old passwords.'**
+  String get auditAnalysisDesc;
+
+  /// No description provided for @auditBreachCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Check breaches (online)'**
+  String get auditBreachCheck;
+
+  /// No description provided for @auditPrivateBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'PRIVATE'**
+  String get auditPrivateBadge;
+
+  /// No description provided for @auditBreachDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Uses k-Anonymity (HaveIBeenPwned) to look up exposed passwords without revealing your real password.'**
+  String get auditBreachDesc;
+
+  /// No description provided for @auditAllGoodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'All good!'**
+  String get auditAllGoodTitle;
+
+  /// No description provided for @auditAllGoodDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'No problems were found in your vault.'**
+  String get auditAllGoodDesc;
+
+  /// No description provided for @auditSeverityCritical.
+  ///
+  /// In en, this message translates to:
+  /// **'Critical'**
+  String get auditSeverityCritical;
+
+  /// No description provided for @auditSeverityWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning'**
+  String get auditSeverityWarning;
+
+  /// No description provided for @auditSeverityInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Info'**
+  String get auditSeverityInfo;
+
+  /// No description provided for @passkeysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey backups'**
+  String get passkeysTitle;
+
+  /// No description provided for @passkeysAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add passkey'**
+  String get passkeysAdd;
+
+  /// No description provided for @passkeysHowToTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How to register a passkey?'**
+  String get passkeysHowToTitle;
+
+  /// No description provided for @passkeysHowToBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are registered directly on each web service (e.g. Google, GitHub, Apple).\n\n1. Go to the service\'s website\n2. Look for \"Passkeys\" under Security\n3. The system will register and sync the passkey automatically\n\nSoloKey will store the passkey information in your vault, encrypted, so you can manage it.'**
+  String get passkeysHowToBody;
+
+  /// No description provided for @passkeysEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No passkey backups'**
+  String get passkeysEmptyTitle;
+
+  /// No description provided for @passkeysEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkeys are the future of authentication: passwordless, safer and faster. Register them on your favourite services and SoloKey will keep an encrypted backup here.'**
+  String get passkeysEmptyDesc;
+
+  /// No description provided for @passkeysEncryptedBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted backup in your vault'**
+  String get passkeysEncryptedBadge;
+
+  /// No description provided for @passkeysUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated: {date}'**
+  String passkeysUpdated(String date);
+
+  /// No description provided for @passkeysViewDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View details'**
+  String get passkeysViewDetails;
+
+  /// No description provided for @passkeyDomain.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain (RP ID)'**
+  String get passkeyDomain;
+
+  /// No description provided for @passkeyService.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get passkeyService;
+
+  /// No description provided for @passkeyVerification.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification'**
+  String get passkeyVerification;
+
+  /// No description provided for @passkeyVerificationRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Required (Biometric / PIN)'**
+  String get passkeyVerificationRequired;
+
+  /// No description provided for @passkeyVerificationOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'Optional'**
+  String get passkeyVerificationOptional;
+
+  /// No description provided for @passkeyCredentialId.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential ID'**
+  String get passkeyCredentialId;
+
+  /// No description provided for @passkeyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'Registered'**
+  String get passkeyRegistered;
+
+  /// No description provided for @passkeyPrivateKeyNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The private key never leaves the device. Only the identifying information is stored.'**
+  String get passkeyPrivateKeyNote;
+
+  /// No description provided for @passkeysDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete passkey'**
+  String get passkeysDeleteTitle;
+
+  /// No description provided for @passkeysDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete the passkey \"{title}\"?\n\nNote: you must also remove it from the corresponding web service ({service}).'**
+  String passkeysDeleteBody(String title, String service);
+
+  /// No description provided for @passkeysSiteFallback.
+  ///
+  /// In en, this message translates to:
+  /// **'the site'**
+  String get passkeysSiteFallback;
+
+  /// No description provided for @passkeysDeleteAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify to delete this passkey'**
+  String get passkeysDeleteAuthReason;
 }
 
 class _AppLocalizationsDelegate

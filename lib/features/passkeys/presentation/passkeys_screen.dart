@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../credentials/application/credentials_provider.dart';
@@ -19,17 +20,18 @@ class PasskeysScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final credsAsync = ref.watch(credentialsNotifierProvider);
 
     return Scaffold(
       backgroundColor: palette.background,
-      appBar: const VaultAppBar(title: 'Respaldos de Passkey'),
+      appBar: VaultAppBar(title: l10n.passkeysTitle),
       body: credsAsync.when(
         loading: () => Center(
           child: CircularProgressIndicator(color: palette.typePasskey),
         ),
         error: (e, _) => Center(
-          child: Text('Error: $e', style: TextStyle(color: palette.error)),
+          child: Text(l10n.commonErrorDetail('$e'), style: TextStyle(color: palette.error)),
         ),
         data: (creds) {
           final passkeys = creds
@@ -54,13 +56,14 @@ class PasskeysScreen extends ConsumerWidget {
         onPressed: () => _showAddPasskeyInfo(context),
         backgroundColor: palette.typePasskey,
         icon: const Icon(Icons.add_rounded),
-        label: const Text('Añadir Passkey'),
+        label: Text(l10n.passkeysAdd),
       ),
     );
   }
 
   void _showAddPasskeyInfo(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet(
       context: context,
       backgroundColor: palette.drawer,
@@ -92,7 +95,7 @@ class PasskeysScreen extends ConsumerWidget {
                   size: 56, color: palette.typePasskey),
               const SizedBox(height: 16),
               Text(
-                '¿Cómo registrar una Passkey?',
+                l10n.passkeysHowToTitle,
                 style: TextStyle(
                   color: palette.textPrimary,
                   fontSize: 18,
@@ -101,13 +104,7 @@ class PasskeysScreen extends ConsumerWidget {
               ),
               const SizedBox(height: 12),
               Text(
-                'Las Passkeys se registran directamente en cada servicio web '
-                '(ej. Google, GitHub, Apple). \n\n'
-                '1. Ve al sitio web del servicio\n'
-                '2. Busca "Passkeys" o "Llaves de acceso" en Seguridad\n'
-                '3. El sistema registrará y sincronizará la passkey automáticamente\n\n'
-                'SoloKey almacenará la información de la passkey en tu bóveda '
-                'de forma cifrada para que puedas gestionarla.',
+                l10n.passkeysHowToBody,
                 style: TextStyle(
                   color: palette.textMuted,
                   fontSize: 13,
@@ -124,7 +121,7 @@ class PasskeysScreen extends ConsumerWidget {
                     backgroundColor: palette.typePasskey,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                   ),
-                  child: const Text('Entendido'),
+                  child: Text(l10n.commonGotIt),
                 ),
               ),
             ],
@@ -141,6 +138,7 @@ class _EmptyPasskeysView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(40),
@@ -165,7 +163,7 @@ class _EmptyPasskeysView extends StatelessWidget {
             ),
             const SizedBox(height: 28),
             Text(
-              'Sin respaldos de passkey',
+              l10n.passkeysEmptyTitle,
               style: TextStyle(
                 color: palette.textPrimary,
                 fontSize: 20,
@@ -174,10 +172,7 @@ class _EmptyPasskeysView extends StatelessWidget {
             ),
             const SizedBox(height: 12),
             Text(
-              'Las Passkeys son el futuro de la autenticación: '
-              'sin contraseñas, más seguras y más rápidas. '
-              'Regístralas en tus servicios favoritos y '
-              'SoloKey guardará aquí un respaldo cifrado.',
+              l10n.passkeysEmptyDesc,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: palette.textMuted,
@@ -201,7 +196,7 @@ class _EmptyPasskeysView extends StatelessWidget {
                       color: palette.typePasskey, size: 16),
                   const SizedBox(width: 8),
                   Text(
-                    'Respaldo cifrado en tu bóveda',
+                    l10n.passkeysEncryptedBadge,
                     style: TextStyle(
                       color: palette.textMuted,
                       fontSize: 12,
@@ -226,6 +221,7 @@ class _PasskeyCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final meta = credential.passkeyMetadata;
     return Container(
       decoration: BoxDecoration(
@@ -273,7 +269,7 @@ class _PasskeyCard extends ConsumerWidget {
             ],
             const SizedBox(height: 4),
             Text(
-              'Actualizado: ${_formatDate(credential.updatedAt)}',
+              l10n.passkeysUpdated(_formatDate(credential.updatedAt)),
               style: TextStyle(
                   color: palette.textDisabled, fontSize: 10),
             ),
@@ -290,7 +286,7 @@ class _PasskeyCard extends ConsumerWidget {
               child: ListTile(
                 leading: Icon(Icons.info_outline_rounded,
                     color: palette.textMuted, size: 20),
-                title: Text('Ver detalles',
+                title: Text(l10n.passkeysViewDetails,
                     style: TextStyle(color: palette.textPrimary, fontSize: 13)),
                 contentPadding: EdgeInsets.zero,
               ),
@@ -300,7 +296,7 @@ class _PasskeyCard extends ConsumerWidget {
               child: ListTile(
                 leading: Icon(Icons.delete_outline_rounded,
                     color: palette.danger, size: 20),
-                title: Text('Eliminar',
+                title: Text(l10n.commonDelete,
                     style: TextStyle(
                         color: palette.danger, fontSize: 13)),
                 contentPadding: EdgeInsets.zero,
@@ -323,6 +319,7 @@ class _PasskeyCard extends ConsumerWidget {
 
   void _showDetails(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final meta = credential.passkeyMetadata;
     showModalBottomSheet(
       context: context,
@@ -359,35 +356,35 @@ class _PasskeyCard extends ConsumerWidget {
             if (meta != null) ...[
               _DetailRow(
                   icon: Icons.language_rounded,
-                  label: 'Dominio (RP ID)',
+                  label: l10n.passkeyDomain,
                   value: meta.rpId),
               if (meta.rpName != null)
                 _DetailRow(
                     icon: Icons.business_rounded,
-                    label: 'Servicio',
+                    label: l10n.passkeyService,
                     value: meta.rpName!),
               if (meta.userDisplayName != null)
                 _DetailRow(
                     icon: Icons.person_rounded,
-                    label: 'Usuario',
+                    label: l10n.fieldUsername,
                     value: meta.userDisplayName!),
               _DetailRow(
                 icon: Icons.verified_user_rounded,
-                label: 'Verificación',
+                label: l10n.passkeyVerification,
                 value: meta.userVerificationRequired
-                    ? 'Requerida (Biométrico / PIN)'
-                    : 'Opcional',
+                    ? l10n.passkeyVerificationRequired
+                    : l10n.passkeyVerificationOptional,
               ),
               _DetailRow(
                 icon: Icons.tag_rounded,
-                label: 'Credential ID',
+                label: l10n.passkeyCredentialId,
                 value:
                     '${meta.credentialId.substring(0, meta.credentialId.length.clamp(0, 20))}…',
               ),
             ],
             _DetailRow(
               icon: Icons.calendar_today_rounded,
-              label: 'Registrada',
+              label: l10n.passkeyRegistered,
               value: _formatDate(credential.createdAt),
             ),
             const SizedBox(height: 8),
@@ -406,8 +403,7 @@ class _PasskeyCard extends ConsumerWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'La clave privada nunca sale del dispositivo. '
-                      'Solo la información de identificación está almacenada.',
+                      l10n.passkeyPrivateKeyNote,
                       style: TextStyle(
                           color: palette.typePasskey, fontSize: 11),
                     ),
@@ -423,26 +419,28 @@ class _PasskeyCard extends ConsumerWidget {
 
   void _confirmDelete(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final service = credential.passkeyMetadata?.rpId ??
+        credential.website ??
+        l10n.passkeysSiteFallback;
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Eliminar Passkey',
+        title: Text(l10n.passkeysDeleteTitle,
             style: TextStyle(color: palette.textPrimary)),
         content: Text(
-          '¿Eliminar la passkey "${credential.title}"?\n\n'
-          'Nota: también deberás eliminarla del servicio web correspondiente '
-          '(${credential.passkeyMetadata?.rpId ?? credential.website ?? "el sitio"}).',
+          l10n.passkeysDeleteBody(credential.title, service),
           style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancelar'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () async {
-              final auth = await AuthHelper.requireAuth(context, reason: 'Verifica para eliminar esta passkey');
+              final auth = await AuthHelper.requireAuth(context, reason: l10n.passkeysDeleteAuthReason);
               if (!auth) return;
 
               if (context.mounted) {
@@ -455,7 +453,7 @@ class _PasskeyCard extends ConsumerWidget {
             },
             style: TextButton.styleFrom(
                 foregroundColor: palette.danger),
-            child: const Text('Eliminar'),
+            child: Text(l10n.commonDelete),
           ),
         ],
       ),

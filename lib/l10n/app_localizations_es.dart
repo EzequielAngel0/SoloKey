@@ -533,4 +533,112 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get quickFillCopyPassword => 'Copiar contraseña';
+
+  @override
+  String get commonGotIt => 'Entendido';
+
+  @override
+  String get auditTitle => 'Auditoría de Seguridad';
+
+  @override
+  String get auditAnalysisTitle => 'Análisis de Seguridad';
+
+  @override
+  String get auditAnalysisDesc =>
+      'SoloKey analiza tus credenciales localmente para identificar contraseñas débiles, cortas, reutilizadas o antiguas.';
+
+  @override
+  String get auditBreachCheck => 'Verificar filtraciones (online)';
+
+  @override
+  String get auditPrivateBadge => 'PRIVADO';
+
+  @override
+  String get auditBreachDesc =>
+      'Usa k-Anonymity (HaveIBeenPwned) para buscar contraseñas expuestas sin revelar tu contraseña real.';
+
+  @override
+  String get auditAllGoodTitle => '¡Todo en orden!';
+
+  @override
+  String get auditAllGoodDesc => 'No se encontraron problemas en tu bóveda.';
+
+  @override
+  String get auditSeverityCritical => 'Crítico';
+
+  @override
+  String get auditSeverityWarning => 'Advertencia';
+
+  @override
+  String get auditSeverityInfo => 'Info';
+
+  @override
+  String get passkeysTitle => 'Respaldos de Passkey';
+
+  @override
+  String get passkeysAdd => 'Añadir Passkey';
+
+  @override
+  String get passkeysHowToTitle => '¿Cómo registrar una Passkey?';
+
+  @override
+  String get passkeysHowToBody =>
+      'Las Passkeys se registran directamente en cada servicio web (ej. Google, GitHub, Apple).\n\n1. Ve al sitio web del servicio\n2. Busca \"Passkeys\" o \"Llaves de acceso\" en Seguridad\n3. El sistema registrará y sincronizará la passkey automáticamente\n\nSoloKey almacenará la información de la passkey en tu bóveda de forma cifrada para que puedas gestionarla.';
+
+  @override
+  String get passkeysEmptyTitle => 'Sin respaldos de passkey';
+
+  @override
+  String get passkeysEmptyDesc =>
+      'Las Passkeys son el futuro de la autenticación: sin contraseñas, más seguras y más rápidas. Regístralas en tus servicios favoritos y SoloKey guardará aquí un respaldo cifrado.';
+
+  @override
+  String get passkeysEncryptedBadge => 'Respaldo cifrado en tu bóveda';
+
+  @override
+  String passkeysUpdated(String date) {
+    return 'Actualizado: $date';
+  }
+
+  @override
+  String get passkeysViewDetails => 'Ver detalles';
+
+  @override
+  String get passkeyDomain => 'Dominio (RP ID)';
+
+  @override
+  String get passkeyService => 'Servicio';
+
+  @override
+  String get passkeyVerification => 'Verificación';
+
+  @override
+  String get passkeyVerificationRequired => 'Requerida (Biométrico / PIN)';
+
+  @override
+  String get passkeyVerificationOptional => 'Opcional';
+
+  @override
+  String get passkeyCredentialId => 'Credential ID';
+
+  @override
+  String get passkeyRegistered => 'Registrada';
+
+  @override
+  String get passkeyPrivateKeyNote =>
+      'La clave privada nunca sale del dispositivo. Solo la información de identificación está almacenada.';
+
+  @override
+  String get passkeysDeleteTitle => 'Eliminar Passkey';
+
+  @override
+  String passkeysDeleteBody(String title, String service) {
+    return '¿Eliminar la passkey \"$title\"?\n\nNota: también deberás eliminarla del servicio web correspondiente ($service).';
+  }
+
+  @override
+  String get passkeysSiteFallback => 'el sitio';
+
+  @override
+  String get passkeysDeleteAuthReason => 'Verifica para eliminar esta passkey';
 }
