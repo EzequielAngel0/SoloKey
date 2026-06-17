@@ -1,12 +1,22 @@
 #include <flutter/dart_project.h>
 #include <flutter/flutter_view_controller.h>
 #include <windows.h>
+#include <shobjidl.h>
 
 #include "flutter_window.h"
 #include "utils.h"
 
+// AppUserModelID estable para SoloKey. Debe coincidir con el AppUserModelID del
+// acceso directo que crea el instalador (Inno Setup), para que las
+// notificaciones (toasts) y el agrupado en la barra de tareas usen la identidad
+// e icono correctos de "SoloKey".
+static const wchar_t kAppUserModelId[] = L"com.angelezequiel.solokey";
+
 int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
                       _In_ wchar_t *command_line, _In_ int show_command) {
+  // Identidad de la app para toasts/taskbar (apps desempaquetadas).
+  ::SetCurrentProcessExplicitAppUserModelID(kAppUserModelId);
+
   // Attach to console when present (e.g., 'flutter run') or create a
   // new console when running with a debugger.
   if (!::AttachConsole(ATTACH_PARENT_PROCESS) && ::IsDebuggerPresent()) {
@@ -27,7 +37,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
   FlutterWindow window(project);
   Win32Window::Point origin(10, 10);
   Win32Window::Size size(1280, 720);
-  if (!window.Create(L"password_manager", origin, size)) {
+  if (!window.Create(L"SoloKey", origin, size)) {
     return EXIT_FAILURE;
   }
   window.SetQuitOnClose(true);

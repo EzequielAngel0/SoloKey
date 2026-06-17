@@ -8,10 +8,12 @@
     - APK general (universal, todas las ABIs)         -> dist/SoloKey-<ver>-universal.apk
     - APKs split-per-abi (arm64-v8a / armeabi-v7a / x86_64)
                                                        -> dist/<abi>/SoloKey-<ver>-<abi>.apk
-    - Build de Windows (.exe + DLLs + carpeta data)    -> dist/windows/
+    - Build portable de Windows (SoloKey.exe + DLLs + data) -> dist/windows/
+    - Instalador Inno Setup                            -> dist/SoloKey-<ver>-setup.exe
+                                                          (requiere Inno Setup / ISCC.exe)
 
 .PARAMETER Target
-  Que compilar: android | windows | all. Por defecto: all.
+  Que compilar: android | windows | inno | all. Por defecto: all.
 
 .PARAMETER Clean
   Ejecuta 'flutter clean' antes de compilar.
@@ -19,11 +21,12 @@
 .EXAMPLE
   ./build_release.ps1
   ./build_release.ps1 -Target android
+  ./build_release.ps1 -Target inno
   ./build_release.ps1 -Target windows -Clean
 #>
 [CmdletBinding()]
 param(
-    [ValidateSet('android', 'windows', 'all')]
+    [ValidateSet('android', 'windows', 'inno', 'all')]
     [string]$Target = 'all',
     [switch]$Clean
 )
@@ -106,11 +109,7 @@ function Build-Android {
 }
 
 # ── Windows ────────────────────────────────────────────────────────────────────
-function Build-Windows {
-    Write-Step 'Compilando Windows (.exe, release)'
-    flutter build windows --release
-    if ($LASTEXITCODE -ne 0) { throw "Fallo 'flutter build windows --release' (exit $LASTEXITCODE)." }
-
+function Find-WindowsRelease {
     # La ruta de salida varia segun la version de Flutter.
     $candidates = @(
         (Join-Path $Root 'build\windows\x64\runner\Release'),
@@ -118,13 +117,58 @@ function Build-Windows {
     )
     $winSrc = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
     if ($null -eq $winSrc) { throw 'No se encontro la carpeta Release de Windows.' }
+    return $winSrc
+}
 
+# Copia el ejecutable portable (exe + DLLs + data) a dist/windows, sin el .msix.
+function Copy-WindowsRelease {
+    $winSrc = Find-WindowsRelease
     $winDest = Join-Path $Dist 'windows'
     if (Test-Path $winDest) { Remove-Item $winDest -Recurse -Force -ErrorAction Stop }
     Confirm-Dir $winDest
-    Copy-Item (Join-Path $winSrc '*') $winDest -Recurse -Force -ErrorAction Stop
+    Copy-Item (Join-Path $winSrc '*') $winDest -Recurse -Force -Exclude '*.msix' -ErrorAction Stop
+    Write-Host "Windows portable -> $winDest (SoloKey.exe + DLLs + data)" -ForegroundColor Green
+}
 
-    Write-Host "Windows listo en $winDest (ejecutable + DLLs + data)" -ForegroundColor Green
+function Build-Windows {
+    Write-Step 'Compilando Windows (.exe, release)'
+    flutter build windows --release
+    if ($LASTEXITCODE -ne 0) { throw "Fallo 'flutter build windows --release' (exit $LASTEXITCODE)." }
+    Copy-WindowsRelease
+}
+
+# ── Instalador Inno Setup (Windows) ──────────────────────────────────────────────
+# Produce SoloKey-<ver>-setup.exe a partir de dist/windows. App desempaquetada
+# (la boveda queda en la misma ubicacion que el .exe). La firma es opcional.
+function Find-Iscc {
+    $candidates = @(
+        "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
+        "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe",
+        "$env:ProgramFiles\Inno Setup 5\ISCC.exe",
+        "${env:ProgramFiles(x86)}\Inno Setup 5\ISCC.exe"
+    )
+    $found = $candidates | Where-Object { Test-Path $_ } | Select-Object -First 1
+    if ($null -eq $found) {
+        $cmd = Get-Command iscc -ErrorAction SilentlyContinue
+        if ($cmd) { $found = $cmd.Source }
+    }
+    if ($null -eq $found) {
+        throw "No se encontro ISCC.exe (Inno Setup). Instalalo con:  winget install JRSoftware.InnoSetup   (o https://jrsoftware.org/isdl.php)"
+    }
+    return $found
+}
+
+function Build-Inno {
+    # El instalador empaqueta dist/windows; aseguramos que exista.
+    if (-not (Test-Path (Join-Path $Dist 'windows\SoloKey.exe'))) {
+        Build-Windows
+    }
+    $iscc = Find-Iscc
+    Write-Step 'Generando instalador con Inno Setup (SoloKey-setup.exe)'
+    & $iscc "/DMyAppVersion=$Version" (Join-Path $Root 'installer\SoloKey.iss')
+    if ($LASTEXITCODE -ne 0) { throw "Fallo ISCC / Inno Setup (exit $LASTEXITCODE)." }
+    Write-Host "Instalador -> $(Join-Path $Dist "$AppName-$Version-setup.exe")" -ForegroundColor Green
 }
 
 # ── Ejecucion ───────────────────────────────────────────────────────────────────
@@ -133,7 +177,8 @@ Confirm-Dir $Dist
 switch ($Target) {
     'android' { Build-Android }
     'windows' { Build-Windows }
-    'all'     { Build-Android; Build-Windows }
+    'inno'    { Build-Inno }
+    'all'     { Build-Android; Build-Windows; Build-Inno }
 }
 
 Write-Step "Listo. Artefactos en: $Dist"

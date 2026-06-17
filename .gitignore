@@ -35,6 +35,8 @@ migrate_working_dir/
 
 # Artefactos de release generados por build_release.ps1
 /dist/
+# Certificados de firma de desarrollo (contienen llave privada)
+/certs/
 
 # Symbolication related
 app.*.symbols

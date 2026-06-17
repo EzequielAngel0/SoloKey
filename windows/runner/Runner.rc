@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.vaultguard" "\0"
-            VALUE "FileDescription", "password_manager" "\0"
+            VALUE "CompanyName", "Angel Ezequiel Barbosa Lomeli" "\0"
+            VALUE "FileDescription", "SoloKey" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "password_manager" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.vaultguard. All rights reserved." "\0"
-            VALUE "OriginalFilename", "password_manager.exe" "\0"
-            VALUE "ProductName", "password_manager" "\0"
+            VALUE "InternalName", "SoloKey" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 Angel Ezequiel Barbosa Lomeli. All rights reserved." "\0"
+            VALUE "OriginalFilename", "SoloKey.exe" "\0"
+            VALUE "ProductName", "SoloKey" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
