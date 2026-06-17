@@ -1,139 +1,326 @@
-# 🖥️ SoloKey Desktop Companion — Plan de Arquitectura y Planificación
+# 🖥️ SoloKey Desktop Companion — Plan Maestro de Arquitectura e Implementación
 
-Este documento establece el diseño técnico, protocolos criptográficos y estrategia de sincronización local para la aplicación de escritorio de **SoloKey** (Windows/macOS/Linux) en complementariedad con la aplicación móvil.
+Este documento sirve como la guía técnica definitiva y el plan de implementación paso a paso para desarrollar el **SoloKey Desktop Companion** (Windows, macOS y Linux) en un chat posterior. Permite la reutilización directa de la lógica de negocio (Clean Architecture) y criptografía de la app móvil.
 
 ---
 
 ## 🏗️ 1. Arquitectura General y Stack Tecnológico
 
-Siguiendo la filosofía **Local-First** y el ecosistema de SoloKey, la aplicación de escritorio se construirá con las siguientes bases:
+La aplicación de escritorio compartirá la base de código del proyecto móvil en Flutter (Dart), reutilizando:
+*   **Dominio y Casos de Uso:** Entidades (`Credential`, `Folder`, `CustomField`), repositorios y lógica de negocio.
+*   **Servicio de Criptografía (`cryptography`):** Algoritmos Argon2id y AES-256-GCM.
+*   **Base de Datos (`Drift` / `SQLite`):** Modelos de persistencia local y DAOs.
 
-*   **Framework:** **Flutter for Desktop** (Dart). Esto permite reutilizar el 85%+ de la lógica de negocio (Clean Architecture), los modelos inmutables (`Freezed`), la base de datos (`Drift` sobre SQLite nativo), los servicios criptográficos (`cryptography`) y la inyección de dependencias (`injectable`).
-*   **Base de Datos Local:** Cada instancia de escritorio tendrá su propia base de datos Drift cifrada de forma independiente utilizando una clave local generada por el sistema operativo (vía `Credential Manager` en Windows, `Keychain` en macOS y `Secret Service` en Linux).
-*   **Comunicación P2P:** La sincronización y comunicación móvil-escritorio se realizará **exclusivamente a través de la red local (LAN/Wi-Fi)** sin depender de servidores en la nube centralizados, manteniendo la privacidad absoluta de los datos.
+### Estructura de Carpetas del Proyecto Multicanal
+Para soportar el desarrollo multiplataforma limpio en el mismo repositorio, se debe organizar la estructura de la siguiente manera:
+
+```
+lib/
+├── core/
+│   ├── domain/               # Entidades y lógica core reutilizable
+│   ├── infrastructure/
+│   │   └── database/         # AppDatabase con soporte multiplataforma (Drift)
+│   └── presentation/
+│       ├── layouts/
+│       │   └── responsive_layout.dart # Selector de Layout móvil vs escritorio
+│       └── theme/            # Diseño premium común
+├── features/
+│   ├── credentials/          # Vistas compartidas o específicas
+│   ├── folders/
+│   └── sync/                 # [NUEVO] Lógica de sincronización P2P
+│       ├── domain/           # Modelos de emparejamiento y sincronización
+│       ├── infrastructure/   # Servidor Shelf (Escritorio) y Cliente WebSocket (Móvil)
+│       └── presentation/     # Pantalla de QR (Escritorio) y Escáner (Móvil)
+```
+
+### Nuevas Dependencias Requeridas (`pubspec.yaml`)
+Para el soporte nativo de escritorio, añade las siguientes dependencias al archivo `pubspec.yaml`:
+```yaml
+dependencies:
+  # Control de ventana (tamaño, posición, centrado)
+  window_manager: ^0.3.9
+  # Soporte para minimizar a barra de tareas (System Tray)
+  tray_manager: ^0.2.1
+  # Descubrimiento de red local por ZeroConf / mDNS
+  nsd: ^1.2.1
+  # Servidor HTTPS / WebSocket local (para el rol de servidor en Escritorio)
+  shelf: ^1.4.1
+  shelf_web_socket: ^2.0.0
+  shelf_router: ^1.1.4
+  # Gestión de atajos de teclado y menús contextuales nativos
+  context_menus: ^1.0.1
+```
 
 ---
 
 ## 🔒 2. Protocolo de Emparejamiento Seguro (Pairing Key Exchange)
 
-Para establecer confianza entre el dispositivo móvil y la aplicación de escritorio, se utilizará un flujo de emparejamiento mediante **códigos QR** que realiza un intercambio de claves autenticado:
+Establece confianza mutua entre el dispositivo móvil (cliente) y la app de escritorio (servidor local) mediante un canal autenticado por código QR y TLS Pinning:
 
 ```mermaid
 sequenceDiagram
     participant Escritorio as SoloKey Desktop (Server)
     participant Movil as SoloKey Mobile (Client)
     
-    Note over Escritorio: Genera par de claves efímeras DH<br/>y un Token de Emparejamiento (32 bytes)
-    Note over Escritorio: Levanta un servidor HTTPS local con<br/>certificado auto-firmado
+    Note over Escritorio: Genera par de claves efímeras ECDH (X25519)<br/>y un Token de Emparejamiento (32 bytes)
+    Note over Escritorio: Levanta un servidor HTTPS/WSS local con<br/>certificado auto-firmado dinámico
     Escritorio->>Escritorio: Muestra código QR en pantalla<br/>(Contiene: IP, Port, Hash Cert y Token)
     
-    Note over Movil: El usuario escanea el QR con la cámara
-    Movil->>Escritorio: Conexión HTTPS (Valida el Hash del Certificado)
-    Note over Movil,Escritorio: Handshake DH autenticado por el Token (SPAKE2 / HASH-HMAC)
+    Note over Movil: El usuario escanea el QR con la cámara física
+    Movil->>Escritorio: Conexión HTTPS segura
+    Note over Movil: badCertificateCallback verifica que la huella<br/>digital coincida con 'Hash Cert' del QR
     
-    Escritorio->>Movil: Confirma emparejamiento
-    Note over Movil,Escritorio: Se establece la Clave de Sincronización Permanente (K_sync)<br/>y se guarda en los Secure Storage de ambos
+    Note over Movil,Escritorio: Handshake ECDH autenticado por el Token (SPAKE2 / HMAC-SHA256)
+    
+    Escritorio->>Movil: Confirma emparejamiento exitoso
+    Note over Movil,Escritorio: Se establece la Clave de Sincronización Permanente (K_sync)<br/>y se almacena en los Secure Storage del OS
 ```
 
-### Detalle del Flujo de Emparejamiento:
-1.  **Activación de Emparejamiento:** El usuario selecciona "Conectar dispositivo" en el escritorio.
-2.  **QR Code Payload:** El escritorio muestra un QR que contiene un JSON serializado con:
-    *   `ip`: Dirección IP local (LAN) y puerto (ej. `192.168.1.45:8283`).
-    *   `cert_fingerprint`: Hash SHA-256 del certificado TLS autogenerado por el escritorio. Esto evita ataques Man-in-the-Middle (MitM) en redes Wi-Fi locales/públicas.
-    *   `pairing_token`: Clave de un solo uso con alta entropía generada aleatoriamente (256-bit).
-3.  **Conexión Segura Directa:** El móvil escanea el QR, extrae los datos, y establece una conexión HTTPS/WSS (WebSockets sobre TLS) directa a la IP indicada. Durante el handshake TLS, el móvil valida que el certificado remoto coincida exactamente con el `cert_fingerprint` escaneado.
-4.  **Confirmación Mutua:** Ambas partes realizan un desafío criptográfico usando el `pairing_token` para derivar una clave compartida permanente de sincronización (`K_sync`). Esta clave se guarda permanentemente en la base segura de cada dispositivo (`flutter_secure_storage`).
+### Detalle Técnico del QR Payload:
+El código QR generado en el escritorio contiene un JSON compacto:
+```json
+{
+  "ip": "192.168.1.45",
+  "port": 8283,
+  "cert_fingerprint": "a3b8cd23d8c4ef547b85e0de5876412f10b2a3cd84ef53a1b02de9c8b746a51d",
+  "pairing_token": "7f8a9b2c3d4e5f6g7h8i9j0k1l2m3n4o"
+}
+```
+
+#### Validación de Certificado TLS Auto-firmado en el Móvil:
+Dado que el certificado TLS de la PC es auto-firmado, el cliente HTTP de Dart lo rechazará por defecto. Se implementa un bypass seguro basado en pinning de huella digital (SHA-256):
+```dart
+final dio = Dio(); // o HttpClient nativo
+(dio.httpClientAdapter as IOHttpClientAdapter).createHttpClient = () {
+  final client = HttpClient();
+  client.badCertificateCallback = (X509Certificate cert, String host, int port) {
+    final certFingerprint = sha256.convert(cert.der).toString();
+    // Validar coincidencia exacta con el hash escaneado en el QR
+    return certFingerprint == scannedFingerprintFromQR;
+  };
+  return client;
+};
+```
 
 ---
 
 ## 🔄 3. Protocolo de Sincronización Incremental (Delta-Sync)
 
-La sincronización utiliza un modelo **Local-First conflict-free** basado en marcas de tiempo y vectores de versión para sincronizar los datos de la bóveda sin exponer las contraseñas en claro.
+La sincronización se realiza en tiempo real a través de WebSockets cifrados de extremo a extremo (E2EE) sobre TLS en la LAN:
 
-### Datos Sincronizados
-Todos los datos que se transfieren viajan en un payload JSON cifrado de extremo a extremo utilizando **AES-256-GCM** con la clave de sincronización (`K_sync`). El canal TLS local añade una capa adicional de transporte cifrado (doble cifrado).
-
-### Proceso de Sincronización (Paso a Paso):
-1.  **Solicitud de Sync:** Cuando ambos dispositivos están en la misma red y encendidos, el móvil se conecta al WebSocket del escritorio.
-2.  **Intercambio de Metadatos (Handshake de Estado):**
-    *   Ambos dispositivos envían una lista compacta de metadatos: `(id, version_counter, updated_at)` para todas las credenciales y carpetas.
-3.  **Cálculo del Delta:**
-    *   Cada dispositivo compara la lista recibida con su estado local.
-    *   Si un ID no existe localmente, o si el `version_counter` remoto es mayor, se añade a la lista de "solicitados".
-    *   Si el `version_counter` local es mayor que el remoto, se añade a la lista de "enviar".
+1.  **Canal Cifrado Secundario:** Todo mensaje enviado por el WebSocket (payload) se encapsula en una envoltura de cifrado utilizando AES-256-GCM con la clave permanente `K_sync`. El servidor WebSocket no ve datos en claro.
+2.  **Handshake de Estado:** Al conectarse, ambos dispositivos intercambian un vector de estado resumido de sus registros:
+    ```json
+    {
+      "type": "sync_handshake",
+      "payload": {
+        "device_id": "desktop_uuid",
+        "last_sync_timestamp": 1729482701,
+        "items": [
+          {"id": "cred_1", "version": 4, "updated_at": 1729482600},
+          {"id": "cred_2", "version": 1, "updated_at": 1729481200}
+        ]
+      }
+    }
+    ```
+3.  **Cálculo de Diferencias:**
+    *   Si `version_local > version_remota`, el dispositivo envía el registro encriptado al otro.
+    *   Si `version_local < version_remota`, el dispositivo solicita el registro actualizado.
 4.  **Resolución de Conflictos:**
-    *   Si un mismo ID tiene cambios en ambos lados con diferentes valores y marcas de tiempo, se utiliza la política de **Last-Write-Wins (LWW)** basada en `updated_at`.
-    *   Para evitar pérdida accidental de datos, el historial de contraseñas (`PasswordHistory`) se combina de forma aditiva, por lo que nunca se pierden las contraseñas anteriores.
-5.  **Envío de Payloads:**
-    *   Los dispositivos intercambian los payloads cifrados correspondientes a los deltas.
-    *   Cada dispositivo descifra e inserta/actualiza las entidades en su base de datos Drift local de forma atómica dentro de una transacción SQLite.
+    *   Regla principal: **Last-Write-Wins (LWW)** basándose estrictamente en el timestamp `updated_at`.
+    *   En caso de discrepancia menor a 1 segundo en marcas de tiempo, la versión del dispositivo móvil prevalece por defecto.
 
 ---
 
-## 📱 4. Desbloqueo Remoto (Auto-Unlock via Mobile)
+## 📡 4. Descubrimiento de Red Local (mDNS / ZeroConf)
 
-Para maximizar la comodidad del usuario sin comprometer la seguridad (evitando escribir la contraseña maestra larga en el teclado de la PC continuamente):
+El móvil descubre la instancia de escritorio en la LAN de forma transparente y sin configurar IPs estáticas:
 
-1.  **Petición de Desbloqueo:** El usuario abre SoloKey Desktop. Si está emparejado con el móvil, el escritorio muestra una opción: "Desbloquear desde el móvil".
-2.  **Notificación Push Local:** El escritorio envía una solicitud cifrada mediante el WebSocket al móvil.
-3.  **Biometría Móvil:** El móvil vibra y muestra un prompt biométrico: "¿Desbloquear SoloKey Desktop?".
-4.  **Transmisión de Master Key:**
-    *   Una vez que el usuario autentica con su huella/rostro en el móvil, el móvil recupera temporalmente la clave maestra AES de la bóveda en memoria RAM.
-    *   El móvil cifra esta clave maestra AES con la clave compartida `K_sync` usando AES-256-GCM (añadiendo un timestamp para prevenir ataques de replay de máximo 10 segundos).
-    *   Envía el blob cifrado al escritorio.
-5.  **Desbloqueo en Escritorio:** El escritorio descifra el blob con su copia de `K_sync`, verifica la frescura del timestamp, carga la clave maestra en su propio `SessionManager` en RAM, y da acceso a la bóveda local sin haber almacenado la contraseña maestra en el disco de la PC.
-
----
-
-## 📡 5. Descubrimiento de Red Local (mDNS / DNS-SD)
-
-Para eliminar la fricción de ingresar direcciones IP manualmente o escanear el código QR repetidamente en cada inicio, SoloKey implementará un protocolo de descubrimiento basado en **Zero Configuration Networking (ZeroConf)**:
-
-1.  **Registro de Servicio en Escritorio:** Al iniciarse y activar el servidor local de sincronización, SoloKey Desktop registrará un servicio del tipo `_solokey-sync._tcp` en la red local utilizando mDNS (Multicast DNS).
-2.  **Búsqueda desde Móvil:** Cuando el usuario abra la pantalla de sincronización en SoloKey Mobile, la aplicación enviará una consulta mDNS para localizar servicios `_solokey-sync._tcp.local`.
-3.  **Resolución de IP/Puerto:** Al encontrar la instancia del escritorio, el móvil obtendrá de forma dinámica la dirección IP actual de la LAN y el puerto activo.
-4.  **Validación de Confianza:** Aunque la IP y puerto cambien dinámicamente, la conexión sigue estando protegida por el certificado TLS. El móvil validará que el hash del certificado del servidor coincida con el fingerprint guardado durante el primer emparejamiento. Si coincide, la sincronización o desbloqueo procede de forma automática y transparente.
+*   **Escritorio:** Registra un servicio de red tipo `_solokey-sync._tcp` usando la librería `nsd`.
+    ```dart
+    final service = await register('_solokey-sync._tcp', 8283);
+    ```
+*   **Móvil:** Al ingresar a la sección de sincronización, inicia la resolución de red local:
+    ```dart
+    final discovery = await startDiscovery('_solokey-sync._tcp');
+    discovery.addListener(() {
+      for (final service in discovery.services) {
+        // Resuelve IP y Puerto
+        final ip = service.addresses.first.address;
+        final port = service.port;
+        // Intenta conectar de forma transparente usando K_sync guardada
+      }
+    });
+    ```
 
 ---
 
-## ⏳ 6. Ciclo de Vida de la Sesión y Seguridad en Memoria
+## 💻 5. Almacenamiento Seguro por Sistema Operativo
 
-Dado que los entornos de escritorio tienen diferentes vectores de ataque y patrones de uso (sesiones compartidas, suspensión de equipo, etc.), se aplicarán políticas rigurosas para el ciclo de vida de la sesión:
+Para almacenar secretos clave (`Master Password` cifrada, `K_sync`, llaves criptográficas del dispositivo) en la máquina del usuario, se utiliza `flutter_secure_storage` configurado según el sistema operativo:
 
-### Bloqueo Automático por Inactividad
-*   **Monitoreo del Sistema:** Se implementará un temporizador de inactividad configurable (ej. 1, 5, 15, 30 minutos). Si no se detectan eventos de teclado o ratón dentro de la ventana de la aplicación, SoloKey se bloqueará automáticamente.
-*   **Eventos del SO:** La aplicación escuchará eventos del sistema operativo (suspensión del equipo, bloqueo del usuario de la sesión del SO) para forzar el bloqueo instantáneo del almacén.
-
-### Minimizado al System Tray (Área de Notificación)
-*   **Comportamiento de Cierre:** El usuario podrá configurar si al presionar la "X" de cerrar la app se cierra por completo o se minimiza al área de notificación (System Tray) para mantener la comunicación P2P en segundo plano.
-*   **Bloqueo al Minimizar:** Opción de bloquear automáticamente la sesión de la bóveda al minimizarse al tray.
-
-### Seguridad en Memoria RAM (Wipe RAM)
-*   **Limpieza Activa (Zeroing):** Para evitar ataques de extracción de memoria heap, cuando la aplicación se bloquee, todas las variables que almacenen claves criptográficas intermedias o la llave maestra se sobrescribirán explícitamente con ceros (`Uint8List.fillRange(0, ...)`) antes de recolectarse por el Garbage Collector.
-*   **Bloqueo de Paginación:** En Windows/Linux/macOS, se explorará el uso de llamadas de sistema nativas (`VirtualLock` en Windows, `mlock` en Unix) para evitar que las secciones de memoria RAM que contienen secretos se paginen al disco duro.
+*   **Windows:** Utiliza **DPAPI (Data Protection API)** a través de las credenciales del sistema de forma transparente.
+*   **macOS:** Utiliza el llavero nativo **Keychain** bajo una clave de acceso única asociada al bundle ID.
+*   **Linux:** Requiere la API **Secret Service** (a través de `libsecret`).
+    > [!IMPORTANT]
+    > **Requisito de compilación en Linux:** El entorno de desarrollo debe contar con el paquete de desarrollo del sistema:
+    > `sudo apt-get install libsecret-1-dev`
+    > El instalador final de la aplicación debe incluir `libsecret-1-0` como dependencia.
 
 ---
 
-## 🛠️ 7. Plan de Fases de Implementación
+## ⏳ 6. Ciclo de Vida de la Sesión y Seguridad Extrema en Memoria
 
-Para asegurar un desarrollo incremental controlado, se propone dividir el desarrollo en 3 fases:
+Para mitigar riesgos de seguridad física en PCs de escritorio:
 
-### Fase 1: Core de Escritorio Local (Independiente)
-*   Habilitar compilación de Flutter para Desktop (Windows/macOS/Linux) en el repositorio actual.
-*   Configurar persistencia con Drift (SQLite) en directorios locales seguros (`AppData` / `Application Support`).
-*   Implementar integración nativa con el almacenamiento de claves seguro del SO para resguardar la sal y la clave local.
-*   Configurar el soporte para minimizar a la barra de tareas / System Tray (`tray_manager`) y monitoreo de inactividad de usuario.
-*   Importar las pantallas de Login, Desbloqueo y Formulario adaptadas a layouts responsivos (Master-Detail).
+### A. Auto-lock por Inactividad
+Un widget `Listener` en la raíz del árbol de widgets intercepta todos los clics, movimientos de mouse y pulsaciones de teclas para mantener la sesión viva.
+```dart
+class AutoLockManager extends ConsumerStatefulWidget {
+  final Widget child;
+  const AutoLockManager({super.key, required this.child});
 
-### Fase 2: Conectividad y Protocolo P2P
-*   Implementar servidor HTTPS y WebSocket local embebido en la app de Escritorio.
-*   Configurar publicación del servicio local vía mDNS (`nsd` / `multicast_dns`) en la app de escritorio y su búsqueda desde el móvil.
-*   Implementar flujo de generación y escaneo de códigos QR para emparejamiento seguro.
-*   Implementar el intercambio criptográfico DH y derivación de `K_sync`.
-*   Añadir pruebas unitarias y de integración del handshake sobre red local ficticia (Mocks de socket).
+  @override
+  ConsumerState<AutoLockManager> createState() => _AutoLockManagerState();
+}
 
-### Fase 3: Sincronización y Desbloqueo Remoto
-*   Implementar motor de sincronización incremental (Delta-Sync) en Drift.
-*   Implementar resolución de conflictos por LWW e integración del historial de contraseñas.
-*   Implementar el mecanismo de desbloqueo remoto seguro por WebSocket utilizando biometría del móvil.
+class _AutoLockManagerState extends ConsumerState<AutoLockManager> {
+  Timer? _timer;
 
+  void _resetTimer() {
+    _timer?.cancel();
+    final timeoutSeconds = ref.read(settingsProvider).autoLockTimeout;
+    _timer = Timer(Duration(seconds: timeoutSeconds), () {
+      ref.read(vaultStateProvider.notifier).lockVault();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => _resetTimer(),
+      onPointerMove: (_) => _resetTimer(),
+      child: KeyboardListener(
+        focusNode: FocusNode()..requestFocus(),
+        onKeyEvent: (_) => _resetTimer(),
+        child: widget.child,
+      ),
+    );
+  }
+}
+```
+
+### B. Borrado Seguro de Memoria (RAM Zeroing)
+Dart no garantiza la eliminación inmediata de objetos `String` o `List` en la heap debido a la inmutabilidad de strings y el recolector de basura (GC). Para mitigar fugas de memoria Heap:
+1.  **Claves Maestras en Arrays Mutables:** Las claves derivadas de Argon2id y AES se representan y procesan estrictamente como `Uint8List`.
+2.  **Limpieza Activa:** Inmediatamente después de descifrar la base de datos o validar el login, se invoca `fillRange` sobre la lista para sobrescribirla con ceros:
+    ```dart
+    void zeroBuffer(Uint8List buffer) {
+      buffer.fillRange(0, buffer.length, 0);
+    }
+    ```
+
+### C. Ocultación y Cierre Inteligente (Bandeja de Sistema)
+*   **Minimizar a Tray al Cerrar:** Al presionar la `X` de la ventana, la aplicación intercepta el evento de cierre, oculta la ventana principal mediante `windowManager.hide()` y muestra un icono en la bandeja del sistema (System Tray).
+*   **Bloqueo Automático en Tray:** Si la ventana permanece minimizada al Tray por más de 5 minutos, la sesión se bloquea de forma preventiva.
+
+---
+
+## 📲 7. Desbloqueo Remoto Cifrado (WiFi Unlock)
+
+Permite al usuario desbloquear la bóveda de la aplicación de escritorio de manera segura usando la biometría (FaceID/TouchID) de su teléfono móvil:
+
+1.  **Escenario:** El escritorio está en la pantalla de bloqueo.
+2.  **Detección:** El móvil se conecta automáticamente vía WebSocket local tras resolver la red por mDNS.
+3.  **Petición de Desbloqueo:** El escritorio envía un evento `challenge` al móvil.
+4.  **Confirmación Biométrica:** El móvil solicita FaceID/TouchID al usuario.
+5.  **Envío Cifrado:** Si la biometría es exitosa, el móvil recupera la `Master Password` de su llavero local, la cifra con la clave efímera derivada de `K_sync` más un vector de inicialización (IV) de un solo uso, y la transmite.
+6.  **Desbloqueo:** El escritorio descifra el payload, valida la contraseña maestra levantando la DB y desbloquea la UI. La contraseña se borra inmediatamente de la memoria del escritorio mediante RAM Zeroing.
+
+---
+
+## 🎨 8. Interfaz de Usuario de Escritorio (Premium UI/UX)
+
+Para lograr un acabado sumamente sofisticado y profesional (Diseño "WOW" Premium):
+
+*   **Responsive Master-Detail:**
+    *   Pantallas anchas (`>720px`): Sidebar colapsable de navegación, lista de credenciales en columna intermedia (`350px`) y panel detallado de credencial a la derecha ocupando el espacio restante.
+    *   Pantallas estrechas (`<720px`): Navegación lineal en pila (idéntica a la vista móvil).
+*   **Atajos de Teclado Nativos:**
+    *   `Ctrl + F` / `Cmd + F`: Enfocar barra de búsqueda inmediatamente.
+    *   `Ctrl + N` / `Cmd + N`: Abrir formulario para agregar una nueva credencial.
+    *   `Ctrl + L` / `Cmd + L`: Bloquear bóveda al instante.
+    *   `Esc`: Limpiar la selección de credencial actual o cerrar modales.
+*   **Menús Contextuales Flotantes (Click Derecho):**
+    *   Sobre credenciales en la lista: "Copiar usuario", "Copiar contraseña", "Editar", "Eliminar", "Copiar clave SSH (si aplica)".
+*   **Micro-animaciones de Feedback:**
+    *   Copia exitosa al portapapeles: Animación de checkmark verde con micro-rebote (Spring Animation) y difuminado suave del tooltip.
+    *   Efecto de transición tipo Slide & Fade al seleccionar credenciales de la lista.
+
+---
+
+## 🛠️ 9. Plan de Trabajo Paso a Paso (Checklist Definitivo)
+
+Este checklist detalla las tareas específicas a ejecutar en un chat de desarrollo posterior:
+
+### 🟩 Fase 1: Habilitación de Plataformas y Ventana Nativa
+- [ ] Correr el comando de inicialización de plataformas de escritorio:
+  ```bash
+  flutter create --platforms=windows,macos,linux .
+  ```
+- [ ] Configurar dependencias en `pubspec.yaml` e instalar (`flutter pub get`).
+- [ ] Modificar `lib/main.dart` para inicializar y forzar tamaños en `window_manager`:
+  ```dart
+  WidgetsFlutterBinding.ensureInitialized();
+  await windowManager.ensureInitialized();
+  
+  WindowOptions windowOptions = const WindowOptions(
+    size: Size(1080, 780),
+    minimumSize: Size(850, 650),
+    center: true,
+    title: "SoloKey Secure Vault",
+    titleBarStyle: TitleBarStyle.normal,
+  );
+  
+  windowManager.waitUntilReadyToShow(windowOptions, () async {
+    await windowManager.show();
+    await windowManager.focus();
+  });
+  ```
+- [ ] Crear el widget selector de layout responsivo: `ResponsiveLayout` basado en `MediaQuery` o `LayoutBuilder`.
+
+### 🟦 Fase 2: Soporte de Bandeja del Sistema y Ciclo de Vida
+- [ ] Registrar el System Tray usando `tray_manager` e implementar menús básicos (Desbloquear, Bloquear, Salir).
+- [ ] Modificar el manejador nativo del ciclo de vida de Flutter para interceptar el botón cerrar (`X` de la ventana) y llamar a `windowManager.hide()`.
+- [ ] Implementar el widget `AutoLockManager` en la raíz del árbol para monitorear eventos globales del mouse y teclado.
+- [ ] Escribir el método `zeroBuffer` en `lib/core/domain/crypto_utils.dart` para limpiar arreglos de bytes de claves AES.
+
+### 🟨 Fase 3: Servidor P2P, mDNS y Emparejamiento QR
+- [ ] Configurar el descubrimiento de red local en escritorio con `nsd` registrando el socket local bajo el tipo `_solokey-sync._tcp`.
+- [ ] Implementar el servidor Shelf en la aplicación de escritorio que levante un socket seguro en un puerto libre aleatorio.
+- [ ] Añadir generación de certificados auto-firmados rápidos y extracción de su huella digital SHA-256.
+- [ ] Desarrollar la UI del código QR en el escritorio con el JSON de configuración para emparejamiento.
+- [ ] Agregar el escáner de QR en la aplicación móvil con `mobile_scanner` y configurar el bypass seguro de TLS Pinning.
+- [ ] Programar el intercambio de claves ECDH X25519 autenticado por PIN/Token para acordar `K_sync`.
+
+### 🟪 Fase 4: Sincronización Delta-Sync y Desbloqueo WiFi
+- [ ] Implementar el canal WebSocket encriptado con AES-256-GCM usando la clave permanente `K_sync`.
+- [ ] Construir la lógica de cálculo de diferencias (Deltas) en Drift, comparando versiones e instantes de modificación.
+- [ ] Implementar la regla de conflicto Last-Write-Wins (LWW) en la base de datos local.
+- [ ] Integrar el mecanismo de Desbloqueo Remoto: Pantalla de bloqueo del escritorio a la espera de confirmación y desencriptación por biometría móvil.
+- [ ] Validar compatibilidad completa en las tres plataformas ejecutando:
+  ```bash
+  # Windows
+  flutter run -d windows
+  
+  # macOS
+  flutter run -d macos
+  
+  # Linux
+  flutter run -d linux
+  ```
+- [ ] Ejecutar el análisis y suite de pruebas para certificar la consistencia criptográfica:
+  ```bash
+  flutter analyze
+  flutter test
+  ```
