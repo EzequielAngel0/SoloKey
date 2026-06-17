@@ -15,6 +15,7 @@ import '../../../shared/widgets/clipboard_countdown.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/double_envelope_service.dart';
 import '../../../core/services/biometric_auth_service.dart';
+import '../../../theme/app_palette.dart';
 
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
@@ -22,11 +23,12 @@ class CredentialDetailScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final credentialsAsync = ref.watch(credentialsNotifierProvider);
 
     return credentialsAsync.when(
-      loading: () => const Scaffold(
-        body: Center(child: CircularProgressIndicator(color: Color(0xFF6C63FF))),
+      loading: () => Scaffold(
+        body: Center(child: CircularProgressIndicator(color: palette.accent)),
       ),
       error: (e, _) => Scaffold(
         body: Center(child: Text('Error: $e')),
@@ -51,6 +53,7 @@ class _DetailView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     return Scaffold(
       appBar: VaultAppBar(
         title: credential.title,
@@ -59,7 +62,7 @@ class _DetailView extends ConsumerWidget {
           IconButton(
             icon: Icon(
               credential.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
-              color: const Color(0xFFFFB74D),
+              color: palette.warning,
             ),
             tooltip: credential.isFavorite ? 'Quitar de favoritas' : 'Añadir a favoritas',
             onPressed: () {
@@ -81,8 +84,8 @@ class _DetailView extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline_rounded,
-                color: Color(0xFFCF6679)),
+            icon: Icon(Icons.delete_outline_rounded,
+                color: palette.danger),
             onPressed: () => _confirmDelete(context, ref),
           ),
         ],
@@ -180,7 +183,7 @@ class _DetailView extends ConsumerWidget {
               icon: const Icon(Icons.history_rounded, size: 18),
               label: const Text('Ver historial de contraseñas'),
               style: TextButton.styleFrom(
-                foregroundColor: const Color(0xFF6C63FF),
+                foregroundColor: palette.accent,
                 textStyle: const TextStyle(fontSize: 13),
               ),
             ),
@@ -191,6 +194,7 @@ class _DetailView extends ConsumerWidget {
   }
 
   Widget _buildRotationStatusTile(BuildContext context) {
+    final palette = context.palette;
     if (credential.rotationInterval == 'none') return const SizedBox.shrink();
 
     final intervalText = switch (credential.rotationInterval) {
@@ -201,7 +205,7 @@ class _DetailView extends ConsumerWidget {
       _ => 'Ninguno',
     };
 
-    int days = switch (credential.rotationInterval) {
+    final days = switch (credential.rotationInterval) {
       'monthly' => 30,
       'quarterly' => 90,
       'semiAnnually' => 180,
@@ -219,13 +223,13 @@ class _DetailView extends ConsumerWidget {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: isOverdue
-            ? const Color(0xFFCF6679).withValues(alpha: 0.1)
-            : const Color(0xFF03DAC6).withValues(alpha: 0.1),
+            ? palette.danger.withValues(alpha: 0.1)
+            : palette.secondary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: isOverdue
-              ? const Color(0xFFCF6679).withValues(alpha: 0.3)
-              : const Color(0xFF03DAC6).withValues(alpha: 0.3),
+              ? palette.danger.withValues(alpha: 0.3)
+              : palette.secondary.withValues(alpha: 0.3),
         ),
       ),
       child: Row(
@@ -233,7 +237,7 @@ class _DetailView extends ConsumerWidget {
         children: [
           Icon(
             isOverdue ? Icons.warning_amber_rounded : Icons.lock_clock_rounded,
-            color: isOverdue ? const Color(0xFFCF6679) : const Color(0xFF03DAC6),
+            color: isOverdue ? palette.danger : palette.secondary,
             size: 24,
           ),
           const SizedBox(width: 12),
@@ -246,7 +250,7 @@ class _DetailView extends ConsumerWidget {
                       ? 'ROTACIÓN DE CONTRASEÑA VENCIDA'
                       : 'RECORDATORIO DE ROTACIÓN',
                   style: TextStyle(
-                    color: isOverdue ? const Color(0xFFCF6679) : const Color(0xFF03DAC6),
+                    color: isOverdue ? palette.danger : palette.secondary,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -257,8 +261,8 @@ class _DetailView extends ConsumerWidget {
                   isOverdue
                       ? 'Debes cambiar esta contraseña. Han pasado más de $days días desde la última actualización.'
                       : 'Próximo cambio requerido en $daysRemaining días ($intervalText).',
-                  style: const TextStyle(
-                    color: Colors.white,
+                  style: TextStyle(
+                    color: palette.textPrimary,
                     fontSize: 13,
                     height: 1.4,
                   ),
@@ -272,15 +276,16 @@ class _DetailView extends ConsumerWidget {
   }
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
+    final palette = context.palette;
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Eliminar credencial',
-            style: TextStyle(color: Colors.white)),
+        backgroundColor: palette.drawer,
+        title: Text('Eliminar credencial',
+            style: TextStyle(color: palette.textPrimary)),
         content: Text(
           '¿Eliminar "${credential.title}"? Esta acción no se puede deshacer.',
-          style: const TextStyle(color: Color(0xFF9E9EBF)),
+          style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(
@@ -289,8 +294,8 @@ class _DetailView extends ConsumerWidget {
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Eliminar',
-                style: TextStyle(color: Color(0xFFCF6679))),
+            child: Text('Eliminar',
+                style: TextStyle(color: palette.danger)),
           ),
         ],
       ),
@@ -324,22 +329,21 @@ class _TypeBadge extends StatelessWidget {
     CredentialType.apiKey:     'API Key',
     CredentialType.secureNote: 'Nota segura',
     CredentialType.totp:       'TOTP / 2FA',
-    CredentialType.passkey:    'Passkey',
+    CredentialType.passkey:    'Respaldo de Passkey',
     CredentialType.sshKey:     'Llave SSH',
-  };
-
-  static const _colors = {
-    CredentialType.password:   Color(0xFF6C63FF),
-    CredentialType.apiKey:     Color(0xFF03DAC6),
-    CredentialType.secureNote: Color(0xFFFFB74D),
-    CredentialType.totp:       Color(0xFFE91E8C),
-    CredentialType.passkey:    Color(0xFF4CAF50),
-    CredentialType.sshKey:     Color(0xFF00E5FF),
   };
 
   @override
   Widget build(BuildContext context) {
-    final color = _colors[type] ?? const Color(0xFF6C63FF);
+    final palette = context.palette;
+    final color = switch (type) {
+      CredentialType.password => palette.typePassword,
+      CredentialType.apiKey => palette.typeApiKey,
+      CredentialType.secureNote => palette.typeNote,
+      CredentialType.totp => palette.typeTotp,
+      CredentialType.passkey => palette.typePasskey,
+      CredentialType.sshKey => palette.typeSshKey,
+    };
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
@@ -427,7 +431,7 @@ class _SecretTileState extends State<_SecretTile> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('Error al descifrar: $e'),
-            backgroundColor: const Color(0xFFCF6679),
+            backgroundColor: context.palette.danger,
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -439,18 +443,19 @@ class _SecretTileState extends State<_SecretTile> {
   }
 
   Future<String?> _showPinDialog(BuildContext context) async {
+    final palette = context.palette;
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
       builder: (diagContext) => AlertDialog(
-        backgroundColor: const Color(0xFF1A1A2E),
-        title: const Text('Ingresa PIN Secundario', style: TextStyle(color: Colors.white, fontSize: 16)),
+        backgroundColor: palette.drawer,
+        title: Text('Ingresa PIN Secundario', style: TextStyle(color: palette.textPrimary, fontSize: 16)),
         content: TextField(
           controller: controller,
           obscureText: true,
           autofocus: true,
           keyboardType: TextInputType.number,
-          style: const TextStyle(color: Colors.white),
+          style: TextStyle(color: palette.textPrimary),
           decoration: const InputDecoration(
             labelText: 'PIN de Sobre Cifrado',
           ),
@@ -477,7 +482,7 @@ class _SecretTileState extends State<_SecretTile> {
     if (!context.mounted) return;
 
     final plain = await _getPlainValue(context);
-    if (plain == null) return;
+    if (plain == null || !context.mounted) return;
 
     await showClipboardCountdownSnackBar(
       context: context,
@@ -492,17 +497,18 @@ class _SecretTileState extends State<_SecretTile> {
         ? 'Descifrando...'
         : (widget.isSecret && !_revealed ? '••••••••••••' : (_decryptedValue ?? widget.value));
 
+    final palette = context.palette;
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: palette.card,
         borderRadius: BorderRadius.circular(14),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(widget.icon, color: const Color(0xFF6C63FF), size: 20),
+          Icon(widget.icon, color: palette.accent, size: 20),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -510,8 +516,8 @@ class _SecretTileState extends State<_SecretTile> {
               children: [
                 Text(
                   widget.label,
-                  style: const TextStyle(
-                    color: Color(0xFF9E9EBF),
+                  style: TextStyle(
+                    color: palette.textMuted,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                     letterSpacing: 0.5,
@@ -521,7 +527,7 @@ class _SecretTileState extends State<_SecretTile> {
                 Text(
                   displayValue,
                   style: TextStyle(
-                    color: Colors.white,
+                    color: palette.textPrimary,
                     fontSize: 14,
                     letterSpacing: widget.isSecret && !_revealed && !_decrypting ? 2 : 0,
                   ),
@@ -539,7 +545,7 @@ class _SecretTileState extends State<_SecretTile> {
                 _revealed
                     ? Icons.visibility_off_rounded
                     : Icons.visibility_rounded,
-                color: const Color(0xFF9E9EBF),
+                color: palette.textMuted,
                 size: 18,
               ),
               onPressed: () async {
@@ -644,25 +650,26 @@ class _TotpTileState extends State<_TotpTile> {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 12),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFFE91E8C).withValues(alpha: 0.1),
+        color: palette.typeTotp.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFE91E8C).withValues(alpha: 0.3)),
+        border: Border.all(color: palette.typeTotp.withValues(alpha: 0.3)),
       ),
       child: Column(
         children: [
           Row(
             children: [
-              const Icon(Icons.timer_rounded, color: Color(0xFFE91E8C), size: 20),
+              Icon(Icons.timer_rounded, color: palette.typeTotp, size: 20),
               const SizedBox(width: 12),
-              const Expanded(
+              Expanded(
                 child: Text(
                   'Código de Verificación (2FA)',
                   style: TextStyle(
-                    color: Color(0xFFE91E8C),
+                    color: palette.typeTotp,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -671,7 +678,7 @@ class _TotpTileState extends State<_TotpTile> {
               ),
               CopyFeedbackButton(
                 onCopy: () => _copy(context),
-                color: const Color(0xFFE91E8C),
+                color: palette.typeTotp,
               ),
             ],
           ),
@@ -681,8 +688,8 @@ class _TotpTileState extends State<_TotpTile> {
             children: [
               Text(
                 _code,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: palette.textPrimary,
                   fontSize: 36,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4,
@@ -695,8 +702,8 @@ class _TotpTileState extends State<_TotpTile> {
                 height: 32,
                 child: CircularProgressIndicator(
                   value: _progress,
-                  backgroundColor: const Color(0xFF1A1A2E),
-                  color: const Color(0xFFE91E8C),
+                  backgroundColor: palette.drawer,
+                  color: palette.typeTotp,
                   strokeWidth: 4,
                 ),
               ),
