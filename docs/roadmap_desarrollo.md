@@ -164,13 +164,30 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
   banner), en `notificationActionBackground` (`@pragma('vm:entry-point')`, app cerrada, abre su DB)
   y en el cold-start (`getNotificationAppLaunchDetails` con `actionId`). _(Requiere validar en
   dispositivo Android real.)_
-- ⬜ **Autofill inline (Android 11+)**: `inlinePresentation` en `SoloKeyAutofillService` para sugerencias dentro del teclado.
-- ⬜ **Biometría antes de inyectar**: `AuthHelper.requireAuth()` previo a entregar credenciales al campo destino.
+- ✅ **Autofill inline + biometría (2026-06-17)**: reescrito `SoloKeyAutofillService` al patrón
+  **authentication-first** (la bóveda corre bloqueada en el proceso de autofill y el `website` para
+  emparejar va cifrado, así que no se puede descifrar ahí). Publica una entrada única "Desbloquear
+  SoloKey" como fila clásica **y** como `InlinePresentation` (chip dentro del teclado, Android 11+/API 30).
+  Al tocarla, el nuevo **`AutofillAuthActivity`** pide **BiometricPrompt** (huella/rostro, con fallback a
+  credencial del dispositivo) y solo tras éxito levanta un `FlutterEngine` headless con el entrypoint
+  dedicado **`autofillEntrypoint`** (canal `com.solokey/autofill` → `AutofillFetchService`), que lee la
+  master key envuelta en `bio_master_key`, descifra y empareja por paquete/dominio (`AutofillMatcher`),
+  y devuelve los datasets reales vía `EXTRA_AUTHENTICATION_RESULT`. Parser de campos mejorado
+  (autofillHints + heurística de `inputType`/hint). Deps nativas: `androidx.autofill:autofill:1.1.0` +
+  `androidx.biometric:biometric:1.1.0`. _(Requiere dispositivo/emulador Android API 30+ para probar el
+  inline; el desbloqueo biométrico debe estar activado en Ajustes para que exista `bio_master_key`.)_
 
 ---
 
 ## 4. Escritorio (lote posterior)
 
+- ✅ **Quick-Fill / autofill de escritorio (2026-06-17)**: el SO de escritorio no expone una API de
+  autofill, así que SoloKey ofrece el flujo estilo KeePass por portapapeles. Hotkey global
+  **Ctrl+Shift+L** (`hotkey_manager`) trae la ventana al frente y abre `/quick-fill` (`QuickFillScreen`):
+  buscador de credenciales que copia usuario/contraseña con el auto-clear de `ClipboardService`; si la
+  bóveda está bloqueada el guard del router redirige a `/unlock` primero. Tarjeta informativa del atajo
+  en Ajustes (solo escritorio). 100% multiplataforma sin código nativo; la lógica de match se comparte
+  con Android vía `AutofillMatcher` (`lib/features/autofill/`).
 - ✅ **Autostart al tray (2026-06-17)**: `launch_at_startup` (registro HKCU\…\Run en Windows).
   `main()` lee el arg `--minimized` que pasa el autostart para **arrancar oculto en la bandeja**.
   Toggle "Iniciar con el sistema" (solo escritorio) en Ajustes con side-effect `enable/disable`.
@@ -253,7 +270,7 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 4 | Passkeys: reetiquetar "respaldo" | 🟢 | con Temas L2 | ✅ |
 | 5 | Rename package `com.angelezequiel.solokey` | 🔴 | Features A | ✅ |
 | 6 | Móvil: acciones de notificación | 🔴 | Features B | ✅ |
-| 7 | Móvil: autofill inline + biometría | 🔴 | Features B | ⬜ |
+| 7 | Móvil: autofill inline + biometría (+ Quick-Fill escritorio) | 🔴 | Features B | ✅ |
 | 8 | Escritorio: autostart al tray | 🔴 | Features C | ✅ |
 | 9 | Escritorio: hotkey global | 🔴 | Features C | ✅ |
 | 10 | Escritorio: instalador (Inno Setup, no MSIX) | 🔴 | Features C | ✅ |
