@@ -237,10 +237,19 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 
 ---
 
-## 6. i18n (último, por ser mecánico)
+## 6. i18n (último, por ser mecánico) — 🟦 EN PROGRESO (2026-06-17)
 
-- ⬜ `flutter_localizations` + `gen-l10n` + archivos ARB (`es`, `en`).
-- ⬜ Extraer todos los strings hardcodeados (depende de tener pantallas estables tras los temas).
+- ✅ **Infraestructura**: `flutter_localizations` + `gen-l10n` (`l10n.yaml`, ARB `es`/`en` en
+  `lib/l10n/`, clase `AppLocalizations` versionada). `MaterialApp.router` cableado con
+  `localizationsDelegates` / `supportedLocales` / `locale`.
+- ✅ **Selección de idioma**: campo `locale` ('system'|'es'|'en') en `AppSecuritySettings`
+  (persistido, retrocompatible) + helper `LanguageMode` + selector en Ajustes › Idioma.
+  Cambiar el idioma reconstruye la UI al vuelo.
+- ✅ **Pantallas migradas**: Splash, Setup (título, validadores, requisitos), Unlock (todas las
+  cadenas + banners), Ajustes (cabeceras de sección + sliders/toggles + Quick-Fill).
+- ⬜ **Pendiente (siguientes lotes)**: Home, detalle/formulario de credencial, carpetas, auditoría
+  de seguridad, passkeys, sync/pairing, recovery, transfer, generador, onboarding de autofill,
+  Quick-Fill, y widgets compartidos. Extracción mecánica pantalla por pantalla, ampliando los ARB.
 
 ---
 
@@ -277,7 +286,7 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 11 | Seguridad: anti-fuerza bruta | 🟡 | Features D | ✅ |
 | 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ✅ |
 | 13 | Sync: endurecer WiFi-unlock (token DUK) | 🟢 | Features D | ✅ |
-| 14 | i18n (es/en) | 🟡 | Final | ⬜ |
+| 14 | i18n (es/en) | 🟡 | Final | 🟦 |
 
 ---
 
