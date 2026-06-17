@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../theme/app_palette.dart';
 
 class QrScannerScreen extends StatefulWidget {
   const QrScannerScreen({super.key});
@@ -39,11 +40,11 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
               now.difference(_lastErrorTime!).inSeconds > 2) {
             _lastErrorTime = now;
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('QR Inválido. Apunta a un código de tipo TOTP.'),
-                backgroundColor: Color(0xFFCF6679),
+              SnackBar(
+                content: const Text('QR Inválido. Apunta a un código de tipo TOTP.'),
+                backgroundColor: context.palette.danger,
                 behavior: SnackBarBehavior.floating,
-                duration: Duration(seconds: 2),
+                duration: const Duration(seconds: 2),
               ),
             );
           }
@@ -64,7 +65,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
           Container(
             decoration: ShapeDecoration(
               shape: QrScannerOverlayShape(
-                borderColor: const Color(0xFFE91E8C),
+                borderColor: context.palette.typeTotp,
                 borderRadius: 12,
                 borderLength: 30,
                 borderWidth: 8,
@@ -79,13 +80,13 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E).withValues(alpha: 0.9),
+                color: context.palette.card.withValues(alpha: 0.9),
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Text(
+              child: Text(
                 'Apunta al código QR generado por tu cuenta',
                 style: TextStyle(
-                  color: Colors.white,
+                  color: context.palette.textPrimary,
                   fontSize: 13,
                   height: 1.4,
                 ),

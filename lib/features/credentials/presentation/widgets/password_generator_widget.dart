@@ -4,6 +4,7 @@ import '../../../../shared/widgets/clipboard_countdown.dart';
 
 import '../../../../features/password_generator/application/password_generator_provider.dart';
 import '../../../../shared/widgets/password_strength_indicator.dart';
+import '../../../../theme/app_palette.dart';
 
 class PasswordGeneratorWidget extends ConsumerWidget {
   const PasswordGeneratorWidget({
@@ -15,6 +16,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final palette = context.palette;
     final config = ref.watch(passwordConfigNotifierProvider);
     final password = ref.watch(generatedPasswordNotifierProvider);
     final strength = ref.watch(passwordStrengthProvider);
@@ -24,9 +26,9 @@ class PasswordGeneratorWidget extends ConsumerWidget {
       margin: const EdgeInsets.only(top: 8, bottom: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: const Color(0xFF16213E),
+        color: palette.card,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFF2A2A4A)),
+        border: Border.all(color: palette.divider),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -35,7 +37,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: const Color(0xFF0F0F23),
+              color: palette.cardDark,
               borderRadius: BorderRadius.circular(8),
             ),
             child: Row(
@@ -43,8 +45,8 @@ class PasswordGeneratorWidget extends ConsumerWidget {
                 Expanded(
                   child: Text(
                     password,
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: palette.textPrimary,
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 2,
@@ -54,7 +56,7 @@ class PasswordGeneratorWidget extends ConsumerWidget {
                   ),
                 ),
                 IconButton(
-                  icon: const Icon(Icons.refresh_rounded, color: Color(0xFF6C63FF)),
+                  icon: Icon(Icons.refresh_rounded, color: palette.accent),
                   onPressed: () => ref.read(generatedPasswordNotifierProvider.notifier).regenerate(),
                   tooltip: 'Regenerar',
                   constraints: const BoxConstraints(),
@@ -66,24 +68,24 @@ class PasswordGeneratorWidget extends ConsumerWidget {
           const SizedBox(height: 12),
           PasswordStrengthIndicator(strength: strength),
           const SizedBox(height: 16),
-          
+
           // ── Length slider ────────────────────────────────────────────
           Text(
             'Longitud: ${config.length}',
-            style: const TextStyle(
-              color: Color(0xFF9E9EBF),
+            style: TextStyle(
+              color: palette.textMuted,
               fontSize: 12,
               fontWeight: FontWeight.w600,
             ),
           ),
           SliderTheme(
-            data: const SliderThemeData(
-              activeTrackColor: Color(0xFF6C63FF),
-              thumbColor: Color(0xFF6C63FF),
-              inactiveTrackColor: Color(0xFF2A2A4A),
-              overlayColor: Color(0x206C63FF),
+            data: SliderThemeData(
+              activeTrackColor: palette.accent,
+              thumbColor: palette.accent,
+              inactiveTrackColor: palette.divider,
+              overlayColor: palette.accent.withValues(alpha: 0.12),
               trackHeight: 2,
-              thumbShape: RoundSliderThumbShape(enabledThumbRadius: 6),
+              thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 6),
             ),
             child: Slider(
               value: config.length.toDouble(),
@@ -136,8 +138,8 @@ class PasswordGeneratorWidget extends ConsumerWidget {
             icon: const Icon(Icons.check_rounded, size: 18),
             label: const Text('Usar y Copiar'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF6C63FF),
-              foregroundColor: Colors.white,
+              backgroundColor: palette.accent,
+              foregroundColor: palette.onPrimary,
               visualDensity: VisualDensity.compact,
             ),
           ),
@@ -160,24 +162,25 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return FilterChip(
       label: Text(
         label,
         style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w600,
-          color: selected ? Colors.white : const Color(0xFF9E9EBF),
+          color: selected ? palette.onPrimary : palette.textMuted,
         ),
       ),
       selected: selected,
       onSelected: onSelected,
-      backgroundColor: const Color(0xFF0F0F23),
-      selectedColor: const Color(0xFF6C63FF).withValues(alpha: 0.4),
-      checkmarkColor: Colors.white,
+      backgroundColor: palette.cardDark,
+      selectedColor: palette.accent.withValues(alpha: 0.4),
+      checkmarkColor: palette.onPrimary,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(8),
         side: BorderSide(
-          color: selected ? const Color(0xFF6C63FF) : Colors.transparent,
+          color: selected ? palette.accent : Colors.transparent,
         ),
       ),
     );

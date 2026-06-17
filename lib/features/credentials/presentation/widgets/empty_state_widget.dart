@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../theme/app_palette.dart';
 
 class EmptyStateWidget extends StatelessWidget {
   const EmptyStateWidget({
@@ -12,6 +13,7 @@ class EmptyStateWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -20,21 +22,21 @@ class EmptyStateWidget extends StatelessWidget {
             'assets/logo/SoloKey.png',
             height: 72,
             width: 72,
-            color: const Color(0xFF2A2A4A),
+            color: palette.textEmpty,
           ),
           const SizedBox(height: 20),
           Text(
             message,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: palette.textPrimary,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Añade tu primera credencial',
-            style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 14),
+            style: TextStyle(color: palette.textMuted, fontSize: 14),
           ),
           const SizedBox(height: 28),
           ElevatedButton.icon(
