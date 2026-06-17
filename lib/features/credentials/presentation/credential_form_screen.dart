@@ -71,6 +71,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   bool _savePinBiometrically = false;
 
   bool _isGeneratingSshKey = false;
+  List<CustomField> _customFields = [];
 
   late AnimationController _saveAnimCtrl;
   late Animation<double> _saveScale;
@@ -130,6 +131,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           }
         });
       }
+      _customFields = _existing!.customFields
+          .where((f) => f.label != 'scopes' && f.label != 'issuer')
+          .toList();
     }
   }
 
@@ -160,6 +164,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           password: _passwordCtrl.text.isEmpty ? null : _passwordCtrl.text,
           website:  _websiteCtrl.text.trim().isEmpty ? null : _websiteCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          customFields: _customFields,
           isFavorite: _isFavorite,
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
@@ -175,9 +180,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           password: _apiKeyCtrl.text.isEmpty ? null : _apiKeyCtrl.text,
           website: _endpointCtrl.text.trim().isEmpty ? null : _endpointCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-          customFields: _scopesCtrl.text.trim().isEmpty
-              ? []
-              : [CustomField(label: 'scopes', value: _scopesCtrl.text.trim())],
+          customFields: [
+            ..._customFields,
+            if (_scopesCtrl.text.trim().isNotEmpty)
+              CustomField(label: 'scopes', value: _scopesCtrl.text.trim()),
+          ],
           isFavorite: _isFavorite,
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
@@ -190,6 +197,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           type: _type,
           title: _titleCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          customFields: _customFields,
           isFavorite: _isFavorite,
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
@@ -203,9 +211,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           title: _titleCtrl.text.trim(),
           password: _totpSecretCtrl.text.isEmpty ? null : _totpSecretCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
-          customFields: _totpIssuerCtrl.text.trim().isEmpty
-              ? []
-              : [CustomField(label: 'issuer', value: _totpIssuerCtrl.text.trim())],
+          customFields: [
+            ..._customFields,
+            if (_totpIssuerCtrl.text.trim().isNotEmpty)
+              CustomField(label: 'issuer', value: _totpIssuerCtrl.text.trim()),
+          ],
           isFavorite: _isFavorite,
           categoryId: _folderId,
           createdAt: _existing?.createdAt ?? now,
@@ -219,6 +229,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           title: _titleCtrl.text.trim(),
           password: _sshPrivateKeyCtrl.text.isEmpty ? null : _sshPrivateKeyCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+          customFields: _customFields,
           isFavorite: _isFavorite,
           categoryId: _folderId,
           isDoubleEncrypted: _isDoubleEncrypted,
@@ -279,9 +290,23 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             );
           }
           
+          final List<CustomField> encryptedCustomFields = [];
+          for (final field in credential.customFields) {
+            if (field.isSecret && !field.value.startsWith('double_enc_v1:')) {
+              final encValue = await doubleEnvelopeService.encryptField(
+                plaintext: field.value,
+                pin: pin,
+              );
+              encryptedCustomFields.add(field.copyWith(value: encValue));
+            } else {
+              encryptedCustomFields.add(field);
+            }
+          }
+
           credential = credential.copyWith(
             password: encryptedPassword,
             sshKeyMetadata: encryptedSshMetadata,
+            customFields: encryptedCustomFields,
             isDoubleEncrypted: true,
           );
           
@@ -326,10 +351,24 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               passphrase: decPass,
             );
           }
+
+          final List<CustomField> decryptedCustomFields = [];
+          for (final field in credential.customFields) {
+            if (field.isSecret && field.value.startsWith('double_enc_v1:')) {
+              final decValue = await doubleEnvelopeService.decryptField(
+                encryptedValue: field.value,
+                pin: pin,
+              );
+              decryptedCustomFields.add(field.copyWith(value: decValue));
+            } else {
+              decryptedCustomFields.add(field);
+            }
+          }
           
           credential = credential.copyWith(
             password: decryptedPassword,
             sshKeyMetadata: decryptedSshMetadata,
+            customFields: decryptedCustomFields,
             isDoubleEncrypted: false,
           );
           
@@ -492,6 +531,238 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     }
   }
 
+  Widget _buildCustomFieldsSection() {
+    if (_type == CredentialType.passkey) return const SizedBox.shrink();
+
+    final typeColor = _typeColor(_type);
+
+    return FormSection(
+      icon: Icons.add_circle_outline_rounded,
+      accentColor: typeColor,
+      title: 'Campos Personalizados',
+      children: [
+        if (_customFields.isEmpty)
+          const Padding(
+            padding: EdgeInsets.symmetric(vertical: 8.0),
+            child: Text(
+              'No hay campos personalizados.',
+              style: TextStyle(color: AppColors.textDisabled, fontSize: 13),
+            ),
+          ),
+        ...List.generate(_customFields.length, (index) {
+          final field = _customFields[index];
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 12.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              field.label,
+                              style: const TextStyle(
+                                color: AppColors.textMuted,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          if (field.isSecret)
+                            Container(
+                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: BoxDecoration(
+                                color: typeColor.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                'SECRETO',
+                                style: TextStyle(
+                                  color: typeColor,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        field.isSecret ? '••••••••••••' : field.value,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 14,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit_outlined, size: 20, color: AppColors.textMuted),
+                  onPressed: () => _showCustomFieldDialog(index: index),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.delete_outline_rounded, size: 20, color: AppColors.danger),
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    setState(() {
+                      _customFields.removeAt(index);
+                    });
+                  },
+                ),
+              ],
+            ),
+          );
+        }),
+        const SizedBox(height: 8),
+        SizedBox(
+          width: double.infinity,
+          child: OutlinedButton.icon(
+            onPressed: _showCustomFieldDialog,
+            icon: const Icon(Icons.add_rounded, size: 16),
+            label: const Text('Añadir campo'),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: typeColor,
+              side: BorderSide(color: typeColor, width: 1.2),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _showCustomFieldDialog({int? index}) async {
+    final isEditing = index != null;
+    final labelCtrl = TextEditingController(text: isEditing ? _customFields[index].label : '');
+    final valueCtrl = TextEditingController(text: isEditing ? _customFields[index].value : '');
+    bool isSecret = isEditing ? _customFields[index].isSecret : false;
+
+    // Check if the current value is double encrypted and decrypt it for editing
+    if (isEditing && _existing?.isDoubleEncrypted == true && valueCtrl.text.startsWith('double_enc_v1:')) {
+      final pin = _secondaryPinCtrl.text.trim();
+      if (pin.isNotEmpty) {
+        try {
+          final plain = await getIt<DoubleEnvelopeService>().decryptField(
+            encryptedValue: valueCtrl.text,
+            pin: pin,
+          );
+          valueCtrl.text = plain;
+        } catch (_) {}
+      }
+    }
+
+    final dialogFormKey = GlobalKey<FormState>();
+
+    if (!mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setDialogState) {
+            return AlertDialog(
+              backgroundColor: AppColors.drawer,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: Text(
+                isEditing ? 'Editar campo' : 'Nuevo campo personalizado',
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              content: Form(
+                key: dialogFormKey,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: labelCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Nombre del campo',
+                        hintText: 'ej. PIN, Pregunta de Seguridad',
+                      ),
+                      validator: (v) => v == null || v.trim().isEmpty ? 'Nombre requerido' : null,
+                      textCapitalization: TextCapitalization.sentences,
+                    ),
+                    const SizedBox(height: 14),
+                    TextFormField(
+                      controller: valueCtrl,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: const InputDecoration(
+                        labelText: 'Valor del campo',
+                        hintText: 'ej. 1234, Ciudad natal',
+                      ),
+                      validator: (v) => v == null || v.trim().isEmpty ? 'Valor requerido' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      value: isSecret,
+                      activeColor: _typeColor(_type),
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Campo secreto', style: TextStyle(color: Colors.white, fontSize: 14)),
+                      subtitle: const Text(
+                        'Ocultará el valor por defecto en los detalles.',
+                        style: TextStyle(color: AppColors.textMuted, fontSize: 11),
+                      ),
+                      onChanged: (v) {
+                        HapticFeedback.selectionClick();
+                        setDialogState(() => isSecret = v);
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancelar', style: TextStyle(color: AppColors.textDisabled)),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: _typeColor(_type),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: () {
+                    if (!dialogFormKey.currentState!.validate()) return;
+                    
+                    final newField = CustomField(
+                      label: labelCtrl.text.trim(),
+                      value: valueCtrl.text.trim(),
+                      isSecret: isSecret,
+                    );
+                    
+                    setState(() {
+                      if (isEditing) {
+                        _customFields[index] = newField;
+                      } else {
+                        _customFields.add(newField);
+                      }
+                    });
+                    
+                    HapticFeedback.mediumImpact();
+                    Navigator.pop(context);
+                  },
+                  child: Text(isEditing ? 'Guardar' : 'Agregar'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    labelCtrl.dispose();
+    valueCtrl.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEdit = _existing != null;
@@ -590,6 +861,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                 ],
               ),
             ],
+
+            const SizedBox(height: 16),
+            _buildCustomFieldsSection(),
 
             const SizedBox(height: 16),
             _buildDoubleEncryptionSection(),
