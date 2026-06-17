@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'app_palette.dart';
+
 abstract final class AppTheme {
   static const _primaryColor = Color(0xFF39FF14); // Neon Green or Cyan, let's use Electric Cyan / Lime
   static const _surfaceColor = Color(0xFF1E1E2C);
@@ -87,6 +89,7 @@ abstract final class AppTheme {
         bodyMedium: TextStyle(color: Color(0xFFB0B0D0)),
         labelLarge: TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
       ),
+      extensions: const [AppPalette.dark],
     );
   }
 }
