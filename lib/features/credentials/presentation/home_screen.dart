@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../router/app_router.dart';
+import '../../../shared/extensions/color_extensions.dart';
 import '../../../shared/widgets/staggered_list_item.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../vault_access/application/vault_state_provider.dart';
@@ -51,6 +53,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             icon: const Icon(Icons.lock_rounded, color: Color(0xFFCF6679)),
             tooltip: 'Bloquear',
             onPressed: () {
+              HapticFeedback.heavyImpact();
               ref.read(vaultNotifierProvider.notifier).lock();
               context.go(AppRoutes.unlock);
             },
@@ -118,12 +121,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push(AppRoutes.credentialCreate),
-        backgroundColor: const Color(0xFF6C63FF),
-        icon: const Icon(Icons.add_rounded, color: Colors.white),
-        label: const Text('Nueva', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
-      ),
+      floatingActionButton: _currentIndex == 2
+          ? null // No FAB on Favorites tab
+          : FloatingActionButton.extended(
+              onPressed: _currentIndex == 1
+                  ? () => _createRootFolder(context, ref)
+                  : () => context.push(AppRoutes.credentialCreate),
+              backgroundColor: const Color(0xFF6C63FF),
+              icon: Icon(
+                _currentIndex == 1 ? Icons.create_new_folder_rounded : Icons.add_rounded,
+                color: Colors.white,
+              ),
+              label: Text(
+                _currentIndex == 1 ? 'Carpeta' : 'Nueva',
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600),
+              ),
+            ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: const Color(0xFF0F0E17),
         selectedItemColor: const Color(0xFF6C63FF),
@@ -160,6 +173,33 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       ),
     );
   }
+
+  Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {
+    final ctrl = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: const Color(0xFF1A1A2E),
+        title: const Text('Carpeta', style: TextStyle(color: Colors.white)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            labelText: 'Nombre de la carpeta',
+            hintText: 'ej. Trabajo, Sociales…',
+          ),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
+        ],
+      ),
+    );
+    if (name != null && name.isNotEmpty) {
+      await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: null);
+    }
+  }
 }
 
 class _FavoritesView extends ConsumerWidget {
@@ -167,13 +207,7 @@ class _FavoritesView extends ConsumerWidget {
   final List<Folder> folders;
   final List<Credential> credentials;
 
-  Color _hexToColor(String hex) {
-    try {
-      return Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
-    } catch (_) {
-      return const Color(0xFF6C63FF);
-    }
-  }
+
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder folder) {
     showModalBottomSheet(
@@ -238,7 +272,7 @@ class _FavoritesView extends ConsumerWidget {
                 onLongPress: () => _showFolderOptionsSheet(context, ref, f),
                 tileColor: const Color(0xFF16213E),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                leading: Icon(Icons.folder_special_rounded, color: _hexToColor(f.colorHex)),
+                leading: Icon(Icons.folder_special_rounded, color: f.colorHex.toColor()),
                 title: Text(f.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                 trailing: const Icon(Icons.star_rounded, color: Color(0xFFFFB74D)),
               ),
@@ -262,13 +296,7 @@ class _FolderListView extends ConsumerWidget {
   final List<Folder> folders;
   final List<Credential> credentials;
 
-  Color _hexToColor(String hex) {
-    try {
-      return Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
-    } catch (_) {
-      return const Color(0xFF6C63FF);
-    }
-  }
+
 
   void _showFolderOptionsSheet(BuildContext context, WidgetRef ref, Folder folder) {
     showModalBottomSheet(
@@ -370,7 +398,7 @@ class _FolderListView extends ConsumerWidget {
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 leading: Icon(
                   f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded, 
-                  color: _hexToColor(f.colorHex)
+                  color: f.colorHex.toColor()
                 ),
                 title: Text(f.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
                 trailing: const Icon(Icons.chevron_right_rounded, color: Color(0xFF5C5C7A)),
