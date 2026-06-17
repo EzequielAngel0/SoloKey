@@ -85,7 +85,36 @@ Para maximizar la comodidad del usuario sin comprometer la seguridad (evitando e
 
 ---
 
-## 🛠️ 5. Plan de Fases de Implementación
+## 📡 5. Descubrimiento de Red Local (mDNS / DNS-SD)
+
+Para eliminar la fricción de ingresar direcciones IP manualmente o escanear el código QR repetidamente en cada inicio, SoloKey implementará un protocolo de descubrimiento basado en **Zero Configuration Networking (ZeroConf)**:
+
+1.  **Registro de Servicio en Escritorio:** Al iniciarse y activar el servidor local de sincronización, SoloKey Desktop registrará un servicio del tipo `_solokey-sync._tcp` en la red local utilizando mDNS (Multicast DNS).
+2.  **Búsqueda desde Móvil:** Cuando el usuario abra la pantalla de sincronización en SoloKey Mobile, la aplicación enviará una consulta mDNS para localizar servicios `_solokey-sync._tcp.local`.
+3.  **Resolución de IP/Puerto:** Al encontrar la instancia del escritorio, el móvil obtendrá de forma dinámica la dirección IP actual de la LAN y el puerto activo.
+4.  **Validación de Confianza:** Aunque la IP y puerto cambien dinámicamente, la conexión sigue estando protegida por el certificado TLS. El móvil validará que el hash del certificado del servidor coincida con el fingerprint guardado durante el primer emparejamiento. Si coincide, la sincronización o desbloqueo procede de forma automática y transparente.
+
+---
+
+## ⏳ 6. Ciclo de Vida de la Sesión y Seguridad en Memoria
+
+Dado que los entornos de escritorio tienen diferentes vectores de ataque y patrones de uso (sesiones compartidas, suspensión de equipo, etc.), se aplicarán políticas rigurosas para el ciclo de vida de la sesión:
+
+### Bloqueo Automático por Inactividad
+*   **Monitoreo del Sistema:** Se implementará un temporizador de inactividad configurable (ej. 1, 5, 15, 30 minutos). Si no se detectan eventos de teclado o ratón dentro de la ventana de la aplicación, SoloKey se bloqueará automáticamente.
+*   **Eventos del SO:** La aplicación escuchará eventos del sistema operativo (suspensión del equipo, bloqueo del usuario de la sesión del SO) para forzar el bloqueo instantáneo del almacén.
+
+### Minimizado al System Tray (Área de Notificación)
+*   **Comportamiento de Cierre:** El usuario podrá configurar si al presionar la "X" de cerrar la app se cierra por completo o se minimiza al área de notificación (System Tray) para mantener la comunicación P2P en segundo plano.
+*   **Bloqueo al Minimizar:** Opción de bloquear automáticamente la sesión de la bóveda al minimizarse al tray.
+
+### Seguridad en Memoria RAM (Wipe RAM)
+*   **Limpieza Activa (Zeroing):** Para evitar ataques de extracción de memoria heap, cuando la aplicación se bloquee, todas las variables que almacenen claves criptográficas intermedias o la llave maestra se sobrescribirán explícitamente con ceros (`Uint8List.fillRange(0, ...)`) antes de recolectarse por el Garbage Collector.
+*   **Bloqueo de Paginación:** En Windows/Linux/macOS, se explorará el uso de llamadas de sistema nativas (`VirtualLock` en Windows, `mlock` en Unix) para evitar que las secciones de memoria RAM que contienen secretos se paginen al disco duro.
+
+---
+
+## 🛠️ 7. Plan de Fases de Implementación
 
 Para asegurar un desarrollo incremental controlado, se propone dividir el desarrollo en 3 fases:
 
@@ -93,10 +122,12 @@ Para asegurar un desarrollo incremental controlado, se propone dividir el desarr
 *   Habilitar compilación de Flutter para Desktop (Windows/macOS/Linux) en el repositorio actual.
 *   Configurar persistencia con Drift (SQLite) en directorios locales seguros (`AppData` / `Application Support`).
 *   Implementar integración nativa con el almacenamiento de claves seguro del SO para resguardar la sal y la clave local.
+*   Configurar el soporte para minimizar a la barra de tareas / System Tray (`tray_manager`) y monitoreo de inactividad de usuario.
 *   Importar las pantallas de Login, Desbloqueo y Formulario adaptadas a layouts responsivos (Master-Detail).
 
 ### Fase 2: Conectividad y Protocolo P2P
 *   Implementar servidor HTTPS y WebSocket local embebido en la app de Escritorio.
+*   Configurar publicación del servicio local vía mDNS (`nsd` / `multicast_dns`) en la app de escritorio y su búsqueda desde el móvil.
 *   Implementar flujo de generación y escaneo de códigos QR para emparejamiento seguro.
 *   Implementar el intercambio criptográfico DH y derivación de `K_sync`.
 *   Añadir pruebas unitarias y de integración del handshake sobre red local ficticia (Mocks de socket).
@@ -105,3 +136,4 @@ Para asegurar un desarrollo incremental controlado, se propone dividir el desarr
 *   Implementar motor de sincronización incremental (Delta-Sync) en Drift.
 *   Implementar resolución de conflictos por LWW e integración del historial de contraseñas.
 *   Implementar el mecanismo de desbloqueo remoto seguro por WebSocket utilizando biometría del móvil.
+
