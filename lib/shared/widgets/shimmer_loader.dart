@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
+
 class ShimmerLoader extends StatefulWidget {
   const ShimmerLoader({super.key, this.itemCount = 6});
 
@@ -34,6 +36,8 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final block = palette.divider;
     return AnimatedBuilder(
       animation: _opacityAnim,
       builder: (context, child) {
@@ -42,14 +46,14 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
           child: ListView.separated(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             itemCount: widget.itemCount,
-            separatorBuilder: (_, __) => const SizedBox(height: 10),
-            itemBuilder: (_, __) => Container(
+            separatorBuilder: (_, _) => const SizedBox(height: 10),
+            itemBuilder: (_, _) => Container(
               height: 72,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: const Color(0xFF16213E),
+                color: palette.card,
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: const Color(0xFF16213E)),
+                border: Border.all(color: palette.card),
               ),
               child: Row(
                 children: [
@@ -57,7 +61,7 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
                     width: 44,
                     height: 44,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF2A2A4A),
+                      color: block,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -71,7 +75,7 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
                           width: 120,
                           height: 14,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A4A),
+                            color: block,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -80,7 +84,7 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
                           width: 180,
                           height: 10,
                           decoration: BoxDecoration(
-                            color: const Color(0xFF2A2A4A),
+                            color: block,
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -90,8 +94,8 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
                   Container(
                     width: 24,
                     height: 24,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF2A2A4A),
+                    decoration: BoxDecoration(
+                      color: block,
                       shape: BoxShape.circle,
                     ),
                   ),

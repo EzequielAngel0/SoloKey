@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import '../../../app/di/injection.dart';
+import '../../theme/app_palette.dart';
 
 class ClipboardCountdown extends StatefulWidget {
   const ClipboardCountdown({
@@ -96,7 +97,7 @@ Future<void> showClipboardCountdownSnackBar({
       ),
       behavior: SnackBarBehavior.floating,
       duration: Duration(seconds: seconds),
-      backgroundColor: const Color(0xFF6C63FF),
+      backgroundColor: context.palette.accent,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
     ),
   );

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
 import '../../features/password_generator/domain/password_generator.dart';
 
 class PasswordStrengthIndicator extends StatelessWidget {
@@ -12,36 +13,46 @@ class PasswordStrengthIndicator extends StatelessWidget {
   final PasswordStrength strength;
   final bool showLabel;
 
-  static const _data = {
-    PasswordStrength.none:   (label: '',        color: Color(0xFF2A2A4A), fill: 0.0),
-    PasswordStrength.weak:   (label: 'Débil',   color: Color(0xFFCF6679), fill: 0.25),
-    PasswordStrength.fair:   (label: 'Regular', color: Color(0xFFFFB74D), fill: 0.5),
-    PasswordStrength.good:   (label: 'Buena',   color: Color(0xFF4FC3F7), fill: 0.75),
-    PasswordStrength.strong: (label: 'Fuerte',  color: Color(0xFF66BB6A), fill: 1.0),
+  static const _meta = {
+    PasswordStrength.none: (label: '', fill: 0.0),
+    PasswordStrength.weak: (label: 'Débil', fill: 0.25),
+    PasswordStrength.fair: (label: 'Regular', fill: 0.5),
+    PasswordStrength.good: (label: 'Buena', fill: 0.75),
+    PasswordStrength.strong: (label: 'Fuerte', fill: 1.0),
   };
+
+  Color _colorFor(AppPalette palette) => switch (strength) {
+        PasswordStrength.none => palette.divider,
+        PasswordStrength.weak => palette.danger,
+        PasswordStrength.fair => palette.warning,
+        PasswordStrength.good => palette.info,
+        PasswordStrength.strong => palette.success,
+      };
 
   @override
   Widget build(BuildContext context) {
-    final d = _data[strength]!;
+    final palette = context.palette;
+    final meta = _meta[strength]!;
+    final color = _colorFor(palette);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: LinearProgressIndicator(
-            value: d.fill,
+            value: meta.fill,
             minHeight: 6,
-            backgroundColor: const Color(0xFF2A2A4A),
-            valueColor: AlwaysStoppedAnimation<Color>(d.color),
+            backgroundColor: palette.divider,
+            valueColor: AlwaysStoppedAnimation<Color>(color),
           ),
         ),
         if (showLabel && strength != PasswordStrength.none) ...[
           const SizedBox(height: 4),
           Text(
-            d.label,
+            meta.label,
             style: TextStyle(
               fontSize: 12,
-              color: d.color,
+              color: color,
               fontWeight: FontWeight.w600,
             ),
           ),

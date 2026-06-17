@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../app/di/injection.dart';
+import '../../theme/app_palette.dart';
 import '../services/biometric_auth_service.dart';
 
 /// Funciones auxiliares para requerir autenticación contextual antes de acciones sensibles.
@@ -17,9 +18,9 @@ class AuthHelper {
     if (!success) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Autenticación cancelada o fallida'),
-            backgroundColor: Color(0xFFCF6679),
+          SnackBar(
+            content: const Text('Autenticación cancelada o fallida'),
+            backgroundColor: context.palette.danger,
             behavior: SnackBarBehavior.floating,
           ),
         );

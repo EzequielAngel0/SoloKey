@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../theme/app_palette.dart';
+
 class SecureTextField extends StatefulWidget {
   const SecureTextField({
     super.key,
@@ -46,8 +48,8 @@ class _SecureTextFieldState extends State<SecureTextField> {
       validator: widget.validator,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
-      style: const TextStyle(
-        color: Colors.white,
+      style: TextStyle(
+        color: context.palette.textPrimary,
         fontSize: 16,
         letterSpacing: 1.5,
       ),
@@ -57,7 +59,7 @@ class _SecureTextFieldState extends State<SecureTextField> {
         suffixIcon: IconButton(
           icon: Icon(
             _obscure ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-            color: const Color(0xFF9E9EBF),
+            color: context.palette.textMuted,
             size: 20,
           ),
           onPressed: () => setState(() => _obscure = !_obscure),

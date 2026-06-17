@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 
+import '../../theme/app_palette.dart';
+
 /// Animated copy button: shows a ripple pulse + checkmark for 1.5 s after copy.
 class CopyFeedbackButton extends StatefulWidget {
   const CopyFeedbackButton({
     super.key,
     required this.onCopy,
     this.size = 18.0,
-    this.color = const Color(0xFF9E9EBF),
+    this.color,
   });
 
   final Future<void> Function() onCopy;
   final double size;
-  final Color color;
+
+  /// Idle icon color. Defaults to the theme's muted text color.
+  final Color? color;
 
   @override
   State<CopyFeedbackButton> createState() => _CopyFeedbackButtonState();
@@ -61,6 +65,8 @@ class _CopyFeedbackButtonState extends State<CopyFeedbackButton>
 
   @override
   Widget build(BuildContext context) {
+    final palette = context.palette;
+    final idleColor = widget.color ?? palette.textMuted;
     return GestureDetector(
       onTap: _handleTap,
       child: SizedBox(
@@ -84,7 +90,7 @@ class _CopyFeedbackButtonState extends State<CopyFeedbackButton>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: const Color(0xFF66BB6A),
+                            color: palette.success,
                             width: 1.5,
                           ),
                         ),
@@ -95,12 +101,8 @@ class _CopyFeedbackButtonState extends State<CopyFeedbackButton>
                 Transform.scale(
                   scale: _copied ? _scale.value : 1.0,
                   child: Icon(
-                    _copied
-                        ? Icons.check_rounded
-                        : Icons.copy_rounded,
-                    color: _copied
-                        ? const Color(0xFF66BB6A)
-                        : widget.color,
+                    _copied ? Icons.check_rounded : Icons.copy_rounded,
+                    color: _copied ? palette.success : idleColor,
                     size: widget.size,
                   ),
                 ),
