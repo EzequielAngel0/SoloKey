@@ -14,6 +14,7 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../domain/entities/app_security_settings.dart';
 import '../domain/repositories/i_settings_repository.dart';
+import '../../../core/presentation/layouts/responsive_layout.dart';
 
 part 'settings_screen.g.dart';
 
@@ -359,6 +360,32 @@ class _DataManagementSection extends StatelessWidget {
           ),
           child: Column(
             children: [
+              if (!ResponsiveLayout.isDesktop(context)) ...[
+                ListTile(
+                  leading: const Icon(
+                    Icons.sync_rounded,
+                    color: Color(0xFF6C63FF),
+                  ),
+                  title: const Text(
+                    'Sincronizar Computadora',
+                    style: TextStyle(color: Colors.white, fontSize: 14),
+                  ),
+                  subtitle: const Text(
+                    'Vincula con SoloKey de escritorio',
+                    style: TextStyle(color: Color(0xFF9E9EBF), fontSize: 12),
+                  ),
+                  trailing: const Icon(
+                    Icons.chevron_right_rounded,
+                    color: Color(0xFF5C5C7A),
+                  ),
+                  onTap: () => context.push(AppRoutes.sync),
+                ),
+                const Divider(
+                  height: 1,
+                  indent: 56,
+                  color: Color(0xFF2A2A4A),
+                ),
+              ],
               ListTile(
                 leading: const Icon(
                   Icons.sync_alt_rounded,

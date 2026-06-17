@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/presentation/layouts/desktop_layout_state.dart';
+import '../../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../folders/application/folders_provider.dart';
@@ -81,7 +83,14 @@ class FolderListView extends ConsumerWidget {
         ...rootFolders.map((f) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: ListTile(
-                onTap: () => context.push(AppRoutes.folderDetail.replaceFirst(':id', f.id)),
+                onTap: () {
+                  if (ResponsiveLayout.isDesktop(context)) {
+                    ref.read(desktopSelectedFolderIdProvider.notifier).state = f.id;
+                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+                  } else {
+                    context.push(AppRoutes.folderDetail.replaceFirst(':id', f.id));
+                  }
+                },
                 onLongPress: () => _showFolderOptionsSheet(context, ref, f),
                 tileColor: const Color(0xFF16213E),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

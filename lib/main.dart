@@ -1,9 +1,11 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:window_manager/window_manager.dart';
 
 import 'app/app.dart';
 import 'app/di/injection.dart';
@@ -27,6 +29,23 @@ Future<void> main() async {
     () async {
       WidgetsFlutterBinding.ensureInitialized();
       await configureDependencies();
+
+      if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+        await windowManager.ensureInitialized();
+        await windowManager.setPreventClose(true);
+        const windowOptions = WindowOptions(
+          size: Size(1080, 780),
+          minimumSize: Size(850, 650),
+          center: true,
+          title: "SoloKey Secure Vault",
+          titleBarStyle: TitleBarStyle.normal,
+        );
+        windowManager.waitUntilReadyToShow(windowOptions, () async {
+          await windowManager.show();
+          await windowManager.focus();
+        });
+      }
+
       runApp(
         ProviderScope(
           overrides: buildProviderOverrides(),

@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +11,7 @@ import '../../../router/app_router.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
+import '../../sync/infrastructure/sync_service.dart';
 import '../application/vault_state_provider.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
@@ -24,10 +28,83 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   // Number of chars entered via the SecureKeyboard (used for the masked display)
   int _charCount = 0;
 
+  // Remote unlock listener
+  StreamSubscription<String>? _remoteUnlockSub;
+  bool _isRemoteUnlocking = false;
+
   @override
   void initState() {
     super.initState();
     _checkBiometrics();
+    _listenForRemoteUnlock();
+  }
+
+  @override
+  void dispose() {
+    _remoteUnlockSub?.cancel();
+    super.dispose();
+  }
+
+  /// Subscribes to the SyncService's serverEvents stream to catch
+  /// `remote_unlock:<password>` events emitted when a paired mobile
+  /// device sends a WiFi unlock request.
+  ///
+  /// Only active on desktop platforms where the Shelf server runs.
+  void _listenForRemoteUnlock() {
+    // Only listen on desktop platforms (Windows, macOS, Linux)
+    if (!_isDesktopPlatform) return;
+
+    try {
+      final syncService = getIt<SyncService>();
+      _remoteUnlockSub = syncService.serverEvents.listen((event) {
+        if (!mounted) return;
+
+        if (event.startsWith('remote_unlock:')) {
+          final password = event.replaceFirst('remote_unlock:', '');
+          _handleRemoteUnlock(password);
+        }
+      });
+    } catch (_) {
+      // SyncService may not be registered in test environments
+    }
+  }
+
+  /// Handles the remote unlock by using the received password to unlock
+  /// the vault. The password string is wiped from memory immediately after
+  /// it's consumed by the unlock use case.
+  Future<void> _handleRemoteUnlock(String password) async {
+    if (_isRemoteUnlocking || !mounted) return;
+
+    setState(() => _isRemoteUnlocking = true);
+
+    try {
+      // Use the received password to unlock
+      await ref.read(vaultNotifierProvider.notifier).unlock(password);
+
+      if (!mounted) return;
+
+      ref.read(vaultNotifierProvider).maybeWhen(
+            unlocked: (_) => _navigateHome(),
+            error: (msg) {
+              setState(() => _isRemoteUnlocking = false);
+              _showError('Desbloqueo remoto fallido: $msg');
+            },
+            orElse: () {
+              setState(() => _isRemoteUnlocking = false);
+            },
+          );
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isRemoteUnlocking = false);
+        _showError('Error en desbloqueo remoto');
+      }
+    }
+  }
+
+  bool get _isDesktopPlatform {
+    return defaultTargetPlatform == TargetPlatform.windows ||
+        defaultTargetPlatform == TargetPlatform.macOS ||
+        defaultTargetPlatform == TargetPlatform.linux;
   }
 
   Future<void> _checkBiometrics() async {
@@ -166,6 +243,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
                     const Spacer(),
 
+                    // Remote unlock indicator (desktop only)
+                    if (_isRemoteUnlocking) ...[
+                      _RemoteUnlockBanner(),
+                      const SizedBox(height: 16),
+                    ],
+
                     // Tappable masked password display
                     _SecurePasswordTap(
                       charCount: _charCount,
@@ -176,7 +259,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
                     AnimatedSwitcher(
                       duration: const Duration(milliseconds: 200),
-                      child: isLoading
+                      child: isLoading || _isRemoteUnlocking
                           ? const Center(
                               child: CircularProgressIndicator(
                                 color: Color(0xFF6C63FF),
@@ -201,6 +284,32 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                             'Usar biometría',
                             style: TextStyle(color: Color(0xFF6C63FF)),
                           ),
+                        ),
+                      ),
+                    ],
+
+                    // WiFi unlock hint for desktop
+                    if (_isDesktopPlatform) ...[
+                      const SizedBox(height: 8),
+                      Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(
+                              Icons.wifi_rounded,
+                              color: const Color(0xFF39FF14).withValues(alpha: 0.5),
+                              size: 14,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Desbloqueo WiFi disponible',
+                              style: TextStyle(
+                                color: const Color(0xFF39FF14).withValues(alpha: 0.5),
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ],
@@ -234,6 +343,50 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 }
 
 // ── Sub-widgets ───────────────────────────────────────────────────────────────
+
+class _RemoteUnlockBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: const Color(0xFF39FF14).withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF39FF14).withValues(alpha: 0.3),
+        ),
+      ),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              color: const Color(0xFF39FF14),
+              strokeWidth: 2,
+            ),
+          ),
+          const SizedBox(width: 12),
+          const Expanded(
+            child: Text(
+              'Desbloqueando desde dispositivo móvil...',
+              style: TextStyle(
+                color: Color(0xFF39FF14),
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const Icon(
+            Icons.phone_android_rounded,
+            color: Color(0xFF39FF14),
+            size: 18,
+          ),
+        ],
+      ),
+    );
+  }
+}
 
 class _SecurePasswordTap extends StatelessWidget {
   const _SecurePasswordTap({required this.charCount, required this.onTap});

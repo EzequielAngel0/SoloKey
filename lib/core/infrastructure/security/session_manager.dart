@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
+import '../../domain/crypto_utils.dart';
+
 /// Holds the derived master key in memory for the duration of an unlocked session.
 /// The key is zeroed out when the vault is locked.
 ///
@@ -31,7 +33,7 @@ class SessionManager {
 
   void _clearBuffer() {
     if (_keyBytes != null) {
-      _keyBytes!.fillRange(0, _keyBytes!.length, 0);
+      zeroBuffer(_keyBytes!);
       _keyBytes = null;
     }
   }

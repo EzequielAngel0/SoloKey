@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
+import '../../../../core/presentation/layouts/desktop_layout_state.dart';
+import '../../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../../core/utils/auth_helper.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
@@ -116,7 +118,12 @@ class CredentialCard extends ConsumerWidget {
             title: const Text('Editar', style: TextStyle(color: Colors.white)),
             onTap: () {
               Navigator.pop(context);
-              context.push(AppRoutes.credentialEdit.replaceFirst(':id', credential.id));
+              if (ResponsiveLayout.isDesktop(context)) {
+                ref.read(desktopSelectedCredentialIdProvider.notifier).state = credential.id;
+                ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.edit;
+              } else {
+                context.push(AppRoutes.credentialEdit.replaceFirst(':id', credential.id));
+              }
             },
           ),
           const Divider(color: Color(0xFF2A2A4A)),
@@ -142,6 +149,12 @@ class CredentialCard extends ConsumerWidget {
               );
               if (confirm == true) {
                 await ref.read(credentialsNotifierProvider.notifier).delete(credential.id);
+                if (ResponsiveLayout.isDesktop(context)) {
+                  if (ref.read(desktopSelectedCredentialIdProvider) == credential.id) {
+                    ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+                  }
+                }
               }
             },
           ),
@@ -238,6 +251,12 @@ class CredentialCard extends ConsumerWidget {
         if (confirm == true) {
           HapticFeedback.heavyImpact();
           await ref.read(credentialsNotifierProvider.notifier).delete(credential.id);
+          if (ResponsiveLayout.isDesktop(context)) {
+            if (ref.read(desktopSelectedCredentialIdProvider) == credential.id) {
+              ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+              ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+            }
+          }
           if (context.mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -269,9 +288,16 @@ class CredentialCard extends ConsumerWidget {
         borderRadius: BorderRadius.circular(16),
         child: InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () => context.push(
-            AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
-          ),
+          onTap: () {
+            if (ResponsiveLayout.isDesktop(context)) {
+              ref.read(desktopSelectedCredentialIdProvider.notifier).state = credential.id;
+              ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
+            } else {
+              context.push(
+                AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
+              );
+            }
+          },
           onLongPress: () => _showOptionsSheet(context, ref),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),

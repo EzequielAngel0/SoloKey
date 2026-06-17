@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import '../../../core/presentation/layouts/desktop_layout_state.dart';
+import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_colors.dart';
@@ -86,7 +88,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     _saveScale = Tween<double>(begin: 1.0, end: 0.95).animate(
       CurvedAnimation(parent: _saveAnimCtrl, curve: Curves.easeInOut),
     );
-    if (widget.existingId != null) _loadExisting();
+    if (widget.existingId != null) {
+      _loadExisting();
+    } else {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ResponsiveLayout.isDesktop(context)) {
+          final activeFolderId = ref.read(desktopSelectedFolderIdProvider);
+          if (activeFolderId != null) {
+            setState(() {
+              _folderId = activeFolderId;
+            });
+          }
+        }
+      });
+    }
   }
 
   void _loadExisting() {
@@ -401,7 +416,12 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
-        context.pop();
+        if (ResponsiveLayout.isDesktop(context)) {
+          ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
+          ref.read(desktopSelectedCredentialIdProvider.notifier).state = credential.id;
+        } else {
+          context.pop();
+        }
       }
     } catch (e) {
       HapticFeedback.heavyImpact();
@@ -771,6 +791,18 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     return Scaffold(
       appBar: VaultAppBar(
         title: isEdit ? 'Editar credencial' : 'Nueva credencial',
+        leading: ResponsiveLayout.isDesktop(context)
+            ? IconButton(
+                icon: const Icon(Icons.close_rounded),
+                onPressed: () {
+                  if (isEdit) {
+                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
+                  } else {
+                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+                  }
+                },
+              )
+            : null,
         actions: [
           if (!_isLoading)
             TextButton.icon(

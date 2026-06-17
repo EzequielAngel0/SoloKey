@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/presentation/layouts/desktop_layout_state.dart';
+import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../credentials/application/credentials_provider.dart';
@@ -69,7 +71,11 @@ class FolderScreen extends ConsumerWidget {
     if (confirmed == true) {
       await ref.read(foldersNotifierProvider.notifier).deleteFolder(folder.id);
       if (context.mounted) {
-        context.pop();
+        if (ResponsiveLayout.isDesktop(context)) {
+          ref.read(desktopSelectedFolderIdProvider.notifier).state = null;
+        } else {
+          context.pop();
+        }
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
           content: Text('Carpeta eliminada'),
           backgroundColor: Color(0xFF4CAF50),
@@ -166,6 +172,7 @@ class FolderScreen extends ConsumerWidget {
     return Scaffold(
       appBar: VaultAppBar(
         title: currentFolder.name,
+        leading: ResponsiveLayout.isDesktop(context) ? const SizedBox.shrink() : null,
         actions: [
           IconButton(
             icon: Icon(
@@ -188,7 +195,13 @@ class FolderScreen extends ConsumerWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push(AppRoutes.credentialCreate),
+        onPressed: () {
+          if (ResponsiveLayout.isDesktop(context)) {
+            ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
+          } else {
+            context.push(AppRoutes.credentialCreate);
+          }
+        },
         backgroundColor: const Color(0xFF6C63FF),
         child: const Icon(Icons.add_rounded, color: Colors.white),
       ),
@@ -223,7 +236,14 @@ class FolderScreen extends ConsumerWidget {
                   ...subFolders.map((f) => Padding(
                         padding: const EdgeInsets.only(bottom: 8),
                         child: ListTile(
-                          onTap: () => context.push(AppRoutes.folderDetail.replaceFirst(':id', f.id)),
+                          onTap: () {
+                            if (ResponsiveLayout.isDesktop(context)) {
+                              ref.read(desktopSelectedFolderIdProvider.notifier).state = f.id;
+                              ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+                            } else {
+                              context.push(AppRoutes.folderDetail.replaceFirst(':id', f.id));
+                            }
+                          },
                           onLongPress: () => _showFolderOptionsSheet(context, ref, f),
                           tileColor: const Color(0xFF16213E),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

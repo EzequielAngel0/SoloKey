@@ -18,6 +18,7 @@ import '../features/vault_access/presentation/splash_screen.dart';
 import '../features/vault_access/presentation/unlock_screen.dart';
 import '../features/credentials/presentation/qr_scanner_screen.dart';
 import '../features/folders/presentation/folder_screen.dart';
+import '../features/sync/presentation/pairing_screen.dart';
 
 // ── Route constants ───────────────────────────────────────────────────────────
 
@@ -38,6 +39,7 @@ abstract final class AppRoutes {
   static const transfer            = '/transfer';
   static const autofillOnboarding  = '/autofill-onboarding';
   static const passkeys            = '/passkeys';
+  static const sync                = '/sync';
 }
 
 // ── RouterNotifier ────────────────────────────────────────────────────────────
@@ -80,7 +82,8 @@ class _RouterNotifier extends ChangeNotifier {
         loc.startsWith('/security-audit') ||
         loc.startsWith('/qr-scanner') ||
         loc.startsWith('/transfer') ||
-        loc.startsWith('/autofill-onboarding');
+        loc.startsWith('/autofill-onboarding') ||
+        loc.startsWith('/sync');
 
     // Redirect to unlock if trying to access protected routes while locked
     if (onProtected && !isUnlocked) return AppRoutes.unlock;
@@ -177,6 +180,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.passkeys,
         builder: (_, _) => const PasskeysScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.sync,
+        builder: (_, _) => const PairingScreen(),
       ),
     ],
   );

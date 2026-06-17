@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
+import '../../../core/presentation/layouts/desktop_layout_state.dart';
+import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/copy_feedback_button.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
@@ -52,6 +54,7 @@ class _DetailView extends ConsumerWidget {
     return Scaffold(
       appBar: VaultAppBar(
         title: credential.title,
+        leading: ResponsiveLayout.isDesktop(context) ? const SizedBox.shrink() : null,
         actions: [
           IconButton(
             icon: Icon(
@@ -67,9 +70,15 @@ class _DetailView extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.edit_rounded),
-            onPressed: () => context.push(
-              AppRoutes.credentialEdit.replaceFirst(':id', credential.id),
-            ),
+            onPressed: () {
+              if (ResponsiveLayout.isDesktop(context)) {
+                ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.edit;
+              } else {
+                context.push(
+                  AppRoutes.credentialEdit.replaceFirst(':id', credential.id),
+                );
+              }
+            },
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline_rounded,
@@ -212,7 +221,14 @@ class _DetailView extends ConsumerWidget {
       await ref
           .read(credentialsNotifierProvider.notifier)
           .delete(credential.id);
-      if (context.mounted) context.pop();
+      if (context.mounted) {
+        if (ResponsiveLayout.isDesktop(context)) {
+          ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+          ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+        } else {
+          context.pop();
+        }
+      }
     }
   }
 }

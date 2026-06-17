@@ -15,14 +15,29 @@ import 'widgets/folder_list_view.dart';
 import 'widgets/credential_list_widget.dart';
 import 'widgets/empty_state_widget.dart';
 
-class HomeScreen extends ConsumerStatefulWidget {
+import '../../../../core/presentation/layouts/desktop_main_layout.dart';
+import '../../../../core/presentation/layouts/responsive_layout.dart';
+
+class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
 
   @override
-  ConsumerState<HomeScreen> createState() => _HomeScreenState();
+  Widget build(BuildContext context, WidgetRef ref) {
+    return const ResponsiveLayout(
+      mobile: MobileHomeScreen(),
+      desktop: DesktopMainLayout(),
+    );
+  }
 }
 
-class _HomeScreenState extends ConsumerState<HomeScreen> {
+class MobileHomeScreen extends ConsumerStatefulWidget {
+  const MobileHomeScreen({super.key});
+
+  @override
+  ConsumerState<MobileHomeScreen> createState() => _MobileHomeScreenState();
+}
+
+class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   final _searchCtrl = TextEditingController();
   int _currentIndex = 0;
 

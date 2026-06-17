@@ -29,7 +29,7 @@ class _QrScannerScreenState extends State<QrScannerScreen> {
     if (barcodes.isNotEmpty) {
       final String? rawValue = barcodes.first.rawValue;
       if (rawValue != null) {
-        if (rawValue.toLowerCase().startsWith('otpauth')) {
+        if (rawValue.toLowerCase().startsWith('otpauth') || rawValue.startsWith('{')) {
           setState(() => _found = true);
           if (mounted) Navigator.of(context).pop(rawValue);
         } else {

@@ -59,8 +59,11 @@ class UnlockVaultUseCase {
     if (settings.biometricEnabled) {
       await getIt<FlutterSecureStorage>()
           .write(key: 'bio_master_key', value: base64Encode(keyBytes));
+      await getIt<FlutterSecureStorage>()
+          .write(key: 'master_password', value: masterPassword);
     } else {
       await getIt<FlutterSecureStorage>().delete(key: 'bio_master_key');
+      await getIt<FlutterSecureStorage>().delete(key: 'master_password');
     }
 
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
