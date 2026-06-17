@@ -25,7 +25,9 @@ mixin _$AppSecuritySettings {
   int get clearClipboardSeconds => throw _privateConstructorUsedError;
   bool get biometricEnabled => throw _privateConstructorUsedError;
   bool get obscureOnBackground => throw _privateConstructorUsedError;
-  String get themeMode => throw _privateConstructorUsedError;
+  String get themeMode =>
+      throw _privateConstructorUsedError; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
+  int get wipeAfterFailedAttempts => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -50,6 +52,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     bool biometricEnabled,
     bool obscureOnBackground,
     String themeMode,
+    int wipeAfterFailedAttempts,
   });
 }
 
@@ -73,6 +76,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
     Object? themeMode = null,
+    Object? wipeAfterFailedAttempts = null,
   }) {
     return _then(
       _value.copyWith(
@@ -96,6 +100,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.themeMode
                 : themeMode // ignore: cast_nullable_to_non_nullable
                       as String,
+            wipeAfterFailedAttempts: null == wipeAfterFailedAttempts
+                ? _value.wipeAfterFailedAttempts
+                : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
+                      as int,
           )
           as $Val,
     );
@@ -117,6 +125,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     bool biometricEnabled,
     bool obscureOnBackground,
     String themeMode,
+    int wipeAfterFailedAttempts,
   });
 }
 
@@ -139,6 +148,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? biometricEnabled = null,
     Object? obscureOnBackground = null,
     Object? themeMode = null,
+    Object? wipeAfterFailedAttempts = null,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -162,6 +172,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.themeMode
             : themeMode // ignore: cast_nullable_to_non_nullable
                   as String,
+        wipeAfterFailedAttempts: null == wipeAfterFailedAttempts
+            ? _value.wipeAfterFailedAttempts
+            : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
+                  as int,
       ),
     );
   }
@@ -176,6 +190,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.biometricEnabled = false,
     this.obscureOnBackground = true,
     this.themeMode = 'system',
+    this.wipeAfterFailedAttempts = 0,
   });
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -196,10 +211,14 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final String themeMode;
+  // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
+  @override
+  @JsonKey()
+  final int wipeAfterFailedAttempts;
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, wipeAfterFailedAttempts: $wipeAfterFailedAttempts)';
   }
 
   @override
@@ -216,7 +235,12 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
             (identical(other.obscureOnBackground, obscureOnBackground) ||
                 other.obscureOnBackground == obscureOnBackground) &&
             (identical(other.themeMode, themeMode) ||
-                other.themeMode == themeMode));
+                other.themeMode == themeMode) &&
+            (identical(
+                  other.wipeAfterFailedAttempts,
+                  wipeAfterFailedAttempts,
+                ) ||
+                other.wipeAfterFailedAttempts == wipeAfterFailedAttempts));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -228,6 +252,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     biometricEnabled,
     obscureOnBackground,
     themeMode,
+    wipeAfterFailedAttempts,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -254,6 +279,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final bool biometricEnabled,
     final bool obscureOnBackground,
     final String themeMode,
+    final int wipeAfterFailedAttempts,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -268,7 +294,9 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   bool get obscureOnBackground;
   @override
-  String get themeMode;
+  String get themeMode; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
+  @override
+  int get wipeAfterFailedAttempts;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

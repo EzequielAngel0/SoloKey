@@ -5,6 +5,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../domain/entities/vault_session.dart';
 import 'setup_vault_use_case.dart';
 import 'unlock_vault_use_case.dart';
+import 'vault_exceptions.dart';
 
 part 'vault_state_provider.freezed.dart';
 part 'vault_state_provider.g.dart';
@@ -40,11 +41,30 @@ class VaultNotifier extends _$VaultNotifier {
       final useCase = ref.read(unlockVaultUseCaseProvider);
       final session = await useCase.execute(masterPassword);
       state = VaultState.unlocked(session);
+    } on VaultLockedOutException catch (e) {
+      state = VaultState.error(
+          'Demasiados intentos. Espera ${_formatLockout(e.remaining)}.');
+    } on WrongMasterPasswordException catch (e) {
+      state = e.lockoutAfter > Duration.zero
+          ? VaultState.error(
+              'Contraseña incorrecta. Bloqueado ${_formatLockout(e.lockoutAfter)}.')
+          : const VaultState.error('Contraseña maestra incorrecta');
+    } on VaultWipedException {
+      state = const VaultState.error(
+          'Bóveda borrada por demasiados intentos fallidos.');
     } on ArgumentError {
       state = const VaultState.error('Contraseña maestra incorrecta');
     } catch (e) {
       state = VaultState.error(e.toString());
     }
+  }
+
+  static String _formatLockout(Duration d) {
+    if (d.inMinutes >= 1) {
+      final s = d.inSeconds % 60;
+      return s > 0 ? '${d.inMinutes}m ${s}s' : '${d.inMinutes}m';
+    }
+    return '${d.inSeconds}s';
   }
 
   Future<void> unlockWithBiometrics() async {

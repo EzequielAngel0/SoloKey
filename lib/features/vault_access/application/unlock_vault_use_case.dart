@@ -7,9 +7,12 @@ import '../../../app/di/injection.dart';
 
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../../core/services/brute_force_guard.dart';
 import '../domain/entities/vault_session.dart';
 import '../domain/repositories/i_vault_repository.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
+import 'vault_exceptions.dart';
+import 'wipe_vault_use_case.dart';
 
 @lazySingleton
 class UnlockVaultUseCase {
@@ -18,14 +21,24 @@ class UnlockVaultUseCase {
     this._settingsRepo,
     this._security,
     this._session,
+    this._guard,
+    this._wipe,
   );
 
   final IVaultRepository _vaultRepo;
   final ISettingsRepository _settingsRepo;
   final ISecurityService _security;
   final SessionManager _session;
+  final BruteForceGuard _guard;
+  final WipeVaultUseCase _wipe;
 
   Future<VaultSession> execute(String masterPassword) async {
+    // Anti brute-force: reject attempts while in a lockout window.
+    final guardState = await _guard.currentState();
+    if (guardState.isLockedOut) {
+      throw VaultLockedOutException(guardState.lockoutRemaining);
+    }
+
     final config = await _vaultRepo.getMasterKeyConfig();
     if (config == null) throw StateError('Vault not initialized');
 
@@ -51,9 +64,22 @@ class UnlockVaultUseCase {
     }
 
     final isValid = await _security.verifyKey(keyBytes, config.verificationData);
-    if (!isValid) throw ArgumentError('Invalid master password');
-
     final settings = await _settingsRepo.getSettings();
+
+    if (!isValid) {
+      // Zero the derived (wrong) key before bailing out.
+      keyBytes.fillRange(0, keyBytes.length, 0);
+      final state = await _guard.recordFailure();
+      if (BruteForceGuard.shouldWipe(
+          state.failedAttempts, settings.wipeAfterFailedAttempts)) {
+        await _wipe.execute();
+        throw const VaultWipedException();
+      }
+      throw WrongMasterPasswordException(state.lockoutRemaining);
+    }
+
+    // Correct password: clear the brute-force counter.
+    await _guard.recordSuccess();
     _session.storeKey(keyBytes);
 
     if (settings.biometricEnabled) {

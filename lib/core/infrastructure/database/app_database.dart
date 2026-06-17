@@ -81,6 +81,16 @@ class AppDatabase extends _$AppDatabase {
         },
       );
 
+  /// Deletes every row from every table. Used by the brute-force wipe and any
+  /// full vault reset. Runs in a single transaction.
+  Future<void> wipeAllData() async {
+    await transaction(() async {
+      for (final table in allTables) {
+        await delete(table).go();
+      }
+    });
+  }
+
   static QueryExecutor _openConnection() {
     return driftDatabase(name: 'vault_guard_db');
   }

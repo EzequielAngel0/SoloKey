@@ -175,6 +175,12 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(obscureOnBackground: v),
               ),
             ),
+            const _Divider(),
+            _WipeAfterAttemptsTile(
+              current: settings.wipeAfterFailedAttempts,
+              onChanged: (n) =>
+                  onUpdate(settings.copyWith(wipeAfterFailedAttempts: n)),
+            ),
           ],
         ),
         const SizedBox(height: 32),
@@ -354,6 +360,85 @@ class _Divider extends StatelessWidget {
       indent: 48,
       endIndent: 16,
       color: context.palette.divider,
+    );
+  }
+}
+
+/// Anti brute-force: wipe the vault after N failed unlock attempts (0 = off).
+class _WipeAfterAttemptsTile extends StatelessWidget {
+  const _WipeAfterAttemptsTile(
+      {required this.current, required this.onChanged});
+
+  final int current;
+  final ValueChanged<int> onChanged;
+
+  static const _options = [0, 5, 10, 15, 20];
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.delete_forever_rounded, color: palette.danger, size: 20),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Borrar bóveda tras intentos fallidos',
+                        style:
+                            TextStyle(color: palette.textPrimary, fontSize: 14)),
+                    Text('Protección anti fuerza bruta (irreversible)',
+                        style:
+                            TextStyle(color: palette.textMuted, fontSize: 11)),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: _options.map((n) {
+              final selected = n == current;
+              final color = n > 0 ? palette.danger : palette.textMuted;
+              return GestureDetector(
+                onTap: () => onChanged(n),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? color.withValues(alpha: 0.15)
+                        : palette.surface,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: selected ? color : palette.divider,
+                      width: selected ? 1.4 : 1,
+                    ),
+                  ),
+                  child: Text(
+                    n == 0 ? 'Desactivado' : '$n',
+                    style: TextStyle(
+                      color: selected ? color : palette.textMuted,
+                      fontSize: 12.5,
+                      fontWeight:
+                          selected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
     );
   }
 }

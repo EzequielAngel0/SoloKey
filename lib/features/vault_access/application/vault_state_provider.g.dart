@@ -43,7 +43,7 @@ final unlockVaultUseCaseProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef UnlockVaultUseCaseRef = AutoDisposeProviderRef<UnlockVaultUseCase>;
-String _$vaultNotifierHash() => r'aab162fb7bc9cf31cd16025756b5c96fb65e5dab';
+String _$vaultNotifierHash() => r'b48c06ee8d14cae2c84003e63d7a1b65cc0ed00a';
 
 /// See also [VaultNotifier].
 @ProviderFor(VaultNotifier)

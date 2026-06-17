@@ -11,6 +11,8 @@ class AppSecuritySettings with _$AppSecuritySettings {
     @Default(false) bool biometricEnabled,
     @Default(true) bool obscureOnBackground,
     @Default('system') String themeMode,
+    // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
+    @Default(0) int wipeAfterFailedAttempts,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>

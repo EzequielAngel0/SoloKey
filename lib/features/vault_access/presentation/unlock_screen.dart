@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import 'package:local_auth/local_auth.dart';
 
 import '../../../app/di/injection.dart';
+import '../../../core/services/brute_force_guard.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
@@ -33,17 +34,51 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   StreamSubscription<String>? _remoteUnlockSub;
   bool _isRemoteUnlocking = false;
 
+  // Anti brute-force lockout
+  Duration _lockout = Duration.zero;
+  Timer? _lockoutTimer;
+
   @override
   void initState() {
     super.initState();
     _checkBiometrics();
     _listenForRemoteUnlock();
+    _refreshLockout();
   }
 
   @override
   void dispose() {
     _remoteUnlockSub?.cancel();
+    _lockoutTimer?.cancel();
     super.dispose();
+  }
+
+  /// Reads the persisted brute-force lockout and starts a 1s countdown ticker.
+  Future<void> _refreshLockout() async {
+    try {
+      final state = await getIt<BruteForceGuard>().currentState();
+      if (!mounted) return;
+      setState(() => _lockout = state.lockoutRemaining);
+      _lockoutTimer?.cancel();
+      if (_lockout > Duration.zero) {
+        _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+          if (!mounted) return;
+          final next = _lockout - const Duration(seconds: 1);
+          setState(() => _lockout = next > Duration.zero ? next : Duration.zero);
+          if (_lockout <= Duration.zero) t.cancel();
+        });
+      }
+    } catch (_) {
+      // BruteForceGuard may be unavailable in test environments.
+    }
+  }
+
+  String _formatLockout(Duration d) {
+    if (d.inMinutes >= 1) {
+      final s = d.inSeconds % 60;
+      return s > 0 ? '${d.inMinutes}m ${s}s' : '${d.inMinutes}m';
+    }
+    return '${d.inSeconds}s';
   }
 
   /// Subscribes to the SyncService's serverEvents stream to catch
@@ -140,6 +175,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
   /// Opens the SecureKeyboard overlay and uses the result to unlock.
   Future<void> _openSecureKeyboard() async {
+    if (_lockout > Duration.zero) return; // bloqueado por intentos fallidos
     final password = await SecureKeyboardOverlay.show(
       context,
       mode: SecureKeyboardMode.password,
@@ -157,6 +193,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
           error: (msg) {
             setState(() => _charCount = 0);
             _showError(msg);
+            // Actualiza el contador/lockout tras un intento fallido.
+            _refreshLockout();
           },
           orElse: () {},
         );
@@ -253,6 +291,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       const SizedBox(height: 16),
                     ],
 
+                    // Brute-force lockout banner (con cuenta regresiva)
+                    if (_lockout > Duration.zero) ...[
+                      _LockoutBanner(remainingText: _formatLockout(_lockout)),
+                      const SizedBox(height: 16),
+                    ],
+
                     // Tappable masked password display
                     _SecurePasswordTap(
                       charCount: _charCount,
@@ -270,8 +314,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                               ),
                             )
                           : ElevatedButton(
-                              onPressed: _openSecureKeyboard,
-                              child: const Text('Desbloquear'),
+                              onPressed: _lockout > Duration.zero
+                                  ? null
+                                  : _openSecureKeyboard,
+                              child: Text(_lockout > Duration.zero
+                                  ? 'Bloqueado (${_formatLockout(_lockout)})'
+                                  : 'Desbloquear'),
                             ),
                     ),
 
@@ -386,6 +434,40 @@ class _RemoteUnlockBanner extends StatelessWidget {
             Icons.phone_android_rounded,
             color: palette.primary,
             size: 18,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _LockoutBanner extends StatelessWidget {
+  const _LockoutBanner({required this.remainingText});
+  final String remainingText;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: palette.danger.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: palette.danger.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.lock_clock_rounded, color: palette.danger, size: 18),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'Demasiados intentos. Reintenta en $remainingText.',
+              style: TextStyle(
+                color: palette.danger,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ),
         ],
       ),
