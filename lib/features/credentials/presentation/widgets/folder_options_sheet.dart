@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../shared/extensions/color_extensions.dart';
 import '../../../folders/domain/entities/folder.dart';
 import '../../../folders/application/folders_provider.dart';
 
