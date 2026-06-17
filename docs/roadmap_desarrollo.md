@@ -249,11 +249,13 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
   Home + EmptyState, detalle de credencial (campos/tipos/rotación/diálogos/TOTP), **formulario de
   credencial** (secciones por tipo, campos personalizados, cifrado doble, rotación, QR/SSH, validadores
   y snackbars), Historial, Recuperación (+ RecoveryCodeDisplay), onboarding de autofill, Quick-Fill de
-  escritorio, Auditoría de Seguridad y Respaldos de Passkey. ~290 claves ARB (es/en).
-- ⬜ **Pendiente (siguientes lotes)**: carpetas (`folder_screen` + widgets), sync/pairing, transfer,
-  layout de escritorio, widgets compartidos (badges/selectores de tipo, fuerza de contraseña), menú del
-  tray + textos de notificaciones, y los textos generados por `SecurityAuditService` (capa de datos:
-  requieren devolver claves, no strings).
+  escritorio, Auditoría de Seguridad y Respaldos de Passkey, **carpetas y favoritos** (folder_screen +
+  folder_list_view + folder_picker_sheet + folder_options_sheet + favorites_view + favorite_toggle), y
+  **widgets compartidos** (credential_card, selector de tipo, generador de contraseñas, indicador de
+  fuerza, clipboard_countdown, password_row, teclado seguro). ~330 claves ARB (es/en).
+- ⬜ **Pendiente (siguientes lotes)**: sync/pairing, transfer, layout de escritorio (`desktop_main_layout`
+  + drawer), menú del tray + textos de notificaciones (`app.dart` / `NotificationService`), y los textos
+  generados por `SecurityAuditService` (capa de datos: requieren devolver claves, no strings).
 
 ---
 
