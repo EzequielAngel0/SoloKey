@@ -5,6 +5,9 @@ import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
 import '../application/password_history_provider.dart';
+import '../../../../theme/app_colors.dart';
+import '../application/credentials_provider.dart';
+import '../domain/entities/credential.dart';
 
 class PasswordHistoryScreen extends ConsumerWidget {
   const PasswordHistoryScreen({super.key, required this.credentialId});
@@ -81,6 +84,7 @@ class PasswordHistoryScreen extends ConsumerWidget {
                         color: Color(0xFF6C63FF),
                         size: 20,
                       ),
+                      tooltip: 'Copiar contraseña',
                       onPressed: () async {
                         final auth = await AuthHelper.requireAuth(context);
                         if (!auth) return;
@@ -91,6 +95,49 @@ class PasswordHistoryScreen extends ConsumerWidget {
                           label: 'Contraseña histórica',
                           value: entry.password,
                         );
+                      },
+                    ),
+                    IconButton(
+                      icon: const Icon(
+                        Icons.restore_rounded,
+                        color: AppColors.secondary,
+                        size: 20,
+                      ),
+                      tooltip: 'Restaurar contraseña',
+                      onPressed: () async {
+                        final auth = await AuthHelper.requireAuth(context);
+                        if (!auth) return;
+                        if (!context.mounted) return;
+
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            backgroundColor: AppColors.drawer,
+                            title: const Text('¿Restaurar contraseña?', style: TextStyle(color: Colors.white)),
+                            content: const Text(
+                              'Esta acción reemplazará la contraseña actual de la credencial con esta contraseña histórica. ¿Deseas continuar?',
+                              style: TextStyle(color: AppColors.textMuted),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.pop(context, false),
+                                child: const Text('Cancelar', style: TextStyle(color: AppColors.textDisabled)),
+                              ),
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.accent,
+                                  foregroundColor: Colors.white,
+                                ),
+                                onPressed: () => Navigator.pop(context, true),
+                                child: const Text('Restaurar'),
+                              ),
+                            ],
+                          ),
+                        );
+
+                        if (confirm == true && context.mounted) {
+                          await _restorePassword(context, ref, entry.password);
+                        }
                       },
                     ),
                   ],
@@ -110,5 +157,53 @@ class PasswordHistoryScreen extends ConsumerWidget {
         ),
       ),
     );
+  }
+
+  Future<void> _restorePassword(
+    BuildContext context,
+    WidgetRef ref,
+    String historicalPassword,
+  ) async {
+    try {
+      final creds = ref.read(credentialsNotifierProvider).valueOrNull;
+      final existing = creds?.firstWhere((c) => c.id == credentialId);
+      if (existing == null) throw Exception('Credencial no encontrada');
+
+      var updated = existing.copyWith(
+        password: historicalPassword,
+        updatedAt: DateTime.now(),
+      );
+
+      if (existing.type == CredentialType.sshKey && existing.sshKeyMetadata != null) {
+        updated = updated.copyWith(
+          sshKeyMetadata: existing.sshKeyMetadata!.copyWith(
+            privateKey: historicalPassword,
+          ),
+        );
+      }
+
+      await ref.read(credentialsNotifierProvider.notifier).updateCredential(updated);
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Contraseña restaurada con éxito'),
+            backgroundColor: AppColors.success,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        Navigator.pop(context); // Volver a la pantalla de detalle
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error al restaurar la contraseña: $e'),
+            backgroundColor: AppColors.danger,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 }
