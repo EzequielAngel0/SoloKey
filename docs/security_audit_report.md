@@ -64,6 +64,14 @@ No se encontraron rutas de acceso directo a credenciales sin la contraseña maes
 
 ---
 
+#### [SEC-007] El secreto TOTP permanece en claro en el widget tree (`_TotpTile`)
+- **Archivo:** `lib/features/credentials/presentation/credential_detail_screen.dart` — Línea 123
+- **Descripción:** `credential.password!` (el secreto TOTP) se pasa como `String` a `_TotpTile` y es retenido por el widget tree. Como el TOTP se recalcula periódicamente cada segundo para refrescar la visualización del token temporal, este secreto permanece expuesto en el heap durante toda la visualización del detalle de la credencial.
+- **Impacto:** Bajo-Medio. Al igual que con SEC-003, un análisis forense de la memoria RAM del proceso (requiere privilegios root) podría revelar el secreto TOTP mientras la pantalla de detalle esté abierta.
+- **Recomendación:** Considerar a futuro realizar el cálculo del código OTP en un Isolate secundario de fondo y pasar solo el código temporal generado (String de 6 dígitos) al árbol de widgets, borrando la clave secreta lo antes posible.
+
+---
+
 ### 🟡 RIESGO BAJO
 
 #### [SEC-004] `obscureOnBackground` está desactivado por defecto
@@ -119,6 +127,7 @@ No se encontraron rutas de acceso directo a credenciales sin la contraseña maes
 | SEC-005 | Baja | Muy bajo | Cambiar `android:label` a `"SoloKey"` |
 | SEC-002 | Baja | Bajo | Eliminar archivo temporal `.vgvault` tras exportar |
 | SEC-003 | Informativo | Alto | Documentar como limitación conocida de Dart |
+| SEC-007 | Informativo | Medio | Calcular códigos TOTP en isolates secundarios para no exponer el secreto en el widget tree |
 
 ---
 
