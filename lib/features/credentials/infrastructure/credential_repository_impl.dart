@@ -46,10 +46,27 @@ class CredentialRepositoryImpl implements ICredentialRepository {
     return CredentialDto.fromEntry(entry: entry, payload: payload);
   }
 
+  /// Like [_decryptEntry] but returns null instead of throwing when a row
+  /// cannot be decrypted (e.g. it was encrypted under a different master key by
+  /// a past broken sync). This keeps a single corrupt row from blocking the
+  /// whole vault from loading — the user can still access their other entries.
+  Future<Credential?> _decryptEntryOrNull(dynamic entry) async {
+    try {
+      return await _decryptEntry(entry);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<List<Credential>> _decryptAll(Iterable<dynamic> entries) async {
+    final results = await Future.wait(entries.map(_decryptEntryOrNull));
+    return results.whereType<Credential>().toList();
+  }
+
   @override
   Future<List<Credential>> getAll() async {
     final entries = await _credentialDao.getAll();
-    return Future.wait(entries.map(_decryptEntry));
+    return _decryptAll(entries);
   }
 
   @override
@@ -90,19 +107,19 @@ class CredentialRepositoryImpl implements ICredentialRepository {
   @override
   Future<List<Credential>> getByCategory(String categoryId) async {
     final entries = await _credentialDao.getByCategory(categoryId);
-    return Future.wait(entries.map(_decryptEntry));
+    return _decryptAll(entries);
   }
 
   @override
   Future<List<Credential>> getFavorites() async {
     final entries = await _credentialDao.getFavorites();
-    return Future.wait(entries.map(_decryptEntry));
+    return _decryptAll(entries);
   }
 
   @override
   Future<List<Credential>> search(String query) async {
     final entries = await _credentialDao.searchByTitle(query);
-    return Future.wait(entries.map(_decryptEntry));
+    return _decryptAll(entries);
   }
 
   @override
