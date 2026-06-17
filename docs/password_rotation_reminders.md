@@ -100,3 +100,27 @@ Aprovecharemos que la aplicación de escritorio cuenta con un Daemon en bandeja 
 ## 7. Panel de Auditoría
 
 En la sección de **Auditoría de Seguridad (Security Audit)** del menú principal (tanto móvil como escritorio), se creará una pestaña o tarjeta llamada **"Contraseñas Expiradas"**. Aquí se listarán de forma prioritaria todas las credenciales que hayan superado su periodo de rotación, con un botón rápido para editarlas y cambiarlas.
+
+---
+
+## 8. Estado de Implementación (Fase 8.8 — 2026-06-17)
+
+Las **notificaciones nativas** ya están implementadas. Mapa de archivos:
+
+| Pieza | Archivo |
+| :--- | :--- |
+| Servicio de notificaciones (singleton DI) | `lib/core/services/notification_service.dart` |
+| Deep-link al detalle de la credencial | `lib/core/services/notification_navigation.dart` (`rootNavigatorKey`) |
+| Arranque + WorkManager + daemon de escritorio | `lib/main.dart` (`callbackDispatcher` top-level) |
+| Sello `lastRotationPromptedAt` sin descifrar | `lib/core/infrastructure/database/daos/credential_dao.dart` (`markRotationPrompted`) |
+
+**Decisiones clave:**
+- `findDueRotations()` lee **solo columnas planas** (`updatedAt`, `rotationInterval`, `customRotationDays`, `lastRotationPromptedAt`); nunca descifra el payload, por lo que corre seguro en el isolate de fondo de Android **sin la clave maestra en RAM**.
+- **Cooldown de 24h** por credencial (`lastRotationPromptedAt`) para evitar fatiga de notificaciones.
+- **Android:** `workmanager` periódico cada 24h; el `callbackDispatcher` llama `DartPluginRegistrant.ensureInitialized()` antes de abrir la DB (los plugins no se auto-registran en isolates de fondo).
+- **Escritorio:** `local_notifier` + `Timer.periodic` cada 6h mientras la app reside en el tray (`startDesktopDaemon()`), con un chequeo inmediato al arrancar.
+
+**Limitaciones conocidas (best-effort, por diseño del SO):**
+- Android puede retrasar/omitir tareas de `workmanager` por Doze u optimizaciones de batería agresivas (Samsung/Xiaomi/Huawei). La frecuencia mínima real es ~15 min y nunca es exacta.
+- En Windows, `local_notifier` requiere un acceso directo/AppUserModelID (lo crea `setup`) para que el Action Center muestre el toast; en ejecución de depuración el ícono/título puede verse genérico.
+- El deep-link al tocar la notificación abre el detalle solo si la bóveda está desbloqueada; si está bloqueada, el guard redirige a `/unlock` (no continúa automáticamente tras desbloquear).
