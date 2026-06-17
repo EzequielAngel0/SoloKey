@@ -81,5 +81,52 @@
 
   "folderDialogTitle": "Carpeta",
   "folderNameLabel": "Nombre de la carpeta",
-  "folderNameHint": "ej. Trabajo, Sociales…"
+  "folderNameHint": "ej. Trabajo, Sociales…",
+
+  "commonAccept": "Aceptar",
+  "commonErrorDetail": "Error: {msg}",
+
+  "detailNotFound": "Credencial no encontrada",
+  "detailRemoveFavorite": "Quitar de favoritas",
+  "detailAddFavorite": "Añadir a favoritas",
+  "detailViewHistory": "Ver historial de contraseñas",
+  "detailDeleteTitle": "Eliminar credencial",
+  "detailDeleteBody": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer.",
+  "detailDeleteAuthReason": "Verifica para eliminar esta credencial",
+
+  "fieldUsername": "Usuario",
+  "fieldPassword": "Contraseña",
+  "fieldWebsite": "Sitio web",
+  "fieldNotes": "Notas",
+  "fieldKeyType": "Tipo de llave",
+  "fieldPrivateKey": "Llave privada",
+  "fieldPublicKey": "Llave pública",
+  "fieldKeyPassphrase": "Passphrase de la llave",
+
+  "typePassword": "Contraseña",
+  "typeApiKey": "API Key",
+  "typeSecureNote": "Nota segura",
+  "typeTotp": "TOTP / 2FA",
+  "typePasskey": "Respaldo de Passkey",
+  "typeSshKey": "Llave SSH",
+
+  "rotationMonthly": "Mensual",
+  "rotationQuarterly": "Cada 3 meses",
+  "rotationSemiAnnually": "Cada 6 meses",
+  "rotationCustom": "Personalizado ({days} días)",
+  "rotationNone": "Ninguno",
+  "rotationOverdueTitle": "ROTACIÓN DE CONTRASEÑA VENCIDA",
+  "rotationReminderTitle": "RECORDATORIO DE ROTACIÓN",
+  "rotationOverdueBody": "Debes cambiar esta contraseña. Han pasado más de {days} días desde la última actualización.",
+  "rotationReminderBody": "Próximo cambio requerido en {days} días ({interval}).",
+
+  "secretDecrypting": "Descifrando…",
+  "secretDecryptAuthReason": "Autentícate para descifrar este secreto",
+  "secretDecryptError": "Error al descifrar: {msg}",
+  "pinDialogTitle": "Ingresa PIN secundario",
+  "pinDialogLabel": "PIN de sobre cifrado",
+
+  "totpTitle": "Código de verificación (2FA)",
+  "totpClipboardLabel": "Código TOTP",
+  "totpInvalid": "Inválido"
 }

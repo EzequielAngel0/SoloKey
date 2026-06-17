@@ -517,6 +517,246 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'e.g. Work, Social…'**
   String get folderNameHint;
+
+  /// No description provided for @commonAccept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get commonAccept;
+
+  /// No description provided for @commonErrorDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Error: {msg}'**
+  String commonErrorDetail(String msg);
+
+  /// No description provided for @detailNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential not found'**
+  String get detailNotFound;
+
+  /// No description provided for @detailRemoveFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove from favourites'**
+  String get detailRemoveFavorite;
+
+  /// No description provided for @detailAddFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Add to favourites'**
+  String get detailAddFavorite;
+
+  /// No description provided for @detailViewHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'View password history'**
+  String get detailViewHistory;
+
+  /// No description provided for @detailDeleteTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete credential'**
+  String get detailDeleteTitle;
+
+  /// No description provided for @detailDeleteBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{title}\"? This action cannot be undone.'**
+  String detailDeleteBody(String title);
+
+  /// No description provided for @detailDeleteAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify to delete this credential'**
+  String get detailDeleteAuthReason;
+
+  /// No description provided for @fieldUsername.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get fieldUsername;
+
+  /// No description provided for @fieldPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get fieldPassword;
+
+  /// No description provided for @fieldWebsite.
+  ///
+  /// In en, this message translates to:
+  /// **'Website'**
+  String get fieldWebsite;
+
+  /// No description provided for @fieldNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Notes'**
+  String get fieldNotes;
+
+  /// No description provided for @fieldKeyType.
+  ///
+  /// In en, this message translates to:
+  /// **'Key type'**
+  String get fieldKeyType;
+
+  /// No description provided for @fieldPrivateKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Private key'**
+  String get fieldPrivateKey;
+
+  /// No description provided for @fieldPublicKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Public key'**
+  String get fieldPublicKey;
+
+  /// No description provided for @fieldKeyPassphrase.
+  ///
+  /// In en, this message translates to:
+  /// **'Key passphrase'**
+  String get fieldKeyPassphrase;
+
+  /// No description provided for @typePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get typePassword;
+
+  /// No description provided for @typeApiKey.
+  ///
+  /// In en, this message translates to:
+  /// **'API key'**
+  String get typeApiKey;
+
+  /// No description provided for @typeSecureNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure note'**
+  String get typeSecureNote;
+
+  /// No description provided for @typeTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP / 2FA'**
+  String get typeTotp;
+
+  /// No description provided for @typePasskey.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey backup'**
+  String get typePasskey;
+
+  /// No description provided for @typeSshKey.
+  ///
+  /// In en, this message translates to:
+  /// **'SSH key'**
+  String get typeSshKey;
+
+  /// No description provided for @rotationMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get rotationMonthly;
+
+  /// No description provided for @rotationQuarterly.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 3 months'**
+  String get rotationQuarterly;
+
+  /// No description provided for @rotationSemiAnnually.
+  ///
+  /// In en, this message translates to:
+  /// **'Every 6 months'**
+  String get rotationSemiAnnually;
+
+  /// No description provided for @rotationCustom.
+  ///
+  /// In en, this message translates to:
+  /// **'Custom ({days} days)'**
+  String rotationCustom(int days);
+
+  /// No description provided for @rotationNone.
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get rotationNone;
+
+  /// No description provided for @rotationOverdueTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'PASSWORD ROTATION OVERDUE'**
+  String get rotationOverdueTitle;
+
+  /// No description provided for @rotationReminderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'ROTATION REMINDER'**
+  String get rotationReminderTitle;
+
+  /// No description provided for @rotationOverdueBody.
+  ///
+  /// In en, this message translates to:
+  /// **'You should change this password. More than {days} days have passed since the last update.'**
+  String rotationOverdueBody(int days);
+
+  /// No description provided for @rotationReminderBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Next change required in {days} days ({interval}).'**
+  String rotationReminderBody(int days, String interval);
+
+  /// No description provided for @secretDecrypting.
+  ///
+  /// In en, this message translates to:
+  /// **'Decrypting…'**
+  String get secretDecrypting;
+
+  /// No description provided for @secretDecryptAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to decrypt this secret'**
+  String get secretDecryptAuthReason;
+
+  /// No description provided for @secretDecryptError.
+  ///
+  /// In en, this message translates to:
+  /// **'Decryption error: {msg}'**
+  String secretDecryptError(String msg);
+
+  /// No description provided for @pinDialogTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter secondary PIN'**
+  String get pinDialogTitle;
+
+  /// No description provided for @pinDialogLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-envelope PIN'**
+  String get pinDialogLabel;
+
+  /// No description provided for @totpTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification code (2FA)'**
+  String get totpTitle;
+
+  /// No description provided for @totpClipboardLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP code'**
+  String get totpClipboardLabel;
+
+  /// No description provided for @totpInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid'**
+  String get totpInvalid;
 }
 
 class _AppLocalizationsDelegate

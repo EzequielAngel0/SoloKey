@@ -99,5 +99,73 @@
 
   "folderDialogTitle": "Folder",
   "folderNameLabel": "Folder name",
-  "folderNameHint": "e.g. Work, Social…"
+  "folderNameHint": "e.g. Work, Social…",
+
+  "commonAccept": "Accept",
+  "commonErrorDetail": "Error: {msg}",
+  "@commonErrorDetail": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
+
+  "detailNotFound": "Credential not found",
+  "detailRemoveFavorite": "Remove from favourites",
+  "detailAddFavorite": "Add to favourites",
+  "detailViewHistory": "View password history",
+  "detailDeleteTitle": "Delete credential",
+  "detailDeleteBody": "Delete \"{title}\"? This action cannot be undone.",
+  "@detailDeleteBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "detailDeleteAuthReason": "Verify to delete this credential",
+
+  "fieldUsername": "Username",
+  "fieldPassword": "Password",
+  "fieldWebsite": "Website",
+  "fieldNotes": "Notes",
+  "fieldKeyType": "Key type",
+  "fieldPrivateKey": "Private key",
+  "fieldPublicKey": "Public key",
+  "fieldKeyPassphrase": "Key passphrase",
+
+  "typePassword": "Password",
+  "typeApiKey": "API key",
+  "typeSecureNote": "Secure note",
+  "typeTotp": "TOTP / 2FA",
+  "typePasskey": "Passkey backup",
+  "typeSshKey": "SSH key",
+
+  "rotationMonthly": "Monthly",
+  "rotationQuarterly": "Every 3 months",
+  "rotationSemiAnnually": "Every 6 months",
+  "rotationCustom": "Custom ({days} days)",
+  "@rotationCustom": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "rotationNone": "None",
+  "rotationOverdueTitle": "PASSWORD ROTATION OVERDUE",
+  "rotationReminderTitle": "ROTATION REMINDER",
+  "rotationOverdueBody": "You should change this password. More than {days} days have passed since the last update.",
+  "@rotationOverdueBody": {
+    "placeholders": { "days": { "type": "int" } }
+  },
+  "rotationReminderBody": "Next change required in {days} days ({interval}).",
+  "@rotationReminderBody": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "interval": { "type": "String" }
+    }
+  },
+
+  "secretDecrypting": "Decrypting…",
+  "secretDecryptAuthReason": "Authenticate to decrypt this secret",
+  "secretDecryptError": "Decryption error: {msg}",
+  "@secretDecryptError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
+  "pinDialogTitle": "Enter secondary PIN",
+  "pinDialogLabel": "Double-envelope PIN",
+
+  "totpTitle": "Verification code (2FA)",
+  "totpClipboardLabel": "TOTP code",
+  "totpInvalid": "Invalid"
 }

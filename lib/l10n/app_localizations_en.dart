@@ -233,4 +233,136 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get folderNameHint => 'e.g. Work, Social…';
+
+  @override
+  String get commonAccept => 'Accept';
+
+  @override
+  String commonErrorDetail(String msg) {
+    return 'Error: $msg';
+  }
+
+  @override
+  String get detailNotFound => 'Credential not found';
+
+  @override
+  String get detailRemoveFavorite => 'Remove from favourites';
+
+  @override
+  String get detailAddFavorite => 'Add to favourites';
+
+  @override
+  String get detailViewHistory => 'View password history';
+
+  @override
+  String get detailDeleteTitle => 'Delete credential';
+
+  @override
+  String detailDeleteBody(String title) {
+    return 'Delete \"$title\"? This action cannot be undone.';
+  }
+
+  @override
+  String get detailDeleteAuthReason => 'Verify to delete this credential';
+
+  @override
+  String get fieldUsername => 'Username';
+
+  @override
+  String get fieldPassword => 'Password';
+
+  @override
+  String get fieldWebsite => 'Website';
+
+  @override
+  String get fieldNotes => 'Notes';
+
+  @override
+  String get fieldKeyType => 'Key type';
+
+  @override
+  String get fieldPrivateKey => 'Private key';
+
+  @override
+  String get fieldPublicKey => 'Public key';
+
+  @override
+  String get fieldKeyPassphrase => 'Key passphrase';
+
+  @override
+  String get typePassword => 'Password';
+
+  @override
+  String get typeApiKey => 'API key';
+
+  @override
+  String get typeSecureNote => 'Secure note';
+
+  @override
+  String get typeTotp => 'TOTP / 2FA';
+
+  @override
+  String get typePasskey => 'Passkey backup';
+
+  @override
+  String get typeSshKey => 'SSH key';
+
+  @override
+  String get rotationMonthly => 'Monthly';
+
+  @override
+  String get rotationQuarterly => 'Every 3 months';
+
+  @override
+  String get rotationSemiAnnually => 'Every 6 months';
+
+  @override
+  String rotationCustom(int days) {
+    return 'Custom ($days days)';
+  }
+
+  @override
+  String get rotationNone => 'None';
+
+  @override
+  String get rotationOverdueTitle => 'PASSWORD ROTATION OVERDUE';
+
+  @override
+  String get rotationReminderTitle => 'ROTATION REMINDER';
+
+  @override
+  String rotationOverdueBody(int days) {
+    return 'You should change this password. More than $days days have passed since the last update.';
+  }
+
+  @override
+  String rotationReminderBody(int days, String interval) {
+    return 'Next change required in $days days ($interval).';
+  }
+
+  @override
+  String get secretDecrypting => 'Decrypting…';
+
+  @override
+  String get secretDecryptAuthReason => 'Authenticate to decrypt this secret';
+
+  @override
+  String secretDecryptError(String msg) {
+    return 'Decryption error: $msg';
+  }
+
+  @override
+  String get pinDialogTitle => 'Enter secondary PIN';
+
+  @override
+  String get pinDialogLabel => 'Double-envelope PIN';
+
+  @override
+  String get totpTitle => 'Verification code (2FA)';
+
+  @override
+  String get totpClipboardLabel => 'TOTP code';
+
+  @override
+  String get totpInvalid => 'Invalid';
 }

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/copy_feedback_button.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
@@ -24,6 +25,7 @@ class CredentialDetailScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final credentialsAsync = ref.watch(credentialsNotifierProvider);
 
     return credentialsAsync.when(
@@ -31,14 +33,14 @@ class CredentialDetailScreen extends ConsumerWidget {
         body: Center(child: CircularProgressIndicator(color: palette.accent)),
       ),
       error: (e, _) => Scaffold(
-        body: Center(child: Text('Error: $e')),
+        body: Center(child: Text(l10n.commonErrorDetail('$e'))),
       ),
       data: (creds) {
         final cred = creds.where((c) => c.id == credentialId).firstOrNull;
         if (cred == null) {
           return Scaffold(
             appBar: AppBar(),
-            body: const Center(child: Text('Credencial no encontrada')),
+            body: Center(child: Text(l10n.detailNotFound)),
           );
         }
         return _DetailView(credential: cred);
@@ -54,6 +56,7 @@ class _DetailView extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: VaultAppBar(
         title: credential.title,
@@ -64,7 +67,9 @@ class _DetailView extends ConsumerWidget {
               credential.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
               color: palette.warning,
             ),
-            tooltip: credential.isFavorite ? 'Quitar de favoritas' : 'Añadir a favoritas',
+            tooltip: credential.isFavorite
+                ? l10n.detailRemoveFavorite
+                : l10n.detailAddFavorite,
             onPressed: () {
               ref.read(credentialsNotifierProvider.notifier).updateCredential(
                     credential.copyWith(isFavorite: !credential.isFavorite),
@@ -98,14 +103,14 @@ class _DetailView extends ConsumerWidget {
           if (credential.username != null)
             _SecretTile(
               icon: Icons.person_rounded,
-              label: 'Usuario',
+              label: l10n.fieldUsername,
               value: credential.username!,
               isSecret: false,
             ),
           if (credential.password != null && credential.type != CredentialType.sshKey)
             _SecretTile(
               icon: Icons.lock_rounded,
-              label: 'Contrasena',
+              label: l10n.fieldPassword,
               value: credential.password!,
               isSecret: true,
               isDoubleEncrypted: credential.isDoubleEncrypted,
@@ -114,14 +119,14 @@ class _DetailView extends ConsumerWidget {
           if (credential.website != null)
             _SecretTile(
               icon: Icons.language_rounded,
-              label: 'Sitio web',
+              label: l10n.fieldWebsite,
               value: credential.website!,
               isSecret: false,
             ),
           if (credential.notes != null && credential.notes!.isNotEmpty)
             _SecretTile(
               icon: Icons.notes_rounded,
-              label: 'Notas',
+              label: l10n.fieldNotes,
               value: credential.notes!,
               isSecret: false,
               multiline: true,
@@ -129,13 +134,13 @@ class _DetailView extends ConsumerWidget {
           if (credential.type == CredentialType.sshKey && credential.sshKeyMetadata != null) ...[
             _SecretTile(
               icon: Icons.vpn_key_rounded,
-              label: 'Tipo de Llave',
+              label: l10n.fieldKeyType,
               value: credential.sshKeyMetadata!.keyType,
               isSecret: false,
             ),
             _SecretTile(
               icon: Icons.terminal_rounded,
-              label: 'Llave Privada',
+              label: l10n.fieldPrivateKey,
               value: credential.sshKeyMetadata!.privateKey,
               isSecret: true,
               multiline: true,
@@ -145,7 +150,7 @@ class _DetailView extends ConsumerWidget {
             if (credential.sshKeyMetadata!.publicKey.isNotEmpty)
               _SecretTile(
                 icon: Icons.public_rounded,
-                label: 'Llave Publica',
+                label: l10n.fieldPublicKey,
                 value: credential.sshKeyMetadata!.publicKey,
                 isSecret: false,
                 multiline: true,
@@ -153,7 +158,7 @@ class _DetailView extends ConsumerWidget {
             if (credential.sshKeyMetadata!.passphrase != null && credential.sshKeyMetadata!.passphrase!.isNotEmpty)
               _SecretTile(
                 icon: Icons.vpn_key_outlined,
-                label: 'Passphrase de la Llave',
+                label: l10n.fieldKeyPassphrase,
                 value: credential.sshKeyMetadata!.passphrase!,
                 isSecret: true,
                 isDoubleEncrypted: credential.isDoubleEncrypted,
@@ -181,7 +186,7 @@ class _DetailView extends ConsumerWidget {
                 AppRoutes.passwordHistory.replaceAll(':id', credential.id),
               ),
               icon: const Icon(Icons.history_rounded, size: 18),
-              label: const Text('Ver historial de contraseñas'),
+              label: Text(l10n.detailViewHistory),
               style: TextButton.styleFrom(
                 foregroundColor: palette.accent,
                 textStyle: const TextStyle(fontSize: 13),
@@ -195,14 +200,15 @@ class _DetailView extends ConsumerWidget {
 
   Widget _buildRotationStatusTile(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     if (credential.rotationInterval == 'none') return const SizedBox.shrink();
 
     final intervalText = switch (credential.rotationInterval) {
-      'monthly' => 'Mensual',
-      'quarterly' => 'Cada 3 meses',
-      'semiAnnually' => 'Cada 6 meses',
-      'custom' => 'Personalizado (${credential.customRotationDays} días)',
-      _ => 'Ninguno',
+      'monthly' => l10n.rotationMonthly,
+      'quarterly' => l10n.rotationQuarterly,
+      'semiAnnually' => l10n.rotationSemiAnnually,
+      'custom' => l10n.rotationCustom(credential.customRotationDays ?? 30),
+      _ => l10n.rotationNone,
     };
 
     final days = switch (credential.rotationInterval) {
@@ -247,8 +253,8 @@ class _DetailView extends ConsumerWidget {
               children: [
                 Text(
                   isOverdue
-                      ? 'ROTACIÓN DE CONTRASEÑA VENCIDA'
-                      : 'RECORDATORIO DE ROTACIÓN',
+                      ? l10n.rotationOverdueTitle
+                      : l10n.rotationReminderTitle,
                   style: TextStyle(
                     color: isOverdue ? palette.danger : palette.secondary,
                     fontSize: 10,
@@ -259,8 +265,8 @@ class _DetailView extends ConsumerWidget {
                 const SizedBox(height: 4),
                 Text(
                   isOverdue
-                      ? 'Debes cambiar esta contraseña. Han pasado más de $days días desde la última actualización.'
-                      : 'Próximo cambio requerido en $daysRemaining días ($intervalText).',
+                      ? l10n.rotationOverdueBody(days)
+                      : l10n.rotationReminderBody(daysRemaining, intervalText),
                   style: TextStyle(
                     color: palette.textPrimary,
                     fontSize: 13,
@@ -277,24 +283,25 @@ class _DetailView extends ConsumerWidget {
 
   Future<void> _confirmDelete(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Eliminar credencial',
+        title: Text(l10n.detailDeleteTitle,
             style: TextStyle(color: palette.textPrimary)),
         content: Text(
-          '¿Eliminar "${credential.title}"? Esta acción no se puede deshacer.',
+          l10n.detailDeleteBody(credential.title),
           style: TextStyle(color: palette.textMuted),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancelar'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
-            child: Text('Eliminar',
+            child: Text(l10n.commonDelete,
                 style: TextStyle(color: palette.danger)),
           ),
         ],
@@ -302,7 +309,7 @@ class _DetailView extends ConsumerWidget {
     );
     if (confirmed == true) {
       if (!context.mounted) return;
-      final auth = await AuthHelper.requireAuth(context, reason: 'Verifica para eliminar esta credencial');
+      final auth = await AuthHelper.requireAuth(context, reason: l10n.detailDeleteAuthReason);
       if (!auth) return;
 
       await ref
@@ -324,18 +331,20 @@ class _TypeBadge extends StatelessWidget {
   const _TypeBadge({required this.type});
   final CredentialType type;
 
-  static const _labels = {
-    CredentialType.password:   'Contrasena',
-    CredentialType.apiKey:     'API Key',
-    CredentialType.secureNote: 'Nota segura',
-    CredentialType.totp:       'TOTP / 2FA',
-    CredentialType.passkey:    'Respaldo de Passkey',
-    CredentialType.sshKey:     'Llave SSH',
-  };
+  static String _label(AppLocalizations l10n, CredentialType type) =>
+      switch (type) {
+        CredentialType.password => l10n.typePassword,
+        CredentialType.apiKey => l10n.typeApiKey,
+        CredentialType.secureNote => l10n.typeSecureNote,
+        CredentialType.totp => l10n.typeTotp,
+        CredentialType.passkey => l10n.typePasskey,
+        CredentialType.sshKey => l10n.typeSshKey,
+      };
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final color = switch (type) {
       CredentialType.password => palette.typePassword,
       CredentialType.apiKey => palette.typeApiKey,
@@ -351,7 +360,7 @@ class _TypeBadge extends StatelessWidget {
         borderRadius: BorderRadius.circular(8),
       ),
       child: Text(
-        _labels[type] ?? '',
+        _label(l10n, type),
         style: TextStyle(
           color: color,
           fontSize: 12,
@@ -398,14 +407,16 @@ class _SecretTileState extends State<_SecretTile> {
       return _decryptedValue;
     }
 
+    final l10n = AppLocalizations.of(context);
     setState(() => _decrypting = true);
     try {
       final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
       final bioService = getIt<BiometricAuthService>();
-      
+
       final savedPin = await doubleEnvelopeService.getPinFromSecureStorage(widget.credentialId);
       if (savedPin != null) {
-        final auth = await bioService.authenticate(reason: 'Autenticate para descifrar este secreto');
+        final auth = await bioService.authenticate(
+            reason: l10n.secretDecryptAuthReason);
         if (auth) {
           final plain = await doubleEnvelopeService.decryptField(
             encryptedValue: widget.value,
@@ -430,7 +441,7 @@ class _SecretTileState extends State<_SecretTile> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Error al descifrar: $e'),
+            content: Text(l10n.secretDecryptError('$e')),
             backgroundColor: context.palette.danger,
             behavior: SnackBarBehavior.floating,
           ),
@@ -444,30 +455,31 @@ class _SecretTileState extends State<_SecretTile> {
 
   Future<String?> _showPinDialog(BuildContext context) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final controller = TextEditingController();
     return showDialog<String>(
       context: context,
       builder: (diagContext) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Ingresa PIN Secundario', style: TextStyle(color: palette.textPrimary, fontSize: 16)),
+        title: Text(l10n.pinDialogTitle, style: TextStyle(color: palette.textPrimary, fontSize: 16)),
         content: TextField(
           controller: controller,
           obscureText: true,
           autofocus: true,
           keyboardType: TextInputType.number,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(
-            labelText: 'PIN de Sobre Cifrado',
+          decoration: InputDecoration(
+            labelText: l10n.pinDialogLabel,
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(diagContext),
-            child: const Text('Cancelar'),
+            child: Text(l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(diagContext, controller.text),
-            child: const Text('Aceptar'),
+            child: Text(l10n.commonAccept),
           ),
         ],
       ),
@@ -494,7 +506,7 @@ class _SecretTileState extends State<_SecretTile> {
   @override
   Widget build(BuildContext context) {
     final displayValue = _decrypting
-        ? 'Descifrando...'
+        ? AppLocalizations.of(context).secretDecrypting
         : (widget.isSecret && !_revealed ? '••••••••••••' : (_decryptedValue ?? widget.value));
 
     final palette = context.palette;
@@ -581,6 +593,9 @@ class _TotpTile extends StatefulWidget {
 }
 
 class _TotpTileState extends State<_TotpTile> {
+  // Internal sentinel for an unparseable secret; rendered as a localized label.
+  static const _kInvalid = '__invalid__';
+
   late Timer _timer;
   String _code = '--- ---';
   double _progress = 1.0;
@@ -628,14 +643,15 @@ class _TotpTileState extends State<_TotpTile> {
       });
     } catch (_) {
       setState(() {
-        _code = 'Invalido';
+        _code = _kInvalid;
       });
     }
   }
 
   Future<void> _copy(BuildContext context) async {
-    if (_code == 'Invalido' || _code == '--- ---') return;
-    
+    if (_code == _kInvalid || _code == '--- ---') return;
+
+    final l10n = AppLocalizations.of(context);
     final auth = await AuthHelper.requireAuth(context);
     if (!auth) return;
     if (!context.mounted) return;
@@ -643,7 +659,7 @@ class _TotpTileState extends State<_TotpTile> {
     final cleanCode = _code.replaceAll(' ', '');
     await showClipboardCountdownSnackBar(
       context: context,
-      label: 'Código TOTP',
+      label: l10n.totpClipboardLabel,
       value: cleanCode,
     );
   }
@@ -651,6 +667,8 @@ class _TotpTileState extends State<_TotpTile> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final displayCode = _code == _kInvalid ? l10n.totpInvalid : _code;
     return Container(
       margin: const EdgeInsets.only(top: 8, bottom: 12),
       padding: const EdgeInsets.all(20),
@@ -667,7 +685,7 @@ class _TotpTileState extends State<_TotpTile> {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'Código de Verificación (2FA)',
+                  l10n.totpTitle,
                   style: TextStyle(
                     color: palette.typeTotp,
                     fontSize: 12,
@@ -687,7 +705,7 @@ class _TotpTileState extends State<_TotpTile> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                _code,
+                displayCode,
                 style: TextStyle(
                   color: palette.textPrimary,
                   fontSize: 36,

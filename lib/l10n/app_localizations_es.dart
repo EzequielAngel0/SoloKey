@@ -233,4 +233,137 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get folderNameHint => 'ej. Trabajo, Sociales…';
+
+  @override
+  String get commonAccept => 'Aceptar';
+
+  @override
+  String commonErrorDetail(String msg) {
+    return 'Error: $msg';
+  }
+
+  @override
+  String get detailNotFound => 'Credencial no encontrada';
+
+  @override
+  String get detailRemoveFavorite => 'Quitar de favoritas';
+
+  @override
+  String get detailAddFavorite => 'Añadir a favoritas';
+
+  @override
+  String get detailViewHistory => 'Ver historial de contraseñas';
+
+  @override
+  String get detailDeleteTitle => 'Eliminar credencial';
+
+  @override
+  String detailDeleteBody(String title) {
+    return '¿Eliminar \"$title\"? Esta acción no se puede deshacer.';
+  }
+
+  @override
+  String get detailDeleteAuthReason => 'Verifica para eliminar esta credencial';
+
+  @override
+  String get fieldUsername => 'Usuario';
+
+  @override
+  String get fieldPassword => 'Contraseña';
+
+  @override
+  String get fieldWebsite => 'Sitio web';
+
+  @override
+  String get fieldNotes => 'Notas';
+
+  @override
+  String get fieldKeyType => 'Tipo de llave';
+
+  @override
+  String get fieldPrivateKey => 'Llave privada';
+
+  @override
+  String get fieldPublicKey => 'Llave pública';
+
+  @override
+  String get fieldKeyPassphrase => 'Passphrase de la llave';
+
+  @override
+  String get typePassword => 'Contraseña';
+
+  @override
+  String get typeApiKey => 'API Key';
+
+  @override
+  String get typeSecureNote => 'Nota segura';
+
+  @override
+  String get typeTotp => 'TOTP / 2FA';
+
+  @override
+  String get typePasskey => 'Respaldo de Passkey';
+
+  @override
+  String get typeSshKey => 'Llave SSH';
+
+  @override
+  String get rotationMonthly => 'Mensual';
+
+  @override
+  String get rotationQuarterly => 'Cada 3 meses';
+
+  @override
+  String get rotationSemiAnnually => 'Cada 6 meses';
+
+  @override
+  String rotationCustom(int days) {
+    return 'Personalizado ($days días)';
+  }
+
+  @override
+  String get rotationNone => 'Ninguno';
+
+  @override
+  String get rotationOverdueTitle => 'ROTACIÓN DE CONTRASEÑA VENCIDA';
+
+  @override
+  String get rotationReminderTitle => 'RECORDATORIO DE ROTACIÓN';
+
+  @override
+  String rotationOverdueBody(int days) {
+    return 'Debes cambiar esta contraseña. Han pasado más de $days días desde la última actualización.';
+  }
+
+  @override
+  String rotationReminderBody(int days, String interval) {
+    return 'Próximo cambio requerido en $days días ($interval).';
+  }
+
+  @override
+  String get secretDecrypting => 'Descifrando…';
+
+  @override
+  String get secretDecryptAuthReason =>
+      'Autentícate para descifrar este secreto';
+
+  @override
+  String secretDecryptError(String msg) {
+    return 'Error al descifrar: $msg';
+  }
+
+  @override
+  String get pinDialogTitle => 'Ingresa PIN secundario';
+
+  @override
+  String get pinDialogLabel => 'PIN de sobre cifrado';
+
+  @override
+  String get totpTitle => 'Código de verificación (2FA)';
+
+  @override
+  String get totpClipboardLabel => 'Código TOTP';
+
+  @override
+  String get totpInvalid => 'Inválido';
 }
