@@ -1222,6 +1222,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferNothingSelected => 'Select at least one item to import';
 
   @override
+  String get transferSelectAll => 'Select all';
+
+  @override
+  String get transferSelectCredentials => 'Select what to export';
+
+  @override
+  String get transferSelectAtLeastOneCredential =>
+      'Select at least one credential';
+
+  @override
   String get commonSearch => 'Search…';
 
   @override

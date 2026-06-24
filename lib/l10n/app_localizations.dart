@@ -2360,6 +2360,24 @@ abstract class AppLocalizations {
   /// **'Select at least one item to import'**
   String get transferNothingSelected;
 
+  /// No description provided for @transferSelectAll.
+  ///
+  /// In en, this message translates to:
+  /// **'Select all'**
+  String get transferSelectAll;
+
+  /// No description provided for @transferSelectCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Select what to export'**
+  String get transferSelectCredentials;
+
+  /// No description provided for @transferSelectAtLeastOneCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one credential'**
+  String get transferSelectAtLeastOneCredential;
+
   /// No description provided for @commonSearch.
   ///
   /// In en, this message translates to:

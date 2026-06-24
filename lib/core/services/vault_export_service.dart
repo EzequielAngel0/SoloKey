@@ -73,15 +73,21 @@ class VaultExportService {
   /// given, only credentials whose folder id is in the set are exported (use
   /// [kNoFolderFilterId] to include unfiled credentials), and only the listed
   /// folders are written to the backup.
+  ///
+  /// [credentialIds] takes precedence over [typeFilter]/[folderFilter]: when
+  /// given, ONLY those exact credentials are exported, together with the folder
+  /// hierarchy (ancestors) they belong to, so they re-import into place.
   Future<ExportSummary> exportVault({
     required String exportPassword,
     Set<CredentialType>? typeFilter,
     Set<String>? folderFilter,
+    Set<String>? credentialIds,
   }) async {
     final built = await _buildEncryptedBackup(
       exportPassword: exportPassword,
       typeFilter: typeFilter,
       folderFilter: folderFilter,
+      credentialIds: credentialIds,
     );
 
     final dir = await getTemporaryDirectory();
@@ -132,20 +138,41 @@ class VaultExportService {
     required String exportPassword,
     Set<CredentialType>? typeFilter,
     Set<String>? folderFilter,
+    Set<String>? credentialIds,
   }) async {
     if (exportPassword.isEmpty) throw ArgumentError('Export password required');
 
     final allCredentials = await _credRepo.getAll();
     final allFolders = await _folderRepo.getAll();
-    final credentials = allCredentials.where((c) {
-      final typeOk = typeFilter == null || typeFilter.contains(c.type);
-      final folderOk = folderFilter == null ||
-          folderFilter.contains(c.folderId ?? kNoFolderFilterId);
-      return typeOk && folderOk;
-    }).toList();
-    final folders = folderFilter == null
-        ? allFolders
-        : allFolders.where((f) => folderFilter.contains(f.id)).toList();
+
+    final List<Credential> credentials;
+    final List<Folder> folders;
+
+    if (credentialIds != null) {
+      // Per-credential selection: export exactly these, plus the folder
+      // hierarchy (ancestors) so they re-import into the right place.
+      credentials =
+          allCredentials.where((c) => credentialIds.contains(c.id)).toList();
+      final byId = {for (final f in allFolders) f.id: f};
+      final keep = <String>{};
+      for (final c in credentials) {
+        var fid = c.folderId;
+        while (fid != null && byId.containsKey(fid) && keep.add(fid)) {
+          fid = byId[fid]!.parentId;
+        }
+      }
+      folders = allFolders.where((f) => keep.contains(f.id)).toList();
+    } else {
+      credentials = allCredentials.where((c) {
+        final typeOk = typeFilter == null || typeFilter.contains(c.type);
+        final folderOk = folderFilter == null ||
+            folderFilter.contains(c.folderId ?? kNoFolderFilterId);
+        return typeOk && folderOk;
+      }).toList();
+      folders = folderFilter == null
+          ? allFolders
+          : allFolders.where((f) => folderFilter.contains(f.id)).toList();
+    }
 
     // Build JSON payload
     final payload = jsonEncode({

@@ -487,6 +487,9 @@
   "transferSectionFolders": "Folders",
   "transferImportConfirm": "Import selection",
   "transferNothingSelected": "Select at least one item to import",
+  "transferSelectAll": "Select all",
+  "transferSelectCredentials": "Select what to export",
+  "transferSelectAtLeastOneCredential": "Select at least one credential",
 
   "commonSearch": "Search…",
   "navSync": "Sync",

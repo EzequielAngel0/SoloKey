@@ -412,6 +412,9 @@
   "transferSectionFolders": "Carpetas",
   "transferImportConfirm": "Importar selección",
   "transferNothingSelected": "Selecciona al menos un elemento para importar",
+  "transferSelectAll": "Seleccionar todo",
+  "transferSelectCredentials": "Selecciona qué exportar",
+  "transferSelectAtLeastOneCredential": "Selecciona al menos una credencial",
 
   "commonSearch": "Buscar…",
   "navSync": "Sincronizar",

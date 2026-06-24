@@ -14,6 +14,7 @@ import '../../../features/folders/application/folders_provider.dart';
 import '../../../features/folders/domain/entities/folder.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
+import 'widgets/export_tree.dart';
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
@@ -29,20 +30,13 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   late final TabController _tabController;
 
   // Export state
-  final Set<CredentialType> _selectedTypes = {
-    CredentialType.password,
-    CredentialType.apiKey,
-    CredentialType.secureNote,
-    CredentialType.totp,
-    CredentialType.sshKey,
-  };
   final _exportPasswordCtrl = TextEditingController();
   bool _exporting = false;
   ExportSummary? _lastExport;
 
-  /// Folder keys (folder ids + [kNoFolderFilterId]) the user has UNchecked in
-  /// the export tab. Empty means "export from every folder" (no filtering).
-  final Set<String> _deselectedFolderKeys = {};
+  /// Ids of the credentials the user picked in the export tree. Empty = nothing
+  /// selected yet (the tree starts collapsed; "Seleccionar todo" picks all).
+  final Set<String> _selectedCredentialIds = {};
 
   // Import state
   ImportMode _importMode = ImportMode.merge;
@@ -66,18 +60,6 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
   // ── Helpers ────────────────────────────────────────────────────────────────
 
-  String _typeLabel(CredentialType type) {
-    final l10n = AppLocalizations.of(context);
-    return switch (type) {
-      CredentialType.password => l10n.transferTypePasswords,
-      CredentialType.apiKey => l10n.transferTypeApiKeys,
-      CredentialType.secureNote => l10n.transferTypeSecureNotes,
-      CredentialType.totp => l10n.transferTypeTotp,
-      CredentialType.passkey => l10n.transferTypePasskeys,
-      CredentialType.sshKey => l10n.transferTypeSshKeys,
-    };
-  }
-
   IconData _typeIcon(CredentialType type) => switch (type) {
         CredentialType.password => Icons.lock_rounded,
         CredentialType.apiKey => Icons.vpn_key_rounded,
@@ -94,21 +76,9 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       _snack(l10n.transferExportPasswordRequired, error: true);
       return;
     }
-    if (_selectedTypes.isEmpty) {
-      _snack(l10n.transferSelectAtLeastOneType, error: true);
+    if (_selectedCredentialIds.isEmpty) {
+      _snack(l10n.transferSelectAtLeastOneCredential, error: true);
       return;
-    }
-    // Build the folder filter from the user's deselections. Empty deselection
-    // set => export from every folder (null filter).
-    Set<String>? folderFilter;
-    if (_deselectedFolderKeys.isNotEmpty) {
-      final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
-      final allKeys = {kNoFolderFilterId, ...folders.map((f) => f.id)};
-      folderFilter = allKeys.difference(_deselectedFolderKeys);
-      if (folderFilter.isEmpty) {
-        _snack(l10n.transferNothingSelected, error: true);
-        return;
-      }
     }
     setState(() {
       _exporting = true;
@@ -118,10 +88,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       final service = getIt<VaultExportService>();
       final summary = await service.exportVault(
         exportPassword: password,
-        typeFilter: _selectedTypes.length == CredentialType.values.length
-            ? null
-            : _selectedTypes,
-        folderFilter: folderFilter,
+        credentialIds: {..._selectedCredentialIds},
       );
       if (mounted) {
         setState(() => _lastExport = summary);
@@ -302,6 +269,8 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+    final credentials =
+        ref.watch(credentialsNotifierProvider).valueOrNull ?? [];
     return Scaffold(
       appBar: VaultAppBar(
         title: l10n.transferTitle,
@@ -320,29 +289,19 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         controller: _tabController,
         children: [
           _ExportTab(
-            selectedTypes: _selectedTypes,
-            onTypeToggled: (type, val) => setState(() {
-              if (val) {
-                _selectedTypes.add(type);
-              } else {
-                _selectedTypes.remove(type);
-              }
-            }),
             folders: folders,
-            isFolderKeySelected: (key) => !_deselectedFolderKeys.contains(key),
-            onFolderToggled: (key, val) => setState(() {
-              if (val) {
-                _deselectedFolderKeys.remove(key);
-              } else {
-                _deselectedFolderKeys.add(key);
-              }
+            credentials: credentials,
+            selectedIds: _selectedCredentialIds,
+            onSelectionChanged: (ids) => setState(() {
+              _selectedCredentialIds
+                ..clear()
+                ..addAll(ids);
             }),
+            typeIcon: _typeIcon,
             passwordCtrl: _exportPasswordCtrl,
             onExport: _exporting ? null : _doExport,
             isLoading: _exporting,
             lastSummary: _lastExport,
-            typeLabel: _typeLabel,
-            typeIcon: _typeIcon,
           ),
           _ImportTab(
             mode: _importMode,
@@ -363,30 +322,26 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
 
 class _ExportTab extends StatelessWidget {
   const _ExportTab({
-    required this.selectedTypes,
-    required this.onTypeToggled,
     required this.folders,
-    required this.isFolderKeySelected,
-    required this.onFolderToggled,
+    required this.credentials,
+    required this.selectedIds,
+    required this.onSelectionChanged,
+    required this.typeIcon,
     required this.passwordCtrl,
     required this.onExport,
     required this.isLoading,
     required this.lastSummary,
-    required this.typeLabel,
-    required this.typeIcon,
   });
 
-  final Set<CredentialType> selectedTypes;
-  final void Function(CredentialType, bool) onTypeToggled;
   final List<Folder> folders;
-  final bool Function(String key) isFolderKeySelected;
-  final void Function(String key, bool val) onFolderToggled;
+  final List<Credential> credentials;
+  final Set<String> selectedIds;
+  final ValueChanged<Set<String>> onSelectionChanged;
+  final IconData Function(CredentialType) typeIcon;
   final TextEditingController passwordCtrl;
   final VoidCallback? onExport;
   final bool isLoading;
   final ExportSummary? lastSummary;
-  final String Function(CredentialType) typeLabel;
-  final IconData Function(CredentialType) typeIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -412,62 +367,15 @@ class _ExportTab extends StatelessWidget {
 
         const SizedBox(height: 24),
 
-        // ── Type filter ──────────────────────────────────────────────────────
-        _SectionLabel(label: l10n.transferSelectWhatToExport),
+        // ── What to export: folder/credential tree ───────────────────────────
+        _SectionLabel(label: l10n.transferSelectCredentials),
         const SizedBox(height: 8),
-        _Card(
-          children: CredentialType.values
-              .map(
-                (t) => CheckboxListTile(
-                  value: selectedTypes.contains(t),
-                  onChanged: (v) => onTypeToggled(t, v ?? false),
-                  title: Text(
-                    typeLabel(t),
-                    style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                  ),
-                  secondary: Icon(typeIcon(t), color: palette.accent),
-                  activeColor: palette.accent,
-                  checkColor: palette.onPrimary,
-                  controlAffinity: ListTileControlAffinity.trailing,
-                ),
-              )
-              .toList(),
-        ),
-
-        const SizedBox(height: 24),
-
-        // ── Folder filter ────────────────────────────────────────────────────
-        _SectionLabel(label: l10n.transferExportSelectFolders),
-        const SizedBox(height: 8),
-        _Card(
-          children: [
-            // "No folder" pseudo-entry: exports credentials not in any folder.
-            CheckboxListTile(
-              value: isFolderKeySelected(kNoFolderFilterId),
-              onChanged: (v) => onFolderToggled(kNoFolderFilterId, v ?? false),
-              title: Text(
-                l10n.transferNoFolder,
-                style: TextStyle(color: palette.textPrimary, fontSize: 14),
-              ),
-              secondary: Icon(Icons.folder_off_rounded, color: palette.textMuted),
-              activeColor: palette.accent,
-              checkColor: palette.onPrimary,
-              controlAffinity: ListTileControlAffinity.trailing,
-            ),
-            for (final f in folders)
-              CheckboxListTile(
-                value: isFolderKeySelected(f.id),
-                onChanged: (v) => onFolderToggled(f.id, v ?? false),
-                title: Text(
-                  f.name,
-                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                ),
-                secondary: Icon(Icons.folder_rounded, color: palette.accent),
-                activeColor: palette.accent,
-                checkColor: palette.onPrimary,
-                controlAffinity: ListTileControlAffinity.trailing,
-              ),
-          ],
+        ExportTree(
+          folders: folders,
+          credentials: credentials,
+          selectedIds: selectedIds,
+          onSelectionChanged: onSelectionChanged,
+          typeIcon: typeIcon,
         ),
 
         const SizedBox(height: 20),
