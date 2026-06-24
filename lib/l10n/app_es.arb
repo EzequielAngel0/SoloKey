@@ -448,5 +448,13 @@
   "secureFilesAddError": "No se pudo añadir el archivo: {msg}",
   "@secureFilesAddError": { "placeholders": { "msg": { "type": "String" } } },
   "secureFilesExportError": "No se pudo exportar el archivo: {msg}",
-  "@secureFilesExportError": { "placeholders": { "msg": { "type": "String" } } }
+  "@secureFilesExportError": { "placeholders": { "msg": { "type": "String" } } },
+  "secureFilesRename": "Renombrar",
+  "secureFilesRenameTitle": "Renombrar archivo",
+  "secureFilesMove": "Mover a carpeta",
+  "secureFilesMoveTitle": "Mover a carpeta",
+  "secureFilesFavorite": "Favorito",
+  "secureFilesDropHint": "Suelta archivos aqui para agregarlos",
+  "secureFilesAddedCount": "Agregados {count} archivo(s)",
+  "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } }
 }

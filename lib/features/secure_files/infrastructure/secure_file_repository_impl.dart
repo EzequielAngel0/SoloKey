@@ -83,6 +83,10 @@ class SecureFileRepositoryImpl implements ISecureFileRepository {
   }
 
   @override
+  Future<void> updateMeta(SecureFile file) =>
+      _dao.upsert(_toCompanion(file.copyWith(updatedAt: DateTime.now())));
+
+  @override
   Future<Uint8List> readDecrypted(String id) async {
     final entry = await _dao.getById(id);
     if (entry == null) throw StateError('File not found');
@@ -141,6 +145,8 @@ class SecureFileRepositoryImpl implements ISecureFileRepository {
         storedFileName: e.storedFileName,
         mimeHint: e.mimeHint,
         note: e.note,
+        folderId: e.folderId,
+        isFavorite: e.isFavorite,
         createdAt: DateTime.fromMillisecondsSinceEpoch(e.createdAt),
         updatedAt: DateTime.fromMillisecondsSinceEpoch(e.updatedAt),
       );
@@ -153,6 +159,8 @@ class SecureFileRepositoryImpl implements ISecureFileRepository {
         storedFileName: f.storedFileName,
         mimeHint: Value(f.mimeHint),
         note: Value(f.note),
+        folderId: Value(f.folderId),
+        isFavorite: Value(f.isFavorite),
         createdAt: f.createdAt.millisecondsSinceEpoch,
         updatedAt: f.updatedAt.millisecondsSinceEpoch,
       );

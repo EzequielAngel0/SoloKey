@@ -26,7 +26,7 @@ final secureFileRepositoryProvider =
 // ignore: unused_element
 typedef SecureFileRepositoryRef = AutoDisposeProviderRef<ISecureFileRepository>;
 String _$secureFilesNotifierHash() =>
-    r'a7272fb669966a86ccc5b6f8c2ffef2d6214b703';
+    r'30bc4f2cf7aff97e6f838255ee077b0268494987';
 
 /// See also [SecureFilesNotifier].
 @ProviderFor(SecureFilesNotifier)

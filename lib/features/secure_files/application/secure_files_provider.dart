@@ -40,6 +40,27 @@ class SecureFilesNotifier extends _$SecureFilesNotifier {
     await ref.read(secureFileRepositoryProvider).delete(id);
     await refresh();
   }
+
+  Future<void> rename(SecureFile file, String newName) async {
+    await ref
+        .read(secureFileRepositoryProvider)
+        .updateMeta(file.copyWith(name: newName));
+    await refresh();
+  }
+
+  Future<void> moveToFolder(SecureFile file, String? folderId) async {
+    await ref
+        .read(secureFileRepositoryProvider)
+        .updateMeta(file.copyWith(folderId: folderId));
+    await refresh();
+  }
+
+  Future<void> toggleFavorite(SecureFile file) async {
+    await ref
+        .read(secureFileRepositoryProvider)
+        .updateMeta(file.copyWith(isFavorite: !file.isFavorite));
+    await refresh();
+  }
 }
 
 @riverpod

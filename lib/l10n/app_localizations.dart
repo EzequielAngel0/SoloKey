@@ -2545,6 +2545,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not export file: {msg}'**
   String secureFilesExportError(String msg);
+
+  /// No description provided for @secureFilesRename.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename'**
+  String get secureFilesRename;
+
+  /// No description provided for @secureFilesRenameTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rename file'**
+  String get secureFilesRenameTitle;
+
+  /// No description provided for @secureFilesMove.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to folder'**
+  String get secureFilesMove;
+
+  /// No description provided for @secureFilesMoveTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Move to folder'**
+  String get secureFilesMoveTitle;
+
+  /// No description provided for @secureFilesFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite'**
+  String get secureFilesFavorite;
+
+  /// No description provided for @secureFilesDropHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drop files here to add them'**
+  String get secureFilesDropHint;
+
+  /// No description provided for @secureFilesAddedCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {count} file(s)'**
+  String secureFilesAddedCount(int count);
 }
 
 class _AppLocalizationsDelegate

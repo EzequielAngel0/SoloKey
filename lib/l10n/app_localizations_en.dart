@@ -1325,4 +1325,27 @@ class AppLocalizationsEn extends AppLocalizations {
   String secureFilesExportError(String msg) {
     return 'Could not export file: $msg';
   }
+
+  @override
+  String get secureFilesRename => 'Rename';
+
+  @override
+  String get secureFilesRenameTitle => 'Rename file';
+
+  @override
+  String get secureFilesMove => 'Move to folder';
+
+  @override
+  String get secureFilesMoveTitle => 'Move to folder';
+
+  @override
+  String get secureFilesFavorite => 'Favourite';
+
+  @override
+  String get secureFilesDropHint => 'Drop files here to add them';
+
+  @override
+  String secureFilesAddedCount(int count) {
+    return 'Added $count file(s)';
+  }
 }

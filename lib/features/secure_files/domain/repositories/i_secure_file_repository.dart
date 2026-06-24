@@ -17,6 +17,10 @@ abstract interface class ISecureFileRepository {
     String? note,
   });
 
+  /// Updates the (non-sensitive) metadata of a file — name, folder, favourite,
+  /// note. Does NOT touch the encrypted blob on disk.
+  Future<void> updateMeta(SecureFile file);
+
   /// Reads and decrypts the contents of the file with [id]. Throws
   /// [StateError] if the vault is locked.
   Future<Uint8List> readDecrypted(String id);

@@ -1335,4 +1335,27 @@ class AppLocalizationsEs extends AppLocalizations {
   String secureFilesExportError(String msg) {
     return 'No se pudo exportar el archivo: $msg';
   }
+
+  @override
+  String get secureFilesRename => 'Renombrar';
+
+  @override
+  String get secureFilesRenameTitle => 'Renombrar archivo';
+
+  @override
+  String get secureFilesMove => 'Mover a carpeta';
+
+  @override
+  String get secureFilesMoveTitle => 'Mover a carpeta';
+
+  @override
+  String get secureFilesFavorite => 'Favorito';
+
+  @override
+  String get secureFilesDropHint => 'Suelta archivos aqui para agregarlos';
+
+  @override
+  String secureFilesAddedCount(int count) {
+    return 'Agregados $count archivo(s)';
+  }
 }

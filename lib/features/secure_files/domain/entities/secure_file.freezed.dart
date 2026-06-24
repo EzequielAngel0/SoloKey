@@ -37,6 +37,10 @@ mixin _$SecureFile {
 
   /// Optional user note.
   String? get note => throw _privateConstructorUsedError;
+
+  /// Folder this file belongs to (reuses the credential folder system).
+  String? get folderId => throw _privateConstructorUsedError;
+  bool get isFavorite => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -64,6 +68,8 @@ abstract class $SecureFileCopyWith<$Res> {
     String storedFileName,
     String? mimeHint,
     String? note,
+    String? folderId,
+    bool isFavorite,
     DateTime createdAt,
     DateTime updatedAt,
   });
@@ -90,6 +96,8 @@ class _$SecureFileCopyWithImpl<$Res, $Val extends SecureFile>
     Object? storedFileName = null,
     Object? mimeHint = freezed,
     Object? note = freezed,
+    Object? folderId = freezed,
+    Object? isFavorite = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -119,6 +127,14 @@ class _$SecureFileCopyWithImpl<$Res, $Val extends SecureFile>
                 ? _value.note
                 : note // ignore: cast_nullable_to_non_nullable
                       as String?,
+            folderId: freezed == folderId
+                ? _value.folderId
+                : folderId // ignore: cast_nullable_to_non_nullable
+                      as String?,
+            isFavorite: null == isFavorite
+                ? _value.isFavorite
+                : isFavorite // ignore: cast_nullable_to_non_nullable
+                      as bool,
             createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -149,6 +165,8 @@ abstract class _$$SecureFileImplCopyWith<$Res>
     String storedFileName,
     String? mimeHint,
     String? note,
+    String? folderId,
+    bool isFavorite,
     DateTime createdAt,
     DateTime updatedAt,
   });
@@ -174,6 +192,8 @@ class __$$SecureFileImplCopyWithImpl<$Res>
     Object? storedFileName = null,
     Object? mimeHint = freezed,
     Object? note = freezed,
+    Object? folderId = freezed,
+    Object? isFavorite = null,
     Object? createdAt = null,
     Object? updatedAt = null,
   }) {
@@ -203,6 +223,14 @@ class __$$SecureFileImplCopyWithImpl<$Res>
             ? _value.note
             : note // ignore: cast_nullable_to_non_nullable
                   as String?,
+        folderId: freezed == folderId
+            ? _value.folderId
+            : folderId // ignore: cast_nullable_to_non_nullable
+                  as String?,
+        isFavorite: null == isFavorite
+            ? _value.isFavorite
+            : isFavorite // ignore: cast_nullable_to_non_nullable
+                  as bool,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -226,6 +254,8 @@ class _$SecureFileImpl implements _SecureFile {
     required this.storedFileName,
     this.mimeHint,
     this.note,
+    this.folderId,
+    this.isFavorite = false,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -255,6 +285,13 @@ class _$SecureFileImpl implements _SecureFile {
   /// Optional user note.
   @override
   final String? note;
+
+  /// Folder this file belongs to (reuses the credential folder system).
+  @override
+  final String? folderId;
+  @override
+  @JsonKey()
+  final bool isFavorite;
   @override
   final DateTime createdAt;
   @override
@@ -262,7 +299,7 @@ class _$SecureFileImpl implements _SecureFile {
 
   @override
   String toString() {
-    return 'SecureFile(id: $id, name: $name, sizeBytes: $sizeBytes, storedFileName: $storedFileName, mimeHint: $mimeHint, note: $note, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'SecureFile(id: $id, name: $name, sizeBytes: $sizeBytes, storedFileName: $storedFileName, mimeHint: $mimeHint, note: $note, folderId: $folderId, isFavorite: $isFavorite, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -279,6 +316,10 @@ class _$SecureFileImpl implements _SecureFile {
             (identical(other.mimeHint, mimeHint) ||
                 other.mimeHint == mimeHint) &&
             (identical(other.note, note) || other.note == note) &&
+            (identical(other.folderId, folderId) ||
+                other.folderId == folderId) &&
+            (identical(other.isFavorite, isFavorite) ||
+                other.isFavorite == isFavorite) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -295,6 +336,8 @@ class _$SecureFileImpl implements _SecureFile {
     storedFileName,
     mimeHint,
     note,
+    folderId,
+    isFavorite,
     createdAt,
     updatedAt,
   );
@@ -321,6 +364,8 @@ abstract class _SecureFile implements SecureFile {
     required final String storedFileName,
     final String? mimeHint,
     final String? note,
+    final String? folderId,
+    final bool isFavorite,
     required final DateTime createdAt,
     required final DateTime updatedAt,
   }) = _$SecureFileImpl;
@@ -350,6 +395,12 @@ abstract class _SecureFile implements SecureFile {
   /// Optional user note.
   @override
   String? get note;
+
+  /// Folder this file belongs to (reuses the credential folder system).
+  @override
+  String? get folderId;
+  @override
+  bool get isFavorite;
   @override
   DateTime get createdAt;
   @override

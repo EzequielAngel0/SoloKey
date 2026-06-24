@@ -1,19 +1,23 @@
 import 'dart:io';
 
+import 'package:desktop_drop/desktop_drop.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../core/services/vault_export_service.dart' show kNoFolderFilterId;
 import '../../../core/utils/auth_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
+import '../../folders/application/folders_provider.dart';
 import '../application/secure_files_provider.dart';
 import '../domain/entities/secure_file.dart';
 
 /// Standalone "Secure files" vault section. Stores arbitrary files (SSH keys,
-/// credentials.json, certs…) encrypted-at-rest on disk.
+/// credentials.json, certs…) encrypted-at-rest on disk. Supports rename, folder
+/// organisation, favourites, export and drag-and-drop from the file explorer.
 class SecureFilesScreen extends ConsumerStatefulWidget {
   const SecureFilesScreen({super.key});
 
@@ -23,6 +27,7 @@ class SecureFilesScreen extends ConsumerStatefulWidget {
 
 class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
   bool _busy = false;
+  bool _dragging = false;
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
@@ -36,27 +41,47 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     );
   }
 
-  Future<void> _addFile() async {
-    final l10n = AppLocalizations.of(context);
-    final picked = await FilePicker.platform.pickFiles(withData: true);
+  Future<void> _addFromPicker() async {
+    final picked =
+        await FilePicker.platform.pickFiles(withData: true, allowMultiple: true);
     if (picked == null || picked.files.isEmpty || !mounted) return;
-    final f = picked.files.first;
-    final bytes = f.bytes;
-    if (bytes == null) {
-      _snack(l10n.secureFilesAddError('empty'), error: true);
-      return;
-    }
+    await _addAll([
+      for (final f in picked.files)
+        if (f.bytes != null) (name: f.name, bytes: f.bytes!),
+    ]);
+  }
+
+  Future<void> _addAll(List<({String name, Uint8List bytes})> files) async {
+    if (files.isEmpty) return;
+    final l10n = AppLocalizations.of(context);
     setState(() => _busy = true);
+    var ok = 0;
     try {
-      await ref
-          .read(secureFilesNotifierProvider.notifier)
-          .addFile(name: f.name, bytes: bytes);
-      _snack(l10n.secureFilesAddedSummary(f.name));
+      final notifier = ref.read(secureFilesNotifierProvider.notifier);
+      for (final f in files) {
+        await notifier.addFile(name: f.name, bytes: f.bytes);
+        ok++;
+      }
+      _snack(ok == 1
+          ? l10n.secureFilesAddedSummary(files.first.name)
+          : l10n.secureFilesAddedCount(ok));
     } catch (e) {
       if (mounted) _snack(l10n.secureFilesAddError('$e'), error: true);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _onDrop(DropDoneDetails detail) async {
+    final files = <({String name, Uint8List bytes})>[];
+    for (final x in detail.files) {
+      try {
+        files.add((name: x.name, bytes: await x.readAsBytes()));
+      } catch (_) {
+        // Skip unreadable items (e.g. dropped folders).
+      }
+    }
+    if (mounted) await _addAll(files);
   }
 
   Future<void> _exportFile(SecureFile file) async {
@@ -72,8 +97,6 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
         fileName: file.name,
         bytes: bytes,
       );
-      // On desktop, saveFile only returns the chosen path — we write the bytes.
-      // On mobile/web the bytes are written by the picker itself.
       if (path != null &&
           !kIsWeb &&
           (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
@@ -85,6 +108,99 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _renameFile(SecureFile file) async {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final ctrl = TextEditingController(text: file.name);
+    final newName = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: palette.drawer,
+        title: Text(l10n.secureFilesRenameTitle,
+            style: TextStyle(color: palette.textPrimary)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          style: TextStyle(color: palette.textPrimary),
+          decoration: InputDecoration(labelText: l10n.folderNewNameLabel),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+            child: Text(l10n.secureFilesRename),
+          ),
+        ],
+      ),
+    );
+    if (newName == null || newName.isEmpty || newName == file.name || !mounted) {
+      return;
+    }
+    await ref.read(secureFilesNotifierProvider.notifier).rename(file, newName);
+  }
+
+  Future<void> _moveFile(SecureFile file) async {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
+    final picked = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: palette.drawer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Text(l10n.secureFilesMoveTitle,
+                  style: TextStyle(
+                      color: palette.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
+            ),
+            Flexible(
+              child: ListView(
+                shrinkWrap: true,
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.folder_off_rounded, color: palette.textMuted),
+                    title: Text(l10n.transferNoFolder,
+                        style: TextStyle(color: palette.textPrimary)),
+                    trailing: file.folderId == null
+                        ? Icon(Icons.check_rounded, color: palette.accent)
+                        : null,
+                    onTap: () => Navigator.pop(context, kNoFolderFilterId),
+                  ),
+                  for (final f in folders)
+                    ListTile(
+                      leading: Icon(Icons.folder_rounded, color: palette.accent),
+                      title: Text(f.name,
+                          style: TextStyle(color: palette.textPrimary)),
+                      trailing: file.folderId == f.id
+                          ? Icon(Icons.check_rounded, color: palette.accent)
+                          : null,
+                      onTap: () => Navigator.pop(context, f.id),
+                    ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+    if (picked == null || !mounted) return;
+    final newFolderId = picked == kNoFolderFilterId ? null : picked;
+    await ref
+        .read(secureFilesNotifierProvider.notifier)
+        .moveToFolder(file, newFolderId);
   }
 
   Future<void> _deleteFile(SecureFile file) async {
@@ -123,58 +239,167 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     }
   }
 
+  void _showOptions(SecureFile file) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: palette.drawer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: Icon(
+                file.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+                color: palette.warning,
+              ),
+              title: Text(l10n.secureFilesFavorite,
+                  style: TextStyle(color: palette.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                ref
+                    .read(secureFilesNotifierProvider.notifier)
+                    .toggleFavorite(file);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.drive_file_rename_outline_rounded,
+                  color: palette.textPrimary),
+              title: Text(l10n.secureFilesRename,
+                  style: TextStyle(color: palette.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _renameFile(file);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.folder_rounded, color: palette.accent),
+              title: Text(l10n.secureFilesMove,
+                  style: TextStyle(color: palette.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _moveFile(file);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.download_rounded, color: palette.textPrimary),
+              title: Text(l10n.secureFilesExport,
+                  style: TextStyle(color: palette.textPrimary)),
+              onTap: () {
+                Navigator.pop(context);
+                _exportFile(file);
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.delete_outline_rounded, color: palette.danger),
+              title: Text(l10n.secureFilesDelete,
+                  style: TextStyle(color: palette.danger)),
+              onTap: () {
+                Navigator.pop(context);
+                _deleteFile(file);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final filesAsync = ref.watch(secureFilesNotifierProvider);
+    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+    final folderNames = {for (final f in folders) f.id: f.name};
 
     return Scaffold(
       appBar: VaultAppBar(title: l10n.secureFilesTitle),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: _busy ? null : _addFile,
+        onPressed: _busy ? null : _addFromPicker,
         backgroundColor: palette.accent,
         icon: const Icon(Icons.add_rounded),
         label: Text(l10n.secureFilesAdd),
       ),
-      body: filesAsync.when(
-        loading: () => Center(
-          child: CircularProgressIndicator(color: palette.accent),
-        ),
-        error: (e, _) => Center(
-          child: Text('$e', style: TextStyle(color: palette.danger)),
-        ),
-        data: (files) {
-          if (files.isEmpty) {
-            return _EmptyState(
-              title: l10n.secureFilesEmptyTitle,
-              desc: l10n.secureFilesEmptyDesc,
-            );
-          }
-          return Stack(
-            children: [
-              ListView.separated(
-                padding: const EdgeInsets.all(16),
-                itemCount: files.length,
-                separatorBuilder: (_, _) => const SizedBox(height: 8),
-                itemBuilder: (context, i) => _SecureFileTile(
-                  file: files[i],
-                  onExport: () => _exportFile(files[i]),
-                  onDelete: () => _deleteFile(files[i]),
+      body: DropTarget(
+        onDragDone: _onDrop,
+        onDragEntered: (_) => setState(() => _dragging = true),
+        onDragExited: (_) => setState(() => _dragging = false),
+        child: Stack(
+          children: [
+            filesAsync.when(
+              loading: () =>
+                  Center(child: CircularProgressIndicator(color: palette.accent)),
+              error: (e, _) =>
+                  Center(child: Text('$e', style: TextStyle(color: palette.danger))),
+              data: (files) {
+                if (files.isEmpty) {
+                  return _EmptyState(
+                    title: l10n.secureFilesEmptyTitle,
+                    desc: l10n.secureFilesEmptyDesc,
+                  );
+                }
+                final sorted = [...files]..sort((a, b) {
+                    if (a.isFavorite != b.isFavorite) {
+                      return a.isFavorite ? -1 : 1;
+                    }
+                    return b.createdAt.compareTo(a.createdAt);
+                  });
+                return ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
+                  itemCount: sorted.length,
+                  separatorBuilder: (_, _) => const SizedBox(height: 8),
+                  itemBuilder: (context, i) => _SecureFileTile(
+                    file: sorted[i],
+                    folderName: sorted[i].folderId == null
+                        ? null
+                        : folderNames[sorted[i].folderId],
+                    onTap: () => _exportFile(sorted[i]),
+                    onMore: () => _showOptions(sorted[i]),
+                    onToggleFavorite: () => ref
+                        .read(secureFilesNotifierProvider.notifier)
+                        .toggleFavorite(sorted[i]),
+                  ),
+                );
+              },
+            ),
+            if (_busy)
+              Positioned.fill(
+                child: ColoredBox(
+                  color: Colors.black54,
+                  child:
+                      Center(child: CircularProgressIndicator(color: palette.accent)),
                 ),
               ),
-              if (_busy)
-                Positioned.fill(
-                  child: ColoredBox(
-                    color: Colors.black54,
-                    child: Center(
-                      child: CircularProgressIndicator(color: palette.accent),
+            if (_dragging)
+              Positioned.fill(
+                child: Container(
+                  color: palette.accent.withValues(alpha: 0.12),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.file_download_rounded,
+                            size: 56, color: palette.accent),
+                        const SizedBox(height: 12),
+                        Text(
+                          l10n.secureFilesDropHint,
+                          style: TextStyle(
+                              color: palette.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-            ],
-          );
-        },
+              ),
+          ],
+        ),
       ),
     );
   }
@@ -183,23 +408,31 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
 class _SecureFileTile extends StatelessWidget {
   const _SecureFileTile({
     required this.file,
-    required this.onExport,
-    required this.onDelete,
+    required this.folderName,
+    required this.onTap,
+    required this.onMore,
+    required this.onToggleFavorite,
   });
 
   final SecureFile file;
-  final VoidCallback onExport;
-  final VoidCallback onDelete;
+  final String? folderName;
+  final VoidCallback onTap;
+  final VoidCallback onMore;
+  final VoidCallback onToggleFavorite;
 
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final meta = StringBuffer(_formatSize(file.sizeBytes));
+    if (folderName != null) meta.write('  ·  $folderName');
     return Material(
       color: palette.card,
       borderRadius: BorderRadius.circular(14),
       child: InkWell(
         borderRadius: BorderRadius.circular(14),
-        onTap: onExport,
+        onTap: onTap,
+        onLongPress: onMore,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
@@ -229,21 +462,27 @@ class _SecureFileTile extends StatelessWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      _formatSize(file.sizeBytes),
+                      meta.toString(),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: palette.textMuted, fontSize: 12),
                     ),
                   ],
                 ),
               ),
               IconButton(
-                icon: Icon(Icons.download_rounded, color: palette.textMuted),
-                tooltip: AppLocalizations.of(context).secureFilesExport,
-                onPressed: onExport,
+                icon: Icon(
+                  file.isFavorite
+                      ? Icons.star_rounded
+                      : Icons.star_border_rounded,
+                  color: file.isFavorite ? palette.warning : palette.textMuted,
+                ),
+                tooltip: l10n.secureFilesFavorite,
+                onPressed: onToggleFavorite,
               ),
               IconButton(
-                icon: Icon(Icons.delete_outline_rounded, color: palette.danger),
-                tooltip: AppLocalizations.of(context).secureFilesDelete,
-                onPressed: onDelete,
+                icon: Icon(Icons.more_vert_rounded, color: palette.textMuted),
+                onPressed: onMore,
               ),
             ],
           ),

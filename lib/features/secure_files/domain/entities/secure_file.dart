@@ -29,6 +29,11 @@ class SecureFile with _$SecureFile {
     /// Optional user note.
     String? note,
 
+    /// Folder this file belongs to (reuses the credential folder system).
+    String? folderId,
+
+    @Default(false) bool isFavorite,
+
     required DateTime createdAt,
     required DateTime updatedAt,
   }) = _SecureFile;

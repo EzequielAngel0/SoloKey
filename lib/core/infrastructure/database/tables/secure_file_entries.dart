@@ -9,6 +9,8 @@ class SecureFileEntries extends Table {
   TextColumn get storedFileName => text()();
   TextColumn get mimeHint => text().nullable()();
   TextColumn get note => text().nullable()();
+  TextColumn get folderId => text().nullable()();
+  BoolColumn get isFavorite => boolean().withDefault(const Constant(false))();
   IntColumn get createdAt => integer()();
   IntColumn get updatedAt => integer()();
 

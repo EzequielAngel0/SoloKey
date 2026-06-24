@@ -1992,6 +1992,32 @@ class $SecureFileEntriesTable extends SecureFileEntries
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _folderIdMeta = const VerificationMeta(
+    'folderId',
+  );
+  @override
+  late final GeneratedColumn<String> folderId = GeneratedColumn<String>(
+    'folder_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isFavoriteMeta = const VerificationMeta(
+    'isFavorite',
+  );
+  @override
+  late final GeneratedColumn<bool> isFavorite = GeneratedColumn<bool>(
+    'is_favorite',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_favorite" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _createdAtMeta = const VerificationMeta(
     'createdAt',
   );
@@ -2022,6 +2048,8 @@ class $SecureFileEntriesTable extends SecureFileEntries
     storedFileName,
     mimeHint,
     note,
+    folderId,
+    isFavorite,
     createdAt,
     updatedAt,
   ];
@@ -2081,6 +2109,18 @@ class $SecureFileEntriesTable extends SecureFileEntries
         note.isAcceptableOrUnknown(data['note']!, _noteMeta),
       );
     }
+    if (data.containsKey('folder_id')) {
+      context.handle(
+        _folderIdMeta,
+        folderId.isAcceptableOrUnknown(data['folder_id']!, _folderIdMeta),
+      );
+    }
+    if (data.containsKey('is_favorite')) {
+      context.handle(
+        _isFavoriteMeta,
+        isFavorite.isAcceptableOrUnknown(data['is_favorite']!, _isFavoriteMeta),
+      );
+    }
     if (data.containsKey('created_at')) {
       context.handle(
         _createdAtMeta,
@@ -2130,6 +2170,14 @@ class $SecureFileEntriesTable extends SecureFileEntries
         DriftSqlType.string,
         data['${effectivePrefix}note'],
       ),
+      folderId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}folder_id'],
+      ),
+      isFavorite: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_favorite'],
+      )!,
       createdAt: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}created_at'],
@@ -2154,6 +2202,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
   final String storedFileName;
   final String? mimeHint;
   final String? note;
+  final String? folderId;
+  final bool isFavorite;
   final int createdAt;
   final int updatedAt;
   const SecureFileEntry({
@@ -2163,6 +2213,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
     required this.storedFileName,
     this.mimeHint,
     this.note,
+    this.folderId,
+    required this.isFavorite,
     required this.createdAt,
     required this.updatedAt,
   });
@@ -2179,6 +2231,10 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
     if (!nullToAbsent || note != null) {
       map['note'] = Variable<String>(note);
     }
+    if (!nullToAbsent || folderId != null) {
+      map['folder_id'] = Variable<String>(folderId);
+    }
+    map['is_favorite'] = Variable<bool>(isFavorite);
     map['created_at'] = Variable<int>(createdAt);
     map['updated_at'] = Variable<int>(updatedAt);
     return map;
@@ -2194,6 +2250,10 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
           ? const Value.absent()
           : Value(mimeHint),
       note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      folderId: folderId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(folderId),
+      isFavorite: Value(isFavorite),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
     );
@@ -2211,6 +2271,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
       storedFileName: serializer.fromJson<String>(json['storedFileName']),
       mimeHint: serializer.fromJson<String?>(json['mimeHint']),
       note: serializer.fromJson<String?>(json['note']),
+      folderId: serializer.fromJson<String?>(json['folderId']),
+      isFavorite: serializer.fromJson<bool>(json['isFavorite']),
       createdAt: serializer.fromJson<int>(json['createdAt']),
       updatedAt: serializer.fromJson<int>(json['updatedAt']),
     );
@@ -2225,6 +2287,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
       'storedFileName': serializer.toJson<String>(storedFileName),
       'mimeHint': serializer.toJson<String?>(mimeHint),
       'note': serializer.toJson<String?>(note),
+      'folderId': serializer.toJson<String?>(folderId),
+      'isFavorite': serializer.toJson<bool>(isFavorite),
       'createdAt': serializer.toJson<int>(createdAt),
       'updatedAt': serializer.toJson<int>(updatedAt),
     };
@@ -2237,6 +2301,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
     String? storedFileName,
     Value<String?> mimeHint = const Value.absent(),
     Value<String?> note = const Value.absent(),
+    Value<String?> folderId = const Value.absent(),
+    bool? isFavorite,
     int? createdAt,
     int? updatedAt,
   }) => SecureFileEntry(
@@ -2246,6 +2312,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
     storedFileName: storedFileName ?? this.storedFileName,
     mimeHint: mimeHint.present ? mimeHint.value : this.mimeHint,
     note: note.present ? note.value : this.note,
+    folderId: folderId.present ? folderId.value : this.folderId,
+    isFavorite: isFavorite ?? this.isFavorite,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -2259,6 +2327,10 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
           : this.storedFileName,
       mimeHint: data.mimeHint.present ? data.mimeHint.value : this.mimeHint,
       note: data.note.present ? data.note.value : this.note,
+      folderId: data.folderId.present ? data.folderId.value : this.folderId,
+      isFavorite: data.isFavorite.present
+          ? data.isFavorite.value
+          : this.isFavorite,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -2273,6 +2345,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
           ..write('storedFileName: $storedFileName, ')
           ..write('mimeHint: $mimeHint, ')
           ..write('note: $note, ')
+          ..write('folderId: $folderId, ')
+          ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -2287,6 +2361,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
     storedFileName,
     mimeHint,
     note,
+    folderId,
+    isFavorite,
     createdAt,
     updatedAt,
   );
@@ -2300,6 +2376,8 @@ class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
           other.storedFileName == this.storedFileName &&
           other.mimeHint == this.mimeHint &&
           other.note == this.note &&
+          other.folderId == this.folderId &&
+          other.isFavorite == this.isFavorite &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
 }
@@ -2311,6 +2389,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
   final Value<String> storedFileName;
   final Value<String?> mimeHint;
   final Value<String?> note;
+  final Value<String?> folderId;
+  final Value<bool> isFavorite;
   final Value<int> createdAt;
   final Value<int> updatedAt;
   final Value<int> rowid;
@@ -2321,6 +2401,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
     this.storedFileName = const Value.absent(),
     this.mimeHint = const Value.absent(),
     this.note = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.isFavorite = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
     this.rowid = const Value.absent(),
@@ -2332,6 +2414,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
     required String storedFileName,
     this.mimeHint = const Value.absent(),
     this.note = const Value.absent(),
+    this.folderId = const Value.absent(),
+    this.isFavorite = const Value.absent(),
     required int createdAt,
     required int updatedAt,
     this.rowid = const Value.absent(),
@@ -2348,6 +2432,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
     Expression<String>? storedFileName,
     Expression<String>? mimeHint,
     Expression<String>? note,
+    Expression<String>? folderId,
+    Expression<bool>? isFavorite,
     Expression<int>? createdAt,
     Expression<int>? updatedAt,
     Expression<int>? rowid,
@@ -2359,6 +2445,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
       if (storedFileName != null) 'stored_file_name': storedFileName,
       if (mimeHint != null) 'mime_hint': mimeHint,
       if (note != null) 'note': note,
+      if (folderId != null) 'folder_id': folderId,
+      if (isFavorite != null) 'is_favorite': isFavorite,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
       if (rowid != null) 'rowid': rowid,
@@ -2372,6 +2460,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
     Value<String>? storedFileName,
     Value<String?>? mimeHint,
     Value<String?>? note,
+    Value<String?>? folderId,
+    Value<bool>? isFavorite,
     Value<int>? createdAt,
     Value<int>? updatedAt,
     Value<int>? rowid,
@@ -2383,6 +2473,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
       storedFileName: storedFileName ?? this.storedFileName,
       mimeHint: mimeHint ?? this.mimeHint,
       note: note ?? this.note,
+      folderId: folderId ?? this.folderId,
+      isFavorite: isFavorite ?? this.isFavorite,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
       rowid: rowid ?? this.rowid,
@@ -2410,6 +2502,12 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
     if (note.present) {
       map['note'] = Variable<String>(note.value);
     }
+    if (folderId.present) {
+      map['folder_id'] = Variable<String>(folderId.value);
+    }
+    if (isFavorite.present) {
+      map['is_favorite'] = Variable<bool>(isFavorite.value);
+    }
     if (createdAt.present) {
       map['created_at'] = Variable<int>(createdAt.value);
     }
@@ -2431,6 +2529,8 @@ class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
           ..write('storedFileName: $storedFileName, ')
           ..write('mimeHint: $mimeHint, ')
           ..write('note: $note, ')
+          ..write('folderId: $folderId, ')
+          ..write('isFavorite: $isFavorite, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt, ')
           ..write('rowid: $rowid')
@@ -3482,6 +3582,8 @@ typedef $$SecureFileEntriesTableCreateCompanionBuilder =
       required String storedFileName,
       Value<String?> mimeHint,
       Value<String?> note,
+      Value<String?> folderId,
+      Value<bool> isFavorite,
       required int createdAt,
       required int updatedAt,
       Value<int> rowid,
@@ -3494,6 +3596,8 @@ typedef $$SecureFileEntriesTableUpdateCompanionBuilder =
       Value<String> storedFileName,
       Value<String?> mimeHint,
       Value<String?> note,
+      Value<String?> folderId,
+      Value<bool> isFavorite,
       Value<int> createdAt,
       Value<int> updatedAt,
       Value<int> rowid,
@@ -3535,6 +3639,16 @@ class $$SecureFileEntriesTableFilterComposer
 
   ColumnFilters<String> get note => $composableBuilder(
     column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3588,6 +3702,16 @@ class $$SecureFileEntriesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get folderId => $composableBuilder(
+    column: $table.folderId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get createdAt => $composableBuilder(
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
@@ -3627,6 +3751,14 @@ class $$SecureFileEntriesTableAnnotationComposer
 
   GeneratedColumn<String> get note =>
       $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<String> get folderId =>
+      $composableBuilder(column: $table.folderId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isFavorite => $composableBuilder(
+    column: $table.isFavorite,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
@@ -3681,6 +3813,8 @@ class $$SecureFileEntriesTableTableManager
                 Value<String> storedFileName = const Value.absent(),
                 Value<String?> mimeHint = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> folderId = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
                 Value<int> createdAt = const Value.absent(),
                 Value<int> updatedAt = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
@@ -3691,6 +3825,8 @@ class $$SecureFileEntriesTableTableManager
                 storedFileName: storedFileName,
                 mimeHint: mimeHint,
                 note: note,
+                folderId: folderId,
+                isFavorite: isFavorite,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,
@@ -3703,6 +3839,8 @@ class $$SecureFileEntriesTableTableManager
                 required String storedFileName,
                 Value<String?> mimeHint = const Value.absent(),
                 Value<String?> note = const Value.absent(),
+                Value<String?> folderId = const Value.absent(),
+                Value<bool> isFavorite = const Value.absent(),
                 required int createdAt,
                 required int updatedAt,
                 Value<int> rowid = const Value.absent(),
@@ -3713,6 +3851,8 @@ class $$SecureFileEntriesTableTableManager
                 storedFileName: storedFileName,
                 mimeHint: mimeHint,
                 note: note,
+                folderId: folderId,
+                isFavorite: isFavorite,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
                 rowid: rowid,

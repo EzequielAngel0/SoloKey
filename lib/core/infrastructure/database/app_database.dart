@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 8;
+  int get schemaVersion => 9;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -90,6 +90,19 @@ class AppDatabase extends _$AppDatabase {
           if (from < 8) {
             // Secure files: encrypted-on-disk file vault metadata.
             await m.createTable(secureFileEntries);
+          }
+          if (from < 9) {
+            // Secure files: folder organisation + favourites.
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              secureFileEntries,
+              secureFileEntries.folderId as GeneratedColumn,
+            );
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              secureFileEntries,
+              secureFileEntries.isFavorite as GeneratedColumn,
+            );
           }
         },
       );
