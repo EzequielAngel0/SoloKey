@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../../app/di/injection.dart';
 import '../../../features/settings/domain/repositories/i_settings_repository.dart';
+import '../clipboard/clipboard_service.dart';
 import 'session_manager.dart';
 
 /// Observes app lifecycle events to enforce security policies:
@@ -71,6 +73,7 @@ class AppLifecycleObserver with WidgetsBindingObserver {
     _inactivityTimer?.cancel();
     _inactivityTimer = null;
     _sessionManager.lock();
+    getIt<ClipboardService>().clearNow();
     onLockRequested?.call();
   }
 
@@ -87,6 +90,7 @@ class AppLifecycleObserver with WidgetsBindingObserver {
         break;
       case AppLifecycleState.resumed:
         _handleResumed();
+        getIt<ClipboardService>().checkAndClear();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:

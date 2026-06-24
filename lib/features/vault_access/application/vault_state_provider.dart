@@ -5,6 +5,8 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../domain/entities/vault_session.dart';
+import '../../../app/di/injection.dart';
+import '../../../core/infrastructure/clipboard/clipboard_service.dart';
 import 'setup_vault_use_case.dart';
 import 'unlock_vault_use_case.dart';
 import 'vault_exceptions.dart';
@@ -94,6 +96,7 @@ class VaultNotifier extends _$VaultNotifier {
 
   void lock() {
     ref.read(unlockVaultUseCaseProvider).lock();
+    getIt<ClipboardService>().clearNow();
     state = const VaultState.locked();
   }
 }
