@@ -8,6 +8,7 @@ import 'package:tray_manager/tray_manager.dart';
 
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../core/services/scheduled_backup_service.dart';
+import '../features/settings/domain/repositories/i_settings_repository.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
 import '../l10n/app_localizations.dart';
@@ -33,6 +34,11 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
     super.initState();
     _observer = getIt<AppLifecycleObserver>();
     _observer.initialize();
+    _observer.onLockRequested = () {
+      if (mounted) {
+        ref.read(vaultNotifierProvider.notifier).lock();
+      }
+    };
 
     if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
       windowManager.addListener(this);
@@ -54,7 +60,13 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
 
   Future<void> _initSystemTray() async {
     try {
-      await trayManager.setIcon('assets/logo/SoloKey.png');
+      // Windows tray needs a small multi-res .ico; the large PNG fails to
+      // render in the 16×16 notification area. Other platforms use the PNG.
+      await trayManager.setIcon(
+        Platform.isWindows
+            ? 'assets/logo/SoloKey.ico'
+            : 'assets/logo/SoloKey.png',
+      );
       final menu = Menu(
         items: [
           MenuItem(
@@ -78,9 +90,20 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
     }
   }
 
-  void _startTrayLockTimer() {
+  Future<void> _startTrayLockTimer() async {
     _trayLockTimer?.cancel();
-    _trayLockTimer = Timer(const Duration(minutes: 5), () {
+    // Read the authoritative persisted timeout rather than the (possibly
+    // still-loading) settings provider, so minimising to tray respects the
+    // user's configured timeout instead of falling back to a short default.
+    int minutes;
+    try {
+      final settings = await getIt<ISettingsRepository>().getSettings();
+      minutes = settings.autoLockMinutes;
+    } catch (_) {
+      minutes =
+          ref.read(settingsNotifierProvider).valueOrNull?.autoLockMinutes ?? 5;
+    }
+    _trayLockTimer = Timer(Duration(minutes: minutes), () {
       ref.read(vaultNotifierProvider.notifier).lock();
     });
   }
