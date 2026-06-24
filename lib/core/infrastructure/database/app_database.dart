@@ -6,10 +6,12 @@ import 'daos/category_dao.dart';
 import 'daos/credential_dao.dart';
 import 'daos/folder_dao.dart';
 import 'daos/password_history_dao.dart';
+import 'daos/secure_file_dao.dart';
 import 'tables/category_entries.dart';
 import 'tables/credential_entries.dart';
 import 'tables/folder_entries.dart';
 import 'tables/password_history_entries.dart';
+import 'tables/secure_file_entries.dart';
 
 part 'app_database.g.dart';
 
@@ -20,14 +22,21 @@ part 'app_database.g.dart';
     CategoryEntries,
     FolderEntries,
     PasswordHistoryEntries,
+    SecureFileEntries,
   ],
-  daos: [CredentialDao, CategoryDao, FolderDao, PasswordHistoryDao],
+  daos: [
+    CredentialDao,
+    CategoryDao,
+    FolderDao,
+    PasswordHistoryDao,
+    SecureFileDao,
+  ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 7;
+  int get schemaVersion => 8;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -77,6 +86,10 @@ class AppDatabase extends _$AppDatabase {
               credentialEntries,
               credentialEntries.lastRotationPromptedAt as GeneratedColumn,
             );
+          }
+          if (from < 8) {
+            // Secure files: encrypted-on-disk file vault metadata.
+            await m.createTable(secureFileEntries);
           }
         },
       );

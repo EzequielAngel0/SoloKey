@@ -14,9 +14,11 @@ import '../../../../features/credentials/presentation/widgets/credential_card.da
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
 import '../../../../features/folders/presentation/folder_screen.dart';
+import '../../../../features/secure_files/presentation/secure_files_screen.dart';
 import '../../../../features/settings/presentation/settings_screen.dart';
 import '../../../../features/vault_access/application/vault_state_provider.dart';
 import '../../../../features/sync/presentation/pairing_screen.dart';
+import 'package:password_manager/l10n/app_localizations.dart';
 import 'desktop_layout_state.dart';
 import 'auto_lock_manager.dart';
 
@@ -71,6 +73,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
       return const SettingsScreen();
     } else if (tabIndex == 5) {
       return const PairingScreen();
+    } else if (tabIndex == 6) {
+      return const SecureFilesScreen();
     }
 
     // Tabs with lists (Credentials, Folders, Favorites)
@@ -96,6 +100,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
   Widget _buildMiddleListPane(int tabIndex) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
     final foldersAsync = ref.watch(foldersNotifierProvider);
 
@@ -105,10 +110,10 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         backgroundColor: palette.cardDark,
         title: Text(
           tabIndex == 0
-              ? 'Credenciales'
+              ? l10n.navCredentials
               : tabIndex == 1
-                  ? 'Carpetas'
-                  : 'Favoritas',
+                  ? l10n.navFolders
+                  : l10n.navFavorites,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
@@ -116,13 +121,13 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
           if (tabIndex == 1)
             IconButton(
               icon: Icon(Icons.create_new_folder_rounded, color: palette.primary),
-              tooltip: 'Nueva carpeta',
+              tooltip: l10n.desktopNewFolderTooltip,
               onPressed: () => _createRootFolder(context, ref),
             )
           else
             IconButton(
               icon: Icon(Icons.add_rounded, color: palette.primary),
-              tooltip: 'Nueva credencial',
+              tooltip: l10n.desktopNewCredentialTooltip,
               onPressed: () {
                 ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
                 ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
@@ -141,7 +146,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                     onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
                     style: TextStyle(color: palette.textPrimary, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: 'Buscar...',
+                      hintText: l10n.commonSearch,
                       prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted, size: 20),
                       suffixIcon: _searchCtrl.text.isNotEmpty
                           ? IconButton(
@@ -168,7 +173,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         loading: () => const ShimmerLoader(),
         error: (e, _) => Center(
           child: Text(
-            'Error: $e',
+            l10n.commonErrorDetail('$e'),
             style: TextStyle(color: palette.error),
           ),
         ),
@@ -186,12 +191,12 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                   children: [
                     Icon(Icons.folder_open_rounded, size: 48, color: palette.divider),
                     const SizedBox(height: 12),
-                    Text('Bóveda vacía', style: TextStyle(color: palette.textMuted)),
+                    Text(l10n.desktopEmptyVault, style: TextStyle(color: palette.textMuted)),
                     const SizedBox(height: 12),
                     OutlinedButton.icon(
                       onPressed: () => _createRootFolder(context, ref),
                       icon: const Icon(Icons.create_new_folder_rounded, size: 16),
-                      label: const Text('Crear carpeta'),
+                      label: Text(l10n.desktopCreateFolder),
                     )
                   ],
                 ),
@@ -356,6 +361,7 @@ class _DesktopSidebar extends ConsumerWidget {
       _SidebarItemData(icon: Icons.folder_rounded, label: 'Carpetas', index: 1),
       _SidebarItemData(icon: Icons.star_rounded, label: 'Favoritas', index: 2),
       _SidebarItemData(icon: Icons.security_rounded, label: 'Auditoría', index: 3),
+      _SidebarItemData(icon: Icons.folder_shared_rounded, label: 'Archivos seguros', index: 6),
       _SidebarItemData(icon: Icons.settings_rounded, label: 'Ajustes', index: 4),
       _SidebarItemData(icon: Icons.sync_rounded, label: 'Sincronizar', index: 5),
     ];

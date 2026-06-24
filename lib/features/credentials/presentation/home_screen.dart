@@ -83,6 +83,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
             color: palette.drawer,
             onSelected: (val) {
               if (val == 'audit') context.push(AppRoutes.securityAudit);
+              if (val == 'secureFiles') context.push(AppRoutes.secureFiles);
               if (val == 'settings') context.push(AppRoutes.settings);
             },
             itemBuilder: (_) => [
@@ -93,6 +94,16 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                     Icon(Icons.security_rounded, color: palette.textPrimary, size: 20),
                     const SizedBox(width: 12),
                     Text(l10n.navAudit, style: TextStyle(color: palette.textPrimary)),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                value: 'secureFiles',
+                child: Row(
+                  children: [
+                    Icon(Icons.folder_shared_rounded, color: palette.textPrimary, size: 20),
+                    const SizedBox(width: 12),
+                    Text(l10n.navSecureFiles, style: TextStyle(color: palette.textPrimary)),
                   ],
                 ),
               ),

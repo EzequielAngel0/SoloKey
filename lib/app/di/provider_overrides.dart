@@ -4,6 +4,8 @@ import '../../features/credentials/application/credential_use_cases.dart';
 import '../../features/credentials/application/credentials_provider.dart';
 import '../../features/folders/application/folders_provider.dart';
 import '../../features/folders/domain/repositories/i_folder_repository.dart';
+import '../../features/secure_files/application/secure_files_provider.dart';
+import '../../features/secure_files/domain/repositories/i_secure_file_repository.dart';
 import '../../features/settings/domain/repositories/i_settings_repository.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/vault_access/application/setup_vault_use_case.dart';
@@ -28,4 +30,6 @@ List<Override> buildProviderOverrides() => [
           .overrideWithValue(getIt<ISettingsRepository>()),
       folderRepositoryProvider
           .overrideWithValue(getIt<IFolderRepository>()),
+      secureFileRepositoryProvider
+          .overrideWithValue(getIt<ISecureFileRepository>()),
     ];

@@ -12,6 +12,7 @@ import '../features/autofill/presentation/autofill_onboarding_screen.dart';
 import '../features/autofill/presentation/quick_fill_screen.dart';
 import '../features/passkeys/presentation/passkeys_screen.dart';
 import '../features/vault_transfer/presentation/transfer_screen.dart';
+import '../features/secure_files/presentation/secure_files_screen.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
 import '../features/vault_access/presentation/recovery_screen.dart';
@@ -39,6 +40,7 @@ abstract final class AppRoutes {
   static const securityAudit      = '/security-audit';
   static const qrScanner           = '/qr-scanner';
   static const transfer            = '/transfer';
+  static const secureFiles         = '/secure-files';
   static const autofillOnboarding  = '/autofill-onboarding';
   static const quickFill           = '/quick-fill';
   static const passkeys            = '/passkeys';
@@ -85,6 +87,7 @@ class _RouterNotifier extends ChangeNotifier {
         loc.startsWith('/security-audit') ||
         loc.startsWith('/qr-scanner') ||
         loc.startsWith('/transfer') ||
+        loc.startsWith('/secure-files') ||
         loc.startsWith('/autofill-onboarding') ||
         loc.startsWith('/quick-fill') ||
         loc.startsWith('/sync');
@@ -177,6 +180,10 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: AppRoutes.transfer,
         builder: (_, _) => const TransferScreen(),
+      ),
+      GoRoute(
+        path: AppRoutes.secureFiles,
+        builder: (_, _) => const SecureFilesScreen(),
       ),
       GoRoute(
         path: AppRoutes.autofillOnboarding,

@@ -1926,6 +1926,519 @@ class PasswordHistoryEntriesCompanion
   }
 }
 
+class $SecureFileEntriesTable extends SecureFileEntries
+    with TableInfo<$SecureFileEntriesTable, SecureFileEntry> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $SecureFileEntriesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sizeBytesMeta = const VerificationMeta(
+    'sizeBytes',
+  );
+  @override
+  late final GeneratedColumn<int> sizeBytes = GeneratedColumn<int>(
+    'size_bytes',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _storedFileNameMeta = const VerificationMeta(
+    'storedFileName',
+  );
+  @override
+  late final GeneratedColumn<String> storedFileName = GeneratedColumn<String>(
+    'stored_file_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _mimeHintMeta = const VerificationMeta(
+    'mimeHint',
+  );
+  @override
+  late final GeneratedColumn<String> mimeHint = GeneratedColumn<String>(
+    'mime_hint',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _noteMeta = const VerificationMeta('note');
+  @override
+  late final GeneratedColumn<String> note = GeneratedColumn<String>(
+    'note',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<int> createdAt = GeneratedColumn<int>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<int> updatedAt = GeneratedColumn<int>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    name,
+    sizeBytes,
+    storedFileName,
+    mimeHint,
+    note,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'secure_file_entries';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SecureFileEntry> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('size_bytes')) {
+      context.handle(
+        _sizeBytesMeta,
+        sizeBytes.isAcceptableOrUnknown(data['size_bytes']!, _sizeBytesMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_sizeBytesMeta);
+    }
+    if (data.containsKey('stored_file_name')) {
+      context.handle(
+        _storedFileNameMeta,
+        storedFileName.isAcceptableOrUnknown(
+          data['stored_file_name']!,
+          _storedFileNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_storedFileNameMeta);
+    }
+    if (data.containsKey('mime_hint')) {
+      context.handle(
+        _mimeHintMeta,
+        mimeHint.isAcceptableOrUnknown(data['mime_hint']!, _mimeHintMeta),
+      );
+    }
+    if (data.containsKey('note')) {
+      context.handle(
+        _noteMeta,
+        note.isAcceptableOrUnknown(data['note']!, _noteMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SecureFileEntry map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SecureFileEntry(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      sizeBytes: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}size_bytes'],
+      )!,
+      storedFileName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}stored_file_name'],
+      )!,
+      mimeHint: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}mime_hint'],
+      ),
+      note: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}note'],
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $SecureFileEntriesTable createAlias(String alias) {
+    return $SecureFileEntriesTable(attachedDatabase, alias);
+  }
+}
+
+class SecureFileEntry extends DataClass implements Insertable<SecureFileEntry> {
+  final String id;
+  final String name;
+  final int sizeBytes;
+  final String storedFileName;
+  final String? mimeHint;
+  final String? note;
+  final int createdAt;
+  final int updatedAt;
+  const SecureFileEntry({
+    required this.id,
+    required this.name,
+    required this.sizeBytes,
+    required this.storedFileName,
+    this.mimeHint,
+    this.note,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    map['name'] = Variable<String>(name);
+    map['size_bytes'] = Variable<int>(sizeBytes);
+    map['stored_file_name'] = Variable<String>(storedFileName);
+    if (!nullToAbsent || mimeHint != null) {
+      map['mime_hint'] = Variable<String>(mimeHint);
+    }
+    if (!nullToAbsent || note != null) {
+      map['note'] = Variable<String>(note);
+    }
+    map['created_at'] = Variable<int>(createdAt);
+    map['updated_at'] = Variable<int>(updatedAt);
+    return map;
+  }
+
+  SecureFileEntriesCompanion toCompanion(bool nullToAbsent) {
+    return SecureFileEntriesCompanion(
+      id: Value(id),
+      name: Value(name),
+      sizeBytes: Value(sizeBytes),
+      storedFileName: Value(storedFileName),
+      mimeHint: mimeHint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(mimeHint),
+      note: note == null && nullToAbsent ? const Value.absent() : Value(note),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory SecureFileEntry.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SecureFileEntry(
+      id: serializer.fromJson<String>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      sizeBytes: serializer.fromJson<int>(json['sizeBytes']),
+      storedFileName: serializer.fromJson<String>(json['storedFileName']),
+      mimeHint: serializer.fromJson<String?>(json['mimeHint']),
+      note: serializer.fromJson<String?>(json['note']),
+      createdAt: serializer.fromJson<int>(json['createdAt']),
+      updatedAt: serializer.fromJson<int>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'name': serializer.toJson<String>(name),
+      'sizeBytes': serializer.toJson<int>(sizeBytes),
+      'storedFileName': serializer.toJson<String>(storedFileName),
+      'mimeHint': serializer.toJson<String?>(mimeHint),
+      'note': serializer.toJson<String?>(note),
+      'createdAt': serializer.toJson<int>(createdAt),
+      'updatedAt': serializer.toJson<int>(updatedAt),
+    };
+  }
+
+  SecureFileEntry copyWith({
+    String? id,
+    String? name,
+    int? sizeBytes,
+    String? storedFileName,
+    Value<String?> mimeHint = const Value.absent(),
+    Value<String?> note = const Value.absent(),
+    int? createdAt,
+    int? updatedAt,
+  }) => SecureFileEntry(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    sizeBytes: sizeBytes ?? this.sizeBytes,
+    storedFileName: storedFileName ?? this.storedFileName,
+    mimeHint: mimeHint.present ? mimeHint.value : this.mimeHint,
+    note: note.present ? note.value : this.note,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  SecureFileEntry copyWithCompanion(SecureFileEntriesCompanion data) {
+    return SecureFileEntry(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      sizeBytes: data.sizeBytes.present ? data.sizeBytes.value : this.sizeBytes,
+      storedFileName: data.storedFileName.present
+          ? data.storedFileName.value
+          : this.storedFileName,
+      mimeHint: data.mimeHint.present ? data.mimeHint.value : this.mimeHint,
+      note: data.note.present ? data.note.value : this.note,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SecureFileEntry(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('storedFileName: $storedFileName, ')
+          ..write('mimeHint: $mimeHint, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    name,
+    sizeBytes,
+    storedFileName,
+    mimeHint,
+    note,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SecureFileEntry &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.sizeBytes == this.sizeBytes &&
+          other.storedFileName == this.storedFileName &&
+          other.mimeHint == this.mimeHint &&
+          other.note == this.note &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class SecureFileEntriesCompanion extends UpdateCompanion<SecureFileEntry> {
+  final Value<String> id;
+  final Value<String> name;
+  final Value<int> sizeBytes;
+  final Value<String> storedFileName;
+  final Value<String?> mimeHint;
+  final Value<String?> note;
+  final Value<int> createdAt;
+  final Value<int> updatedAt;
+  final Value<int> rowid;
+  const SecureFileEntriesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.sizeBytes = const Value.absent(),
+    this.storedFileName = const Value.absent(),
+    this.mimeHint = const Value.absent(),
+    this.note = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  SecureFileEntriesCompanion.insert({
+    required String id,
+    required String name,
+    required int sizeBytes,
+    required String storedFileName,
+    this.mimeHint = const Value.absent(),
+    this.note = const Value.absent(),
+    required int createdAt,
+    required int updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       name = Value(name),
+       sizeBytes = Value(sizeBytes),
+       storedFileName = Value(storedFileName),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<SecureFileEntry> custom({
+    Expression<String>? id,
+    Expression<String>? name,
+    Expression<int>? sizeBytes,
+    Expression<String>? storedFileName,
+    Expression<String>? mimeHint,
+    Expression<String>? note,
+    Expression<int>? createdAt,
+    Expression<int>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (sizeBytes != null) 'size_bytes': sizeBytes,
+      if (storedFileName != null) 'stored_file_name': storedFileName,
+      if (mimeHint != null) 'mime_hint': mimeHint,
+      if (note != null) 'note': note,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  SecureFileEntriesCompanion copyWith({
+    Value<String>? id,
+    Value<String>? name,
+    Value<int>? sizeBytes,
+    Value<String>? storedFileName,
+    Value<String?>? mimeHint,
+    Value<String?>? note,
+    Value<int>? createdAt,
+    Value<int>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return SecureFileEntriesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      sizeBytes: sizeBytes ?? this.sizeBytes,
+      storedFileName: storedFileName ?? this.storedFileName,
+      mimeHint: mimeHint ?? this.mimeHint,
+      note: note ?? this.note,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (sizeBytes.present) {
+      map['size_bytes'] = Variable<int>(sizeBytes.value);
+    }
+    if (storedFileName.present) {
+      map['stored_file_name'] = Variable<String>(storedFileName.value);
+    }
+    if (mimeHint.present) {
+      map['mime_hint'] = Variable<String>(mimeHint.value);
+    }
+    if (note.present) {
+      map['note'] = Variable<String>(note.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<int>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<int>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SecureFileEntriesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('sizeBytes: $sizeBytes, ')
+          ..write('storedFileName: $storedFileName, ')
+          ..write('mimeHint: $mimeHint, ')
+          ..write('note: $note, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1937,12 +2450,15 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $FolderEntriesTable folderEntries = $FolderEntriesTable(this);
   late final $PasswordHistoryEntriesTable passwordHistoryEntries =
       $PasswordHistoryEntriesTable(this);
+  late final $SecureFileEntriesTable secureFileEntries =
+      $SecureFileEntriesTable(this);
   late final CredentialDao credentialDao = CredentialDao(this as AppDatabase);
   late final CategoryDao categoryDao = CategoryDao(this as AppDatabase);
   late final FolderDao folderDao = FolderDao(this as AppDatabase);
   late final PasswordHistoryDao passwordHistoryDao = PasswordHistoryDao(
     this as AppDatabase,
   );
+  late final SecureFileDao secureFileDao = SecureFileDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1952,6 +2468,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     categoryEntries,
     folderEntries,
     passwordHistoryEntries,
+    secureFileEntries,
   ];
 }
 
@@ -2957,6 +3474,274 @@ typedef $$PasswordHistoryEntriesTableProcessedTableManager =
       PasswordHistoryEntry,
       PrefetchHooks Function()
     >;
+typedef $$SecureFileEntriesTableCreateCompanionBuilder =
+    SecureFileEntriesCompanion Function({
+      required String id,
+      required String name,
+      required int sizeBytes,
+      required String storedFileName,
+      Value<String?> mimeHint,
+      Value<String?> note,
+      required int createdAt,
+      required int updatedAt,
+      Value<int> rowid,
+    });
+typedef $$SecureFileEntriesTableUpdateCompanionBuilder =
+    SecureFileEntriesCompanion Function({
+      Value<String> id,
+      Value<String> name,
+      Value<int> sizeBytes,
+      Value<String> storedFileName,
+      Value<String?> mimeHint,
+      Value<String?> note,
+      Value<int> createdAt,
+      Value<int> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$SecureFileEntriesTableFilterComposer
+    extends Composer<_$AppDatabase, $SecureFileEntriesTable> {
+  $$SecureFileEntriesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get storedFileName => $composableBuilder(
+    column: $table.storedFileName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get mimeHint => $composableBuilder(
+    column: $table.mimeHint,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$SecureFileEntriesTableOrderingComposer
+    extends Composer<_$AppDatabase, $SecureFileEntriesTable> {
+  $$SecureFileEntriesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sizeBytes => $composableBuilder(
+    column: $table.sizeBytes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get storedFileName => $composableBuilder(
+    column: $table.storedFileName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get mimeHint => $composableBuilder(
+    column: $table.mimeHint,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get note => $composableBuilder(
+    column: $table.note,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$SecureFileEntriesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $SecureFileEntriesTable> {
+  $$SecureFileEntriesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<int> get sizeBytes =>
+      $composableBuilder(column: $table.sizeBytes, builder: (column) => column);
+
+  GeneratedColumn<String> get storedFileName => $composableBuilder(
+    column: $table.storedFileName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get mimeHint =>
+      $composableBuilder(column: $table.mimeHint, builder: (column) => column);
+
+  GeneratedColumn<String> get note =>
+      $composableBuilder(column: $table.note, builder: (column) => column);
+
+  GeneratedColumn<int> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<int> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$SecureFileEntriesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $SecureFileEntriesTable,
+          SecureFileEntry,
+          $$SecureFileEntriesTableFilterComposer,
+          $$SecureFileEntriesTableOrderingComposer,
+          $$SecureFileEntriesTableAnnotationComposer,
+          $$SecureFileEntriesTableCreateCompanionBuilder,
+          $$SecureFileEntriesTableUpdateCompanionBuilder,
+          (
+            SecureFileEntry,
+            BaseReferences<
+              _$AppDatabase,
+              $SecureFileEntriesTable,
+              SecureFileEntry
+            >,
+          ),
+          SecureFileEntry,
+          PrefetchHooks Function()
+        > {
+  $$SecureFileEntriesTableTableManager(
+    _$AppDatabase db,
+    $SecureFileEntriesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$SecureFileEntriesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$SecureFileEntriesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$SecureFileEntriesTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<int> sizeBytes = const Value.absent(),
+                Value<String> storedFileName = const Value.absent(),
+                Value<String?> mimeHint = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                Value<int> createdAt = const Value.absent(),
+                Value<int> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => SecureFileEntriesCompanion(
+                id: id,
+                name: name,
+                sizeBytes: sizeBytes,
+                storedFileName: storedFileName,
+                mimeHint: mimeHint,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required String name,
+                required int sizeBytes,
+                required String storedFileName,
+                Value<String?> mimeHint = const Value.absent(),
+                Value<String?> note = const Value.absent(),
+                required int createdAt,
+                required int updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => SecureFileEntriesCompanion.insert(
+                id: id,
+                name: name,
+                sizeBytes: sizeBytes,
+                storedFileName: storedFileName,
+                mimeHint: mimeHint,
+                note: note,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$SecureFileEntriesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $SecureFileEntriesTable,
+      SecureFileEntry,
+      $$SecureFileEntriesTableFilterComposer,
+      $$SecureFileEntriesTableOrderingComposer,
+      $$SecureFileEntriesTableAnnotationComposer,
+      $$SecureFileEntriesTableCreateCompanionBuilder,
+      $$SecureFileEntriesTableUpdateCompanionBuilder,
+      (
+        SecureFileEntry,
+        BaseReferences<_$AppDatabase, $SecureFileEntriesTable, SecureFileEntry>,
+      ),
+      SecureFileEntry,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2972,4 +3757,6 @@ class $AppDatabaseManager {
         _db,
         _db.passwordHistoryEntries,
       );
+  $$SecureFileEntriesTableTableManager get secureFileEntries =>
+      $$SecureFileEntriesTableTableManager(_db, _db.secureFileEntries);
 }
