@@ -2317,6 +2317,216 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Import completed'**
   String get transferImportDone;
+
+  /// No description provided for @transferExportSelectFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders to export'**
+  String get transferExportSelectFolders;
+
+  /// No description provided for @transferNoFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'No folder'**
+  String get transferNoFolder;
+
+  /// No description provided for @transferImportSelectTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select what to import'**
+  String get transferImportSelectTitle;
+
+  /// No description provided for @transferSectionTypes.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential types'**
+  String get transferSectionTypes;
+
+  /// No description provided for @transferSectionFolders.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get transferSectionFolders;
+
+  /// No description provided for @transferImportConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Import selection'**
+  String get transferImportConfirm;
+
+  /// No description provided for @transferNothingSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one item to import'**
+  String get transferNothingSelected;
+
+  /// No description provided for @commonSearch.
+  ///
+  /// In en, this message translates to:
+  /// **'Search…'**
+  String get commonSearch;
+
+  /// No description provided for @navSync.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync'**
+  String get navSync;
+
+  /// No description provided for @desktopEmptyVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Empty vault'**
+  String get desktopEmptyVault;
+
+  /// No description provided for @desktopCreateFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Create folder'**
+  String get desktopCreateFolder;
+
+  /// No description provided for @desktopNoCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'No credentials'**
+  String get desktopNoCredentials;
+
+  /// No description provided for @desktopNoFavorites.
+  ///
+  /// In en, this message translates to:
+  /// **'No favourites'**
+  String get desktopNoFavorites;
+
+  /// No description provided for @desktopSelectFolderTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a folder'**
+  String get desktopSelectFolderTitle;
+
+  /// No description provided for @desktopSelectFolderSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Click a folder in the list to see its contents here.'**
+  String get desktopSelectFolderSub;
+
+  /// No description provided for @desktopSecureVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Vault'**
+  String get desktopSecureVaultTitle;
+
+  /// No description provided for @desktopSelectCredentialSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a credential from the list to view or edit its details.'**
+  String get desktopSelectCredentialSub;
+
+  /// No description provided for @desktopNewFolderTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'New folder'**
+  String get desktopNewFolderTooltip;
+
+  /// No description provided for @desktopNewCredentialTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'New credential'**
+  String get desktopNewCredentialTooltip;
+
+  /// No description provided for @desktopLockVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock vault'**
+  String get desktopLockVault;
+
+  /// No description provided for @navSecureFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure files'**
+  String get navSecureFiles;
+
+  /// No description provided for @secureFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure files'**
+  String get secureFilesTitle;
+
+  /// No description provided for @secureFilesEmptyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No files yet'**
+  String get secureFilesEmptyTitle;
+
+  /// No description provided for @secureFilesEmptyDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Store SSH private keys, credentials.json or any other file, encrypted with your master key.'**
+  String get secureFilesEmptyDesc;
+
+  /// No description provided for @secureFilesAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add file'**
+  String get secureFilesAdd;
+
+  /// No description provided for @secureFilesExport.
+  ///
+  /// In en, this message translates to:
+  /// **'Export / Save'**
+  String get secureFilesExport;
+
+  /// No description provided for @secureFilesDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get secureFilesDelete;
+
+  /// No description provided for @secureFilesAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify your identity to access the file'**
+  String get secureFilesAuthReason;
+
+  /// No description provided for @secureFilesDeleteConfirmTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete file?'**
+  String get secureFilesDeleteConfirmTitle;
+
+  /// No description provided for @secureFilesDeleteConfirmBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete \"{name}\"? This permanently removes the encrypted file.'**
+  String secureFilesDeleteConfirmBody(String name);
+
+  /// No description provided for @secureFilesDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'File deleted'**
+  String get secureFilesDeleted;
+
+  /// No description provided for @secureFilesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'File saved'**
+  String get secureFilesSaved;
+
+  /// No description provided for @secureFilesAddedSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'Added {name}'**
+  String secureFilesAddedSummary(String name);
+
+  /// No description provided for @secureFilesAddError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not add file: {msg}'**
+  String secureFilesAddError(String msg);
+
+  /// No description provided for @secureFilesExportError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not export file: {msg}'**
+  String secureFilesExportError(String msg);
 }
 
 class _AppLocalizationsDelegate

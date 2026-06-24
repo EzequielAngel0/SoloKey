@@ -1199,4 +1199,120 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transferImportDone => 'Import completed';
+
+  @override
+  String get transferExportSelectFolders => 'Folders to export';
+
+  @override
+  String get transferNoFolder => 'No folder';
+
+  @override
+  String get transferImportSelectTitle => 'Select what to import';
+
+  @override
+  String get transferSectionTypes => 'Credential types';
+
+  @override
+  String get transferSectionFolders => 'Folders';
+
+  @override
+  String get transferImportConfirm => 'Import selection';
+
+  @override
+  String get transferNothingSelected => 'Select at least one item to import';
+
+  @override
+  String get commonSearch => 'Search…';
+
+  @override
+  String get navSync => 'Sync';
+
+  @override
+  String get desktopEmptyVault => 'Empty vault';
+
+  @override
+  String get desktopCreateFolder => 'Create folder';
+
+  @override
+  String get desktopNoCredentials => 'No credentials';
+
+  @override
+  String get desktopNoFavorites => 'No favourites';
+
+  @override
+  String get desktopSelectFolderTitle => 'Select a folder';
+
+  @override
+  String get desktopSelectFolderSub =>
+      'Click a folder in the list to see its contents here.';
+
+  @override
+  String get desktopSecureVaultTitle => 'Secure Vault';
+
+  @override
+  String get desktopSelectCredentialSub =>
+      'Select a credential from the list to view or edit its details.';
+
+  @override
+  String get desktopNewFolderTooltip => 'New folder';
+
+  @override
+  String get desktopNewCredentialTooltip => 'New credential';
+
+  @override
+  String get desktopLockVault => 'Lock vault';
+
+  @override
+  String get navSecureFiles => 'Secure files';
+
+  @override
+  String get secureFilesTitle => 'Secure files';
+
+  @override
+  String get secureFilesEmptyTitle => 'No files yet';
+
+  @override
+  String get secureFilesEmptyDesc =>
+      'Store SSH private keys, credentials.json or any other file, encrypted with your master key.';
+
+  @override
+  String get secureFilesAdd => 'Add file';
+
+  @override
+  String get secureFilesExport => 'Export / Save';
+
+  @override
+  String get secureFilesDelete => 'Delete';
+
+  @override
+  String get secureFilesAuthReason => 'Verify your identity to access the file';
+
+  @override
+  String get secureFilesDeleteConfirmTitle => 'Delete file?';
+
+  @override
+  String secureFilesDeleteConfirmBody(String name) {
+    return 'Delete \"$name\"? This permanently removes the encrypted file.';
+  }
+
+  @override
+  String get secureFilesDeleted => 'File deleted';
+
+  @override
+  String get secureFilesSaved => 'File saved';
+
+  @override
+  String secureFilesAddedSummary(String name) {
+    return 'Added $name';
+  }
+
+  @override
+  String secureFilesAddError(String msg) {
+    return 'Could not add file: $msg';
+  }
+
+  @override
+  String secureFilesExportError(String msg) {
+    return 'Could not export file: $msg';
+  }
 }

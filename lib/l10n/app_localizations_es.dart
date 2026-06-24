@@ -1207,4 +1207,122 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transferImportDone => 'Importación completada';
+
+  @override
+  String get transferExportSelectFolders => 'Carpetas a exportar';
+
+  @override
+  String get transferNoFolder => 'Sin carpeta';
+
+  @override
+  String get transferImportSelectTitle => 'Selecciona qué importar';
+
+  @override
+  String get transferSectionTypes => 'Tipos de credencial';
+
+  @override
+  String get transferSectionFolders => 'Carpetas';
+
+  @override
+  String get transferImportConfirm => 'Importar selección';
+
+  @override
+  String get transferNothingSelected =>
+      'Selecciona al menos un elemento para importar';
+
+  @override
+  String get commonSearch => 'Buscar…';
+
+  @override
+  String get navSync => 'Sincronizar';
+
+  @override
+  String get desktopEmptyVault => 'Bóveda vacía';
+
+  @override
+  String get desktopCreateFolder => 'Crear carpeta';
+
+  @override
+  String get desktopNoCredentials => 'Sin credenciales';
+
+  @override
+  String get desktopNoFavorites => 'Sin favoritas';
+
+  @override
+  String get desktopSelectFolderTitle => 'Selecciona una carpeta';
+
+  @override
+  String get desktopSelectFolderSub =>
+      'Haz clic en una carpeta de la lista para ver su contenido aquí.';
+
+  @override
+  String get desktopSecureVaultTitle => 'Bóveda Segura';
+
+  @override
+  String get desktopSelectCredentialSub =>
+      'Selecciona una credencial de la lista para ver o editar sus detalles.';
+
+  @override
+  String get desktopNewFolderTooltip => 'Nueva carpeta';
+
+  @override
+  String get desktopNewCredentialTooltip => 'Nueva credencial';
+
+  @override
+  String get desktopLockVault => 'Bloquear Bóveda';
+
+  @override
+  String get navSecureFiles => 'Archivos seguros';
+
+  @override
+  String get secureFilesTitle => 'Archivos seguros';
+
+  @override
+  String get secureFilesEmptyTitle => 'Sin archivos';
+
+  @override
+  String get secureFilesEmptyDesc =>
+      'Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu clave maestra.';
+
+  @override
+  String get secureFilesAdd => 'Añadir archivo';
+
+  @override
+  String get secureFilesExport => 'Exportar / Guardar';
+
+  @override
+  String get secureFilesDelete => 'Eliminar';
+
+  @override
+  String get secureFilesAuthReason =>
+      'Verifica tu identidad para acceder al archivo';
+
+  @override
+  String get secureFilesDeleteConfirmTitle => '¿Eliminar archivo?';
+
+  @override
+  String secureFilesDeleteConfirmBody(String name) {
+    return '¿Eliminar \"$name\"? Esto borra permanentemente el archivo cifrado.';
+  }
+
+  @override
+  String get secureFilesDeleted => 'Archivo eliminado';
+
+  @override
+  String get secureFilesSaved => 'Archivo guardado';
+
+  @override
+  String secureFilesAddedSummary(String name) {
+    return 'Añadido $name';
+  }
+
+  @override
+  String secureFilesAddError(String msg) {
+    return 'No se pudo añadir el archivo: $msg';
+  }
+
+  @override
+  String secureFilesExportError(String msg) {
+    return 'No se pudo exportar el archivo: $msg';
+  }
 }
