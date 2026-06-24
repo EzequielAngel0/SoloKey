@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/services.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -227,75 +226,15 @@ class CredentialCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
     final icon = _typeIcons[credential.type] ?? Icons.lock_rounded;
     final color = credentialTypeColor(credential.type, palette);
 
-    return Dismissible(
-      key: Key(credential.id),
-      direction: DismissDirection.endToStart,
-      confirmDismiss: (direction) async {
-        HapticFeedback.heavyImpact();
-        final confirm = await showDialog<bool>(
-          context: context,
-          builder: (_) => AlertDialog(
-            backgroundColor: palette.drawer,
-            title: Text(l10n.detailDeleteTitle, style: TextStyle(color: palette.textPrimary)),
-            content: Text(
-              l10n.detailDeleteBody(credential.title),
-              style: TextStyle(color: palette.textMuted),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(l10n.commonCancel),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: Text(l10n.commonDelete, style: TextStyle(color: palette.danger)),
-              ),
-            ],
-          ),
-        );
-        if (confirm == true) {
-          HapticFeedback.heavyImpact();
-          await ref.read(credentialsNotifierProvider.notifier).delete(credential.id);
-          if (context.mounted && ResponsiveLayout.isDesktop(context)) {
-            if (ref.read(desktopSelectedCredentialIdProvider) == credential.id) {
-              ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
-              ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
-            }
-          }
-          if (context.mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('"${credential.title}" eliminada'),
-                backgroundColor: palette.danger,
-                behavior: SnackBarBehavior.floating,
-              ),
-            );
-          }
-          return true;
-        }
-        return false;
-      },
-      background: Container(
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.only(right: 20.0),
-        decoration: BoxDecoration(
-          color: palette.danger,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Icon(
-          Icons.delete_forever_rounded,
-          color: palette.onPrimary,
-          size: 24,
-        ),
-      ),
-      child: Material(
-        color: palette.card,
-        borderRadius: BorderRadius.circular(16),
-        child: InkWell(
+    // Swipe-to-delete intentionally removed: deletion is available via the
+    // long-press options sheet and the credential detail screen.
+    return Material(
+      color: palette.card,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
             if (ResponsiveLayout.isDesktop(context)) {
@@ -361,8 +300,7 @@ class CredentialCard extends ConsumerWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }
 
