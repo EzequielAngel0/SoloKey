@@ -46,11 +46,13 @@ ArchitecturesInstallIn64BitMode=x64compatible
 PrivilegesRequired=lowest
 ; Actualizaciones en sitio: mismo AppId => Inno reemplaza solo los binarios en
 ; {app} y NUNCA toca la boveda en %APPDATA%, asi que las credenciales se
-; conservan (Drift migra el esquema solo al abrir la version nueva). Como la app
-; vive en la bandeja, se cierra automaticamente durante la actualizacion para
-; evitar fallos de "archivo en uso".
-CloseApplications=yes
-RestartApplications=no
+; conservan (Drift migra el esquema solo al abrir la version nueva).
+;
+; NOTA: NO usamos CloseApplications/Restart Manager. SoloKey vive en la bandeja
+; con la ventana oculta y reintercepta WM_CLOSE (prevent-close => se oculta en
+; vez de salir), por lo que el Restart Manager solo cierra ventanas visibles y
+; deja vivo el proceso en segundo plano, que sigue bloqueando el .exe/DLLs. En
+; su lugar el [Code] de abajo hace taskkill /F del proceso antes de copiar.
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
@@ -68,3 +70,30 @@ Name: "{userdesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; AppUserMo
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
+
+[Code]
+// Cierra a la fuerza cualquier instancia de SoloKey (incluida la que vive
+// oculta en la bandeja, que reintercepta WM_CLOSE y no saldria sola), para
+// liberar el .exe/DLLs antes de reemplazarlos. Es seguro: la app persiste cada
+// cambio de forma transaccional (SQLite/Keystore) y la clave en RAM es efimera.
+procedure KillRunningApp;
+var
+  ResultCode: Integer;
+begin
+  Exec(ExpandConstant('{sys}\taskkill.exe'), '/F /T /IM {#MyAppExeName}', '',
+    SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
+
+// Se ejecuta justo antes de copiar archivos (tras pulsar "Instalar").
+function PrepareToInstall(var NeedsRestart: Boolean): String;
+begin
+  KillRunningApp;
+  Result := '';
+end;
+
+// Tambien al desinstalar, para no dejar el proceso bloqueando la carpeta.
+function InitializeUninstall(): Boolean;
+begin
+  KillRunningApp;
+  Result := True;
+end;
