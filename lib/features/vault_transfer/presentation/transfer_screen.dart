@@ -90,7 +90,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         exportPassword: password,
         credentialIds: {..._selectedCredentialIds},
       );
-      if (mounted) {
+      if (mounted && summary != null) {
         setState(() => _lastExport = summary);
         _snack(
           l10n.transferExportedSummary(

@@ -1,7 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -77,7 +78,10 @@ class VaultExportService {
   /// [credentialIds] takes precedence over [typeFilter]/[folderFilter]: when
   /// given, ONLY those exact credentials are exported, together with the folder
   /// hierarchy (ancestors) they belong to, so they re-import into place.
-  Future<ExportSummary> exportVault({
+  ///
+  /// Returns the [ExportSummary], or `null` if the user cancelled the desktop
+  /// save dialog.
+  Future<ExportSummary?> exportVault({
     required String exportPassword,
     Set<CredentialType>? typeFilter,
     Set<String>? folderFilter,
@@ -90,12 +94,28 @@ class VaultExportService {
       credentialIds: credentialIds,
     );
 
-    final dir = await getTemporaryDirectory();
-    final ts = DateTime.now().millisecondsSinceEpoch;
-    final file = File('${dir.path}/solokey_$ts.skvault');
-    await file.writeAsBytes(built.bytes);
+    final fileName = 'solokey_${DateTime.now().millisecondsSinceEpoch}.skvault';
 
-    // SEC-002: Delete temp file after sharing
+    if (!kIsWeb &&
+        (Platform.isWindows || Platform.isLinux || Platform.isMacOS)) {
+      // Desktop: a native Save dialog. The Windows "share" sheet is unreliable
+      // for unpackaged apps ("could not show all the ways to share content"),
+      // so we let the user choose where to write the .skvault file.
+      final path = await FilePicker.platform.saveFile(
+        dialogTitle: 'SoloKey Backup',
+        fileName: fileName,
+        bytes: built.bytes,
+      );
+      if (path == null) return null; // cancelled
+      // On desktop saveFile only returns the path — write the bytes ourselves.
+      await File(path).writeAsBytes(built.bytes, flush: true);
+      return built.summary;
+    }
+
+    // Mobile: share sheet from a temp file, deleted afterwards.
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/$fileName');
+    await file.writeAsBytes(built.bytes);
     try {
       await SharePlus.instance.share(
         ShareParams(
