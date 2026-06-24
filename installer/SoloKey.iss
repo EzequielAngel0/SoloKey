@@ -44,6 +44,13 @@ ArchitecturesInstallIn64BitMode=x64compatible
 ; Instalacion per-user (sin UAC). La boveda queda en el %APPDATA% del usuario,
 ; misma ubicacion que al correr el .exe portable.
 PrivilegesRequired=lowest
+; Actualizaciones en sitio: mismo AppId => Inno reemplaza solo los binarios en
+; {app} y NUNCA toca la boveda en %APPDATA%, asi que las credenciales se
+; conservan (Drift migra el esquema solo al abrir la version nueva). Como la app
+; vive en la bandeja, se cierra automaticamente durante la actualizacion para
+; evitar fallos de "archivo en uso".
+CloseApplications=yes
+RestartApplications=no
 
 [Languages]
 Name: "spanish"; MessagesFile: "compiler:Languages\Spanish.isl"
