@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:injectable/injectable.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
@@ -31,6 +30,12 @@ import 'csv_import_service.dart';
 /// session key exactly as before.
 ///
 /// File extension: .skvault
+///
+/// Sentinel folder id used inside a `folderFilter` to represent credentials
+/// that are not assigned to any folder ("Sin carpeta"). Lets the caller decide
+/// whether unfiled credentials are included in a selective export/import.
+const String kNoFolderFilterId = '__no_folder__';
+
 @lazySingleton
 class VaultExportService {
   VaultExportService(
@@ -63,13 +68,20 @@ class VaultExportService {
   /// It must be entered again when importing on another device.
   ///
   /// Pass `null` for [typeFilter] to export every credential type.
+  ///
+  /// Pass `null` for [folderFilter] to export from every folder. When a set is
+  /// given, only credentials whose folder id is in the set are exported (use
+  /// [kNoFolderFilterId] to include unfiled credentials), and only the listed
+  /// folders are written to the backup.
   Future<ExportSummary> exportVault({
     required String exportPassword,
     Set<CredentialType>? typeFilter,
+    Set<String>? folderFilter,
   }) async {
     final built = await _buildEncryptedBackup(
       exportPassword: exportPassword,
       typeFilter: typeFilter,
+      folderFilter: folderFilter,
     );
 
     final dir = await getTemporaryDirectory();
@@ -98,10 +110,12 @@ class VaultExportService {
     required String exportPassword,
     required String directoryPath,
     Set<CredentialType>? typeFilter,
+    Set<String>? folderFilter,
   }) async {
     final built = await _buildEncryptedBackup(
       exportPassword: exportPassword,
       typeFilter: typeFilter,
+      folderFilter: folderFilter,
     );
     final ts = DateTime.now();
     final stamp = '${ts.year}${_two(ts.month)}${_two(ts.day)}-'
@@ -117,14 +131,21 @@ class VaultExportService {
   Future<({Uint8List bytes, ExportSummary summary})> _buildEncryptedBackup({
     required String exportPassword,
     Set<CredentialType>? typeFilter,
+    Set<String>? folderFilter,
   }) async {
     if (exportPassword.isEmpty) throw ArgumentError('Export password required');
 
     final allCredentials = await _credRepo.getAll();
-    final credentials = typeFilter == null
-        ? allCredentials
-        : allCredentials.where((c) => typeFilter.contains(c.type)).toList();
-    final folders = await _folderRepo.getAll();
+    final allFolders = await _folderRepo.getAll();
+    final credentials = allCredentials.where((c) {
+      final typeOk = typeFilter == null || typeFilter.contains(c.type);
+      final folderOk = folderFilter == null ||
+          folderFilter.contains(c.folderId ?? kNoFolderFilterId);
+      return typeOk && folderOk;
+    }).toList();
+    final folders = folderFilter == null
+        ? allFolders
+        : allFolders.where((f) => folderFilter.contains(f.id)).toList();
 
     // Build JSON payload
     final payload = jsonEncode({
@@ -182,53 +203,28 @@ class VaultExportService {
 
   // ── Import ──────────────────────────────────────────────────────────────────
 
-  /// Picks and imports a `.skvault` file.
-  ///
-  /// [exportPassword]: the password that was used to encrypt the backup.
-  ///   - For v2 files: uses the embedded salt + this password to derive key.
-  ///   - For legacy v1 files: falls back to the current session key
-  ///     (same-device only). [exportPassword] is ignored in that case.
-  ///
-  /// [mode]: `ImportMode.merge`   — keep existing items, add new ones.
-  ///         `ImportMode.replace` — delete all current data, then import.
-  Future<ImportResult> importVault({
+  /// Decrypts a backup file and returns the decrypted credentials and folders.
+  /// Does not persist anything to the database.
+  Future<DecryptedBackup> decryptBackup({
+    required Uint8List fileBytes,
     required String exportPassword,
-    ImportMode mode = ImportMode.merge,
   }) async {
-    // Pick file — use FileType.any for broad Android compatibility;
-    // Android does not recognize custom extensions like .skvault.
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      withData: true,
-    );
-    if (result == null || result.files.isEmpty) {
-      return ImportResult(success: false, message: 'Importación cancelada');
+    if (fileBytes.length < 8) {
+      throw ArgumentError('Archivo inválido o vacío');
     }
 
-    final fileBytes = result.files.first.bytes;
-    if (fileBytes == null || fileBytes.length < 8) {
-      return ImportResult(success: false, message: 'Archivo inválido o vacío');
-    }
-
-    // Detect format version
-    final headerStr = utf8.decode(fileBytes.sublist(0, 8),
-        allowMalformed: true);
-
+    final headerStr = utf8.decode(fileBytes.sublist(0, 8), allowMalformed: true);
     late Uint8List encrypted;
 
     if (headerStr == _magicV2) {
-      // v2: magic(8) | salt(32) | blob
       if (fileBytes.length < 8 + _saltLen) {
-        return ImportResult(success: false, message: 'Archivo corrupto (v2)');
+        throw ArgumentError('Archivo corrupto (v2)');
       }
       final saltBytes = fileBytes.sublist(8, 8 + _saltLen);
       encrypted = fileBytes.sublist(8 + _saltLen);
 
       if (exportPassword.isEmpty) {
-        return ImportResult(
-          success: false,
-          message: 'Ingresa la contraseña de exportación',
-        );
+        throw ArgumentError('Se requiere contraseña de exportación');
       }
 
       final exportKey = await _security.deriveKey(
@@ -240,164 +236,132 @@ class VaultExportService {
       );
 
       try {
-        return await _decryptAndSave(
-          encrypted: encrypted,
-          keyBytes: exportKey,
-          mode: mode,
-        );
+        final decryptedBytes = await _security.decrypt(encrypted, exportKey);
+        final json = jsonDecode(utf8.decode(decryptedBytes)) as Map<String, dynamic>;
+        
+        final credentials = (json['credentials'] as List)
+            .map((e) => Credential.fromJson(e as Map<String, dynamic>))
+            .toList();
+        final folders = (json['folders'] as List)
+            .map((e) => Folder.fromJson(e as Map<String, dynamic>))
+            .toList();
+
+        return DecryptedBackup(credentials: credentials, folders: folders);
+      } catch (e) {
+        throw ArgumentError('Contraseña de exportación incorrecta o archivo corrupto.');
       } finally {
-        // Zero the derived key to minimize memory exposure window.
         exportKey.fillRange(0, exportKey.length, 0);
       }
     } else if (headerStr == _magicV1 || headerStr == _magicLegacyVG) {
-      // Legacy v1: same-device only — use session key
       final sessionKey = _session.getKeyCopy();
       if (sessionKey == null) {
-        return ImportResult(success: false, message: 'La bóveda está bloqueada');
+        throw StateError('La bóveda está bloqueada');
       }
       encrypted = fileBytes.sublist(8);
 
-      return _decryptAndSave(
-        encrypted: encrypted,
-        keyBytes: sessionKey,
-        mode: mode,
-        isLegacy: true,
-      );
+      try {
+        final decryptedBytes = await _security.decrypt(encrypted, sessionKey);
+        final json = jsonDecode(utf8.decode(decryptedBytes)) as Map<String, dynamic>;
+        
+        final credentials = (json['credentials'] as List)
+            .map((e) => Credential.fromJson(e as Map<String, dynamic>))
+            .toList();
+        final folders = (json['folders'] as List)
+            .map((e) => Folder.fromJson(e as Map<String, dynamic>))
+            .toList();
+
+        return DecryptedBackup(credentials: credentials, folders: folders);
+      } catch (_) {
+        throw ArgumentError(
+            'Este backup fue creado en este mismo dispositivo. La bóveda puede haber cambiado.');
+      } finally {
+        sessionKey.fillRange(0, sessionKey.length, 0);
+      }
     } else {
-      // Unknown magic — try interpreting as plain JSON (CSV/other)
-      return ImportResult(
-        success: false,
-        message: 'El archivo no es un backup válido de SoloKey.\n'
-            'Asegúrate de exportar desde Ajustes → Transferir datos.',
-      );
+      throw ArgumentError(
+          'El archivo no es un backup válido de SoloKey. Asegúrate de exportar desde Ajustes → Sincronizar/Transferir.');
     }
   }
 
-  Future<ImportResult> _decryptAndSave({
-    required Uint8List encrypted,
-    required Uint8List keyBytes,
-    required ImportMode mode,
-    bool isLegacy = false,
-  }) async {
-    late Uint8List decrypted;
-    try {
-      decrypted = await _security.decrypt(encrypted, keyBytes);
-    } catch (_) {
-      final hint = isLegacy
-          ? 'Este backup fue creado en este mismo dispositivo. '
-              'La bóveda puede haber cambiado.'
-          : 'Contraseña de exportación incorrecta o archivo corrupto.';
-      return ImportResult(success: false, message: hint);
-    }
-
-    late Map<String, dynamic> json;
-    try {
-      json = jsonDecode(utf8.decode(decrypted)) as Map<String, dynamic>;
-    } catch (_) {
-      return ImportResult(
-          success: false, message: 'El contenido del backup está corrupto');
-    }
-
-    final credentials = (json['credentials'] as List)
-        .map((e) => Credential.fromJson(e as Map<String, dynamic>))
-        .toList();
-    final folders = (json['folders'] as List)
-        .map((e) => Folder.fromJson(e as Map<String, dynamic>))
-        .toList();
-
-    if (mode == ImportMode.replace) {
-      final existing = await _credRepo.getAll();
-      for (final c in existing) {
-        await _credRepo.delete(c.id);
-      }
-    }
-
-    for (final f in folders) {
-      await _folderRepo.save(f);
-    }
-    for (final c in credentials) {
-      await _credRepo.save(c);
-    }
-
-    final countsByType = <CredentialType, int>{};
-    for (final c in credentials) {
-      countsByType[c.type] = (countsByType[c.type] ?? 0) + 1;
-    }
-
-    return ImportResult(
-      success: true,
-      message:
-          'Importados ${credentials.length} credenciales y ${folders.length} carpetas',
-      credentialsImported: credentials.length,
-      foldersImported: folders.length,
-      countsByType: countsByType,
-    );
-  }
-
-  Future<ImportResult> importCsv({
-    required CsvImportService csvService,
-    ImportMode mode = ImportMode.merge,
-  }) async {
-    final result = await FilePicker.platform.pickFiles(
-      type: FileType.any,
-      withData: true,
-    );
-    if (result == null || result.files.isEmpty) {
-      return const ImportResult(success: false, message: 'Importación cancelada');
-    }
-
-    final fileBytes = result.files.first.bytes;
-    if (fileBytes == null) {
-      return const ImportResult(success: false, message: 'Archivo inválido o vacío');
-    }
-
-    late String csvContent;
-    try {
-      csvContent = utf8.decode(fileBytes);
-    } catch (_) {
-      return const ImportResult(
-        success: false,
-        message: 'No se pudo decodificar el archivo como texto CSV UTF-8 válido.',
-      );
-    }
-
+  /// Parses CSV content and returns a [DecryptedBackup] with folders being empty.
+  DecryptedBackup parseCsvBackup(String csvContent, CsvImportService csvService) {
     final credentials = csvService.parseCsv(csvContent);
-
     if (credentials.isEmpty) {
-      return const ImportResult(
+      throw ArgumentError('No se encontraron credenciales válidas en el archivo CSV');
+    }
+    return DecryptedBackup(credentials: credentials, folders: []);
+  }
+
+  /// Saves selected elements from [backup] to the database.
+  Future<ImportResult> performSelectiveImport({
+    required DecryptedBackup backup,
+    required ImportMode mode,
+    required Set<CredentialType> typeFilter,
+    required Set<String> folderFilter,
+  }) async {
+    try {
+      final credentialsToImport = backup.credentials
+          .where((c) =>
+              typeFilter.contains(c.type) &&
+              folderFilter.contains(c.folderId ?? kNoFolderFilterId))
+          .toList();
+      
+      final foldersToImport = backup.folders
+          .where((f) => folderFilter.contains(f.id))
+          .toList();
+
+      if (mode == ImportMode.replace) {
+        final existing = await _credRepo.getAll();
+        for (final c in existing) {
+          await _credRepo.delete(c.id);
+        }
+        final existingFolders = await _folderRepo.getAll();
+        for (final f in existingFolders) {
+          await _folderRepo.delete(f.id);
+        }
+      }
+
+      for (final f in foldersToImport) {
+        await _folderRepo.save(f);
+      }
+      for (final c in credentialsToImport) {
+        await _credRepo.save(c);
+      }
+
+      final countsByType = <CredentialType, int>{};
+      for (final c in credentialsToImport) {
+        countsByType[c.type] = (countsByType[c.type] ?? 0) + 1;
+      }
+
+      return ImportResult(
+        success: true,
+        message: 'Importadas ${credentialsToImport.length} credenciales y ${foldersToImport.length} carpetas',
+        credentialsImported: credentialsToImport.length,
+        foldersImported: foldersToImport.length,
+        countsByType: countsByType,
+      );
+    } catch (e) {
+      return ImportResult(
         success: false,
-        message: 'No se encontraron credenciales válidas en el archivo CSV',
+        message: 'Error al importar datos: $e',
       );
     }
-
-    if (mode == ImportMode.replace) {
-      final existing = await _credRepo.getAll();
-      for (final c in existing) {
-        await _credRepo.delete(c.id);
-      }
-    }
-
-    for (final c in credentials) {
-      await _credRepo.save(c);
-    }
-
-    final countsByType = <CredentialType, int>{};
-    for (final c in credentials) {
-      countsByType[c.type] = (countsByType[c.type] ?? 0) + 1;
-    }
-
-    return ImportResult(
-      success: true,
-      message: 'Importadas ${credentials.length} credenciales desde CSV',
-      credentialsImported: credentials.length,
-      countsByType: countsByType,
-    );
   }
 }
 
 // ── Supporting types ─────────────────────────────────────────────────────────
 
 enum ImportMode { merge, replace }
+
+class DecryptedBackup {
+  const DecryptedBackup({
+    required this.credentials,
+    required this.folders,
+  });
+
+  final List<Credential> credentials;
+  final List<Folder> folders;
+}
 
 class ExportSummary {
   const ExportSummary({

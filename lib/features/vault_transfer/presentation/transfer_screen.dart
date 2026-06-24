@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -8,6 +11,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
 import '../../../features/folders/application/folders_provider.dart';
+import '../../../features/folders/domain/entities/folder.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 
@@ -35,6 +39,10 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   final _exportPasswordCtrl = TextEditingController();
   bool _exporting = false;
   ExportSummary? _lastExport;
+
+  /// Folder keys (folder ids + [kNoFolderFilterId]) the user has UNchecked in
+  /// the export tab. Empty means "export from every folder" (no filtering).
+  final Set<String> _deselectedFolderKeys = {};
 
   // Import state
   ImportMode _importMode = ImportMode.merge;
@@ -90,6 +98,18 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       _snack(l10n.transferSelectAtLeastOneType, error: true);
       return;
     }
+    // Build the folder filter from the user's deselections. Empty deselection
+    // set => export from every folder (null filter).
+    Set<String>? folderFilter;
+    if (_deselectedFolderKeys.isNotEmpty) {
+      final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
+      final allKeys = {kNoFolderFilterId, ...folders.map((f) => f.id)};
+      folderFilter = allKeys.difference(_deselectedFolderKeys);
+      if (folderFilter.isEmpty) {
+        _snack(l10n.transferNothingSelected, error: true);
+        return;
+      }
+    }
     setState(() {
       _exporting = true;
       _lastExport = null;
@@ -101,6 +121,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         typeFilter: _selectedTypes.length == CredentialType.values.length
             ? null
             : _selectedTypes,
+        folderFilter: folderFilter,
       );
       if (mounted) {
         setState(() => _lastExport = summary);
@@ -119,19 +140,98 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   Future<void> _doImport() async {
     final l10n = AppLocalizations.of(context);
     final password = _importPasswordCtrl.text.trim();
+
+    setState(() {
+      _importing = true;
+      _lastImport = null;
+    });
+    DecryptedBackup? backup;
+    try {
+      final picked = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+      if (picked == null || picked.files.isEmpty) return;
+      final bytes = picked.files.first.bytes;
+      if (bytes == null) {
+        _snack(l10n.transferErrorTitle, error: true);
+        return;
+      }
+      // Decrypt only — nothing is persisted until the user confirms the
+      // selection in the sheet below.
+      backup = await getIt<VaultExportService>().decryptBackup(
+        fileBytes: bytes,
+        exportPassword: password,
+      );
+    } catch (e) {
+      if (mounted) _snack(l10n.transferImportError('$e'), error: true);
+      return;
+    } finally {
+      if (mounted) setState(() => _importing = false);
+    }
+
+    if (mounted) await _runSelectiveImport(backup);
+  }
+
+  Future<void> _doImportCsv() async {
+    final l10n = AppLocalizations.of(context);
+
+    setState(() {
+      _importing = true;
+      _lastImport = null;
+    });
+    DecryptedBackup? backup;
+    try {
+      final picked = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+      if (picked == null || picked.files.isEmpty) return;
+      final bytes = picked.files.first.bytes;
+      if (bytes == null) {
+        _snack(l10n.transferErrorTitle, error: true);
+        return;
+      }
+      final csv = utf8.decode(bytes);
+      backup = getIt<VaultExportService>()
+          .parseCsvBackup(csv, getIt<CsvImportService>());
+    } catch (e) {
+      if (mounted) _snack(l10n.transferImportCsvError('$e'), error: true);
+      return;
+    } finally {
+      if (mounted) setState(() => _importing = false);
+    }
+
+    if (mounted) await _runSelectiveImport(backup);
+  }
+
+  /// Shows the selection sheet for [backup], then performs a selective import
+  /// of the chosen credential types and folders.
+  Future<void> _runSelectiveImport(DecryptedBackup backup) async {
+    final selection = await showModalBottomSheet<_ImportSelection>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => _ImportSelectionSheet(backup: backup),
+    );
+    if (selection == null || !mounted) return;
+
+    final l10n = AppLocalizations.of(context);
     if (_importMode == ImportMode.replace) {
       final confirmed = await _confirmReplace();
-      if (!confirmed) return;
+      if (!confirmed || !mounted) return;
     }
+
     setState(() {
       _importing = true;
       _lastImport = null;
     });
     try {
-      final service = getIt<VaultExportService>();
-      final result = await service.importVault(
-        exportPassword: password,
+      final result = await getIt<VaultExportService>().performSelectiveImport(
+        backup: backup,
         mode: _importMode,
+        typeFilter: selection.types,
+        folderFilter: selection.folderKeys,
       );
       if (mounted) {
         setState(() => _lastImport = result);
@@ -145,40 +245,6 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
       }
     } catch (e) {
       if (mounted) _snack(l10n.transferImportError('$e'), error: true);
-    } finally {
-      if (mounted) setState(() => _importing = false);
-    }
-  }
-
-  Future<void> _doImportCsv() async {
-    final l10n = AppLocalizations.of(context);
-    if (_importMode == ImportMode.replace) {
-      final confirmed = await _confirmReplace();
-      if (!confirmed) return;
-    }
-    setState(() {
-      _importing = true;
-      _lastImport = null;
-    });
-    try {
-      final exportService = getIt<VaultExportService>();
-      final csvService = getIt<CsvImportService>();
-      final result = await exportService.importCsv(
-        csvService: csvService,
-        mode: _importMode,
-      );
-      if (mounted) {
-        setState(() => _lastImport = result);
-        _snack(result.message, error: !result.success);
-
-        // Refresh all screens so imported data appears immediately
-        if (result.success) {
-          ref.read(credentialsNotifierProvider.notifier).refresh();
-          ref.read(foldersNotifierProvider.notifier).refresh();
-        }
-      }
-    } catch (e) {
-      if (mounted) _snack(l10n.transferImportCsvError('$e'), error: true);
     } finally {
       if (mounted) setState(() => _importing = false);
     }
@@ -235,6 +301,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
     return Scaffold(
       appBar: VaultAppBar(
         title: l10n.transferTitle,
@@ -259,6 +326,15 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
                 _selectedTypes.add(type);
               } else {
                 _selectedTypes.remove(type);
+              }
+            }),
+            folders: folders,
+            isFolderKeySelected: (key) => !_deselectedFolderKeys.contains(key),
+            onFolderToggled: (key, val) => setState(() {
+              if (val) {
+                _deselectedFolderKeys.remove(key);
+              } else {
+                _deselectedFolderKeys.add(key);
               }
             }),
             passwordCtrl: _exportPasswordCtrl,
@@ -289,6 +365,9 @@ class _ExportTab extends StatelessWidget {
   const _ExportTab({
     required this.selectedTypes,
     required this.onTypeToggled,
+    required this.folders,
+    required this.isFolderKeySelected,
+    required this.onFolderToggled,
     required this.passwordCtrl,
     required this.onExport,
     required this.isLoading,
@@ -299,6 +378,9 @@ class _ExportTab extends StatelessWidget {
 
   final Set<CredentialType> selectedTypes;
   final void Function(CredentialType, bool) onTypeToggled;
+  final List<Folder> folders;
+  final bool Function(String key) isFolderKeySelected;
+  final void Function(String key, bool val) onFolderToggled;
   final TextEditingController passwordCtrl;
   final VoidCallback? onExport;
   final bool isLoading;
@@ -350,6 +432,42 @@ class _ExportTab extends StatelessWidget {
                 ),
               )
               .toList(),
+        ),
+
+        const SizedBox(height: 24),
+
+        // ── Folder filter ────────────────────────────────────────────────────
+        _SectionLabel(label: l10n.transferExportSelectFolders),
+        const SizedBox(height: 8),
+        _Card(
+          children: [
+            // "No folder" pseudo-entry: exports credentials not in any folder.
+            CheckboxListTile(
+              value: isFolderKeySelected(kNoFolderFilterId),
+              onChanged: (v) => onFolderToggled(kNoFolderFilterId, v ?? false),
+              title: Text(
+                l10n.transferNoFolder,
+                style: TextStyle(color: palette.textPrimary, fontSize: 14),
+              ),
+              secondary: Icon(Icons.folder_off_rounded, color: palette.textMuted),
+              activeColor: palette.accent,
+              checkColor: palette.onPrimary,
+              controlAffinity: ListTileControlAffinity.trailing,
+            ),
+            for (final f in folders)
+              CheckboxListTile(
+                value: isFolderKeySelected(f.id),
+                onChanged: (v) => onFolderToggled(f.id, v ?? false),
+                title: Text(
+                  f.name,
+                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
+                ),
+                secondary: Icon(Icons.folder_rounded, color: palette.accent),
+                activeColor: palette.accent,
+                checkColor: palette.onPrimary,
+                controlAffinity: ListTileControlAffinity.trailing,
+              ),
+          ],
         ),
 
         const SizedBox(height: 20),
@@ -698,6 +816,234 @@ class _InfoBanner extends StatelessWidget {
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+// ── Selective import sheet ──────────────────────────────────────────────────
+
+/// User's choice in the import selection sheet.
+class _ImportSelection {
+  const _ImportSelection({required this.types, required this.folderKeys});
+
+  /// Credential types to import.
+  final Set<CredentialType> types;
+
+  /// Folder keys to import (folder ids + [kNoFolderFilterId] for unfiled items).
+  final Set<String> folderKeys;
+}
+
+/// Bottom sheet that previews a decrypted backup and lets the user pick which
+/// credential types and folders to import before anything is persisted.
+class _ImportSelectionSheet extends StatefulWidget {
+  const _ImportSelectionSheet({required this.backup});
+
+  final DecryptedBackup backup;
+
+  @override
+  State<_ImportSelectionSheet> createState() => _ImportSelectionSheetState();
+}
+
+class _ImportSelectionSheetState extends State<_ImportSelectionSheet> {
+  final Map<CredentialType, int> _typeCounts = {};
+  final Map<String, int> _folderCounts = {}; // key -> count
+  final Map<String, String> _folderNames = {};
+  final Set<CredentialType> _selectedTypes = {};
+  final Set<String> _selectedFolderKeys = {};
+
+  @override
+  void initState() {
+    super.initState();
+    for (final c in widget.backup.credentials) {
+      _typeCounts[c.type] = (_typeCounts[c.type] ?? 0) + 1;
+      final key = c.folderId ?? kNoFolderFilterId;
+      _folderCounts[key] = (_folderCounts[key] ?? 0) + 1;
+    }
+    for (final f in widget.backup.folders) {
+      _folderNames[f.id] = f.name;
+    }
+    // Everything selected by default.
+    _selectedTypes.addAll(_typeCounts.keys);
+    _selectedFolderKeys.addAll(_folderCounts.keys);
+  }
+
+  bool get _canImport =>
+      _selectedTypes.isNotEmpty && _selectedFolderKeys.isNotEmpty;
+
+  String _typeLabel(CredentialType t, AppLocalizations l10n) => switch (t) {
+        CredentialType.password => l10n.transferTypePasswords,
+        CredentialType.apiKey => l10n.transferTypeApiKeys,
+        CredentialType.secureNote => l10n.transferTypeSecureNotes,
+        CredentialType.totp => l10n.transferTypeTotp,
+        CredentialType.passkey => l10n.transferTypePasskeys,
+        CredentialType.sshKey => l10n.transferTypeSshKeys,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final typeList = _typeCounts.keys.toList();
+    final folderList = _folderCounts.keys.toList()
+      ..sort((a, b) {
+        if (a == kNoFolderFilterId) return 1; // push "no folder" last
+        if (b == kNoFolderFilterId) return -1;
+        return (_folderNames[a] ?? a)
+            .toLowerCase()
+            .compareTo((_folderNames[b] ?? b).toLowerCase());
+      });
+
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.7,
+      minChildSize: 0.4,
+      maxChildSize: 0.92,
+      builder: (context, scrollCtrl) => Container(
+        decoration: BoxDecoration(
+          color: palette.drawer,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        ),
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: palette.textDisabled,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(
+                children: [
+                  Icon(Icons.download_rounded, color: palette.accent),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      l10n.transferImportSelectTitle,
+                      style: TextStyle(
+                        color: palette.textPrimary,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Expanded(
+              child: ListView(
+                controller: scrollCtrl,
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                children: [
+                  _SectionLabel(label: l10n.transferSectionTypes),
+                  const SizedBox(height: 8),
+                  _Card(
+                    children: [
+                      for (final t in typeList)
+                        CheckboxListTile(
+                          value: _selectedTypes.contains(t),
+                          onChanged: (v) => setState(() {
+                            if (v ?? false) {
+                              _selectedTypes.add(t);
+                            } else {
+                              _selectedTypes.remove(t);
+                            }
+                          }),
+                          activeColor: palette.accent,
+                          checkColor: palette.onPrimary,
+                          controlAffinity: ListTileControlAffinity.trailing,
+                          secondary: _CountBadge(count: _typeCounts[t] ?? 0),
+                          title: Text(
+                            _typeLabel(t, l10n),
+                            style: TextStyle(
+                                color: palette.textPrimary, fontSize: 14),
+                          ),
+                        ),
+                    ],
+                  ),
+                  if (folderList.isNotEmpty) ...[
+                    const SizedBox(height: 20),
+                    _SectionLabel(label: l10n.transferSectionFolders),
+                    const SizedBox(height: 8),
+                    _Card(
+                      children: [
+                        for (final key in folderList)
+                          CheckboxListTile(
+                            value: _selectedFolderKeys.contains(key),
+                            onChanged: (v) => setState(() {
+                              if (v ?? false) {
+                                _selectedFolderKeys.add(key);
+                              } else {
+                                _selectedFolderKeys.remove(key);
+                              }
+                            }),
+                            activeColor: palette.accent,
+                            checkColor: palette.onPrimary,
+                            controlAffinity: ListTileControlAffinity.trailing,
+                            secondary: _CountBadge(count: _folderCounts[key] ?? 0),
+                            title: Text(
+                              key == kNoFolderFilterId
+                                  ? l10n.transferNoFolder
+                                  : (_folderNames[key] ?? key),
+                              style: TextStyle(
+                                  color: palette.textPrimary, fontSize: 14),
+                            ),
+                          ),
+                      ],
+                    ),
+                  ],
+                  const SizedBox(height: 24),
+                  ElevatedButton.icon(
+                    onPressed: _canImport
+                        ? () => Navigator.pop(
+                              context,
+                              _ImportSelection(
+                                types: _selectedTypes.toSet(),
+                                folderKeys: _selectedFolderKeys.toSet(),
+                              ),
+                            )
+                        : null,
+                    icon: const Icon(Icons.check_rounded),
+                    label: Text(l10n.transferImportConfirm),
+                    style: ElevatedButton.styleFrom(
+                      minimumSize: const Size.fromHeight(52),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CountBadge extends StatelessWidget {
+  const _CountBadge({required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: palette.accent.withValues(alpha: 0.15),
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Text(
+        '$count',
+        style: TextStyle(
+          color: palette.accent,
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+        ),
       ),
     );
   }
