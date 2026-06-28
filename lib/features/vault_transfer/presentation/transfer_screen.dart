@@ -765,7 +765,8 @@ class _ImportSelectionSheetState extends State<_ImportSelectionSheet> {
     super.initState();
     for (final c in widget.backup.credentials) {
       _typeCounts[c.type] = (_typeCounts[c.type] ?? 0) + 1;
-      final key = c.folderId ?? kNoFolderFilterId;
+      // La carpeta de la credencial se guarda en `categoryId` (no en `folderId`).
+      final key = c.categoryId ?? kNoFolderFilterId;
       _folderCounts[key] = (_folderCounts[key] ?? 0) + 1;
     }
     for (final f in widget.backup.folders) {

@@ -176,7 +176,10 @@ class VaultExportService {
       final byId = {for (final f in allFolders) f.id: f};
       final keep = <String>{};
       for (final c in credentials) {
-        var fid = c.folderId;
+        // La carpeta de la credencial vive en `categoryId` (no en `folderId`,
+        // que esta en desuso). Subimos por los ancestros para reimportar en su
+        // sitio.
+        var fid = c.categoryId;
         while (fid != null && byId.containsKey(fid) && keep.add(fid)) {
           fid = byId[fid]!.parentId;
         }
@@ -186,7 +189,7 @@ class VaultExportService {
       credentials = allCredentials.where((c) {
         final typeOk = typeFilter == null || typeFilter.contains(c.type);
         final folderOk = folderFilter == null ||
-            folderFilter.contains(c.folderId ?? kNoFolderFilterId);
+            folderFilter.contains(c.categoryId ?? kNoFolderFilterId);
         return typeOk && folderOk;
       }).toList();
       folders = folderFilter == null
@@ -350,7 +353,7 @@ class VaultExportService {
       final credentialsToImport = backup.credentials
           .where((c) =>
               typeFilter.contains(c.type) &&
-              folderFilter.contains(c.folderId ?? kNoFolderFilterId))
+              folderFilter.contains(c.categoryId ?? kNoFolderFilterId))
           .toList();
       
       final foldersToImport = backup.folders

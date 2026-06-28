@@ -66,8 +66,12 @@ class _ExportTreeState extends State<ExportTree> {
       list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
     }
     for (final c in widget.credentials) {
-      final key = (c.folderId != null && validIds.contains(c.folderId))
-          ? c.folderId
+      // La carpeta de una credencial se guarda en `categoryId` (asi lo escribe
+      // el formulario y lo filtra folder_screen). El campo `folderId` esta en
+      // desuso para credenciales, por eso antes el arbol mostraba TODO bajo
+      // "Sin carpeta".
+      final key = (c.categoryId != null && validIds.contains(c.categoryId))
+          ? c.categoryId
           : null;
       (_credsOf[key] ??= []).add(c);
     }
@@ -292,7 +296,11 @@ class _NodeRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
     return InkWell(
-      onTap: onExpand ?? onCheck,
+      // Tocar la fila SELECCIONA (tri-estado en carpetas, marca en credenciales).
+      // La expansion para ver/seleccionar credenciales individuales queda en el
+      // chevron. Antes la fila expandia y solo el checkbox diminuto seleccionaba,
+      // lo que hacia parecer que "la seleccion no funcionaba".
+      onTap: onCheck ?? onExpand,
       child: Padding(
         padding: EdgeInsets.fromLTRB(8 + depth * 18.0, 2, 8, 2),
         child: Row(
