@@ -14,4 +14,11 @@ abstract final class NotificationNavigation {
     if (ctx == null || credentialId.isEmpty) return;
     ctx.go('/credentials/$credentialId');
   }
+
+  /// Opens the Sync screen (e.g. from a desktop login-approval notification, M3).
+  static void openSync() {
+    final ctx = rootNavigatorKey.currentContext;
+    if (ctx == null) return;
+    ctx.go('/sync');
+  }
 }

@@ -103,6 +103,10 @@ const String _kActionChangePassword = 'change_password';
 const String _kActionSnooze3d = 'snooze_3d';
 const Duration _kSnoozeDuration = Duration(days: 3);
 
+// Login-approval notification (M3): fixed id + payload sentinel.
+const int _kApprovalNotificationId = 990001;
+const String _kApprovalPayload = '__approve_login__';
+
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
   DueRotation item,
@@ -231,6 +235,10 @@ class NotificationService {
             final until =
                 DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
             await _db.credentialDao.markRotationPrompted(payload, until);
+          } else if (payload == _kApprovalPayload) {
+            WidgetsBinding.instance.addPostFrameCallback(
+              (_) => NotificationNavigation.openSync(),
+            );
           } else {
             WidgetsBinding.instance.addPostFrameCallback(
               (_) => NotificationNavigation.openCredential(payload),
@@ -243,6 +251,33 @@ class NotificationService {
     } catch (_) {
       // Never let notification setup crash the app.
     }
+  }
+
+  /// Shows a local notification asking the user to approve a desktop login (M3).
+  /// No FCM: only delivered while the phone app is running/connected. Tapping it
+  /// opens the Sync screen where the user approves (biometric + DUK send).
+  Future<void> showLoginApprovalRequest({String desktopName = ''}) async {
+    await initialize();
+    if (!_isMobile) return;
+    const details = NotificationDetails(
+      android: AndroidNotificationDetails(
+        _kChannelId,
+        _kChannelName,
+        channelDescription: _kChannelDesc,
+        importance: Importance.high,
+        priority: Priority.high,
+      ),
+      iOS: DarwinNotificationDetails(),
+    );
+    await _mobilePlugin.show(
+      id: _kApprovalNotificationId,
+      title: 'Aprobar inicio de sesion',
+      body: desktopName.isEmpty
+          ? 'Tu computadora pide desbloquearse. Toca para aprobar.'
+          : 'Desbloquear "$desktopName"? Toca para aprobar.',
+      notificationDetails: details,
+      payload: _kApprovalPayload,
+    );
   }
 
   /// Scans the vault and fires native reminders for every overdue credential.
@@ -294,6 +329,11 @@ class NotificationService {
   void _onMobileTap(NotificationResponse response) {
     final id = response.payload;
     if (id == null) return;
+    if (id == _kApprovalPayload) {
+      // M3: abrir la pantalla de Sincronizar para aprobar el desbloqueo.
+      NotificationNavigation.openSync();
+      return;
+    }
     if (response.actionId == _kActionSnooze3d) {
       // Posponer 3 dias: empuja lastRotationPromptedAt al futuro para silenciar.
       final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;

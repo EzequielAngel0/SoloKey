@@ -7,7 +7,9 @@ import 'package:window_manager/window_manager.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
+import '../core/services/notification_service.dart';
 import '../core/services/scheduled_backup_service.dart';
+import '../features/sync/infrastructure/sync_service.dart';
 import '../features/settings/domain/repositories/i_settings_repository.dart';
 import '../features/settings/presentation/settings_screen.dart';
 import '../features/vault_access/application/vault_state_provider.dart';
@@ -28,6 +30,7 @@ class App extends ConsumerStatefulWidget {
 class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   late final AppLifecycleObserver _observer;
   Timer? _trayLockTimer;
+  StreamSubscription<String>? _approvalSub;
 
   @override
   void initState() {
@@ -40,6 +43,21 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
       }
     };
 
+    // M3: en movil, cuando el escritorio pide aprobacion de login por el canal
+    // E2EE, mostramos una notificacion local (sin FCM). Al tocarla se abre la
+    // pantalla de Sincronizar para aprobar con biometria.
+    if (!kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
+      try {
+        _approvalSub = getIt<SyncService>().clientEvents.listen((event) {
+          if (event == 'approval_request') {
+            getIt<NotificationService>().showLoginApprovalRequest();
+          }
+        });
+      } catch (_) {
+        // SyncService/NotificationService pueden no existir en tests.
+      }
+    }
+
     if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
       windowManager.addListener(this);
       trayManager.addListener(this);
@@ -50,6 +68,7 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   @override
   void dispose() {
     _cancelTrayLockTimer();
+    _approvalSub?.cancel();
     if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
       windowManager.removeListener(this);
       trayManager.removeListener(this);
