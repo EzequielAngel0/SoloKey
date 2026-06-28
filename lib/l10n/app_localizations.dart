@@ -2587,6 +2587,60 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Added {count} file(s)'**
   String secureFilesAddedCount(int count);
+
+  /// No description provided for @homeShowHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Show hidden'**
+  String get homeShowHidden;
+
+  /// No description provided for @homeShowActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Show active'**
+  String get homeShowActive;
+
+  /// No description provided for @homeNoHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You have no hidden credentials'**
+  String get homeNoHidden;
+
+  /// No description provided for @detailHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide'**
+  String get detailHide;
+
+  /// No description provided for @detailUnhide.
+  ///
+  /// In en, this message translates to:
+  /// **'Show in list'**
+  String get detailUnhide;
+
+  /// No description provided for @detailHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential hidden from the main list'**
+  String get detailHidden;
+
+  /// No description provided for @detailUnhidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential visible again'**
+  String get detailUnhidden;
+
+  /// No description provided for @unlockApprovalSent.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent to your phone. Approve it there to unlock.'**
+  String get unlockApprovalSent;
+
+  /// No description provided for @unlockApprovalNoDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'No phone connected. Open SoloKey on your phone on the same Wi-Fi network.'**
+  String get unlockApprovalNoDevice;
 }
 
 class _AppLocalizationsDelegate

@@ -1348,4 +1348,33 @@ class AppLocalizationsEn extends AppLocalizations {
   String secureFilesAddedCount(int count) {
     return 'Added $count file(s)';
   }
+
+  @override
+  String get homeShowHidden => 'Show hidden';
+
+  @override
+  String get homeShowActive => 'Show active';
+
+  @override
+  String get homeNoHidden => 'You have no hidden credentials';
+
+  @override
+  String get detailHide => 'Hide';
+
+  @override
+  String get detailUnhide => 'Show in list';
+
+  @override
+  String get detailHidden => 'Credential hidden from the main list';
+
+  @override
+  String get detailUnhidden => 'Credential visible again';
+
+  @override
+  String get unlockApprovalSent =>
+      'Request sent to your phone. Approve it there to unlock.';
+
+  @override
+  String get unlockApprovalNoDevice =>
+      'No phone connected. Open SoloKey on your phone on the same Wi-Fi network.';
 }

@@ -531,5 +531,15 @@
   "secureFilesFavorite": "Favourite",
   "secureFilesDropHint": "Drop files here to add them",
   "secureFilesAddedCount": "Added {count} file(s)",
-  "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } }
+  "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } },
+
+  "homeShowHidden": "Show hidden",
+  "homeShowActive": "Show active",
+  "homeNoHidden": "You have no hidden credentials",
+  "detailHide": "Hide",
+  "detailUnhide": "Show in list",
+  "detailHidden": "Credential hidden from the main list",
+  "detailUnhidden": "Credential visible again",
+  "unlockApprovalSent": "Request sent to your phone. Approve it there to unlock.",
+  "unlockApprovalNoDevice": "No phone connected. Open SoloKey on your phone on the same Wi-Fi network."
 }

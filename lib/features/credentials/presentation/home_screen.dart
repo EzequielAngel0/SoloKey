@@ -91,7 +91,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                     : Icons.visibility_rounded,
                 color: _showHidden ? palette.accent : palette.textMuted,
               ),
-              tooltip: _showHidden ? 'Ver activas' : 'Ver ocultas',
+              tooltip: _showHidden ? l10n.homeShowActive : l10n.homeShowHidden,
               onPressed: () => setState(() => _showHidden = !_showHidden),
             ),
           IconButton(
@@ -240,7 +240,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                             ? (_showHidden
                                 ? Center(
                                     child: Text(
-                                      'No tienes credenciales ocultas',
+                                      l10n.homeNoHidden,
                                       style:
                                           TextStyle(color: palette.textMuted),
                                     ),

@@ -456,5 +456,15 @@
   "secureFilesFavorite": "Favorito",
   "secureFilesDropHint": "Suelta archivos aqui para agregarlos",
   "secureFilesAddedCount": "Agregados {count} archivo(s)",
-  "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } }
+  "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } },
+
+  "homeShowHidden": "Ver ocultas",
+  "homeShowActive": "Ver activas",
+  "homeNoHidden": "No tienes credenciales ocultas",
+  "detailHide": "Ocultar",
+  "detailUnhide": "Mostrar en la lista",
+  "detailHidden": "Credencial oculta de la lista principal",
+  "detailUnhidden": "Credencial visible de nuevo",
+  "unlockApprovalSent": "Solicitud enviada a tu celular. Apruebala alli para desbloquear.",
+  "unlockApprovalNoDevice": "No hay un celular conectado. Abre SoloKey en tu celular en la misma red Wi-Fi."
 }

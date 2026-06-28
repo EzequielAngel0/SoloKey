@@ -216,13 +216,13 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   /// The phone shows a local notification; approving sends back its DUK over the
   /// E2EE channel and the existing `remote_unlock_key:` listener unlocks here.
   Future<void> _requestPhoneApproval() async {
+    final l10n = AppLocalizations.of(context);
     try {
       final sent = await getIt<SyncService>().requestApproval();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(sent > 0
-            ? 'Solicitud enviada a tu celular. Apruebala alli para desbloquear.'
-            : 'No hay un celular conectado. Abre SoloKey en tu celular en la misma red Wi-Fi.'),
+        content: Text(
+            sent > 0 ? l10n.unlockApprovalSent : l10n.unlockApprovalNoDevice),
         backgroundColor:
             sent > 0 ? context.palette.primary : context.palette.danger,
         behavior: SnackBarBehavior.floating,

@@ -83,7 +83,7 @@ class _DetailView extends ConsumerWidget {
                   : Icons.visibility_off_rounded,
               color: palette.textMuted,
             ),
-            tooltip: credential.isHidden ? 'Mostrar en la lista' : 'Ocultar',
+            tooltip: credential.isHidden ? l10n.detailUnhide : l10n.detailHide,
             onPressed: () {
               ref
                   .read(credentialsNotifierProvider.notifier)
@@ -91,8 +91,8 @@ class _DetailView extends ConsumerWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(credential.isHidden
-                      ? 'Credencial visible de nuevo'
-                      : 'Credencial oculta de la lista principal'),
+                      ? l10n.detailUnhidden
+                      : l10n.detailHidden),
                   behavior: SnackBarBehavior.floating,
                 ),
               );
