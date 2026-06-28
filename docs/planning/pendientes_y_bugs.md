@@ -206,20 +206,27 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 | M2 | Login PC con PIN / Windows Hello (`isDeviceSupported` + PIN permitido en escritorio) | Mejora | 🟡 | 🟢 | ✅ |
 | M1 | Sincronización constante (resume + heartbeat + auto-sync 60s + auto-reconexión) | Mejora | 🟡 | 🔴 | 🟦 |
 | M3 | Push al celular para aprobar login (notificación local, sin FCM) | Mejora | 🟢 | 🔴 | 🟦 |
-| — | Tests del módulo sync (lógica pura: LWW + PairingPayload + SyncManifestItem) | Deuda | 🟡 | 🟡 | 🟦 |
-| — | Tests de integración del sync (handshake/delta con DB en memoria — requiere sqlite3 en test) | Deuda | 🟡 | 🟡 | ⬜ |
+| — | Tests del módulo sync (lógica pura: LWW + PairingPayload + SyncManifestItem) | Deuda | 🟡 | 🟡 | ✅ |
+| — | Tests de integración del sync (deltas/apply/LWW con DB en memoria) | Deuda | 🟡 | 🟡 | ✅ |
 | — | i18n de los textos NUEVOS (ocultar/mostrar + aprobación) en home/detalle/unlock | Deuda | 🟢 | 🟢 | ✅ |
-| — | i18n del RESTO (pantalla de sync/pairing, transfer, notificaciones, layout escritorio, audit) — §6 del roadmap | Deuda | 🟢 | 🟡 | ⬜ |
+| — | i18n: pantalla de Sincronizar (pairing) + textos del layout de escritorio | Deuda | 🟢 | 🟡 | ✅ |
+| — | i18n restante: notificaciones y SecurityAuditService (strings en capa de servicio, sin BuildContext) | Deuda | 🟢 | 🟡 | ⬜ |
+| — | Lint preexistente (crypto dep, deprecaciones Flutter 3.4x, underscores) | Deuda | 🟢 | 🟢 | ✅ |
+| — | Reorden (drag) de credenciales en el companion de escritorio | Deuda | 🟢 | 🟡 | ✅ |
 | — | Empaquetado macOS/Linux/iOS (diferido: sin Mac/iPhone) | Deuda | 🟢 | 🔴 | ⏸️ |
-| — | Reorden (drag) en la lista de escritorio (hoy solo móvil) | Deuda | 🟢 | 🟡 | ⬜ |
 
 > Estado 2026-06-28: **B1, B2, B3, F1, G1, M2** completos. **R1/M1/M3 implementados**
 > pero marcados 🟦 porque el flujo cruzado PC↔celular (handshake resume, sync continua,
 > push de aprobación) **no se pudo probar en dispositivos reales** desde este entorno —
 > requieren verificación con un celular y un PC en la misma red antes de confiar en ellos.
-> Se agregaron tests de lógica pura del sync (LWW + serialización) y se localizaron
-> (es/en) los textos nuevos; también se corrigió que `isHidden`/`sortOrder` viajen en el
-> sync. `flutter analyze` sin issues nuevos; **52/52 tests verde**.
+> Tests de sync (lógica pura + integración con DB en memoria), i18n de la pantalla de
+> Sincronizar y del escritorio, reorden por drag en escritorio, y limpieza del lint
+> preexistente: **hechos**. `isHidden`/`sortOrder` ahora viajan en el sync.
+> `flutter analyze`: **sin issues** (lib+test); **56/56 tests verde**.
+>
+> Único i18n que queda: strings en capa de servicio (notificaciones de rotación/aprobación
+> y `SecurityAuditService`), que no tienen `BuildContext`; localizarlos requiere devolver
+> claves en vez de texto (refactor aparte). El resto de la app está en es/en.
 >
 > **Cómo funciona M3 sin FCM:** el celular (app abierta/conectada por resume) recibe la
 > petición por el canal E2EE y muestra una **notificación local**; al tocarla abre Sincronizar
