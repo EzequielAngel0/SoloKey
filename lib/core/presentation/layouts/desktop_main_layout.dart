@@ -7,10 +7,12 @@ import '../../../../router/app_router.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../features/credentials/application/credentials_provider.dart';
+import '../../../../features/credentials/domain/entities/credential.dart';
 import '../../../../features/credentials/presentation/credential_detail_screen.dart';
 import '../../../../features/credentials/presentation/credential_form_screen.dart';
 import '../../../../features/credentials/presentation/security_audit_screen.dart';
 import '../../../../features/credentials/presentation/widgets/credential_card.dart';
+import '../../../../features/credentials/presentation/widgets/credential_list_widget.dart';
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
 import '../../../../features/folders/presentation/folder_screen.dart';
@@ -62,6 +64,15 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         ),
       ),
     );
+  }
+
+  /// Persists the new manual order after a drag in the desktop credentials list.
+  void _onReorder(List<Credential> visible, int oldIndex, int newIndex) {
+    // newIndex ya viene ajustado por onReorderItem (no restar 1).
+    final ids = visible.map((c) => c.id).toList();
+    final moved = ids.removeAt(oldIndex);
+    ids.insert(newIndex, moved);
+    ref.read(credentialsNotifierProvider.notifier).reorder(ids);
   }
 
   Widget _buildContentArea(int tabIndex) {
@@ -271,13 +282,13 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.all(16),
-            itemCount: list.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 8),
-            itemBuilder: (context, i) {
-              return CredentialCard(credential: list[i]);
-            },
+          return CredentialListWidget(
+            credentials: list,
+            // Reorden por drag solo en la lista principal sin busqueda activa
+            // (el orden es global; reordenar resultados filtrados no aplica).
+            onReorder: (tabIndex == 0 && _searchCtrl.text.isEmpty)
+                ? (oldIndex, newIndex) => _onReorder(list, oldIndex, newIndex)
+                : null,
           );
         },
       ),
