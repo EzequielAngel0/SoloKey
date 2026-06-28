@@ -154,6 +154,33 @@ class $CredentialEntriesTable extends CredentialEntries
     type: DriftSqlType.int,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _isHiddenMeta = const VerificationMeta(
+    'isHidden',
+  );
+  @override
+  late final GeneratedColumn<bool> isHidden = GeneratedColumn<bool>(
+    'is_hidden',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_hidden" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _sortOrderMeta = const VerificationMeta(
+    'sortOrder',
+  );
+  @override
+  late final GeneratedColumn<int> sortOrder = GeneratedColumn<int>(
+    'sort_order',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -169,6 +196,8 @@ class $CredentialEntriesTable extends CredentialEntries
     rotationInterval,
     customRotationDays,
     lastRotationPromptedAt,
+    isHidden,
+    sortOrder,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -284,6 +313,18 @@ class $CredentialEntriesTable extends CredentialEntries
         ),
       );
     }
+    if (data.containsKey('is_hidden')) {
+      context.handle(
+        _isHiddenMeta,
+        isHidden.isAcceptableOrUnknown(data['is_hidden']!, _isHiddenMeta),
+      );
+    }
+    if (data.containsKey('sort_order')) {
+      context.handle(
+        _sortOrderMeta,
+        sortOrder.isAcceptableOrUnknown(data['sort_order']!, _sortOrderMeta),
+      );
+    }
     return context;
   }
 
@@ -345,6 +386,14 @@ class $CredentialEntriesTable extends CredentialEntries
         DriftSqlType.int,
         data['${effectivePrefix}last_rotation_prompted_at'],
       ),
+      isHidden: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_hidden'],
+      )!,
+      sortOrder: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}sort_order'],
+      )!,
     );
   }
 
@@ -394,6 +443,14 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
 
   /// Unix timestamp in ms — last time a rotation notification was shown.
   final int? lastRotationPromptedAt;
+
+  /// Hidden/archived flag — unencrypted. Hidden credentials are kept out of the
+  /// main list (still searchable / shown in the "Ocultas" view).
+  final bool isHidden;
+
+  /// Manual sort order for the main list (ascending; lower = higher up).
+  /// Defaults to 0 — ties fall back to createdAt. Set explicitly on drag-reorder.
+  final int sortOrder;
   const CredentialEntry({
     required this.id,
     required this.title,
@@ -408,6 +465,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     required this.rotationInterval,
     this.customRotationDays,
     this.lastRotationPromptedAt,
+    required this.isHidden,
+    required this.sortOrder,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -433,6 +492,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     if (!nullToAbsent || lastRotationPromptedAt != null) {
       map['last_rotation_prompted_at'] = Variable<int>(lastRotationPromptedAt);
     }
+    map['is_hidden'] = Variable<bool>(isHidden);
+    map['sort_order'] = Variable<int>(sortOrder);
     return map;
   }
 
@@ -459,6 +520,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       lastRotationPromptedAt: lastRotationPromptedAt == null && nullToAbsent
           ? const Value.absent()
           : Value(lastRotationPromptedAt),
+      isHidden: Value(isHidden),
+      sortOrder: Value(sortOrder),
     );
   }
 
@@ -485,6 +548,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       lastRotationPromptedAt: serializer.fromJson<int?>(
         json['lastRotationPromptedAt'],
       ),
+      isHidden: serializer.fromJson<bool>(json['isHidden']),
+      sortOrder: serializer.fromJson<int>(json['sortOrder']),
     );
   }
   @override
@@ -504,6 +569,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       'rotationInterval': serializer.toJson<String>(rotationInterval),
       'customRotationDays': serializer.toJson<int?>(customRotationDays),
       'lastRotationPromptedAt': serializer.toJson<int?>(lastRotationPromptedAt),
+      'isHidden': serializer.toJson<bool>(isHidden),
+      'sortOrder': serializer.toJson<int>(sortOrder),
     };
   }
 
@@ -521,6 +588,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     String? rotationInterval,
     Value<int?> customRotationDays = const Value.absent(),
     Value<int?> lastRotationPromptedAt = const Value.absent(),
+    bool? isHidden,
+    int? sortOrder,
   }) => CredentialEntry(
     id: id ?? this.id,
     title: title ?? this.title,
@@ -539,6 +608,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     lastRotationPromptedAt: lastRotationPromptedAt.present
         ? lastRotationPromptedAt.value
         : this.lastRotationPromptedAt,
+    isHidden: isHidden ?? this.isHidden,
+    sortOrder: sortOrder ?? this.sortOrder,
   );
   CredentialEntry copyWithCompanion(CredentialEntriesCompanion data) {
     return CredentialEntry(
@@ -569,6 +640,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
       lastRotationPromptedAt: data.lastRotationPromptedAt.present
           ? data.lastRotationPromptedAt.value
           : this.lastRotationPromptedAt,
+      isHidden: data.isHidden.present ? data.isHidden.value : this.isHidden,
+      sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
     );
   }
 
@@ -587,7 +660,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           ..write('updatedAt: $updatedAt, ')
           ..write('rotationInterval: $rotationInterval, ')
           ..write('customRotationDays: $customRotationDays, ')
-          ..write('lastRotationPromptedAt: $lastRotationPromptedAt')
+          ..write('lastRotationPromptedAt: $lastRotationPromptedAt, ')
+          ..write('isHidden: $isHidden, ')
+          ..write('sortOrder: $sortOrder')
           ..write(')'))
         .toString();
   }
@@ -607,6 +682,8 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
     rotationInterval,
     customRotationDays,
     lastRotationPromptedAt,
+    isHidden,
+    sortOrder,
   );
   @override
   bool operator ==(Object other) =>
@@ -627,7 +704,9 @@ class CredentialEntry extends DataClass implements Insertable<CredentialEntry> {
           other.updatedAt == this.updatedAt &&
           other.rotationInterval == this.rotationInterval &&
           other.customRotationDays == this.customRotationDays &&
-          other.lastRotationPromptedAt == this.lastRotationPromptedAt);
+          other.lastRotationPromptedAt == this.lastRotationPromptedAt &&
+          other.isHidden == this.isHidden &&
+          other.sortOrder == this.sortOrder);
 }
 
 class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
@@ -644,6 +723,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
   final Value<String> rotationInterval;
   final Value<int?> customRotationDays;
   final Value<int?> lastRotationPromptedAt;
+  final Value<bool> isHidden;
+  final Value<int> sortOrder;
   final Value<int> rowid;
   const CredentialEntriesCompanion({
     this.id = const Value.absent(),
@@ -659,6 +740,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     this.rotationInterval = const Value.absent(),
     this.customRotationDays = const Value.absent(),
     this.lastRotationPromptedAt = const Value.absent(),
+    this.isHidden = const Value.absent(),
+    this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   });
   CredentialEntriesCompanion.insert({
@@ -675,6 +758,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     this.rotationInterval = const Value.absent(),
     this.customRotationDays = const Value.absent(),
     this.lastRotationPromptedAt = const Value.absent(),
+    this.isHidden = const Value.absent(),
+    this.sortOrder = const Value.absent(),
     this.rowid = const Value.absent(),
   }) : id = Value(id),
        title = Value(title),
@@ -696,6 +781,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Expression<String>? rotationInterval,
     Expression<int>? customRotationDays,
     Expression<int>? lastRotationPromptedAt,
+    Expression<bool>? isHidden,
+    Expression<int>? sortOrder,
     Expression<int>? rowid,
   }) {
     return RawValuesInsertable({
@@ -714,6 +801,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
         'custom_rotation_days': customRotationDays,
       if (lastRotationPromptedAt != null)
         'last_rotation_prompted_at': lastRotationPromptedAt,
+      if (isHidden != null) 'is_hidden': isHidden,
+      if (sortOrder != null) 'sort_order': sortOrder,
       if (rowid != null) 'rowid': rowid,
     });
   }
@@ -732,6 +821,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
     Value<String>? rotationInterval,
     Value<int?>? customRotationDays,
     Value<int?>? lastRotationPromptedAt,
+    Value<bool>? isHidden,
+    Value<int>? sortOrder,
     Value<int>? rowid,
   }) {
     return CredentialEntriesCompanion(
@@ -749,6 +840,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
       customRotationDays: customRotationDays ?? this.customRotationDays,
       lastRotationPromptedAt:
           lastRotationPromptedAt ?? this.lastRotationPromptedAt,
+      isHidden: isHidden ?? this.isHidden,
+      sortOrder: sortOrder ?? this.sortOrder,
       rowid: rowid ?? this.rowid,
     );
   }
@@ -797,6 +890,12 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
         lastRotationPromptedAt.value,
       );
     }
+    if (isHidden.present) {
+      map['is_hidden'] = Variable<bool>(isHidden.value);
+    }
+    if (sortOrder.present) {
+      map['sort_order'] = Variable<int>(sortOrder.value);
+    }
     if (rowid.present) {
       map['rowid'] = Variable<int>(rowid.value);
     }
@@ -819,6 +918,8 @@ class CredentialEntriesCompanion extends UpdateCompanion<CredentialEntry> {
           ..write('rotationInterval: $rotationInterval, ')
           ..write('customRotationDays: $customRotationDays, ')
           ..write('lastRotationPromptedAt: $lastRotationPromptedAt, ')
+          ..write('isHidden: $isHidden, ')
+          ..write('sortOrder: $sortOrder, ')
           ..write('rowid: $rowid')
           ..write(')'))
         .toString();
@@ -2587,6 +2688,8 @@ typedef $$CredentialEntriesTableCreateCompanionBuilder =
       Value<String> rotationInterval,
       Value<int?> customRotationDays,
       Value<int?> lastRotationPromptedAt,
+      Value<bool> isHidden,
+      Value<int> sortOrder,
       Value<int> rowid,
     });
 typedef $$CredentialEntriesTableUpdateCompanionBuilder =
@@ -2604,6 +2707,8 @@ typedef $$CredentialEntriesTableUpdateCompanionBuilder =
       Value<String> rotationInterval,
       Value<int?> customRotationDays,
       Value<int?> lastRotationPromptedAt,
+      Value<bool> isHidden,
+      Value<int> sortOrder,
       Value<int> rowid,
     });
 
@@ -2678,6 +2783,16 @@ class $$CredentialEntriesTableFilterComposer
 
   ColumnFilters<int> get lastRotationPromptedAt => $composableBuilder(
     column: $table.lastRotationPromptedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isHidden => $composableBuilder(
+    column: $table.isHidden,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2755,6 +2870,16 @@ class $$CredentialEntriesTableOrderingComposer
     column: $table.lastRotationPromptedAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get isHidden => $composableBuilder(
+    column: $table.isHidden,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sortOrder => $composableBuilder(
+    column: $table.sortOrder,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CredentialEntriesTableAnnotationComposer
@@ -2818,6 +2943,12 @@ class $$CredentialEntriesTableAnnotationComposer
     column: $table.lastRotationPromptedAt,
     builder: (column) => column,
   );
+
+  GeneratedColumn<bool> get isHidden =>
+      $composableBuilder(column: $table.isHidden, builder: (column) => column);
+
+  GeneratedColumn<int> get sortOrder =>
+      $composableBuilder(column: $table.sortOrder, builder: (column) => column);
 }
 
 class $$CredentialEntriesTableTableManager
@@ -2873,6 +3004,8 @@ class $$CredentialEntriesTableTableManager
                 Value<String> rotationInterval = const Value.absent(),
                 Value<int?> customRotationDays = const Value.absent(),
                 Value<int?> lastRotationPromptedAt = const Value.absent(),
+                Value<bool> isHidden = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CredentialEntriesCompanion(
                 id: id,
@@ -2888,6 +3021,8 @@ class $$CredentialEntriesTableTableManager
                 rotationInterval: rotationInterval,
                 customRotationDays: customRotationDays,
                 lastRotationPromptedAt: lastRotationPromptedAt,
+                isHidden: isHidden,
+                sortOrder: sortOrder,
                 rowid: rowid,
               ),
           createCompanionCallback:
@@ -2905,6 +3040,8 @@ class $$CredentialEntriesTableTableManager
                 Value<String> rotationInterval = const Value.absent(),
                 Value<int?> customRotationDays = const Value.absent(),
                 Value<int?> lastRotationPromptedAt = const Value.absent(),
+                Value<bool> isHidden = const Value.absent(),
+                Value<int> sortOrder = const Value.absent(),
                 Value<int> rowid = const Value.absent(),
               }) => CredentialEntriesCompanion.insert(
                 id: id,
@@ -2920,6 +3057,8 @@ class $$CredentialEntriesTableTableManager
                 rotationInterval: rotationInterval,
                 customRotationDays: customRotationDays,
                 lastRotationPromptedAt: lastRotationPromptedAt,
+                isHidden: isHidden,
+                sortOrder: sortOrder,
                 rowid: rowid,
               ),
           withReferenceMapper: (p0) => p0

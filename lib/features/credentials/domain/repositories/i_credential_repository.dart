@@ -12,6 +12,12 @@ abstract interface class ICredentialRepository {
   Future<List<Credential>> getFavorites();
   Future<List<Credential>> search(String query);
   Future<List<PasswordHistory>> getPasswordHistory(String credentialId);
+
+  /// Hides/unhides a credential (archive). Plain-column update, no re-encryption.
+  Future<void> setHidden(String id, bool hidden);
+
+  /// Persists the manual order of the given credential ids (index = position).
+  Future<void> reorder(List<String> orderedIds);
 }
 
 abstract interface class ICategoryRepository {

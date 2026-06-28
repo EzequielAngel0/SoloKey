@@ -123,6 +123,17 @@ class CredentialRepositoryImpl implements ICredentialRepository {
   }
 
   @override
+  Future<void> setHidden(String id, bool hidden) =>
+      _credentialDao.setHidden(id, hidden);
+
+  @override
+  Future<void> reorder(List<String> orderedIds) async {
+    for (var i = 0; i < orderedIds.length; i++) {
+      await _credentialDao.setSortOrder(orderedIds[i], i);
+    }
+  }
+
+  @override
   Future<List<PasswordHistory>> getPasswordHistory(String credentialId) async {
     final entries = await _historyDao.getByCredential(credentialId);
     final key = _keyBytes;

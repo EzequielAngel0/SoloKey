@@ -85,6 +85,10 @@ class Credential with _$Credential {
     String? folderId,
     @Default(false) bool isFavorite,
     @Default(false) bool isDoubleEncrypted,
+    /// Hidden/archived: kept out of the main list (shown in the "Ocultas" view).
+    @Default(false) bool isHidden,
+    /// Manual sort order for the main list (ascending; lower = higher up).
+    @Default(0) int sortOrder,
     required DateTime createdAt,
     required DateTime updatedAt,
     /// Present only when [type] == [CredentialType.passkey]

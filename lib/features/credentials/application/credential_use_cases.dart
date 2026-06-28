@@ -28,6 +28,11 @@ class SaveCredentialUseCase {
   }
 
   Future<void> update(Credential credential) => _repo.update(credential);
+
+  Future<void> setHidden(String id, bool hidden) =>
+      _repo.setHidden(id, hidden);
+
+  Future<void> reorder(List<String> orderedIds) => _repo.reorder(orderedIds);
 }
 
 @lazySingleton

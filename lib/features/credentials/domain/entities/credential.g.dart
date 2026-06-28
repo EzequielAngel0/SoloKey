@@ -77,6 +77,8 @@ _$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
       folderId: json['folderId'] as String?,
       isFavorite: json['isFavorite'] as bool? ?? false,
       isDoubleEncrypted: json['isDoubleEncrypted'] as bool? ?? false,
+      isHidden: json['isHidden'] as bool? ?? false,
+      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
       passkeyMetadata: json['passkeyMetadata'] == null
@@ -111,6 +113,8 @@ Map<String, dynamic> _$$CredentialImplToJson(
   'folderId': instance.folderId,
   'isFavorite': instance.isFavorite,
   'isDoubleEncrypted': instance.isDoubleEncrypted,
+  'isHidden': instance.isHidden,
+  'sortOrder': instance.sortOrder,
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt.toIso8601String(),
   'passkeyMetadata': instance.passkeyMetadata,

@@ -256,8 +256,11 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
             );
           }
 
-          // Credentials or Favorites list
-          final list = tabIndex == 0 ? creds : creds.where((c) => c.isFavorite).toList();
+          // Credentials or Favorites list. La lista principal excluye las
+          // ocultas (igual que en movil); las favoritas se mantienen tal cual.
+          final list = tabIndex == 0
+              ? creds.where((c) => !c.isHidden).toList()
+              : creds.where((c) => c.isFavorite).toList();
 
           if (list.isEmpty) {
             return EmptyStateWidget(

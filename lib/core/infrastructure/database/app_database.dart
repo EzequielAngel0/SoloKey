@@ -36,7 +36,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 9;
+  int get schemaVersion => 10;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -102,6 +102,19 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(
               secureFileEntries,
               secureFileEntries.isFavorite as GeneratedColumn,
+            );
+          }
+          if (from < 10) {
+            // Credentials: hide/archive + manual reorder.
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.isHidden as GeneratedColumn,
+            );
+            // ignore: invalid_use_of_visible_for_testing_member
+            await m.addColumn(
+              credentialEntries,
+              credentialEntries.sortOrder as GeneratedColumn,
             );
           }
         },

@@ -783,6 +783,12 @@ mixin _$Credential {
   String? get folderId => throw _privateConstructorUsedError;
   bool get isFavorite => throw _privateConstructorUsedError;
   bool get isDoubleEncrypted => throw _privateConstructorUsedError;
+
+  /// Hidden/archived: kept out of the main list (shown in the "Ocultas" view).
+  bool get isHidden => throw _privateConstructorUsedError;
+
+  /// Manual sort order for the main list (ascending; lower = higher up).
+  int get sortOrder => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
 
@@ -832,6 +838,8 @@ abstract class $CredentialCopyWith<$Res> {
     String? folderId,
     bool isFavorite,
     bool isDoubleEncrypted,
+    bool isHidden,
+    int sortOrder,
     DateTime createdAt,
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
@@ -872,6 +880,8 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
     Object? folderId = freezed,
     Object? isFavorite = null,
     Object? isDoubleEncrypted = null,
+    Object? isHidden = null,
+    Object? sortOrder = null,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
@@ -930,6 +940,14 @@ class _$CredentialCopyWithImpl<$Res, $Val extends Credential>
                 ? _value.isDoubleEncrypted
                 : isDoubleEncrypted // ignore: cast_nullable_to_non_nullable
                       as bool,
+            isHidden: null == isHidden
+                ? _value.isHidden
+                : isHidden // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            sortOrder: null == sortOrder
+                ? _value.sortOrder
+                : sortOrder // ignore: cast_nullable_to_non_nullable
+                      as int,
             createdAt: null == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1014,6 +1032,8 @@ abstract class _$$CredentialImplCopyWith<$Res>
     String? folderId,
     bool isFavorite,
     bool isDoubleEncrypted,
+    bool isHidden,
+    int sortOrder,
     DateTime createdAt,
     DateTime updatedAt,
     PasskeyMetadata? passkeyMetadata,
@@ -1055,6 +1075,8 @@ class __$$CredentialImplCopyWithImpl<$Res>
     Object? folderId = freezed,
     Object? isFavorite = null,
     Object? isDoubleEncrypted = null,
+    Object? isHidden = null,
+    Object? sortOrder = null,
     Object? createdAt = null,
     Object? updatedAt = null,
     Object? passkeyMetadata = freezed,
@@ -1113,6 +1135,14 @@ class __$$CredentialImplCopyWithImpl<$Res>
             ? _value.isDoubleEncrypted
             : isDoubleEncrypted // ignore: cast_nullable_to_non_nullable
                   as bool,
+        isHidden: null == isHidden
+            ? _value.isHidden
+            : isHidden // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        sortOrder: null == sortOrder
+            ? _value.sortOrder
+            : sortOrder // ignore: cast_nullable_to_non_nullable
+                  as int,
         createdAt: null == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -1162,6 +1192,8 @@ class _$CredentialImpl implements _Credential {
     this.folderId,
     this.isFavorite = false,
     this.isDoubleEncrypted = false,
+    this.isHidden = false,
+    this.sortOrder = 0,
     required this.createdAt,
     required this.updatedAt,
     this.passkeyMetadata,
@@ -1210,6 +1242,16 @@ class _$CredentialImpl implements _Credential {
   @override
   @JsonKey()
   final bool isDoubleEncrypted;
+
+  /// Hidden/archived: kept out of the main list (shown in the "Ocultas" view).
+  @override
+  @JsonKey()
+  final bool isHidden;
+
+  /// Manual sort order for the main list (ascending; lower = higher up).
+  @override
+  @JsonKey()
+  final int sortOrder;
   @override
   final DateTime createdAt;
   @override
@@ -1239,7 +1281,7 @@ class _$CredentialImpl implements _Credential {
 
   @override
   String toString() {
-    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, isDoubleEncrypted: $isDoubleEncrypted, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata, sshKeyMetadata: $sshKeyMetadata, rotationInterval: $rotationInterval, customRotationDays: $customRotationDays, lastRotationPromptedAt: $lastRotationPromptedAt)';
+    return 'Credential(id: $id, type: $type, title: $title, username: $username, password: $password, website: $website, notes: $notes, customFields: $customFields, categoryId: $categoryId, folderId: $folderId, isFavorite: $isFavorite, isDoubleEncrypted: $isDoubleEncrypted, isHidden: $isHidden, sortOrder: $sortOrder, createdAt: $createdAt, updatedAt: $updatedAt, passkeyMetadata: $passkeyMetadata, sshKeyMetadata: $sshKeyMetadata, rotationInterval: $rotationInterval, customRotationDays: $customRotationDays, lastRotationPromptedAt: $lastRotationPromptedAt)';
   }
 
   @override
@@ -1268,6 +1310,10 @@ class _$CredentialImpl implements _Credential {
                 other.isFavorite == isFavorite) &&
             (identical(other.isDoubleEncrypted, isDoubleEncrypted) ||
                 other.isDoubleEncrypted == isDoubleEncrypted) &&
+            (identical(other.isHidden, isHidden) ||
+                other.isHidden == isHidden) &&
+            (identical(other.sortOrder, sortOrder) ||
+                other.sortOrder == sortOrder) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -1300,6 +1346,8 @@ class _$CredentialImpl implements _Credential {
     folderId,
     isFavorite,
     isDoubleEncrypted,
+    isHidden,
+    sortOrder,
     createdAt,
     updatedAt,
     passkeyMetadata,
@@ -1337,6 +1385,8 @@ abstract class _Credential implements Credential {
     final String? folderId,
     final bool isFavorite,
     final bool isDoubleEncrypted,
+    final bool isHidden,
+    final int sortOrder,
     required final DateTime createdAt,
     required final DateTime updatedAt,
     final PasskeyMetadata? passkeyMetadata,
@@ -1373,6 +1423,14 @@ abstract class _Credential implements Credential {
   bool get isFavorite;
   @override
   bool get isDoubleEncrypted;
+
+  /// Hidden/archived: kept out of the main list (shown in the "Ocultas" view).
+  @override
+  bool get isHidden;
+
+  /// Manual sort order for the main list (ascending; lower = higher up).
+  @override
+  int get sortOrder;
   @override
   DateTime get createdAt;
   @override

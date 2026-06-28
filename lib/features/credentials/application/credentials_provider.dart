@@ -34,6 +34,18 @@ class CredentialsNotifier extends _$CredentialsNotifier {
     await ref.read(deleteCredentialUseCaseProvider).execute(id);
     await refresh();
   }
+
+  /// Hides/unhides (archives) a credential, then refreshes the list.
+  Future<void> setHidden(String id, bool hidden) async {
+    await ref.read(saveCredentialUseCaseProvider).setHidden(id, hidden);
+    await refresh();
+  }
+
+  /// Persists a new manual order (index = position) and refreshes.
+  Future<void> reorder(List<String> orderedIds) async {
+    await ref.read(saveCredentialUseCaseProvider).reorder(orderedIds);
+    await refresh();
+  }
 }
 
 @riverpod

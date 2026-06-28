@@ -49,6 +49,14 @@ class CredentialEntries extends Table {
   /// Unix timestamp in ms — last time a rotation notification was shown.
   IntColumn get lastRotationPromptedAt => integer().nullable()();
 
+  /// Hidden/archived flag — unencrypted. Hidden credentials are kept out of the
+  /// main list (still searchable / shown in the "Ocultas" view).
+  BoolColumn get isHidden => boolean().withDefault(const Constant(false))();
+
+  /// Manual sort order for the main list (ascending; lower = higher up).
+  /// Defaults to 0 — ties fall back to createdAt. Set explicitly on drag-reorder.
+  IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
   @override
   Set<Column> get primaryKey => {id};
 }

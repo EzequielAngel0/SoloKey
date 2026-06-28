@@ -10,8 +10,12 @@ class CredentialDao extends DatabaseAccessor<AppDatabase>
     with _$CredentialDaoMixin {
   CredentialDao(super.db);
 
-  Future<List<CredentialEntry>> getAll() =>
-      select(credentialEntries).get();
+  Future<List<CredentialEntry>> getAll() => (select(credentialEntries)
+        ..orderBy([
+          (t) => OrderingTerm(expression: t.sortOrder),
+          (t) => OrderingTerm(expression: t.createdAt, mode: OrderingMode.desc),
+        ]))
+      .get();
 
   Future<CredentialEntry?> getById(String id) =>
       (select(credentialEntries)..where((t) => t.id.equals(id)))
@@ -42,6 +46,18 @@ class CredentialDao extends DatabaseAccessor<AppDatabase>
         CredentialEntriesCompanion(
           lastRotationPromptedAt: Value(timestampMs),
         ),
+      );
+
+  /// Toggles the hidden/archive flag without touching the encrypted payload.
+  Future<void> setHidden(String id, bool hidden) =>
+      (update(credentialEntries)..where((t) => t.id.equals(id))).write(
+        CredentialEntriesCompanion(isHidden: Value(hidden)),
+      );
+
+  /// Sets the manual sort order without touching the encrypted payload.
+  Future<void> setSortOrder(String id, int order) =>
+      (update(credentialEntries)..where((t) => t.id.equals(id))).write(
+        CredentialEntriesCompanion(sortOrder: Value(order)),
       );
 
   Future<int> deleteById(String id) =>

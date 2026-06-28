@@ -77,6 +77,28 @@ class _DetailView extends ConsumerWidget {
             },
           ),
           IconButton(
+            icon: Icon(
+              credential.isHidden
+                  ? Icons.visibility_rounded
+                  : Icons.visibility_off_rounded,
+              color: palette.textMuted,
+            ),
+            tooltip: credential.isHidden ? 'Mostrar en la lista' : 'Ocultar',
+            onPressed: () {
+              ref
+                  .read(credentialsNotifierProvider.notifier)
+                  .setHidden(credential.id, !credential.isHidden);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(credential.isHidden
+                      ? 'Credencial visible de nuevo'
+                      : 'Credencial oculta de la lista principal'),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.edit_rounded),
             onPressed: () {
               if (ResponsiveLayout.isDesktop(context)) {

@@ -42,6 +42,18 @@ class MobileHomeScreen extends ConsumerStatefulWidget {
 class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   final _searchCtrl = TextEditingController();
   int _currentIndex = 0;
+  // When true the Credentials tab shows the "Ocultas" view instead of the
+  // active list.
+  bool _showHidden = false;
+
+  /// Persists the new manual order after a drag in the Credentials list.
+  void _onReorder(List<Credential> visible, int oldIndex, int newIndex) {
+    // newIndex ya viene ajustado por onReorderItem (no restar 1).
+    final ids = visible.map((c) => c.id).toList();
+    final moved = ids.removeAt(oldIndex);
+    ids.insert(newIndex, moved);
+    ref.read(credentialsNotifierProvider.notifier).reorder(ids);
+  }
 
   @override
   void dispose() {
@@ -60,7 +72,9 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     List<Credential> filtered = [];
 
     if (_currentIndex == 0) {
-      filtered = credentials;
+      filtered = credentials
+          .where((c) => _showHidden ? c.isHidden : !c.isHidden)
+          .toList();
     } else if (_currentIndex == 2) {
       filtered = credentials.where((c) => c.isFavorite).toList();
     }
@@ -69,6 +83,17 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       appBar: VaultAppBar(
         title: 'SoloKey',
         actions: [
+          if (_currentIndex == 0)
+            IconButton(
+              icon: Icon(
+                _showHidden
+                    ? Icons.visibility_off_rounded
+                    : Icons.visibility_rounded,
+                color: _showHidden ? palette.accent : palette.textMuted,
+              ),
+              tooltip: _showHidden ? 'Ver activas' : 'Ver ocultas',
+              onPressed: () => setState(() => _showHidden = !_showHidden),
+            ),
           IconButton(
             icon: Icon(Icons.lock_rounded, color: palette.danger),
             tooltip: l10n.homeLockTooltip,
@@ -212,11 +237,28 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                             credentials: credentials,
                           )
                         : filtered.isEmpty
-                            ? EmptyStateWidget(
-                                message: l10n.homeEmptyVault,
-                                onAdd: () => context.push(AppRoutes.credentialCreate),
-                              )
-                            : CredentialListWidget(credentials: filtered),
+                            ? (_showHidden
+                                ? Center(
+                                    child: Text(
+                                      'No tienes credenciales ocultas',
+                                      style:
+                                          TextStyle(color: palette.textMuted),
+                                    ),
+                                  )
+                                : EmptyStateWidget(
+                                    message: l10n.homeEmptyVault,
+                                    onAdd: () => context
+                                        .push(AppRoutes.credentialCreate),
+                                  ))
+                            : CredentialListWidget(
+                                credentials: filtered,
+                                // Reordenar solo en la lista activa sin busqueda
+                                // (el orden no aplica a resultados filtrados).
+                                onReorder:
+                                    (_searchCtrl.text.isEmpty && !_showHidden)
+                                        ? (o, n) => _onReorder(filtered, o, n)
+                                        : null,
+                              ),
       ),
     );
   }
