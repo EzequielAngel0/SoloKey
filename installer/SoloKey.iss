@@ -60,6 +60,9 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+; Regla de firewall entrante para el servidor de sync (vinculacion/sync con el
+; celular en la red local). Opt-in: agrega la regla con una unica elevacion UAC.
+Name: "firewall"; Description: "Permitir sincronizacion con el celular en la red local (regla de firewall)"; GroupDescription: "Red local:"
 
 [Files]
 Source: "{#SourceDir}\*"; DestDir: "{app}"; Excludes: "*.pdb,*.msix"; Flags: ignoreversion recursesubdirs createallsubdirs
@@ -96,4 +99,34 @@ function InitializeUninstall(): Boolean;
 begin
   KillRunningApp;
   Result := True;
+end;
+
+// Regla de firewall ENTRANTE basada en el programa (cubre el rango de puertos
+// dinamico 8283+ del servidor Shelf). El instalador es per-user (sin admin), asi
+// que elevamos SOLO este paso con 'runas' (un UAC). Si el usuario cancela, el
+// sync sigue siendo posible cuando Windows muestre su propio aviso de firewall.
+procedure AddFirewallRule;
+var
+  ResultCode: Integer;
+begin
+  ShellExec('runas', ExpandConstant('{sys}\netsh.exe'),
+    ExpandConstant('advfirewall firewall add rule name="SoloKey Sync" dir=in action=allow program="{app}\{#MyAppExeName}" enable=yes profile=private,domain'),
+    '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if (CurStep = ssPostInstall) and WizardIsTaskSelected('firewall') then
+    AddFirewallRule;
+end;
+
+// Limpia la regla al desinstalar (elevado; si se cancela, no es critico).
+procedure CurUninstallStepChanged(CurUninstallStep: TUninstallStep);
+var
+  ResultCode: Integer;
+begin
+  if CurUninstallStep = usUninstall then
+    ShellExec('runas', ExpandConstant('{sys}\netsh.exe'),
+      'advfirewall firewall delete rule name="SoloKey Sync"',
+      '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
 end;
