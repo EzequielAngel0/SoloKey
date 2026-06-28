@@ -148,7 +148,12 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   }
 
   Future<void> _checkBiometrics() async {
-    final available = await _localAuth.canCheckBiometrics;
+    // En escritorio (Windows Hello) el desbloqueo puede ser por PIN, huella o
+    // rostro: usamos isDeviceSupported() porque canCheckBiometrics solo detecta
+    // hardware biometrico y ocultaria la opcion en equipos con solo PIN.
+    final available = _isDesktopPlatform
+        ? await _localAuth.isDeviceSupported()
+        : await _localAuth.canCheckBiometrics;
     if (mounted) setState(() => _biometricAvailable = available);
     if (!available) return;
 
@@ -160,7 +165,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     try {
       final authenticated = await _localAuth.authenticate(
         localizedReason: AppLocalizations.of(context).unlockBiometricReason,
-        options: const AuthenticationOptions(biometricOnly: true),
+        // En escritorio permitimos el PIN de Windows Hello (no solo biometria);
+        // en movil exigimos biometria estricta.
+        options: AuthenticationOptions(biometricOnly: !_isDesktopPlatform),
       );
       if (!authenticated || !mounted) return;
 
@@ -203,6 +210,26 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
           },
           orElse: () {},
         );
+  }
+
+  /// Desktop (M3): asks the connected phone(s) to approve unlocking this PC.
+  /// The phone shows a local notification; approving sends back its DUK over the
+  /// E2EE channel and the existing `remote_unlock_key:` listener unlocks here.
+  Future<void> _requestPhoneApproval() async {
+    try {
+      final sent = await getIt<SyncService>().requestApproval();
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(sent > 0
+            ? 'Solicitud enviada a tu celular. Apruebala alli para desbloquear.'
+            : 'No hay un celular conectado. Abre SoloKey en tu celular en la misma red Wi-Fi.'),
+        backgroundColor:
+            sent > 0 ? context.palette.primary : context.palette.danger,
+        behavior: SnackBarBehavior.floating,
+      ));
+    } catch (_) {
+      // SyncService puede no estar disponible (p.ej. en tests).
+    }
   }
 
   void _navigateHome() => context.go(AppRoutes.home);
@@ -347,28 +374,23 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       ),
                     ],
 
-                    // WiFi unlock hint for desktop
+                    // Desktop (M3): pedir aprobacion de desbloqueo al celular.
                     if (_isDesktopPlatform) ...[
                       const SizedBox(height: 8),
                       Center(
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.wifi_rounded,
-                              color: palette.primary.withValues(alpha: 0.5),
-                              size: 14,
+                        child: TextButton.icon(
+                          onPressed:
+                              _isRemoteUnlocking ? null : _requestPhoneApproval,
+                          icon: Icon(Icons.phonelink_lock_rounded,
+                              color: palette.primary),
+                          label: Text(
+                            l10n.unlockWifiAvailable,
+                            style: TextStyle(
+                              color: palette.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
-                            const SizedBox(width: 6),
-                            Text(
-                              l10n.unlockWifiAvailable,
-                              style: TextStyle(
-                                color: palette.primary.withValues(alpha: 0.5),
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
+                          ),
                         ),
                       ),
                     ],
