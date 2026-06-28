@@ -64,7 +64,7 @@ flutter build apk --release --obfuscate --split-debug-info=./debug_info
 
 ## 💡 Próximos pasos y Roadmap
 
-Puedes visualizar las mejoras planificadas (como Autofill API Nativo de Android o Autenticación Completa por Biometría) en [docs/feature_ideas.md](docs/feature_ideas.md).
+Toda la documentación está organizada en [docs/](docs/README.md). Puedes visualizar las mejoras planificadas en [docs/planning/feature_ideas.md](docs/planning/feature_ideas.md) y el backlog de estabilización vigente en [docs/planning/pendientes_y_bugs.md](docs/planning/pendientes_y_bugs.md).
 
 ---
 *Hecho con ♥, Clean Code, y agentes de Arquitectura Segura.*

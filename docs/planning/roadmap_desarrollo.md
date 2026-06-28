@@ -293,6 +293,39 @@ Antes: `applicationId/namespace = com.vaultguard.password_manager` (Android).
 | 12 | Seguridad: backup cifrado programado | 🟡 | Features D | ✅ |
 | 13 | Sync: endurecer WiFi-unlock (token DUK) | 🟢 | Features D | ✅ |
 | 14 | i18n (es/en) | 🟡 | Final | 🟦 |
+| 15 | Bug: instancia única en escritorio (procesos duplicados) | 🔴 | Estabilización | ⬜ |
+| 16 | Bug: vinculación de celulares (mDNS/firewall/IP) | 🔴 | Estabilización | ⬜ |
+| 17 | Servidor de sync residente en segundo plano | 🟡 | Estabilización | ⬜ |
+| 18 | Login PC con PIN / Windows Hello (pulir lo existente) | 🟡 | Estabilización | ⬜ |
+| 19 | Sincronización constante (WebSocket persistente + auto) | 🟡 | Companion | ⬜ |
+| 20 | Push al celular para aprobar login | 🟢 | Companion | ⬜ |
+
+---
+
+## 9. Estabilización y companion de escritorio — 🟦 (abierto 2026-06-28)
+
+> Detalle completo, diagnóstico, causas raíz (con refs a archivos+líneas) y
+> arreglos propuestos en **`pendientes_y_bugs.md`** (misma carpeta).
+
+- ⬜ **B1 — Procesos de escritorio duplicados:** no hay control de instancia
+  única (`windows/runner/main.cpp` sin mutex; sin `windows_single_instance` en
+  `pubspec.yaml`). Cerrar oculta a la bandeja (`setPreventClose`); reabrir crea
+  un proceso nuevo. Fix: mutex nativo o `windows_single_instance`.
+- ⬜ **B2 — No vincula celulares:** (a) `nsd.register` en `startServer()` rompe la
+  generación del QR en Windows (falta Bonjour/`dnssd.dll`) → envolver en
+  try/catch; (b) sin regla de firewall inbound en `installer/SoloKey.iss`
+  (per-user, sin UAC); (c) `_getLocalIp()` puede elegir un adaptador virtual.
+- ⬜ **G1 — Servidor de sync no residente:** solo arranca al abrir la pantalla de
+  Sincronizar (`pairing_screen.dart`), no en `main.dart`. Bloquea el WiFi-unlock
+  desde la pantalla de bloqueo y la sync constante.
+- ⬜ **M1 — Sync constante:** depende de G1 + WebSocket persistente con heartbeat
+  + disparo por cambios (streams de Drift). Limitación móvil en segundo plano.
+- ⬜ **M2 — Login PC con PIN/Windows Hello:** `local_auth` en Windows = Windows
+  Hello; el flujo `bio_master_key` ya existe. Falta verificar registro de
+  `local_auth_windows`, surfacing y copys en escritorio.
+- ⬜ **M3 — Push al celular para aprobar login:** hoy el WiFi-unlock es PULL.
+  PUSH en LAN reutiliza el WebSocket (depende de G1); con app cerrada requiere
+  FCM (rompe local-first — decisión de producto).
 
 ---
 

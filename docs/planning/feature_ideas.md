@@ -36,3 +36,59 @@ Este documento contiene un conjunto de ideas, expansiones funcionales y mecánic
 
 *   **Iconos Automáticos / Favicons:** Al ingresar un sitio web como `netflix.com`, que la aplicación descargue automáticamente (y almacene como BLOB binario) el favicon del logotipo del servicio, para darle un look mucho más corporativo a la bóveda visual.
 *   **Etiquetas Combinadas (Tags):** Aparte de "Carpetas", permitir agrupar por etiquetas (`#Trabajo`, `#Streaming`, `#Bancos`) donde una misma credencial pueda tener más de una sola etiqueta a la vez.
+
+---
+
+## 🆕 7. Sugerencias revisadas (2026-06-28)
+
+> Curadas tras revisar el código real. Se excluyen a propósito "Acceso de
+> emergencia / herencia digital" y "Tipos de credencial con plantillas (tarjeta,
+> identidad, banco…)" por decisión de producto: **no se manejará PII**.
+> Lo ya implementado (autofill Android, teclado seguro, HaveIBeenPwned, favicons,
+> import CSV, TOTP, carpetas, auditoría, recovery, anti-fuerza-bruta, backup
+> programado, rotación, doble sobre, llaves SSH, sync P2P, WiFi-unlock, quick-fill,
+> hotkeys, autostart, archivos seguros) no se repite aquí.
+
+### 🖥️ Escritorio
+*   **Extensión de navegador (Chrome/Edge/Firefox) — máxima prioridad:** el SO de
+    escritorio no expone autofill; hoy solo hay Quick-Fill por portapapeles. Una
+    extensión que hable con la app por el WebSocket local (mismo canal del sync)
+    daría autocompletado real en webs. Es lo que más acerca SoloKey a
+    Bitwarden/1Password en PC.
+*   **Auto-Type estilo KeePass:** en vez de copiar al portapapeles, simular
+    pulsaciones en el campo enfocado (`user{TAB}pass{ENTER}`). Más seguro que el
+    clipboard; complementa el `Ctrl+Shift+L` existente.
+*   **Overlay tipo Spotlight:** ventana flotante de búsqueda rápida sobre el hotkey
+    global, sin abrir la app entera (ya anotado como mejora futura en el roadmap).
+*   **Recordar tamaño/posición de ventana + multi-monitor** y **modo portable**
+    (bóveda junto al `.exe` en USB).
+
+### 📱 Móvil (Android)
+*   **Passkeys reales vía Credential Manager:** hoy es "respaldo" sin firma
+    WebAuthn (gap de la Fase 12). Cierra la promesa de passkeys.
+*   **Widget de pantalla de inicio + Quick Settings tile:** widget de TOTP
+    favoritos y un botón de "bloquear bóveda ya". Alto valor, bajo esfuerzo.
+*   **Importar QR de migración de Google Authenticator** (`otpauth-migration://`):
+    migración masiva de TOTPs en un escaneo.
+*   **PIN de coacción (duress):** un segundo PIN que abre una bóveda señuelo o
+    dispara wipe. Encaja con el `WipeVaultUseCase` existente.
+
+### 🔗 Ambas / transversal
+*   **Etiquetas (tags multi-categoría):** complemento a carpetas; una credencial
+    con `#trabajo #banca`. (Reitera el §6, sigue pendiente.)
+*   **Compartición segura "VaultDrop":** pasar una credencial por QR/enlace
+    efímero cifrado, reutilizando el canal E2EE del sync. (Reitera el §5.)
+*   **YubiKey / FIDO2 como 2FA del desbloqueo:** NFC en móvil, USB en PC.
+*   **Monitoreo proactivo de brechas:** hoy HaveIBeenPwned es manual/opt-in;
+    convertirlo en chequeo programado que **notifique** (reutiliza
+    `NotificationService` + workmanager ya existentes).
+*   **Ocultar / reorganizar credenciales en la lista (solicitado por el usuario):**
+    cuando hay muchas credenciales, el scroll se vuelve tedioso. Opciones
+    combinables:
+    1.  **Reordenar manualmente** con arrastrar-y-soltar y un campo persistido
+        `sortOrder` (o `ReorderableListView`), respetando el orden elegido.
+    2.  **Ocultar / archivar**: bandera `isHidden`/`isArchived` para sacar
+        credenciales poco usadas de la lista principal, con una vista "Ocultas"
+        para verlas/restaurarlas. Migración Drift (nueva columna) + filtro en el
+        repositorio + toggle en la barra de la credencial.
+    3.  **Anclar (pin)** las más usadas arriba (complementa Favoritos).
