@@ -11,6 +11,7 @@ import 'package:hotkey_manager/hotkey_manager.dart';
 import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:windows_single_instance/windows_single_instance.dart';
 import 'package:workmanager/workmanager.dart';
 
 import 'app/app.dart';
@@ -80,6 +81,22 @@ Future<void> main(List<String> args) async {
   runZonedGuarded(
     () async {
       WidgetsFlutterBinding.ensureInitialized();
+
+      // Instancia unica (Windows): si ya hay una instancia viva (p.ej. oculta en
+      // la bandeja), reenvia los args a la primera, la trae al frente y termina
+      // ESTE proceso (exit(0) interno del paquete). Asi reabrir el icono no crea
+      // procesos/daemons/tray duplicados. Es no-op fuera de Windows.
+      if (!kIsWeb && Platform.isWindows) {
+        await WindowsSingleInstance.ensureSingleInstance(
+          args,
+          'solokey_single_instance',
+          onSecondWindow: (_) async {
+            await windowManager.show();
+            await windowManager.focus();
+          },
+        );
+      }
+
       await configureDependencies();
 
       final notifications = getIt<NotificationService>();
