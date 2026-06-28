@@ -1387,4 +1387,193 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get unlockApprovalNoDevice =>
       'No hay un celular conectado. Abre SoloKey en tu celular en la misma red Wi-Fi.';
+
+  @override
+  String get syncTitle => 'Sincronizar Dispositivo';
+
+  @override
+  String get syncServerActive =>
+      'Servidor activo. Esperando conexión del celular...';
+
+  @override
+  String get syncServerOff => 'Servidor apagado.';
+
+  @override
+  String get syncClientConnecting => 'Celular conectándose...';
+
+  @override
+  String get syncClientDisconnected =>
+      'Celular desconectado. Servidor en espera...';
+
+  @override
+  String get syncPairedOk => '¡Vinculación completada con éxito!';
+
+  @override
+  String get syncComparing => 'Comparando datos locales con celular...';
+
+  @override
+  String get syncBidirOk => '¡Sincronización bidireccional exitosa!';
+
+  @override
+  String get syncErrorGeneric => 'Error durante la sincronización.';
+
+  @override
+  String get syncRemoteUnlockReceived =>
+      'Recibida solicitud de desbloqueo remoto.';
+
+  @override
+  String get syncPairTitle => 'Vincular con App Móvil';
+
+  @override
+  String get syncPairSubtitle =>
+      'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.';
+
+  @override
+  String get syncGenerateQr => 'Generar Código QR';
+
+  @override
+  String get syncStartingServer => 'Iniciando servidor local...';
+
+  @override
+  String get syncScanThisQr => 'Escanea este código QR';
+
+  @override
+  String get syncScanThisQrSub =>
+      'Abre SoloKey en tu móvil, ve a Sincronizar y escanea este código.';
+
+  @override
+  String get syncConnectingDevice => 'Conectando con el dispositivo móvil...';
+
+  @override
+  String get syncLinkedTitle => '¡Vinculado Exitosamente!';
+
+  @override
+  String get syncLinkedSub =>
+      'Los dispositivos ahora están enlazados de forma segura.';
+
+  @override
+  String get syncUnderstood => 'Entendido';
+
+  @override
+  String get syncErrorTitle => 'Error de Vinculación';
+
+  @override
+  String get syncUnexpectedError => 'Ocurrió un error inesperado.';
+
+  @override
+  String get syncRetry => 'Reintentar';
+
+  @override
+  String get syncComputerLinked => 'Computadora Vinculada';
+
+  @override
+  String get syncComputerLinkedSub =>
+      'Esta computadora está emparejada de forma segura. Puedes conectar varios dispositivos a la vez escaneando el mismo QR.';
+
+  @override
+  String get syncServerE2eeActive => 'Servidor local E2EE Activo';
+
+  @override
+  String get syncRemoveLink => 'Eliminar Vínculo';
+
+  @override
+  String get syncShowQr => 'Mostrar QR';
+
+  @override
+  String get syncWaitingDevices => 'Esperando dispositivos…';
+
+  @override
+  String get syncStatusSyncing => 'Sincronizando…';
+
+  @override
+  String get syncStatusSynced => 'Sincronizado';
+
+  @override
+  String get syncStatusConnected => 'Conectado';
+
+  @override
+  String get syncStarting => 'Iniciando sincronización...';
+
+  @override
+  String get syncSendingLocal => 'Enviando cambios locales...';
+
+  @override
+  String syncSuccessStats(String stats) {
+    return '¡Sincronización exitosa! ($stats)';
+  }
+
+  @override
+  String get syncBiometricReason =>
+      'Autentícate para desbloquear tu computadora';
+
+  @override
+  String get syncLinkComputer => 'Vincular Computadora';
+
+  @override
+  String get syncLinkComputerSub =>
+      'Escanea el código QR generado por la aplicación SoloKey en tu computadora para sincronizar los datos locales.';
+
+  @override
+  String get syncScanQrButton => 'Escanear Código QR';
+
+  @override
+  String get syncNegotiating => 'Negociando claves de encriptación...';
+
+  @override
+  String get syncComputerLinkedExcl => '¡Computadora Vinculada!';
+
+  @override
+  String get syncComputerLinkedExclSub =>
+      'Los datos ahora se sincronizarán de forma segura entre dispositivos.';
+
+  @override
+  String get syncBack => 'Volver';
+
+  @override
+  String get syncCouldNotConnect => 'No se pudo conectar con la computadora.';
+
+  @override
+  String get syncRetryButton => 'Volver a Intentar';
+
+  @override
+  String get syncRemoteUnlockTitle => 'Desbloqueo Remoto';
+
+  @override
+  String get syncRemoteUnlockSub =>
+      'Desbloquea la bóveda de tu computadora usando la biometría de este dispositivo.';
+
+  @override
+  String get syncSending => 'Enviando...';
+
+  @override
+  String get syncUnlockComputer => 'Desbloquear Computadora';
+
+  @override
+  String get syncUnlockSentBanner =>
+      '¡Solicitud enviada! La bóveda debería desbloquearse.';
+
+  @override
+  String get syncAuthCancelled => 'Autenticación biométrica cancelada.';
+
+  @override
+  String get syncNoToken =>
+      'Vincula de nuevo con el escritorio DESBLOQUEADO para habilitar el desbloqueo remoto.';
+
+  @override
+  String get syncVaultTitle => 'Sincronizar Bóveda';
+
+  @override
+  String get syncVaultSub =>
+      'Intercambia y actualiza tus credenciales bidireccionalmente en red local.';
+
+  @override
+  String get syncNotPairedYet =>
+      'Aun no has vinculado. Escanea el QR del escritorio.';
+
+  @override
+  String get syncConnectingComputer => 'Conectando con la computadora...';
+
+  @override
+  String get syncConnectFailCheck =>
+      'No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.';
 }

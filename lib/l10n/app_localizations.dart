@@ -2641,6 +2641,348 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No phone connected. Open SoloKey on your phone on the same Wi-Fi network.'**
   String get unlockApprovalNoDevice;
+
+  /// No description provided for @syncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync device'**
+  String get syncTitle;
+
+  /// No description provided for @syncServerActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Server active. Waiting for the phone to connect…'**
+  String get syncServerActive;
+
+  /// No description provided for @syncServerOff.
+  ///
+  /// In en, this message translates to:
+  /// **'Server off.'**
+  String get syncServerOff;
+
+  /// No description provided for @syncClientConnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone connecting…'**
+  String get syncClientConnecting;
+
+  /// No description provided for @syncClientDisconnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone disconnected. Server waiting…'**
+  String get syncClientDisconnected;
+
+  /// No description provided for @syncPairedOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing completed successfully!'**
+  String get syncPairedOk;
+
+  /// No description provided for @syncComparing.
+  ///
+  /// In en, this message translates to:
+  /// **'Comparing local data with the phone…'**
+  String get syncComparing;
+
+  /// No description provided for @syncBidirOk.
+  ///
+  /// In en, this message translates to:
+  /// **'Two-way sync successful!'**
+  String get syncBidirOk;
+
+  /// No description provided for @syncErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Error during sync.'**
+  String get syncErrorGeneric;
+
+  /// No description provided for @syncRemoteUnlockReceived.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote unlock request received.'**
+  String get syncRemoteUnlockReceived;
+
+  /// No description provided for @syncPairTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with mobile app'**
+  String get syncPairTitle;
+
+  /// No description provided for @syncPairSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync your passwords in real time securely and unlock this vault using your phone\'s biometrics.'**
+  String get syncPairSubtitle;
+
+  /// No description provided for @syncGenerateQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate QR code'**
+  String get syncGenerateQr;
+
+  /// No description provided for @syncStartingServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting local server…'**
+  String get syncStartingServer;
+
+  /// No description provided for @syncScanThisQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan this QR code'**
+  String get syncScanThisQr;
+
+  /// No description provided for @syncScanThisQrSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Open SoloKey on your phone, go to Sync and scan this code.'**
+  String get syncScanThisQrSub;
+
+  /// No description provided for @syncConnectingDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to the mobile device…'**
+  String get syncConnectingDevice;
+
+  /// No description provided for @syncLinkedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked successfully!'**
+  String get syncLinkedTitle;
+
+  /// No description provided for @syncLinkedSub.
+  ///
+  /// In en, this message translates to:
+  /// **'The devices are now securely linked.'**
+  String get syncLinkedSub;
+
+  /// No description provided for @syncUnderstood.
+  ///
+  /// In en, this message translates to:
+  /// **'Got it'**
+  String get syncUnderstood;
+
+  /// No description provided for @syncErrorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pairing error'**
+  String get syncErrorTitle;
+
+  /// No description provided for @syncUnexpectedError.
+  ///
+  /// In en, this message translates to:
+  /// **'An unexpected error occurred.'**
+  String get syncUnexpectedError;
+
+  /// No description provided for @syncRetry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get syncRetry;
+
+  /// No description provided for @syncComputerLinked.
+  ///
+  /// In en, this message translates to:
+  /// **'Computer linked'**
+  String get syncComputerLinked;
+
+  /// No description provided for @syncComputerLinkedSub.
+  ///
+  /// In en, this message translates to:
+  /// **'This computer is securely paired. You can connect several devices at once by scanning the same QR.'**
+  String get syncComputerLinkedSub;
+
+  /// No description provided for @syncServerE2eeActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Local E2EE server active'**
+  String get syncServerE2eeActive;
+
+  /// No description provided for @syncRemoveLink.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove link'**
+  String get syncRemoveLink;
+
+  /// No description provided for @syncShowQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Show QR'**
+  String get syncShowQr;
+
+  /// No description provided for @syncWaitingDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Waiting for devices…'**
+  String get syncWaitingDevices;
+
+  /// No description provided for @syncStatusSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing…'**
+  String get syncStatusSyncing;
+
+  /// No description provided for @syncStatusSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Synced'**
+  String get syncStatusSynced;
+
+  /// No description provided for @syncStatusConnected.
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get syncStatusConnected;
+
+  /// No description provided for @syncStarting.
+  ///
+  /// In en, this message translates to:
+  /// **'Starting sync…'**
+  String get syncStarting;
+
+  /// No description provided for @syncSendingLocal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending local changes…'**
+  String get syncSendingLocal;
+
+  /// No description provided for @syncSuccessStats.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync successful! ({stats})'**
+  String syncSuccessStats(String stats);
+
+  /// No description provided for @syncBiometricReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to unlock your computer'**
+  String get syncBiometricReason;
+
+  /// No description provided for @syncLinkComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair computer'**
+  String get syncLinkComputer;
+
+  /// No description provided for @syncLinkComputerSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan the QR code generated by the SoloKey app on your computer to sync local data.'**
+  String get syncLinkComputerSub;
+
+  /// No description provided for @syncScanQrButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR code'**
+  String get syncScanQrButton;
+
+  /// No description provided for @syncNegotiating.
+  ///
+  /// In en, this message translates to:
+  /// **'Negotiating encryption keys…'**
+  String get syncNegotiating;
+
+  /// No description provided for @syncComputerLinkedExcl.
+  ///
+  /// In en, this message translates to:
+  /// **'Computer linked!'**
+  String get syncComputerLinkedExcl;
+
+  /// No description provided for @syncComputerLinkedExclSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Data will now sync securely between devices.'**
+  String get syncComputerLinkedExclSub;
+
+  /// No description provided for @syncBack.
+  ///
+  /// In en, this message translates to:
+  /// **'Back'**
+  String get syncBack;
+
+  /// No description provided for @syncCouldNotConnect.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to the computer.'**
+  String get syncCouldNotConnect;
+
+  /// No description provided for @syncRetryButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Try again'**
+  String get syncRetryButton;
+
+  /// No description provided for @syncRemoteUnlockTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Remote unlock'**
+  String get syncRemoteUnlockTitle;
+
+  /// No description provided for @syncRemoteUnlockSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock your computer\'s vault using this device\'s biometrics.'**
+  String get syncRemoteUnlockSub;
+
+  /// No description provided for @syncSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Sending…'**
+  String get syncSending;
+
+  /// No description provided for @syncUnlockComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock computer'**
+  String get syncUnlockComputer;
+
+  /// No description provided for @syncUnlockSentBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Request sent! The vault should unlock.'**
+  String get syncUnlockSentBanner;
+
+  /// No description provided for @syncAuthCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric authentication cancelled.'**
+  String get syncAuthCancelled;
+
+  /// No description provided for @syncNoToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair again with the desktop UNLOCKED to enable remote unlock.'**
+  String get syncNoToken;
+
+  /// No description provided for @syncVaultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync vault'**
+  String get syncVaultTitle;
+
+  /// No description provided for @syncVaultSub.
+  ///
+  /// In en, this message translates to:
+  /// **'Exchange and update your credentials both ways on the local network.'**
+  String get syncVaultSub;
+
+  /// No description provided for @syncNotPairedYet.
+  ///
+  /// In en, this message translates to:
+  /// **'You haven\'t paired yet. Scan the QR on the desktop.'**
+  String get syncNotPairedYet;
+
+  /// No description provided for @syncConnectingComputer.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to the computer…'**
+  String get syncConnectingComputer;
+
+  /// No description provided for @syncConnectFailCheck.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect. Make sure the PC is on and on the same Wi-Fi network.'**
+  String get syncConnectFailCheck;
 }
 
 class _AppLocalizationsDelegate

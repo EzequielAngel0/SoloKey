@@ -254,7 +254,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 12),
                     child: Text(
-                      'Sin carpeta asignada',
+                      l10n.transferNoFolder,
                       style: TextStyle(color: palette.textDisabled, fontSize: 11, fontWeight: FontWeight.bold),
                     ),
                   ),
@@ -275,7 +275,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
           if (list.isEmpty) {
             return EmptyStateWidget(
-              message: tabIndex == 0 ? 'Sin credenciales' : 'Sin favoritas',
+              message:
+                  tabIndex == 0 ? l10n.desktopNoCredentials : l10n.desktopNoFavorites,
               onAdd: () {
                 ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
               },
@@ -296,14 +297,15 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   }
 
   Widget _buildRightPane(int tabIndex) {
+    final l10n = AppLocalizations.of(context);
     if (tabIndex == 1) {
       // Folder View in Right Column
       final folderId = ref.watch(desktopSelectedFolderIdProvider);
       if (folderId == null) {
-        return const _EmptyStateRightPane(
+        return _EmptyStateRightPane(
           icon: Icons.folder_rounded,
-          title: 'Selecciona una carpeta',
-          subtitle: 'Haz clic en una carpeta de la lista para ver su contenido aquí.',
+          title: l10n.desktopSelectFolderTitle,
+          subtitle: l10n.desktopSelectFolderSub,
         );
       }
       return FolderScreen(folderId: folderId);
@@ -318,10 +320,10 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     }
 
     if (selectedId == null) {
-      return const _EmptyStateRightPane(
+      return _EmptyStateRightPane(
         icon: Icons.shield_rounded,
-        title: 'Bóveda Segura',
-        subtitle: 'Selecciona una credencial de la lista para ver o editar sus detalles.',
+        title: l10n.desktopSecureVaultTitle,
+        subtitle: l10n.desktopSelectCredentialSub,
       );
     }
 
@@ -335,24 +337,25 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
   Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final ctrl = TextEditingController();
     final name = await showDialog<String>(
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text('Carpeta', style: TextStyle(color: palette.textPrimary)),
+        title: Text(l10n.folderDialogTitle, style: TextStyle(color: palette.textPrimary)),
         content: TextField(
           controller: ctrl,
           autofocus: true,
           style: TextStyle(color: palette.textPrimary),
-          decoration: const InputDecoration(
-            labelText: 'Nombre de la carpeta',
-            hintText: 'ej. Trabajo, Sociales…',
+          decoration: InputDecoration(
+            labelText: l10n.folderNameLabel,
+            hintText: l10n.folderNameHint,
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: const Text('Crear')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
+          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonCreate)),
         ],
       ),
     );
@@ -368,16 +371,17 @@ class _DesktopSidebar extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final selectedIndex = ref.watch(desktopSelectedNavigationProvider);
 
-    const menuItems = [
-      _SidebarItemData(icon: Icons.lock_rounded, label: 'Credenciales', index: 0),
-      _SidebarItemData(icon: Icons.folder_rounded, label: 'Carpetas', index: 1),
-      _SidebarItemData(icon: Icons.star_rounded, label: 'Favoritas', index: 2),
-      _SidebarItemData(icon: Icons.security_rounded, label: 'Auditoría', index: 3),
-      _SidebarItemData(icon: Icons.folder_shared_rounded, label: 'Archivos seguros', index: 6),
-      _SidebarItemData(icon: Icons.settings_rounded, label: 'Ajustes', index: 4),
-      _SidebarItemData(icon: Icons.sync_rounded, label: 'Sincronizar', index: 5),
+    final menuItems = [
+      _SidebarItemData(icon: Icons.lock_rounded, label: l10n.navCredentials, index: 0),
+      _SidebarItemData(icon: Icons.folder_rounded, label: l10n.navFolders, index: 1),
+      _SidebarItemData(icon: Icons.star_rounded, label: l10n.navFavorites, index: 2),
+      _SidebarItemData(icon: Icons.security_rounded, label: l10n.navAudit, index: 3),
+      _SidebarItemData(icon: Icons.folder_shared_rounded, label: l10n.navSecureFiles, index: 6),
+      _SidebarItemData(icon: Icons.settings_rounded, label: l10n.navSettings, index: 4),
+      _SidebarItemData(icon: Icons.sync_rounded, label: l10n.navSync, index: 5),
     ];
 
     return Container(

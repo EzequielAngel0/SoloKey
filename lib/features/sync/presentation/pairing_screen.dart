@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 
 import '../../../app/di/injection.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../core/services/biometric_auth_service.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
@@ -19,10 +20,11 @@ class PairingScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDesktop = ResponsiveLayout.isDesktop(context);
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       appBar: VaultAppBar(
-        title: 'Sincronizar Dispositivo',
+        title: l10n.syncTitle,
         leading: isDesktop ? const SizedBox.shrink() : null,
       ),
       body: isDesktop ? const _DesktopPairingView() : const _MobilePairingView(),
@@ -56,7 +58,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
         ref.read(pairingNotifierProvider.notifier).startDesktopServer();
       } else {
         setState(() {
-          _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...';
+          _serverStatusMessage = AppLocalizations.of(context).syncServerActive;
         });
       }
     });
@@ -69,40 +71,44 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
 
   void _subscribeToServerEvents() {
     _serverEventsSubscription = getIt<SyncService>().serverEvents.listen((event) {
-      if (mounted) {
-        setState(() {
-          if (event == 'server_started') {
-            _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...';
-          } else if (event == 'server_stopped') {
-            _serverStatusMessage = 'Servidor apagado.';
-          } else if (event == 'client_connecting') {
-            _serverStatusMessage = 'Celular conectándose...';
-          } else if (event == 'client_disconnected') {
-            _serverStatusMessage = 'Celular desconectado. Servidor en espera...';
-          } else if (event == 'paired') {
-            _hasPairingKey = true;
-            _serverStatusMessage = '¡Vinculación completada con éxito!';
-          } else if (event == 'sync_manifest_processed') {
-            _serverStatusMessage = 'Comparando datos locales con celular...';
-          } else if (event == 'sync_completed') {
-            _serverStatusMessage = '¡Sincronización bidireccional exitosa!';
-            Future.delayed(const Duration(seconds: 4), () {
-              if (mounted && _serverStatusMessage == '¡Sincronización bidireccional exitosa!') {
-                setState(() => _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...');
-              }
-            });
-          } else if (event == 'sync_error') {
-            _serverStatusMessage = 'Error durante la sincronización.';
-          } else if (event.startsWith('remote_unlock')) {
-            _serverStatusMessage = 'Recibida solicitud de desbloqueo remoto.';
-            Future.delayed(const Duration(seconds: 4), () {
-              if (mounted && _serverStatusMessage == 'Recibida solicitud de desbloqueo remoto.') {
-                setState(() => _serverStatusMessage = 'Servidor activo. Esperando conexión del celular...');
-              }
-            });
-          }
-        });
-      }
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      setState(() {
+        if (event == 'server_started') {
+          _serverStatusMessage = l10n.syncServerActive;
+        } else if (event == 'server_stopped') {
+          _serverStatusMessage = l10n.syncServerOff;
+        } else if (event == 'client_connecting') {
+          _serverStatusMessage = l10n.syncClientConnecting;
+        } else if (event == 'client_disconnected') {
+          _serverStatusMessage = l10n.syncClientDisconnected;
+        } else if (event == 'paired') {
+          _hasPairingKey = true;
+          _serverStatusMessage = l10n.syncPairedOk;
+        } else if (event == 'sync_manifest_processed') {
+          _serverStatusMessage = l10n.syncComparing;
+        } else if (event == 'sync_completed') {
+          final done = l10n.syncBidirOk;
+          _serverStatusMessage = done;
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted && _serverStatusMessage == done) {
+              setState(() => _serverStatusMessage =
+                  AppLocalizations.of(context).syncServerActive);
+            }
+          });
+        } else if (event == 'sync_error') {
+          _serverStatusMessage = l10n.syncErrorGeneric;
+        } else if (event.startsWith('remote_unlock')) {
+          final msg = l10n.syncRemoteUnlockReceived;
+          _serverStatusMessage = msg;
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted && _serverStatusMessage == msg) {
+              setState(() => _serverStatusMessage =
+                  AppLocalizations.of(context).syncServerActive);
+            }
+          });
+        }
+      });
     });
   }
 
@@ -116,6 +122,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final state = ref.watch(pairingNotifierProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: Container(
@@ -137,12 +144,12 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 Icon(Icons.sync_rounded, size: 64, color: palette.primary),
                 const SizedBox(height: 20),
                 Text(
-                  'Vincular con App Móvil',
+                  l10n.syncPairTitle,
                   style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.',
+                  l10n.syncPairSubtitle,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
                 ),
@@ -150,21 +157,21 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 ElevatedButton.icon(
                   onPressed: () => ref.read(pairingNotifierProvider.notifier).startDesktopServer(),
                   icon: const Icon(Icons.qr_code_rounded),
-                  label: const Text('Generar Código QR'),
+                  label: Text(l10n.syncGenerateQr),
                 ),
               ],
             ] else if (state.status == PairingStatus.loading) ...[
               CircularProgressIndicator(color: palette.primary),
               const SizedBox(height: 20),
-              Text('Iniciando servidor local...', style: TextStyle(color: palette.textMuted)),
+              Text(l10n.syncStartingServer, style: TextStyle(color: palette.textMuted)),
             ] else if (state.status == PairingStatus.serverReady && state.payload != null) ...[
               Text(
-                'Escanea este código QR',
+                l10n.syncScanThisQr,
                 style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Abre SoloKey en tu móvil, ve a Sincronizar y escanea este código.',
+                l10n.syncScanThisQrSub,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: palette.textMuted, fontSize: 12),
               ),
@@ -192,7 +199,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
               OutlinedButton.icon(
                 onPressed: () => ref.read(pairingNotifierProvider.notifier).stopDesktopServer(),
                 icon: Icon(Icons.close_rounded, color: palette.error),
-                label: Text('Cancelar', style: TextStyle(color: palette.error)),
+                label: Text(l10n.commonCancel, style: TextStyle(color: palette.error)),
                 style: OutlinedButton.styleFrom(
                   side: BorderSide(color: palette.error),
                 ),
@@ -200,42 +207,42 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
             ] else if (state.status == PairingStatus.connecting) ...[
               CircularProgressIndicator(color: palette.primary),
               const SizedBox(height: 20),
-              Text('Conectando con el dispositivo móvil...', style: TextStyle(color: palette.textMuted)),
+              Text(l10n.syncConnectingDevice, style: TextStyle(color: palette.textMuted)),
             ] else if (state.status == PairingStatus.paired) ...[
               Icon(Icons.check_circle_rounded, size: 64, color: palette.primary),
               const SizedBox(height: 20),
               Text(
-                '¡Vinculado Exitosamente!',
+                l10n.syncLinkedTitle,
                 style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'Los dispositivos ahora están enlazados de forma segura.',
+                l10n.syncLinkedSub,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: palette.textMuted, fontSize: 13),
               ),
               const SizedBox(height: 28),
               ElevatedButton(
                 onPressed: () => ref.read(pairingNotifierProvider.notifier).reset(),
-                child: const Text('Entendido'),
+                child: Text(l10n.syncUnderstood),
               ),
             ] else if (state.status == PairingStatus.failed) ...[
               Icon(Icons.error_outline_rounded, size: 64, color: palette.error),
               const SizedBox(height: 20),
               Text(
-                'Error de Vinculación',
+                l10n.syncErrorTitle,
                 style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                state.errorMessage ?? 'Ocurrió un error inesperado.',
+                state.errorMessage ?? l10n.syncUnexpectedError,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: palette.textMuted, fontSize: 13),
               ),
               const SizedBox(height: 28),
               ElevatedButton(
                 onPressed: () => ref.read(pairingNotifierProvider.notifier).reset(),
-                child: const Text('Reintentar'),
+                child: Text(l10n.syncRetryButton),
               ),
             ],
           ],
@@ -246,19 +253,19 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
 
   Widget _buildDesktopConnectedSection(PairingState state) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Icon(Icons.check_circle_rounded, size: 64, color: palette.primary),
         const SizedBox(height: 20),
         Text(
-          'Computadora Vinculada',
+          l10n.syncComputerLinked,
           style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
         Text(
-          'Esta computadora está emparejada de forma segura. Puedes conectar '
-          'varios dispositivos a la vez escaneando el mismo QR.',
+          l10n.syncComputerLinkedSub,
           textAlign: TextAlign.center,
           style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
         ),
@@ -294,7 +301,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Servidor local E2EE Activo',
+                    l10n.syncServerE2eeActive,
                     style: TextStyle(color: palette.textPrimary, fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                 ],
@@ -330,7 +337,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 ref.read(pairingNotifierProvider.notifier).reset();
               },
               icon: Icon(Icons.delete_outline_rounded, color: palette.error),
-              label: Text('Eliminar Vínculo', style: TextStyle(color: palette.error)),
+              label: Text(l10n.syncRemoveLink, style: TextStyle(color: palette.error)),
               style: OutlinedButton.styleFrom(
                 minimumSize: const Size(0, 46),
                 side: BorderSide(color: palette.error),
@@ -341,7 +348,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 ref.read(pairingNotifierProvider.notifier).startDesktopServer();
               },
               icon: const Icon(Icons.qr_code_rounded),
-              label: const Text('Mostrar QR'),
+              label: Text(l10n.syncShowQr),
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size(0, 46),
                 backgroundColor: palette.primary,
@@ -363,7 +370,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
         palette,
         palette.textMuted,
         Icon(Icons.hourglass_empty_rounded, color: palette.textMuted, size: 16),
-        'Esperando dispositivos…',
+        AppLocalizations.of(context).syncWaitingDevices,
       );
     }
     return Column(
@@ -377,6 +384,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   }
 
   Widget _buildDeviceRow(AppPalette palette, ConnectedDevice device) {
+    final l10n = AppLocalizations.of(context);
     final Color color;
     final Widget trailing;
     final String statusLabel;
@@ -388,15 +396,15 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           height: 13,
           child: CircularProgressIndicator(strokeWidth: 2, color: color),
         );
-        statusLabel = 'Sincronizando…';
+        statusLabel = l10n.syncStatusSyncing;
       case DeviceSyncStatus.synced:
         color = palette.success;
         trailing = Icon(Icons.check_circle_rounded, color: color, size: 15);
-        statusLabel = 'Sincronizado';
+        statusLabel = l10n.syncStatusSynced;
       case DeviceSyncStatus.connected:
         color = palette.success;
         trailing = Icon(Icons.bolt_rounded, color: color, size: 15);
-        statusLabel = 'Conectado';
+        statusLabel = l10n.syncStatusConnected;
     }
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
@@ -473,6 +481,10 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   String? _unlockResult;
   bool _isSyncing = false;
   String? _syncStatusMessage;
+  // Tipo del mensaje de estado (para color/icono) — reemplaza la deteccion por
+  // prefijo de texto, que se rompia al localizar.
+  bool _syncIsError = false;
+  bool _syncIsSuccess = false;
   StreamSubscription<String>? _clientEventsSubscription;
 
   @override
@@ -496,26 +508,31 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
 
   void _subscribeToClientEvents() {
     _clientEventsSubscription = getIt<SyncService>().clientEvents.listen((event) {
-      if (mounted) {
-        setState(() {
-          if (event == 'sync_started') {
-            _isSyncing = true;
-            _syncStatusMessage = 'Iniciando sincronización...';
-          } else if (event == 'sync_response_processed') {
-            _syncStatusMessage = 'Enviando cambios locales...';
-          } else if (event.startsWith('sync_completed:')) {
-            _isSyncing = false;
-            final stats = event.replaceFirst('sync_completed:', '');
-            _syncStatusMessage = '¡Sincronización exitosa! ($stats)';
-            Future.delayed(const Duration(seconds: 4), () {
-              if (mounted) setState(() => _syncStatusMessage = null);
-            });
-          } else if (event.startsWith('error:')) {
-            _isSyncing = false;
-            _syncStatusMessage = 'Error: ${event.replaceFirst('error:', '')}';
-          }
-        });
-      }
+      if (!mounted) return;
+      final l10n = AppLocalizations.of(context);
+      setState(() {
+        if (event == 'sync_started') {
+          _isSyncing = true;
+          _syncIsError = false;
+          _syncIsSuccess = false;
+          _syncStatusMessage = l10n.syncStarting;
+        } else if (event == 'sync_response_processed') {
+          _syncStatusMessage = l10n.syncSendingLocal;
+        } else if (event.startsWith('sync_completed:')) {
+          _isSyncing = false;
+          _syncIsSuccess = true;
+          final stats = event.replaceFirst('sync_completed:', '');
+          _syncStatusMessage = l10n.syncSuccessStats(stats);
+          Future.delayed(const Duration(seconds: 4), () {
+            if (mounted) setState(() => _syncStatusMessage = null);
+          });
+        } else if (event.startsWith('error:')) {
+          _isSyncing = false;
+          _syncIsError = true;
+          final detail = event.replaceFirst('error:', '').trim();
+          _syncStatusMessage = '${l10n.syncErrorGeneric} ($detail)';
+        }
+      });
     });
   }
 
@@ -548,6 +565,9 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   /// 3. Send the DUK over the E2EE channel — the desktop decrypts its own master
   ///    key with it. The master PASSWORD never leaves this device.
   Future<void> _sendRemoteUnlock() async {
+    // Capturamos l10n ANTES de cualquier await para no usar el context tras un
+    // async gap (la razon biometrica se pasa luego de varios awaits).
+    final l10n = AppLocalizations.of(context);
     setState(() {
       _isSendingUnlock = true;
       _unlockResult = null;
@@ -570,7 +590,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
       // 2. Require biometric authentication
       final biometricService = getIt<BiometricAuthService>();
       final authenticated = await biometricService.authenticate(
-        reason: 'Autentícate para desbloquear tu computadora',
+        reason: l10n.syncBiometricReason,
       );
 
       if (!authenticated) {
@@ -606,6 +626,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final state = ref.watch(pairingNotifierProvider);
+    final l10n = AppLocalizations.of(context);
 
     return Center(
       child: SingleChildScrollView(
@@ -617,12 +638,12 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
               Icon(Icons.sync_rounded, size: 72, color: palette.accent),
               const SizedBox(height: 24),
               Text(
-                'Vincular Computadora',
+                l10n.syncLinkComputer,
                 style: TextStyle(color: palette.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(
-                'Escanea el código QR generado por la aplicación SoloKey en tu computadora para sincronizar los datos locales.',
+                l10n.syncLinkComputerSub,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: palette.textMuted, fontSize: 14, height: 1.4),
               ),
@@ -630,7 +651,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
               ElevatedButton.icon(
                 onPressed: _scanQr,
                 icon: const Icon(Icons.qr_code_scanner_rounded),
-                label: const Text('Escanear Código QR'),
+                label: Text(l10n.syncScanQrButton),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: palette.accent,
                   minimumSize: const Size(240, 54),
@@ -650,19 +671,19 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
               CircularProgressIndicator(color: palette.accent),
               const SizedBox(height: 24),
               Text(
-                'Negociando claves de encriptación...',
+                l10n.syncNegotiating,
                 style: TextStyle(color: palette.textMuted, fontSize: 15),
               ),
             ] else if (state.status == PairingStatus.paired) ...[
               Icon(Icons.check_circle_rounded, size: 72, color: palette.success),
               const SizedBox(height: 24),
               Text(
-                '¡Computadora Vinculada!',
+                l10n.syncComputerLinkedExcl,
                 style: TextStyle(color: palette.textPrimary, fontSize: 22, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Text(
-                'Los datos ahora se sincronizarán de forma segura entre dispositivos.',
+                l10n.syncComputerLinkedExclSub,
                 textAlign: TextAlign.center,
                 style: TextStyle(color: palette.textMuted, fontSize: 14),
               ),
@@ -676,20 +697,20 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                   backgroundColor: palette.success,
                   minimumSize: const Size(200, 50),
                 ),
-                child: const Text('Volver'),
+                child: Text(l10n.syncBack),
               ),
             ] else if (state.status == PairingStatus.failed) ...[
               Icon(Icons.error_outline_rounded, size: 72, color: palette.danger),
               const SizedBox(height: 24),
               Text(
-                'Error de Vinculación',
+                l10n.syncErrorTitle,
                 style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Text(
-                  state.errorMessage ?? 'No se pudo conectar con la computadora.',
+                  state.errorMessage ?? l10n.syncCouldNotConnect,
                   textAlign: TextAlign.center,
                   style: TextStyle(color: palette.textMuted, fontSize: 14),
                 ),
@@ -701,7 +722,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                   backgroundColor: palette.danger,
                   minimumSize: const Size(200, 50),
                 ),
-                child: const Text('Volver a Intentar'),
+                child: Text(l10n.syncRetryButton),
               ),
             ],
           ],
@@ -712,6 +733,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
 
   Widget _buildWifiUnlockSection() {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -738,7 +760,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Desbloqueo Remoto',
+            l10n.syncRemoteUnlockTitle,
             style: TextStyle(
               color: palette.textPrimary,
               fontSize: 17,
@@ -747,7 +769,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Desbloquea la bóveda de tu computadora usando la biometría de este dispositivo.',
+            l10n.syncRemoteUnlockSub,
             textAlign: TextAlign.center,
             style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.3),
           ),
@@ -777,7 +799,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Enviando...',
+                          l10n.syncSending,
                           style: TextStyle(color: palette.primary, fontSize: 14),
                         ),
                       ],
@@ -786,7 +808,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                 : ElevatedButton.icon(
                     onPressed: _sendRemoteUnlock,
                     icon: const Icon(Icons.lock_open_rounded),
-                    label: const Text('Desbloquear Computadora'),
+                    label: Text(l10n.syncUnlockComputer),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: palette.primary,
                       foregroundColor: palette.background,
@@ -804,6 +826,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
 
   Widget _buildUnlockResultBanner() {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     late final IconData icon;
     late final Color color;
     late final String message;
@@ -812,25 +835,24 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
       case 'sent':
         icon = Icons.check_circle_rounded;
         color = palette.success;
-        message = '¡Solicitud enviada! La bóveda debería desbloquearse.';
+        message = l10n.syncUnlockSentBanner;
         break;
       case 'auth_cancelled':
         icon = Icons.fingerprint_rounded;
         color = palette.textMuted;
-        message = 'Autenticación biométrica cancelada.';
+        message = l10n.syncAuthCancelled;
         break;
       case 'no_token':
         icon = Icons.warning_amber_rounded;
         color = palette.warning;
-        message = 'Vincula de nuevo con el escritorio DESBLOQUEADO para '
-            'habilitar el desbloqueo remoto.';
+        message = l10n.syncNoToken;
         break;
       case 'failed':
       case 'error':
       default:
         icon = Icons.error_outline_rounded;
         color = palette.danger;
-        message = 'No se pudo conectar con la computadora.';
+        message = l10n.syncCouldNotConnect;
         break;
     }
 
@@ -858,6 +880,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
 
   Widget _buildSyncSection() {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -884,7 +907,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           ),
           const SizedBox(height: 16),
           Text(
-            'Sincronizar Bóveda',
+            l10n.syncVaultTitle,
             style: TextStyle(
               color: palette.textPrimary,
               fontSize: 17,
@@ -893,7 +916,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Intercambia y actualiza tus credenciales bidireccionalmente en red local.',
+            l10n.syncVaultSub,
             textAlign: TextAlign.center,
             style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.3),
           ),
@@ -903,12 +926,12 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
               decoration: BoxDecoration(
-                color: (_syncStatusMessage!.startsWith('Error')
+                color: (_syncIsError
                     ? palette.danger
                     : palette.accent).withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(10),
                 border: Border.all(
-                  color: (_syncStatusMessage!.startsWith('Error')
+                  color: (_syncIsError
                       ? palette.danger
                       : palette.accent).withValues(alpha: 0.3),
                 ),
@@ -916,12 +939,12 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
               child: Row(
                 children: [
                   Icon(
-                    _syncStatusMessage!.startsWith('Error')
+                    _syncIsError
                         ? Icons.error_outline_rounded
-                        : (_syncStatusMessage!.startsWith('¡Sincronización') ? Icons.check_circle_rounded : Icons.sync_rounded),
-                    color: _syncStatusMessage!.startsWith('Error')
+                        : (_syncIsSuccess ? Icons.check_circle_rounded : Icons.sync_rounded),
+                    color: _syncIsError
                         ? palette.danger
-                        : (_syncStatusMessage!.startsWith('¡Sincronización') ? palette.success : palette.accent),
+                        : (_syncIsSuccess ? palette.success : palette.accent),
                     size: 20,
                   ),
                   const SizedBox(width: 10),
@@ -929,9 +952,9 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                     child: Text(
                       _syncStatusMessage!,
                       style: TextStyle(
-                        color: _syncStatusMessage!.startsWith('Error')
+                        color: _syncIsError
                             ? palette.danger
-                            : (_syncStatusMessage!.startsWith('¡Sincronización') ? palette.success : palette.textMuted),
+                            : (_syncIsSuccess ? palette.success : palette.textMuted),
                         fontSize: 12,
                         height: 1.3,
                       ),
@@ -961,7 +984,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                         ),
                         const SizedBox(width: 12),
                         Text(
-                          'Sincronizando...',
+                          l10n.syncStatusSyncing,
                           style: TextStyle(color: palette.accent, fontSize: 14),
                         ),
                       ],
@@ -981,15 +1004,20 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                         if (mounted) {
                           setState(() {
                             _isSyncing = false;
+                            _syncIsError = true;
+                            _syncIsSuccess = false;
                             _syncStatusMessage =
-                                'Error: Aun no has vinculado. Escanea el QR del escritorio.';
+                                AppLocalizations.of(context).syncNotPairedYet;
                           });
                         }
                         return;
                       }
                       setState(() {
                         _isSyncing = true;
-                        _syncStatusMessage = 'Conectando con la computadora...';
+                        _syncIsError = false;
+                        _syncIsSuccess = false;
+                        _syncStatusMessage =
+                            AppLocalizations.of(context).syncConnectingComputer;
                       });
                       final ok = await syncService.resumeWithDesktop();
                       if (!mounted) return;
@@ -998,13 +1026,14 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                       } else {
                         setState(() {
                           _isSyncing = false;
+                          _syncIsError = true;
                           _syncStatusMessage =
-                              'Error: No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.';
+                              AppLocalizations.of(context).syncConnectFailCheck;
                         });
                       }
                     },
                     icon: const Icon(Icons.sync_rounded),
-                    label: const Text('Sincronizar Bóveda'),
+                    label: Text(l10n.syncVaultTitle),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: palette.accent,
                       foregroundColor: palette.onPrimary,
