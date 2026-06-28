@@ -35,6 +35,11 @@ part 'app_database.g.dart';
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
+  /// Test-only constructor: runs on a caller-provided executor (e.g.
+  /// `NativeDatabase.memory()`), so unit tests exercise the schema/migrations
+  /// in isolation without touching the on-disk vault.
+  AppDatabase.forTesting(super.executor);
+
   @override
   int get schemaVersion => 10;
 
