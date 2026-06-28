@@ -157,14 +157,14 @@ class DeltaSyncManager {
         }
       } else {
         // Both have it → LWW
-        final resolution = _resolveConflict(
+        final resolution = resolveSyncConflict(
           localUpdatedAt: local.updatedAt,
           remoteUpdatedAt: remote.updatedAt,
           localId: local.id,
           remoteId: remote.id,
         );
 
-        if (resolution == _ConflictWinner.remote) {
+        if (resolution == SyncConflictWinner.remote) {
           if (remote.isDeleted) {
             // Remote deleted it — apply deletion locally
             await _db.credentialDao.deleteById(remote.id);
@@ -229,14 +229,14 @@ class DeltaSyncManager {
           toRequest.add(remote.id);
         }
       } else {
-        final resolution = _resolveConflict(
+        final resolution = resolveSyncConflict(
           localUpdatedAt: local.createdAt,
           remoteUpdatedAt: remote.updatedAt,
           localId: local.id,
           remoteId: remote.id,
         );
 
-        if (resolution == _ConflictWinner.remote) {
+        if (resolution == SyncConflictWinner.remote) {
           if (remote.isDeleted) {
             await _db.folderDao.deleteById(remote.id);
           } else {
@@ -332,25 +332,6 @@ class DeltaSyncManager {
   }
 
   // ─────────────────────────────────────────────────────────────────────────
-  // LWW Conflict Resolution
-  // ─────────────────────────────────────────────────────────────────────────
-
-  _ConflictWinner _resolveConflict({
-    required int localUpdatedAt,
-    required int remoteUpdatedAt,
-    required String localId,
-    required String remoteId,
-  }) {
-    if (remoteUpdatedAt > localUpdatedAt) return _ConflictWinner.remote;
-    if (remoteUpdatedAt < localUpdatedAt) return _ConflictWinner.local;
-    // Timestamps equal — tie-break by lexicographic UUID comparison.
-    // Deterministic on both sides because both see the same IDs.
-    return localId.compareTo(remoteId) <= 0
-        ? _ConflictWinner.local
-        : _ConflictWinner.remote;
-  }
-
-  // ─────────────────────────────────────────────────────────────────────────
   // Row ↔ JSON serialization helpers
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -376,6 +357,8 @@ class DeltaSyncManager {
       'folder_id': row.folderId,
       'is_favorite': row.isFavorite,
       'is_double_encrypted': row.isDoubleEncrypted,
+      'is_hidden': row.isHidden,
+      'sort_order': row.sortOrder,
       'payload_plain': payloadPlain,
       'created_at': row.createdAt,
       'updated_at': row.updatedAt,
@@ -401,6 +384,8 @@ class DeltaSyncManager {
       folderId: Value(json['folder_id'] as String?),
       isFavorite: Value(json['is_favorite'] as bool? ?? false),
       isDoubleEncrypted: Value(json['is_double_encrypted'] as bool? ?? false),
+      isHidden: Value(json['is_hidden'] as bool? ?? false),
+      sortOrder: Value(json['sort_order'] as int? ?? 0),
       encryptedPayload: Value(encryptedPayload),
       createdAt: Value(json['created_at'] as int),
       updatedAt: Value(json['updated_at'] as int),
@@ -433,4 +418,22 @@ class DeltaSyncManager {
   }
 }
 
-enum _ConflictWinner { local, remote }
+/// Winner of a Last-Write-Wins comparison.
+enum SyncConflictWinner { local, remote }
+
+/// Last-Write-Wins resolution shared by credential & folder deltas. Pure and
+/// deterministic so BOTH devices independently agree on the same winner.
+/// The newer `updatedAt` wins; on an exact tie the lexicographically smaller
+/// UUID wins (`local` if `localId <= remoteId`). Public for unit testing.
+SyncConflictWinner resolveSyncConflict({
+  required int localUpdatedAt,
+  required int remoteUpdatedAt,
+  required String localId,
+  required String remoteId,
+}) {
+  if (remoteUpdatedAt > localUpdatedAt) return SyncConflictWinner.remote;
+  if (remoteUpdatedAt < localUpdatedAt) return SyncConflictWinner.local;
+  return localId.compareTo(remoteId) <= 0
+      ? SyncConflictWinner.local
+      : SyncConflictWinner.remote;
+}
