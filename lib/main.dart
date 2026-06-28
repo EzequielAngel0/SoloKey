@@ -20,6 +20,7 @@ import 'app/di/provider_overrides.dart';
 import 'core/services/notification_navigation.dart';
 import 'core/services/notification_service.dart';
 import 'features/autofill/infrastructure/autofill_fetch_service.dart';
+import 'features/sync/infrastructure/sync_service.dart';
 import 'router/app_router.dart';
 
 /// WorkManager background entry point (Android). Runs in its own isolate, so it
@@ -198,6 +199,21 @@ Future<void> main(List<String> args) async {
       // Desktop tray daemon: periodic in-process rotation sweeps.
       if (isDesktop) {
         notifications.startDesktopDaemon();
+
+        // G1: si ya hay un dispositivo emparejado, deja el servidor de sync
+        // escuchando desde el arranque (no solo al abrir la pantalla de
+        // Sincronizar). Asi el celular puede reconectarse, sincronizar y aprobar
+        // el desbloqueo remoto aunque la boveda este bloqueada.
+        unawaited(() async {
+          try {
+            final sync = getIt<SyncService>();
+            if (!sync.isServerRunning && await sync.hasPairingKey()) {
+              await sync.startServer();
+            }
+          } catch (_) {
+            // Best-effort: nunca debe impedir el arranque.
+          }
+        }());
       }
     },
     (error, stack) {

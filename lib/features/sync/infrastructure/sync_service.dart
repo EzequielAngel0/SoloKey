@@ -34,6 +34,11 @@ class SyncService {
   static const String _kSyncKeyName = 'solokey_sync_key';
   static const String _kSyncDevicesName = 'solokey_sync_devices';
   static const String _kDeviceIdName = 'solokey_device_id';
+  // Escritorio: K_sync persistida por dispositivo, para que un celular pueda
+  // RECONECTARSE (resume) sin re-escanear el QR. Mapa {deviceId: base64(K_sync)}.
+  static const String _kServerDeviceKeysName = 'solokey_server_device_keys';
+  // Movil: ultimo endpoint conocido del escritorio (ip:port) para reconectar.
+  static const String _kDesktopEndpointName = 'solokey_desktop_endpoint';
   // WiFi-unlock (token DUK): el escritorio guarda su master key CIFRADA con el
   // DUK; el movil guarda el DUK que la desbloquea. Asi nunca viaja ni se
   // almacena la contrasena maestra en texto plano.
@@ -70,6 +75,11 @@ class SyncService {
   // Mobile Client State
   WebSocketChannel? _clientChannel;
   nsd.Discovery? _discovery;
+  // M1: keep-alive + periodic auto-sync while connected, and one-shot
+  // auto-reconnect when the link drops.
+  Timer? _heartbeatTimer;
+  Timer? _autoSyncTimer;
+  bool _autoReconnect = false;
   final StreamController<String> _clientEventController =
       StreamController<String>.broadcast();
   Stream<String> get clientEvents => _clientEventController.stream;
@@ -159,6 +169,7 @@ class SyncService {
 
   void _handleServerConnection(WebSocketChannel ws) {
     final peer = _ServerPeer();
+    peer.channel = ws;
     _peers.add(peer);
     _serverEventController.add('client_connecting');
 
@@ -170,6 +181,12 @@ class SyncService {
 
           if (type == 'ecdh_exchange') {
             await _handleEcdhExchange(ws, data, peer);
+          } else if (type == 'resume') {
+            await _handleResume(ws, data, peer);
+          } else if (type == 'resume_response') {
+            await _handleResumeResponse(ws, data, peer);
+          } else if (type == 'ping') {
+            ws.sink.add(jsonEncode({'type': 'pong'}));
           } else if (type == 'encrypted') {
             await _handleEncryptedServerMessage(ws, data, peer);
           }
@@ -242,6 +259,9 @@ class SyncService {
           : 'Dispositivo móvil';
       peer.status = DeviceSyncStatus.connected;
       await _savePairedDevice(peer.id, peer.name);
+      // Persistir K_sync de ESTE dispositivo para permitir reconexion (resume)
+      // sin re-escanear el QR en futuras sesiones del escritorio.
+      await _saveServerDeviceKey(peer.id, peer.key!);
 
       // Respond with Desktop signature: HMAC(kSync, DesktopPubKey)
       final desktopPubKey = await _desktopKeyPair!.extractPublicKey();
@@ -273,6 +293,100 @@ class SyncService {
           {'type': 'error', 'message': 'Invalid pairing token signature'}));
       _serverEventController.add('pairing_failed');
     }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DESKTOP SERVER: Resume (reconnect with persisted K_sync, no QR re-scan)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Resume step 1: the phone announces its device id. If we hold a stored
+  /// K_sync for it, we reply with a random challenge nonce it must HMAC.
+  Future<void> _handleResume(
+      WebSocketChannel ws, Map<String, dynamic> data, _ServerPeer peer) async {
+    final deviceId = (data['device_id'] as String?)?.trim() ?? '';
+    final storedKey =
+        deviceId.isEmpty ? null : await _loadServerDeviceKey(deviceId);
+    if (storedKey == null) {
+      ws.sink.add(
+          jsonEncode({'type': 'error', 'message': 'resume_unknown_device'}));
+      return;
+    }
+    peer.id = deviceId;
+    final devices = await _loadPairedDevices();
+    peer.name = devices[deviceId] ?? 'Dispositivo móvil';
+    peer.resumeKey = storedKey;
+    peer.resumeChallenge = _cryptoRandomBytes(32);
+    ws.sink.add(jsonEncode({
+      'type': 'resume_challenge',
+      'nonce': base64Encode(peer.resumeChallenge!),
+    }));
+  }
+
+  /// Resume step 2: verify HMAC(K_sync, nonce). On success the connection is
+  /// authenticated and bound to the stored key — encrypted messages flow as if
+  /// freshly paired, without re-deriving or transmitting the key.
+  Future<void> _handleResumeResponse(
+      WebSocketChannel ws, Map<String, dynamic> data, _ServerPeer peer) async {
+    final mac = data['mac'] as String?;
+    if (peer.resumeKey == null || peer.resumeChallenge == null || mac == null) {
+      ws.sink.add(jsonEncode({'type': 'error', 'message': 'resume_failed'}));
+      return;
+    }
+    final hmac = crypto.Hmac.sha256();
+    final expected = await hmac.calculateMac(
+      peer.resumeChallenge!,
+      secretKey: crypto.SecretKey(peer.resumeKey!),
+    );
+    if (base64Encode(expected.bytes) != mac) {
+      ws.sink.add(jsonEncode({'type': 'error', 'message': 'resume_failed'}));
+      _serverEventController.add('pairing_failed');
+      return;
+    }
+    peer.key = peer.resumeKey;
+    peer.resumeKey = null;
+    peer.resumeChallenge = null;
+    peer.status = DeviceSyncStatus.connected;
+    ws.sink.add(jsonEncode({'type': 'resumed'}));
+    _serverEventController.add('client_resumed');
+    _serverEventController.add('devices_changed');
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // DESKTOP SERVER: Push login-approval request to connected phones (M3)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// True when at least one phone is connected (a remote approval can be sent).
+  bool get hasConnectedDevices => _peers.any((p) => p.key != null);
+
+  /// Asks every connected phone to approve unlocking this desktop. The phone
+  /// shows a LOCAL notification (no FCM); approving sends back its DUK over the
+  /// existing E2EE channel, which decrypts the locally-wrapped master key.
+  /// Returns how many phones the request reached.
+  Future<int> requestApproval() async {
+    var sent = 0;
+    for (final peer in _peers) {
+      if (peer.key == null) continue;
+      await _sendEncryptedToPeer(peer, {
+        'action': 'approval_request',
+        'payload': {'desktop': _localDeviceName()},
+      });
+      sent++;
+    }
+    if (sent > 0) _serverEventController.add('approval_requested');
+    return sent;
+  }
+
+  Future<void> _sendEncryptedToPeer(
+      _ServerPeer peer, Map<String, dynamic> plainMsg) async {
+    final ch = peer.channel;
+    if (peer.key == null || ch == null) return;
+    final plainBytes = utf8.encode(jsonEncode(plainMsg));
+    final encryptedBytes = await _securityService.encrypt(
+        Uint8List.fromList(plainBytes), peer.key!);
+    ch.sink.add(jsonEncode({
+      'type': 'encrypted',
+      'payload': base64Encode(encryptedBytes),
+    }));
   }
 
   Future<void> _handleEncryptedServerMessage(
@@ -594,6 +708,11 @@ class SyncService {
               await _storage.write(
                   key: _kSyncKeyName,
                   value: base64Encode(_syncKey!));
+              // Guarda el endpoint del escritorio para poder reconectar (resume)
+              // sin re-escanear el QR en futuras sesiones.
+              await _storage.write(
+                  key: _kDesktopEndpointName,
+                  value: '${payload.ip}:${payload.port}');
 
               // NOTE: We no longer adopt the remote MasterKeyConfig. Each device
               // keeps its own salt/master key; payloads are re-keyed in transit
@@ -706,6 +825,12 @@ class SyncService {
         break;
       case 'wifi_unlock_response':
         _handleWifiUnlockResponse(msg);
+        break;
+      case 'approval_request':
+        // M3: el escritorio pide aprobacion de desbloqueo. Lo exponemos para que
+        // la UI muestre una notificacion local y el usuario apruebe (biometria +
+        // envio del DUK). No se usa FCM: requiere la app conectada.
+        _clientEventController.add('approval_request');
         break;
       default:
         debugPrint('[SyncService Client] Unknown action: $action');
@@ -879,6 +1004,138 @@ class SyncService {
     }
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
+  // MOBILE: Resume (reconnect without QR) + keep-alive auto-sync (M1)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  int _reconnectAttempts = 0;
+
+  /// True once this phone has resume data (endpoint + K_sync) to reconnect.
+  Future<bool> canResume() async =>
+      (await _storage.read(key: _kDesktopEndpointName)) != null &&
+      (await _storage.read(key: _kSyncKeyName)) != null;
+
+  /// Reconnects to the paired desktop using the persisted endpoint + K_sync,
+  /// authenticating via the resume challenge (no QR). On success it starts the
+  /// keep-alive + periodic auto-sync loop. Returns true when the link is up.
+  Future<bool> resumeWithDesktop({String? ip, int? port}) async {
+    try {
+      var endpoint = (ip != null && port != null) ? '$ip:$port' : null;
+      endpoint ??= await _storage.read(key: _kDesktopEndpointName);
+      if (endpoint == null || !endpoint.contains(':')) {
+        _clientEventController.add('error: no_endpoint');
+        return false;
+      }
+      final sep = endpoint.lastIndexOf(':');
+      final host = endpoint.substring(0, sep);
+      final p = int.tryParse(endpoint.substring(sep + 1)) ?? 0;
+
+      if (_syncKey == null) {
+        final saved = await _storage.read(key: _kSyncKeyName);
+        if (saved == null) {
+          _clientEventController.add('error: not_paired');
+          return false;
+        }
+        _syncKey = base64Decode(saved);
+      }
+      final deviceId = await _localDeviceId();
+      final hmac = crypto.Hmac.sha256();
+      final done = Completer<bool>();
+
+      _clientChannel = WebSocketChannel.connect(Uri.parse('ws://$host:$p/ws'));
+      _clientChannel!.stream.listen(
+        (message) async {
+          try {
+            final data = jsonDecode(message as String) as Map<String, dynamic>;
+            final type = data['type'] as String?;
+            if (type == 'resume_challenge') {
+              final nonce = base64Decode(data['nonce'] as String);
+              final mac = await hmac.calculateMac(nonce,
+                  secretKey: crypto.SecretKey(_syncKey!));
+              _clientChannel!.sink.add(jsonEncode({
+                'type': 'resume_response',
+                'mac': base64Encode(mac.bytes),
+              }));
+            } else if (type == 'resumed') {
+              _reconnectAttempts = 0;
+              _clientEventController.add('connected');
+              _startClientKeepAlive();
+              if (!done.isCompleted) done.complete(true);
+            } else if (type == 'encrypted') {
+              await _handleEncryptedClientMessage(data);
+            } else if (type == 'pong') {
+              // keep-alive ack — nothing to do.
+            } else if (type == 'error') {
+              _clientEventController.add('error: ${data['message']}');
+              if (!done.isCompleted) done.complete(false);
+            }
+          } catch (e) {
+            _clientEventController.add('error: $e');
+            if (!done.isCompleted) done.complete(false);
+          }
+        },
+        onDone: _onClientDisconnected,
+        onError: (err) {
+          _clientEventController.add('error: $err');
+          _onClientDisconnected();
+          if (!done.isCompleted) done.complete(false);
+        },
+      );
+
+      _autoReconnect = true;
+      _clientChannel!.sink
+          .add(jsonEncode({'type': 'resume', 'device_id': deviceId}));
+
+      return await done.future
+          .timeout(const Duration(seconds: 10), onTimeout: () => false);
+    } catch (e) {
+      _clientEventController.add('error: $e');
+      return false;
+    }
+  }
+
+  /// Keep-alive ping + periodic delta-sync while connected (M1). Delta-sync only
+  /// moves diffs, so a 60s cadence is cheap.
+  void _startClientKeepAlive() {
+    _heartbeatTimer?.cancel();
+    _autoSyncTimer?.cancel();
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 20), (_) {
+      try {
+        _clientChannel?.sink.add(jsonEncode({'type': 'ping'}));
+      } catch (_) {}
+    });
+    _autoSyncTimer =
+        Timer.periodic(const Duration(seconds: 60), (_) => unawaited(requestSync()));
+    unawaited(requestSync()); // immediate sync on (re)connect
+  }
+
+  void _onClientDisconnected() {
+    _heartbeatTimer?.cancel();
+    _autoSyncTimer?.cancel();
+    _heartbeatTimer = null;
+    _autoSyncTimer = null;
+    _clientChannel = null;
+    _clientEventController.add('disconnected');
+    // One-shot auto-reconnect with capped backoff (avoids battery-draining loop).
+    if (_autoReconnect && _reconnectAttempts < 5) {
+      final attempt = ++_reconnectAttempts;
+      Future.delayed(Duration(seconds: 5 * attempt), () {
+        if (_clientChannel == null && _autoReconnect) {
+          unawaited(resumeWithDesktop());
+        }
+      });
+    }
+  }
+
+  /// Stops keeping the connection alive (e.g. user left the sync screen / unpaired).
+  void stopAutoReconnect() {
+    _autoReconnect = false;
+    _heartbeatTimer?.cancel();
+    _autoSyncTimer?.cancel();
+    _heartbeatTimer = null;
+    _autoSyncTimer = null;
+  }
+
   /// Checks if this device has paired before — either as a mobile client
   /// (single stored K_sync) or as a desktop server (one or more known devices).
   Future<bool> hasPairingKey() async {
@@ -894,6 +1151,8 @@ class SyncService {
     await _storage.delete(key: _kSyncDevicesName);
     await _storage.delete(key: _kWrappedKeyName);
     await _storage.delete(key: _kRemoteUnlockToken);
+    await _storage.delete(key: _kServerDeviceKeysName);
+    await _storage.delete(key: _kDesktopEndpointName);
     for (final p in _peers) {
       if (p.key != null) zeroBuffer(p.key!);
     }
@@ -917,6 +1176,28 @@ class SyncService {
     final devices = await _loadPairedDevices();
     devices[id] = name;
     await _storage.write(key: _kSyncDevicesName, value: jsonEncode(devices));
+  }
+
+  /// Persisted per-device K_sync map for the desktop server (resume support).
+  Future<Map<String, String>> _loadServerDeviceKeys() async {
+    final raw = await _storage.read(key: _kServerDeviceKeysName);
+    if (raw == null) return {};
+    try {
+      return Map<String, String>.from(jsonDecode(raw) as Map);
+    } catch (_) {
+      return {};
+    }
+  }
+
+  Future<void> _saveServerDeviceKey(String id, Uint8List key) async {
+    final map = await _loadServerDeviceKeys();
+    map[id] = base64Encode(key);
+    await _storage.write(key: _kServerDeviceKeysName, value: jsonEncode(map));
+  }
+
+  Future<Uint8List?> _loadServerDeviceKey(String id) async {
+    final b64 = (await _loadServerDeviceKeys())[id];
+    return b64 == null ? null : base64Decode(b64);
   }
 
   /// Stable random id for THIS device, used to label it on the peer. Persisted.
@@ -1042,6 +1323,7 @@ class SyncService {
 
   /// Dispose resources when the service is torn down.
   Future<void> dispose() async {
+    stopAutoReconnect();
     await stopServer();
     await stopDiscovery();
     _clientChannel?.sink.close();
@@ -1083,4 +1365,11 @@ class _ServerPeer {
   String id = '';
   String name = 'Dispositivo móvil';
   DeviceSyncStatus status = DeviceSyncStatus.connected;
+
+  /// The live socket, so the desktop can PUSH messages (e.g. approval requests).
+  WebSocketChannel? channel;
+
+  /// Transient state during the resume (reconnect) handshake.
+  Uint8List? resumeKey;
+  Uint8List? resumeChallenge;
 }

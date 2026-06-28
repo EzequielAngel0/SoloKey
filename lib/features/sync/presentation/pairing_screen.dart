@@ -480,6 +480,18 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
     super.initState();
     _checkPairingKey();
     _subscribeToClientEvents();
+    _autoResume();
+  }
+
+  /// Reconnects automatically (resume, no QR) if this phone was paired before,
+  /// so sync and login-approval work without re-scanning. Keep-alive starts on
+  /// success (M1).
+  Future<void> _autoResume() async {
+    final sync = getIt<SyncService>();
+    if (sync.isClientConnected) return;
+    if (await sync.canResume()) {
+      await sync.resumeWithDesktop();
+    }
   }
 
   void _subscribeToClientEvents() {
@@ -958,36 +970,37 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                 : ElevatedButton.icon(
                     onPressed: () async {
                       final syncService = getIt<SyncService>();
-                      if (!syncService.isClientConnected) {
-                        setState(() {
-                          _isSyncing = true;
-                          _syncStatusMessage = 'Buscando computadora en la red...';
-                        });
-                        await syncService.startDiscovery((payload) async {
-                          await syncService.stopDiscovery();
-                          final connected = await syncService.pairWithDesktop(payload);
-                          if (connected) {
-                            await syncService.requestSync();
-                          } else {
-                            if (mounted) {
-                              setState(() {
-                                _isSyncing = false;
-                                _syncStatusMessage = 'Error: No se pudo conectar a la computadora.';
-                              });
-                            }
-                          }
-                        });
-                        Future.delayed(const Duration(seconds: 8), () async {
-                          if (mounted && _isSyncing && _syncStatusMessage == 'Buscando computadora en la red...') {
-                            await syncService.stopDiscovery();
-                            setState(() {
-                              _isSyncing = false;
-                              _syncStatusMessage = 'Error: No se encontró la computadora en la red local.';
-                            });
-                          }
-                        });
-                      } else {
+                      // Ya conectado: dispara una sincronizacion.
+                      if (syncService.isClientConnected) {
                         await syncService.requestSync();
+                        return;
+                      }
+                      // Reconexion (resume) sin re-escanear el QR, usando la
+                      // clave persistida del emparejamiento previo.
+                      if (!await syncService.canResume()) {
+                        if (mounted) {
+                          setState(() {
+                            _isSyncing = false;
+                            _syncStatusMessage =
+                                'Error: Aun no has vinculado. Escanea el QR del escritorio.';
+                          });
+                        }
+                        return;
+                      }
+                      setState(() {
+                        _isSyncing = true;
+                        _syncStatusMessage = 'Conectando con la computadora...';
+                      });
+                      final ok = await syncService.resumeWithDesktop();
+                      if (!mounted) return;
+                      if (ok) {
+                        await syncService.requestSync();
+                      } else {
+                        setState(() {
+                          _isSyncing = false;
+                          _syncStatusMessage =
+                              'Error: No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.';
+                        });
                       }
                     },
                     icon: const Icon(Icons.sync_rounded),
