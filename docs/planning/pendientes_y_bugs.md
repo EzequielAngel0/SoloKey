@@ -198,21 +198,29 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 | # | Item | Tipo | Prioridad | Esfuerzo | Estado |
 | --: | :--- | :--- | :--- | :--- | :--- |
 | B1 | Instancia única en escritorio (`windows_single_instance` en `main.dart`) | Bug | 🔴 | 🟢 | ✅ |
-| B2 | Vinculación: mDNS no bloquea el QR (try/catch) + IP no virtual | Bug | 🔴 | 🟡 | 🟦 |
+| B2 | Vinculación: mDNS no bloquea el QR + IP no virtual + regla de firewall opt-in en el instalador | Bug | 🔴 | 🟡 | ✅ |
 | B3 | Export: árbol agrupaba por `folderId` (muerto) en vez de `categoryId` → credenciales aparecían "Sin carpeta" | Bug | 🔴 | 🟡 | ✅ |
 | F1 | Ocultar/archivar + reordenar (drag) credenciales — migración Drift v10 (`isHidden`/`sortOrder`) | Mejora | 🟡 | 🔴 | ✅ |
-| G1 | Servidor de sync residente en segundo plano | Gap | 🟡 | 🟡 | ⬜ |
-| M2 | Login PC con PIN / Windows Hello (pulir) | Mejora | 🟡 | 🟢 | ⬜ |
-| M1 | Sincronización constante (persistente + auto) | Mejora | 🟡 | 🔴 | ⬜ |
-| M3 | Push al celular para aprobar login | Mejora | 🟢 | 🔴 | ⬜ |
+| G1 | Servidor de sync residente al arrancar el escritorio (si hay dispositivo emparejado) | Gap | 🟡 | 🟡 | ✅ |
+| R1 | Reconexión sin QR: K_sync persistida por dispositivo (escritorio) + handshake resume (HMAC challenge) | Base | 🔴 | 🔴 | 🟦 |
+| M2 | Login PC con PIN / Windows Hello (`isDeviceSupported` + PIN permitido en escritorio) | Mejora | 🟡 | 🟢 | ✅ |
+| M1 | Sincronización constante (resume + heartbeat + auto-sync 60s + auto-reconexión) | Mejora | 🟡 | 🔴 | 🟦 |
+| M3 | Push al celular para aprobar login (notificación local, sin FCM) | Mejora | 🟢 | 🔴 | 🟦 |
 | — | Tests del módulo sync | Deuda | 🟡 | 🟡 | ⬜ |
-| — | Empaquetado macOS/Linux/iOS | Deuda | 🟢 | 🔴 | ⬜ |
-| — | i18n del UI de ocultar/reordenar (strings hardcoded por ahora) | Deuda | 🟢 | 🟢 | ⬜ |
+| — | Empaquetado macOS/Linux/iOS (diferido: sin Mac/iPhone) | Deuda | 🟢 | 🔴 | ⏸️ |
+| — | i18n del UI de ocultar/reordenar + sync (strings hardcoded por ahora) | Deuda | 🟢 | 🟢 | ⬜ |
 | — | Reorden (drag) en la lista de escritorio (hoy solo móvil) | Deuda | 🟢 | 🟡 | ⬜ |
 
-> Resuelto el 2026-06-28: **B1, B3, F1** completos; **B2** parcial (mDNS+IP listos,
-> falta regla de firewall en el instalador). Siguiente sugerido: **G1 → M2**, y
-> luego **M1 / M3** (dependen de G1). `flutter analyze` sin issues nuevos; 40/40 tests verde.
+> Estado 2026-06-28: **B1, B2, B3, F1, G1, M2** completos. **R1/M1/M3 implementados**
+> pero marcados 🟦 porque el flujo cruzado PC↔celular (handshake resume, sync continua,
+> push de aprobación) **no se pudo probar en dispositivos reales** desde este entorno —
+> requieren verificación con un celular y un PC en la misma red antes de confiar en ellos.
+> `flutter analyze` sin issues nuevos; 40/40 tests verde.
+>
+> **Cómo funciona M3 sin FCM:** el celular (app abierta/conectada por resume) recibe la
+> petición por el canal E2EE y muestra una **notificación local**; al tocarla abre Sincronizar
+> y, con biometría, envía el DUK que ya tenía → el escritorio descifra su master key y se
+> desbloquea. FCM solo haría falta para despertar la app si está **totalmente cerrada**.
 
 ---
 
