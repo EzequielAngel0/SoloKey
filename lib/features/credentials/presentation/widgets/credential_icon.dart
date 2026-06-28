@@ -33,7 +33,7 @@ class CredentialIcon extends StatelessWidget {
             fit: BoxFit.contain,
             width: 46,
             height: 46,
-            errorBuilder: (_, __, ___) => _buildDefault(),
+            errorBuilder: (_, _, _) => _buildDefault(),
             loadingBuilder: (context, child, loadingProgress) {
               if (loadingProgress == null) return child;
               return _buildDefault();

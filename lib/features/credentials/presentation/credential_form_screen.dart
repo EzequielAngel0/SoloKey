@@ -775,7 +775,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     const SizedBox(height: 12),
                     SwitchListTile(
                       value: isSecret,
-                      activeColor: _typeColor(_type),
+                      activeThumbColor: _typeColor(_type),
                       contentPadding: EdgeInsets.zero,
                       title: Text(l10n.formSecretField, style: const TextStyle(color: Colors.white, fontSize: 14)),
                       subtitle: Text(
@@ -1324,7 +1324,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       title: l10n.formSectionSsh,
       children: [
         DropdownButtonFormField<String>(
-          value: _sshKeyType,
+          initialValue: _sshKeyType,
           style: const TextStyle(color: Colors.white),
           dropdownColor: AppColors.drawer,
           decoration: InputDecoration(
@@ -1425,7 +1425,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             l10n.formDoubleEncDesc,
             style: const TextStyle(color: AppColors.textMuted, fontSize: 12),
           ),
-          activeColor: AppColors.secondary,
+          activeThumbColor: AppColors.secondary,
           contentPadding: EdgeInsets.zero,
         ),
         if (_isDoubleEncrypted) ...[
@@ -1456,7 +1456,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               l10n.formBiometricUnlockSub,
               style: const TextStyle(color: AppColors.textMuted, fontSize: 11),
             ),
-            activeColor: AppColors.secondary,
+            activeThumbColor: AppColors.secondary,
             contentPadding: EdgeInsets.zero,
           ),
         ],
@@ -1480,7 +1480,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       title: l10n.formSectionRotation,
       children: [
         DropdownButtonFormField<String>(
-          value: _rotationInterval,
+          initialValue: _rotationInterval,
           style: const TextStyle(color: Colors.white),
           dropdownColor: AppColors.drawer,
           decoration: InputDecoration(
