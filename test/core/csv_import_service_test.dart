@@ -35,6 +35,12 @@ class FakeCredentialRepository implements ICredentialRepository {
 
   @override
   Future<List<PasswordHistory>> getPasswordHistory(String credentialId) async => [];
+
+  @override
+  Future<void> setHidden(String id, bool hidden) async {}
+
+  @override
+  Future<void> reorder(List<String> orderedIds) async {}
 }
 
 void main() {
