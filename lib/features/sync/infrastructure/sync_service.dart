@@ -105,20 +105,28 @@ class SyncService {
 
     // 3. Start Shelf router with WebSocket
     final app = Router();
-    app.get('/ws', webSocketHandler((WebSocketChannel ws) {
-      _handleServerConnection(ws);
-    }));
+    app.get('/ws', webSocketHandler(_handleServerConnection));
 
-    _server = await shelf_io.serve(app, '0.0.0.0', port);
+    _server = await shelf_io.serve(app.call, '0.0.0.0', port);
 
-    // 4. Register mDNS service
-    _registration = await nsd.register(
-      nsd.Service(
-        name: 'SoloKey Secure Desktop',
-        type: _serviceType,
-        port: port,
-      ),
-    );
+    // 4. Register mDNS service. mDNS is OPTIONAL — it only enables later
+    //    auto-discovery for re-sync. On Windows `nsd` needs Bonjour/dnssd.dll,
+    //    which is NOT present by default and makes register() throw. That must
+    //    never abort pairing: the QR already carries IP+port+token, so we
+    //    swallow the failure and still return the payload / show the QR.
+    try {
+      _registration = await nsd.register(
+        nsd.Service(
+          name: 'SoloKey Secure Desktop',
+          type: _serviceType,
+          port: port,
+        ),
+      );
+    } catch (e) {
+      _registration = null;
+      debugPrint(
+          '[SyncService] mDNS no disponible (la vinculacion por QR sigue funcionando): $e');
+    }
 
     _serverEventController.add('server_started');
 
@@ -134,7 +142,11 @@ class SyncService {
     _serverEventController.add('server_stopped');
     final reg = _registration;
     if (reg != null) {
-      await nsd.unregister(reg);
+      try {
+        await nsd.unregister(reg);
+      } catch (_) {
+        // mDNS puede no estar disponible (Windows sin Bonjour); ignorar.
+      }
     }
     _registration = null;
     await _server?.close(force: true);
@@ -472,7 +484,16 @@ class SyncService {
       await stopDiscovery();
     }
 
-    _discovery = await nsd.startDiscovery(_serviceType);
+    try {
+      _discovery = await nsd.startDiscovery(_serviceType);
+    } catch (e) {
+      // mDNS no disponible (p.ej. Windows sin Bonjour). La auto-deteccion no
+      // puede correr; el usuario debe re-vincular por QR. Lo exponemos para que
+      // la UI lo refleje en vez de quedarse "buscando" para siempre.
+      _discovery = null;
+      _clientEventController.add('error: discovery_unavailable');
+      return;
+    }
     _discovery!.addListener(() {
       for (final service in _discovery!.services) {
         final addresses = service.addresses;
@@ -958,23 +979,43 @@ class SyncService {
     return result;
   }
 
+  /// Fragmentos de nombre tipicos de adaptadores virtuales (WSL, VMs, Docker,
+  /// Hyper-V, VPNs). Sus IPs suelen ser inalcanzables desde el celular, asi que
+  /// los dejamos como ultima opcion al elegir la IP del QR.
+  static const List<String> _virtualAdapterHints = [
+    'vethernet', 'wsl', 'virtualbox', 'vmware', 'hyper-v', 'docker',
+    'loopback', 'bluetooth', 'tailscale', 'zerotier', 'tunnel', 'vpn', 'radmin',
+  ];
+
   Future<String> _getLocalIp() async {
     final interfaces = await NetworkInterface.list(
       type: InternetAddressType.IPv4,
       includeLoopback: false,
     );
+
+    bool isPrivate(String ip) =>
+        ip.startsWith('192.168.') ||
+        ip.startsWith('10.') ||
+        ip.startsWith('172.');
+    bool isVirtual(String name) {
+      final n = name.toLowerCase();
+      return _virtualAdapterHints.any(n.contains);
+    }
+
+    // 1) IPv4 privada en un adaptador NO virtual (Wi-Fi/Ethernet real).
     for (final interface in interfaces) {
+      if (isVirtual(interface.name)) continue;
       for (final addr in interface.addresses) {
-        if (!addr.isLoopback &&
-            (addr.address.startsWith('192.168.') ||
-                addr.address.startsWith('10.') ||
-                addr.address.startsWith('172.'))) {
-          return addr.address;
-        }
+        if (!addr.isLoopback && isPrivate(addr.address)) return addr.address;
       }
     }
-    return interfaces.isNotEmpty &&
-            interfaces.first.addresses.isNotEmpty
+    // 2) Fallback: cualquier IPv4 privada, aunque sea de un adaptador virtual.
+    for (final interface in interfaces) {
+      for (final addr in interface.addresses) {
+        if (!addr.isLoopback && isPrivate(addr.address)) return addr.address;
+      }
+    }
+    return interfaces.isNotEmpty && interfaces.first.addresses.isNotEmpty
         ? interfaces.first.addresses.first.address
         : '127.0.0.1';
   }
