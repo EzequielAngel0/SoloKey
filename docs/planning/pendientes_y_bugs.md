@@ -237,5 +237,34 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 
 ---
 
+## 6. Build de release / artefactos (2026-06-28)
+
+`build_release.ps1` (raíz del repo) compila y agrupa todo en `dist/`:
+
+```powershell
+./build_release.ps1            # android + windows (instalador)
+./build_release.ps1 -Target android   # solo APKs
+./build_release.ps1 -Target inno      # solo Windows + instalador
+```
+
+Genera:
+- `dist/SoloKey-<ver>-universal.apk` (todas las ABIs) y split-per-abi en
+  `dist/<abi>/` (arm64-v8a / armeabi-v7a / x86_64). Firmados con **clave debug**
+  (`android/app/build.gradle.kts` usa `signingConfigs.debug` para release) →
+  instalables para pruebas, NO para Play Store.
+- `dist/SoloKey-<ver>-setup.exe` — instalador Windows (Inno Setup, per-user, app
+  desempaquetada; bóveda en `%APPDATA%`).
+
+Requisitos: Flutter en PATH, toolchain Android, Visual Studio (C++ desktop) e
+`ISCC.exe` (Inno Setup 6) para el instalador.
+
+> **Nota de build (2026-06-28):** si el proyecto se mueve de carpeta, `build/windows`
+> puede quedar con un `CMakeCache.txt` que apunta a la ruta vieja y `flutter build
+> windows` falla ("source ... does not match"). Solución: borrar `build/windows`
+> (o `flutter clean`) y recompilar. Empaquetado macOS/Linux/iOS: **pendiente** (sin
+> Mac/iPhone).
+
+---
+
 *Generado tras revisión del código el 2026-06-28. Actualizar el estado
 (⬜/🟦/✅) conforme se resuelva cada item.*

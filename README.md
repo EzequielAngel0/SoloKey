@@ -63,7 +63,17 @@ flutter run -d windows      # companion de escritorio (Windows)
 > El empaquetado para macOS/Linux/iOS está pendiente.
 
 ### Construcción para Producción (Release)
-Si deseas generar el APK con ofuscación de código activada (recomendado por máxima seguridad):
+La forma más rápida de generar **todos los artefactos** (APK universal + split-per-abi
++ instalador de Windows) y agruparlos en `dist/` es el script de release:
+```powershell
+./build_release.ps1                  # Android + Windows (instalador Inno Setup)
+./build_release.ps1 -Target android  # solo APKs
+./build_release.ps1 -Target inno     # solo Windows + instalador
+```
+Salida en `dist/`: `SoloKey-<ver>-universal.apk`, `dist/<abi>/SoloKey-<ver>-<abi>.apk`
+y `SoloKey-<ver>-setup.exe`. (Requiere `ISCC.exe` de Inno Setup 6 para el instalador.)
+
+Para un APK manual con ofuscación de código activada (máxima seguridad):
 ```bash
 flutter build apk --release --obfuscate --split-debug-info=./debug_info
 ```
