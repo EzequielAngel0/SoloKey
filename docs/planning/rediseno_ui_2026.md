@@ -13,6 +13,14 @@
 > Leyenda de estado: ⬜ pendiente · 🟦 en progreso · ✅ hecho.
 > Leyenda de esfuerzo: 🟢 acotado · 🟡 medio · 🔴 grande.
 
+> ⚠️ **ALCANCE (revisión 2026-06-29):** este documento fue la **capa visual**
+> (Graphite Pro: tokens, tipografía, navegación M3/master-detail, hub). Está
+> **hecho y mergeado a `main`**. El dueño aclaró que "rediseño completo" significaba
+> **rehacer la UX de cada pantalla** (no recolorear): navegación de carpetas,
+> detalle por tipo (TOTP como código en vivo, no como contraseña), estados, etc.
+> Ese trabajo continúa en **`ux_overhaul_2026.md`** (+ prototipo
+> `ux_overhaul_preview.html`). El look grafito se conserva.
+
 ---
 
 ## 0. Decisiones tomadas (input del dueño del producto)

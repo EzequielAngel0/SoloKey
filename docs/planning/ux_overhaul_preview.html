@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoloKey — Rediseño UX (no recolor) · Direcciones A/B</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0F; --surface:#121218; --card:#17171F; --card2:#1E1E26;
+    --divider:#262630; --primary:#3B82F6; --primary2:#2563EB; --emerald:#10B981;
+    --text:#F3F4F7; --body:#C7C8D1; --muted:#8A8B97; --disabled:#56575F;
+    --danger:#F26D6D; --warning:#F5A524; --info:#38BDF8;
+    --t-password:#3B82F6; --t-apikey:#10B981; --t-note:#F5A524;
+    --t-totp:#8B5CF6; --t-passkey:#14B8A6; --t-ssh:#0EA5E9;
+    --r:16px; --r-s:12px; --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);line-height:1.45;padding:0 0 90px;-webkit-font-smoothing:antialiased}
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1240px;margin:0 auto;padding:0 24px}
+  header.top{border-bottom:1px solid var(--divider);padding:40px 0 30px;margin-bottom:36px;background:linear-gradient(180deg,#15151C,var(--bg))}
+  .brand{display:flex;align-items:center;gap:16px}
+  .logo{width:60px;height:60px;border-radius:16px;flex:none;border:1px solid var(--divider);display:grid;place-items:center;background:linear-gradient(160deg,#1b1b24,#0c0c11)}
+  .logo span{font-weight:800;font-size:36px;letter-spacing:-2px;background:linear-gradient(180deg,var(--primary),var(--primary2));-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1{font-size:28px;font-weight:800;letter-spacing:-.6px}
+  .sub{color:var(--muted);font-size:15px;margin-top:3px;max-width:760px}
+  .pill{display:inline-flex;gap:8px;align-items:center;margin-top:16px;padding:8px 14px;border:1px solid var(--divider);border-radius:999px;font-size:13px;color:var(--body);background:var(--surface)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald)}
+
+  section{margin-bottom:54px}
+  .kicker{font-size:12px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+  h2{font-size:22px;font-weight:700;letter-spacing:-.4px;margin-bottom:6px}
+  .lead{color:var(--body);font-size:14.5px;max-width:820px;margin-bottom:22px}
+  .lead b{color:var(--text)}
+
+  /* problem callouts */
+  .probs{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:8px}
+  .prob{border:1px solid var(--divider);border-radius:var(--r);padding:16px 18px;background:var(--card)}
+  .prob .bad{color:var(--danger);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase}
+  .prob .ok{color:var(--emerald);font-size:12px;font-weight:700;letter-spacing:.4px;text-transform:uppercase;margin-top:10px}
+  .prob h3{font-size:15px;font-weight:700;margin:6px 0 4px}
+  .prob p{color:var(--muted);font-size:13px}
+
+  /* A/B columns */
+  .ab{display:grid;grid-template-columns:1fr 1fr;gap:28px}
+  @media(max-width:980px){.ab{grid-template-columns:1fr}}
+  .dir{border:1px solid var(--divider);border-radius:20px;padding:22px;background:linear-gradient(180deg,#141019,#0e0e13)}
+  .dir.b{background:linear-gradient(180deg,#0f1418,#0b0d10)}
+  .dir .tag{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 12px;border-radius:999px;margin-bottom:6px}
+  .dir.a .tag{color:#9cc0ff;background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.3)}
+  .dir.b .tag{color:#7ee0bf;background:rgba(16,185,129,.14);border:1px solid rgba(16,185,129,.3)}
+  .dir .dname{font-size:18px;font-weight:700;margin:4px 0 2px}
+  .dir .ddesc{color:var(--muted);font-size:13px;margin-bottom:18px}
+  .center{display:flex;justify-content:center}
+
+  /* phone */
+  .phone{width:340px;border:1px solid var(--divider);border-radius:34px;background:var(--bg);overflow:hidden;box-shadow:var(--shadow)}
+  .sbar{display:flex;justify-content:space-between;padding:12px 22px 4px;font-size:11px;color:var(--muted)}
+  .scr{padding:4px 16px 16px}
+  .topbar{display:flex;align-items:center;gap:12px;padding:8px 2px 14px}
+  .iconbtn{width:34px;height:34px;border-radius:10px;border:1px solid var(--divider);display:grid;place-items:center;color:var(--body);font-size:16px;background:var(--card)}
+  .big{font-size:23px;font-weight:800;letter-spacing:-.5px}
+  .grow{flex:1}
+
+  /* credential detail */
+  .dhead{display:flex;align-items:center;gap:14px;margin:4px 0 18px}
+  .av{width:52px;height:52px;border-radius:14px;flex:none;display:grid;place-items:center;font-weight:700;font-size:20px;color:#fff}
+  .av.s{width:38px;height:38px;border-radius:11px;font-size:15px}
+  .dtitle{font-size:18px;font-weight:700}
+  .durl{font-size:12.5px;color:var(--info)}
+  .badge{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:7px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-top:4px}
+
+  /* TOTP hero — the fix */
+  .totp-hero{border:1px solid rgba(139,92,246,.35);border-radius:var(--r);padding:18px;background:rgba(139,92,246,.08);margin-bottom:14px}
+  .totp-hero .lbl{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px}
+  .totp-row{display:flex;align-items:center;gap:14px;margin-top:8px}
+  .totp-code{font-family:'JetBrains Mono',monospace;font-size:34px;font-weight:700;letter-spacing:4px;color:#c4b1f7}
+  .ring{width:40px;height:40px;border-radius:50%;flex:none;background:conic-gradient(var(--t-totp) 0 62%,#2a2a33 62%);display:grid;place-items:center}
+  .ring b{width:30px;height:30px;border-radius:50%;background:var(--bg);display:grid;place-items:center;font-size:11px;color:var(--body);font-family:'JetBrains Mono',monospace}
+  .copybtn{margin-left:auto;background:var(--t-totp);color:#fff;border:none;border-radius:10px;padding:10px 14px;font:inherit;font-weight:600;font-size:13px;cursor:pointer;display:inline-flex;gap:7px;align-items:center}
+
+  .field{border:1px solid var(--divider);border-radius:var(--r-s);padding:12px 14px;margin-bottom:10px;background:var(--card);display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .field .k{font-size:10.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .field .v{font-size:14px;margin-top:3px;color:var(--text)}
+  .field .v.mono{font-family:'JetBrains Mono',monospace;letter-spacing:1px}
+  .field .act{display:flex;gap:14px;color:var(--muted);font-size:15px;flex:none}
+  .seclabel{font-size:11px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--muted);margin:16px 2px 9px}
+  .rowline{display:flex;align-items:center;gap:12px;padding:13px 4px;border-bottom:1px solid var(--divider)}
+  .rowline .k{font-size:13px;color:var(--muted);width:96px;flex:none}
+  .rowline .v{font-size:14px;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rowline .v.mono{font-family:'JetBrains Mono',monospace}
+  .rowline .act{color:var(--muted);font-size:15px;display:flex;gap:12px}
+
+  /* folders */
+  .crumbs{display:flex;align-items:center;gap:7px;font-size:13px;color:var(--muted);padding:6px 2px 14px;flex-wrap:wrap}
+  .crumbs a{color:var(--info);text-decoration:none}
+  .crumbs .cur{color:var(--text);font-weight:600}
+  .folder-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+  .fcard{border:1px solid var(--divider);border-radius:var(--r-s);padding:13px;background:var(--card);display:flex;flex-direction:column;gap:8px}
+  .fcard .fi{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:18px}
+  .fcard .fn{font-size:13.5px;font-weight:600}
+  .fcard .fc{font-size:11px;color:var(--muted)}
+  .tree{font-size:13.5px}
+  .tnode{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:9px;color:var(--body)}
+  .tnode.on{background:rgba(59,130,246,.14);color:#bcd5ff;font-weight:600}
+  .tnode.sub{margin-left:18px;color:var(--muted)}
+  .tnode.sub2{margin-left:36px;color:var(--muted)}
+
+  .ccard{display:flex;align-items:center;gap:12px;padding:11px 12px;border:1px solid var(--divider);border-radius:var(--r-s);background:var(--card);margin-bottom:8px}
+  .ccard .nm{font-size:13.5px;font-weight:600}
+  .ccard .un{font-size:11.5px;color:var(--muted)}
+
+  .note{color:var(--muted);font-size:13px;margin-top:14px;line-height:1.55}
+  .note b{color:var(--body)}
+  .checklist{list-style:none;display:grid;gap:8px;margin-top:8px}
+  .checklist li{display:flex;gap:10px;font-size:13.5px;color:var(--body)}
+  .checklist li::before{content:"✓";color:var(--emerald);font-weight:800}
+
+  footer{border-top:1px solid var(--divider);padding-top:22px;color:var(--muted);font-size:13px}
+  .desk{border:1px solid var(--divider);border-radius:16px;overflow:hidden;box-shadow:var(--shadow);margin-top:6px}
+  .desk-body{display:grid;grid-template-columns:230px 1fr;min-height:340px}
+  .side{border-right:1px solid var(--divider);background:var(--surface);padding:14px 10px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo"><span>S</span></div>
+      <div>
+        <h1>SoloKey · Rediseño <span style="color:var(--primary)">UX</span> (no recolor)</h1>
+        <div class="sub">Mismas bases Graphite Pro (look grafito + azul), pero las <b style="color:var(--text)">pantallas y flujos rehechos</b>. Aquí ves <b style="color:var(--text)">2 direcciones (A vs B)</b> sobre las pantallas que más molestan. Elige una y la construyo en Flutter.</div>
+      </div>
+    </div>
+    <div class="pill"><span class="dot"></span> Prototipo navegable de referencia — no es la app real. Decide: <b>&nbsp;Dirección A o Dirección B</b>.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- PROBLEMS -->
+  <section>
+    <div class="kicker">0 · Qué está mal hoy</div>
+    <h2>Los 3 dolores que reportaste</h2>
+    <div class="probs">
+      <div class="prob">
+        <div class="bad">✕ Hoy</div>
+        <h3>Detalle de TOTP = contraseña</h3>
+        <p>Al abrir un 2FA se ve el <i>secreto</i> oculto tipo password, no el código de 6 dígitos en vivo con su cuenta regresiva.</p>
+        <div class="ok">✓ Rediseño</div>
+        <p>Código grande en vivo + anillo de 30 s + copiar arriba; el secreto queda escondido en "Avanzado".</p>
+      </div>
+      <div class="prob">
+        <div class="bad">✕ Hoy</div>
+        <h3>Carpetas: navegación atrapada</h3>
+        <p>Entrar a una subcarpeta apila pantallas; para ir a otra hay que volver hasta la raíz. Sin breadcrumbs ni árbol.</p>
+        <div class="ok">✓ Rediseño</div>
+        <p>Breadcrumbs + atrás real (móvil) y árbol expandible en el sidebar (escritorio). Saltas a cualquier nivel.</p>
+      </div>
+      <div class="prob">
+        <div class="bad">✕ Hoy</div>
+        <h3>Pantallas genéricas</h3>
+        <p>Mismo layout para todo; sin estados vacíos/acciones por tipo. Detalle plano sin jerarquía.</p>
+        <div class="ok">✓ Rediseño</div>
+        <p>Detalle <b>por tipo</b> (login, TOTP, SSH, API, passkey) con la acción primaria clara y secciones.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DETAIL A/B -->
+  <section>
+    <div class="kicker">1 · Pantalla clave — Detalle de credencial</div>
+    <h2>Dos direcciones para el detalle (incluye el fix de TOTP)</h2>
+    <p class="lead">La misma credencial 2FA "AWS Console" en cada dirección. <b>A = amplia/guiada</b> (tarjetas, aire, acción primaria grande). <b>B = compacta/pro</b> (filas densas estilo 1Password, más datos a la vista).</p>
+    <div class="ab">
+      <!-- DIR A -->
+      <div class="dir a">
+        <span class="tag">● Dirección A — Amplia / guiada</span>
+        <div class="dname">Tarjetas + hero de acción</div>
+        <div class="ddesc">El código 2FA es el héroe. Campos en tarjetas con bordes hairline. Pensado para tocar rápido en móvil.</div>
+        <div class="center">
+          <div class="phone">
+            <div class="sbar"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="scr">
+              <div class="topbar">
+                <div class="iconbtn">‹</div><div class="grow"></div>
+                <div class="iconbtn">★</div><div class="iconbtn">✎</div>
+              </div>
+              <div class="dhead">
+                <div class="av" style="background:#8B5CF6">A</div>
+                <div>
+                  <div class="dtitle">AWS Console</div>
+                  <span class="badge" style="background:rgba(139,92,246,.16);color:#c4b1f7"><span style="width:7px;height:7px;border-radius:50%;background:#8B5CF6"></span>TOTP · 2FA</span>
+                </div>
+              </div>
+              <div class="totp-hero">
+                <div class="lbl">Código de verificación</div>
+                <div class="totp-row">
+                  <span class="totp-code">318&nbsp;942</span>
+                  <span class="ring"><b>18s</b></span>
+                  <button class="copybtn">📋 Copiar</button>
+                </div>
+              </div>
+              <div class="field">
+                <div><div class="k">Cuenta</div><div class="v">angelez@dev.com</div></div>
+                <div class="act">📋</div>
+              </div>
+              <div class="field">
+                <div><div class="k">Emisor</div><div class="v">Amazon Web Services</div></div>
+                <div class="act">📋</div>
+              </div>
+              <div class="seclabel">Avanzado</div>
+              <div class="field">
+                <div><div class="k">Secreto (semilla)</div><div class="v mono">•••• •••• •••• ••••</div></div>
+                <div class="act">👁️ 📋</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li>Código en vivo arriba, copiar de un toque</li>
+          <li>Semilla escondida bajo "Avanzado" (revelar con biometría)</li>
+          <li>Mucho aire, ideal para móvil y dedos</li>
+        </ul>
+      </div>
+      <!-- DIR B -->
+      <div class="dir b">
+        <span class="tag">● Dirección B — Compacta / pro</span>
+        <div class="dname">Filas densas estilo 1Password</div>
+        <div class="ddesc">Header sobrio + filas key/value separadas por hairline. Más información por pantalla, menos scroll. Brilla en escritorio.</div>
+        <div class="center">
+          <div class="phone">
+            <div class="sbar"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="scr">
+              <div class="topbar">
+                <div class="iconbtn">‹</div><div class="grow"></div>
+                <div class="iconbtn">★</div><div class="iconbtn">⋯</div>
+              </div>
+              <div class="dhead">
+                <div class="av s" style="background:#8B5CF6">A</div>
+                <div><div class="dtitle" style="font-size:16px">AWS Console</div><div class="durl">aws.amazon.com · 2FA</div></div>
+              </div>
+              <div class="rowline">
+                <div class="k">2FA</div>
+                <div class="v mono" style="color:#c4b1f7;font-size:17px;letter-spacing:2px">318 942</div>
+                <span class="ring" style="width:24px;height:24px"><b style="width:18px;height:18px;font-size:8px">18</b></span>
+                <div class="act">📋</div>
+              </div>
+              <div class="rowline">
+                <div class="k">Cuenta</div><div class="v">angelez@dev.com</div><div class="act">📋</div>
+              </div>
+              <div class="rowline">
+                <div class="k">Emisor</div><div class="v">Amazon Web Services</div><div class="act">📋</div>
+              </div>
+              <div class="rowline">
+                <div class="k">Secreto</div><div class="v mono">•••• •••• •••• ••••</div><div class="act">👁️ 📋</div>
+              </div>
+              <div class="rowline" style="border:none">
+                <div class="k">Creada</div><div class="v" style="color:var(--muted)">12 mar 2026</div><div class="act"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li>Todo a la vista sin scroll, filas tabulares</li>
+          <li>Código vivo como primera fila destacada</li>
+          <li>Densidad "pro" — encaja con el master-detail de escritorio</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOLDERS A/B -->
+  <section>
+    <div class="kicker">2 · Pantalla clave — Carpetas</div>
+    <h2>Dos direcciones para la navegación de carpetas</h2>
+    <p class="lead"><b>A = breadcrumbs</b> (header con migas + atrás real, subcarpetas en grid). <b>B = árbol</b> (jerarquía expandible siempre visible, saltas a cualquier nivel sin "volver a la raíz").</p>
+    <div class="ab">
+      <!-- DIR A folders -->
+      <div class="dir a">
+        <span class="tag">● Dirección A — Breadcrumbs</span>
+        <div class="dname">Migas + atrás real</div>
+        <div class="ddesc">Sabes siempre dónde estás y saltas a cualquier nivel tocando una miga. Subcarpetas en tarjetas.</div>
+        <div class="center">
+          <div class="phone">
+            <div class="sbar"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="scr">
+              <div class="topbar"><div class="iconbtn">‹</div><div class="big grow" style="font-size:19px">Trabajo</div><div class="iconbtn">＋</div></div>
+              <div class="crumbs"><a href="#">Bóveda</a> › <a href="#">Trabajo</a> › <span class="cur">Cloud</span></div>
+              <div class="folder-grid">
+                <div class="fcard"><div class="fi" style="background:rgba(59,130,246,.16);color:#9cc0ff">📁</div><div class="fn">AWS</div><div class="fc">6 items</div></div>
+                <div class="fcard"><div class="fi" style="background:rgba(16,185,129,.16);color:#7ee0bf">📁</div><div class="fn">GCP</div><div class="fc">3 items</div></div>
+              </div>
+              <div class="seclabel">Credenciales aquí</div>
+              <div class="ccard"><div class="av s" style="background:#8B5CF6">A</div><div><div class="nm">AWS Console</div><div class="un">2FA · 318 942</div></div></div>
+              <div class="ccard"><div class="av s" style="background:#10B981">S</div><div><div class="nm">Stripe API</div><div class="un">sk_live_••••</div></div></div>
+            </div>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li>Migas tocables → saltas a cualquier ancestro</li>
+          <li>Atrás del sistema funciona nivel por nivel</li>
+          <li>Subcarpetas claras antes de las credenciales</li>
+        </ul>
+      </div>
+      <!-- DIR B folders -->
+      <div class="dir b">
+        <span class="tag">● Dirección B — Árbol</span>
+        <div class="dname">Jerarquía expandible</div>
+        <div class="ddesc">Drawer/panel con todo el árbol; tocas un nodo y a la derecha ves su contenido. Cero "volver a la raíz".</div>
+        <div class="center">
+          <div class="phone">
+            <div class="sbar"><span>9:41</span><span>📶 🔋</span></div>
+            <div class="scr">
+              <div class="topbar"><div class="iconbtn">‹</div><div class="big grow" style="font-size:19px">Carpetas</div><div class="iconbtn">＋</div></div>
+              <div class="tree">
+                <div class="tnode">▸ 📁 Personal <span style="margin-left:auto;color:var(--disabled);font-size:11px">4</span></div>
+                <div class="tnode">▾ 📁 Trabajo <span style="margin-left:auto;color:var(--disabled);font-size:11px">12</span></div>
+                <div class="tnode sub on">▾ 📁 Cloud <span style="margin-left:auto;color:#9cc0ff;font-size:11px">9</span></div>
+                <div class="tnode sub2">📁 AWS <span style="margin-left:auto;color:var(--disabled);font-size:11px">6</span></div>
+                <div class="tnode sub2">📁 GCP <span style="margin-left:auto;color:var(--disabled);font-size:11px">3</span></div>
+                <div class="tnode sub">📁 Bancos <span style="margin-left:auto;color:var(--disabled);font-size:11px">3</span></div>
+              </div>
+              <div class="seclabel">Cloud · contenido</div>
+              <div class="ccard"><div class="av s" style="background:#8B5CF6">A</div><div><div class="nm">AWS Console</div><div class="un">2FA</div></div></div>
+            </div>
+          </div>
+        </div>
+        <ul class="checklist">
+          <li>Todo el árbol visible, expandir/colapsar</li>
+          <li>Saltas a cualquier nivel sin apilar pantallas</li>
+          <li>En escritorio el árbol vive en el sidebar (3 columnas)</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESKTOP note -->
+  <section>
+    <div class="kicker">3 · Escritorio</div>
+    <h2>La dirección elegida se refleja en el master-detail</h2>
+    <p class="lead">Misma decisión A/B aplicada al panel de detalle de la derecha; con la <b>Dirección B (árbol)</b>, las carpetas se integran como árbol en el sidebar (3 columnas: árbol · lista · detalle).</p>
+    <div class="desk">
+      <div class="desk-body">
+        <div class="side">
+          <div class="tree">
+            <div class="tnode on">🗄️ Bóveda</div>
+            <div class="tnode">▾ 📁 Trabajo</div>
+            <div class="tnode sub">📁 Cloud</div>
+            <div class="tnode">🛡️ Seguridad</div>
+            <div class="tnode">⚙️ Ajustes</div>
+          </div>
+        </div>
+        <div style="padding:24px">
+          <div class="dhead"><div class="av" style="background:#8B5CF6">A</div><div><div class="dtitle">AWS Console</div><div class="durl">2FA</div></div></div>
+          <div class="totp-hero" style="max-width:420px">
+            <div class="lbl">Código de verificación</div>
+            <div class="totp-row"><span class="totp-code">318&nbsp;942</span><span class="ring"><b>18s</b></span><button class="copybtn">📋 Copiar</button></div>
+          </div>
+          <p class="note" style="max-width:520px">El detalle se actualiza in-place al seleccionar en la lista; el código 2FA se ve igual de claro que en móvil. Sin salir de la pantalla.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SCOPE -->
+  <section>
+    <div class="kicker">4 · Alcance del rediseño UX</div>
+    <h2>Pantallas que se rehacen (no recolor)</h2>
+    <p class="lead">Cada una con layout + estados (vacío/carga/error) + interacciones repensadas, manteniendo el look grafito:</p>
+    <ul class="checklist" style="grid-template-columns:1fr 1fr;display:grid">
+      <li>Detalle de credencial <b>por tipo</b> (login · TOTP · SSH · API · passkey · nota)</li>
+      <li>Carpetas (breadcrumbs/árbol + atrás real)</li>
+      <li>Formulario crear/editar (por tipo, validación clara)</li>
+      <li>Bóveda / lista (secciones, orden, vacío)</li>
+      <li>Detalle/listado en escritorio (3 columnas)</li>
+      <li>Generador, Auditoría, Ajustes, Sync (estados y jerarquía)</li>
+    </ul>
+    <p class="note">Aparte y en paralelo: <b>fix del ícono en la barra de tareas</b> de Windows (refuerzo nativo <span class="mono">WM_SETICON</span> + AppUserModelID + rebuild). Es independiente del diseño.</p>
+  </section>
+
+  <footer>
+    Prototipo de <b style="color:var(--body)">Rediseño UX</b> · decide <b style="color:var(--text)">Dirección A (amplia/guiada)</b> o <b style="color:var(--text)">Dirección B (compacta/pro)</b> ·
+    detalle del plan en <span class="mono">docs/planning/ux_overhaul_2026.md</span>.
+  </footer>
+
+</div>
+</body>
+</html>

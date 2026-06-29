@@ -266,5 +266,22 @@ Requisitos: Flutter en PATH, toolchain Android, Visual Studio (C++ desktop) e
 
 ---
 
-*Generado tras revisión del código el 2026-06-28. Actualizar el estado
-(⬜/🟦/✅) conforme se resuelva cada item.*
+## Bugs/pendientes nuevos (revisión 2026-06-29)
+
+- **BUG-WIN (⬜): el logo no se ve en la barra de tareas de Windows.** La barra de
+  **título** ya muestra la "S" (ícono de ventana OK), pero la **taskbar** del
+  proceso vivo sigue genérica pese al `.ico` multi-tamaño. Falta el refuerzo nativo
+  `WM_SETICON` (ICON_BIG + ICON_SMALL) en `windows/runner/win32_window.cpp` tras
+  `CreateWindow`, y asegurar el `AppUserModelID` (`com.angelezequiel.solokey`) +
+  ícono en el acceso directo del instalador. Luego rebuild. Detalle en
+  `ux_overhaul_2026.md` (WIN-ICON).
+- **Rediseño UX pendiente (⬜):** el "rediseño" cerrado (`rediseno_ui_2026.md`) fue
+  **sólo la capa visual** (Graphite Pro). El dueño pidió **rehacer la UX de cada
+  pantalla** (carpetas con breadcrumbs/árbol, detalle de TOTP como código en vivo,
+  detalle por tipo, estados). Plan + prototipo: `ux_overhaul_2026.md` y
+  `ux_overhaul_preview.html`. Pendiente que el dueño elija **Dirección A o B**.
+
+---
+
+*Generado tras revisión del código el 2026-06-28; ampliado 2026-06-29. Actualizar
+el estado (⬜/🟦/✅) conforme se resuelva cada item.*
