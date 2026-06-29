@@ -138,9 +138,27 @@ elegida (filas densas + breadcrumbs, look grafito intacto):
 6. **QA:** validar en tema claro (smoke test) y repaso en dispositivo/ventana real
    tras L3 antes de ir a lo ancho.
 
-> 🔸 **Decisión abierta:** carpetas en **escritorio** — ¿breadcrumbs solamente (ya
-> hecho) o **breadcrumbs + árbol expandible** en el panel/sidebar? (recomendado el
-> árbol; se haría en L9).
+**Organización y power-user (estándar)**
+15. **Selección múltiple + mover/borrar en lote** y **drag-and-drop** de
+    credenciales a carpetas en escritorio. (L3 / L9)
+16. **Deshacer en borrados:** Snackbar *"Eliminado — Deshacer"* además del
+    confirm + auth. (transversal)
+17. **Menús contextuales (clic derecho) en escritorio** con `context_menus` (ya es
+    dependencia): copiar / editar / mover / borrar. (L9)
+18. **Atajos de teclado (escritorio):** Ctrl+N nueva, Ctrl+L bloquear, Ctrl+E
+    editar, copiar usuario/clave. (L9)
+19. **Fechas relativas + plurales ICU** es/en ("hace 2 días", "3 elementos").
+    (transversal)
+
+**Opcionales (calidad)**
+20. **Toggle de densidad** (cómoda/compacta) en Ajustes. (L6)
+21. **Rendimiento en bóvedas grandes:** búsqueda con debounce, descifrado perezoso,
+    listas virtualizadas. (desde L3)
+22. **Smoke test por pantalla** rediseñada para cazar regresiones. (cada lote)
+
+> ✅ **Decisión resuelta (2026-06-29):** carpetas en **escritorio = breadcrumbs +
+> árbol expandible** en el panel/sidebar (L9; el árbol permite saltar a cualquier
+> carpeta sin pasar por la raíz).
 
 ---
 
