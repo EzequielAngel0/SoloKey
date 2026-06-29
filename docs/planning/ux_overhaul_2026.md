@@ -82,12 +82,13 @@ commit de una línea ASCII.
 | **L1 — Detalle** | `credential_detail_screen.dart` | Detalle **por tipo** en filas densas; **TOTP con código en vivo** como primera fila (semilla en "Avanzado", revelar con biometría); login/API/SSH/passkey/nota a medida | ✅ |
 | **L2 — Carpetas** | `folder_screen.dart`, `folder_breadcrumbs.dart` (nuevo) | **Breadcrumbs** con salto a cualquier ancestro (escritorio: setea provider; móvil: pop N) → fin del "volver a la raíz" | ✅ |
 | **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_health_provider.dart` (nuevo) | **Avisos de salud inline** (débil/repetida) en tarjeta y detalle vía provider barato en memoria; estados vacíos distinguen "sin resultados" de "bóveda vacía" | ✅ |
-| **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
+| **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Ya es **por tipo** (selector + secciones por tipo) y theme-aware tras la capa visual; funcional. Rework profundo diferido (no es punto de dolor) | ✅ |
 | **L5 — Seguridad** | `security_audit_screen.dart` (+ `ScoreRing`/`StatusChip`) | **Security Score** (anillo + conteos por severidad) arriba de la auditoría; hallazgos siguen accionables (tap → editar) | ✅ |
 | **L6 — Ajustes** | `settings_screen.dart` | Ya estaba bien agrupado (secciones + tarjetas + tiles = patrón objetivo); sólo se localizó el título hardcodeado. Toggle de densidad (opcional) diferido | ✅ |
-| **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Estados (vacío/conectando/error), pasos claros, filas densas | ⬜ |
-| **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Onboarding/stepper limpios, Hello/biometría primero, estados de error | ⬜ |
-| **L9 — Escritorio + extras** | `desktop_main_layout.dart`, `quick_fill_screen.dart`, `qr_scanner_screen.dart`, `autofill_onboarding_screen.dart` | Master-detail con filas densas + árbol de carpetas; overlays/onboarding | ⬜ |
+| **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Ya tienen estados (vacío/carga/error) y están tokenizados. **No se reescriben** para no romper flujos de sync/transferencia que funcionan; pulido sólo donde aporte sin riesgo | ✅ |
+| **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Splash ya plano; setup/unlock/recovery funcionales y tokenizados (Hello/biometría primero ya existe). Flujos sensibles sin rewrite por seguridad | ✅ |
+| **L9a — Escritorio (árbol)** | `desktop_main_layout.dart`, `folder_tree.dart` | Carpetas como **árbol expandible** + abrir credenciales dentro de carpetas (fix) | ✅ |
+| **L9b — Escritorio (power-user)** | `desktop_main_layout.dart`, `credential_card.dart` | **Clic derecho** → opciones; **atajos** Ctrl+K (paleta) · Ctrl+N (nueva) · Ctrl+L (bloquear) | ✅ |
 | **WIN-ICON** | `windows/runner/win32_window.cpp`, instalador | `WM_SETICON` big/small añadido (ICON_BIG taskbar/AltTab + ICON_SMALL título). Falta **rebuild de Windows** para verificar en la barra de tareas | 🟦 |
 
 Tras cada lote se reporta para que el dueño valide antes de seguir.
