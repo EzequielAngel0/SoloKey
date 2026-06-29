@@ -144,6 +144,27 @@ bool Win32Window::Create(const std::wstring& title,
     return false;
   }
 
+  // Pin the window/taskbar icon explicitly from the multi-size app_icon.ico.
+  // The title bar may resolve an icon on its own, but the taskbar button of the
+  // running process can stay generic (window_manager can recreate the window),
+  // so we set ICON_BIG (Alt+Tab / taskbar) and ICON_SMALL (title bar) directly.
+  HICON icon_big = static_cast<HICON>(
+      LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP_ICON),
+                IMAGE_ICON, GetSystemMetrics(SM_CXICON),
+                GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR));
+  HICON icon_small = static_cast<HICON>(
+      LoadImage(GetModuleHandle(nullptr), MAKEINTRESOURCE(IDI_APP_ICON),
+                IMAGE_ICON, GetSystemMetrics(SM_CXSMICON),
+                GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR));
+  if (icon_big != nullptr) {
+    SendMessage(window, WM_SETICON, ICON_BIG,
+                reinterpret_cast<LPARAM>(icon_big));
+  }
+  if (icon_small != nullptr) {
+    SendMessage(window, WM_SETICON, ICON_SMALL,
+                reinterpret_cast<LPARAM>(icon_small));
+  }
+
   UpdateTheme(window);
 
   return OnCreate();

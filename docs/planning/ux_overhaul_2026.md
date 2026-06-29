@@ -87,7 +87,7 @@ commit de una línea ASCII.
 | **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Estados (vacío/conectando/error), pasos claros, filas densas | ⬜ |
 | **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Onboarding/stepper limpios, Hello/biometría primero, estados de error | ⬜ |
 | **L9 — Escritorio + extras** | `desktop_main_layout.dart`, `quick_fill_screen.dart`, `qr_scanner_screen.dart`, `autofill_onboarding_screen.dart` | Master-detail con filas densas + árbol de carpetas; overlays/onboarding | ⬜ |
-| **WIN-ICON** | `windows/runner/win32_window.cpp`, instalador | `WM_SETICON` big/small + AUMID + rebuild (independiente del diseño) | ⬜ |
+| **WIN-ICON** | `windows/runner/win32_window.cpp`, instalador | `WM_SETICON` big/small añadido (ICON_BIG taskbar/AltTab + ICON_SMALL título). Falta **rebuild de Windows** para verificar en la barra de tareas | 🟦 |
 
 Tras cada lote se reporta para que el dueño valide antes de seguir.
 
