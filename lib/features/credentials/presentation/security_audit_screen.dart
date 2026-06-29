@@ -246,6 +246,33 @@ class _IssueCard extends StatelessWidget {
         AuditSeverity.info => p.accent,
       };
 
+  /// Localized title for an audit finding (the service returns a [type], not text).
+  static String _title(AppLocalizations l10n, AuditIssue i) => switch (i.type) {
+        AuditIssueType.tooShort => l10n.auditIssueTooShortTitle,
+        AuditIssueType.weakLettersOnly ||
+        AuditIssueType.weakNumbersOnly =>
+          l10n.auditIssueWeakTitle,
+        AuditIssueType.reused => l10n.auditIssueReusedTitle,
+        AuditIssueType.breached => l10n.auditIssueBreachedTitle,
+        AuditIssueType.noPassword => l10n.auditIssueNoPasswordTitle,
+        AuditIssueType.rotationDue => l10n.auditIssueRotationTitle,
+        AuditIssueType.stale => l10n.auditIssueStaleTitle,
+      };
+
+  /// Localized description (with the finding's numeric params interpolated).
+  static String _description(AppLocalizations l10n, AuditIssue i) =>
+      switch (i.type) {
+        AuditIssueType.tooShort => l10n.auditIssueTooShortDesc,
+        AuditIssueType.weakLettersOnly => l10n.auditIssueWeakLettersDesc,
+        AuditIssueType.weakNumbersOnly => l10n.auditIssueWeakNumbersDesc,
+        AuditIssueType.reused => l10n.auditIssueReusedDesc,
+        AuditIssueType.breached => l10n.auditIssueBreachedDesc(i.breachCount),
+        AuditIssueType.noPassword => l10n.auditIssueNoPasswordDesc,
+        AuditIssueType.rotationDue =>
+          l10n.auditIssueRotationDesc(i.daysOverdue, i.intervalDays),
+        AuditIssueType.stale => l10n.auditIssueStaleDesc(i.daysSinceUpdate),
+      };
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
@@ -305,7 +332,7 @@ class _IssueCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 6),
                   Text(
-                    issue.title,
+                    _title(l10n, issue),
                     style: TextStyle(
                       color: palette.textPrimary,
                       fontSize: 13,
@@ -314,7 +341,7 @@ class _IssueCard extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    issue.description,
+                    _description(l10n, issue),
                     style: TextStyle(
                       color: palette.textMuted,
                       fontSize: 12,

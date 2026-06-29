@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'dart:ui' as ui;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -8,20 +9,22 @@ import 'package:injectable/injectable.dart';
 import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../infrastructure/database/app_database.dart';
 import 'notification_navigation.dart';
 
 // ── Notification copy & channel constants ─────────────────────────────────────
 
 const String _kChannelId = 'rotation_reminders';
-const String _kChannelName = 'Recordatorios de rotacion';
-const String _kChannelDesc =
-    'Alertas cuando una contrasena debe rotarse por seguridad.';
 
-const String _kRotationTitle = 'Rotacion de Contrasena Requerida';
-
-String _rotationBody(String title) =>
-    'Tu contrasena para "$title" ha expirado. Cambiala ahora por seguridad.';
+/// Loads localized notification strings WITHOUT a BuildContext (works in
+/// background isolates) by resolving the system locale to a supported one.
+Future<AppLocalizations> _loadNotifL10n() {
+  final lang = ui.PlatformDispatcher.instance.locale.languageCode;
+  final supported =
+      AppLocalizations.supportedLocales.any((l) => l.languageCode == lang);
+  return AppLocalizations.delegate.load(Locale(supported ? lang : 'en'));
+}
 
 /// Minimum gap between two reminders for the SAME credential, to avoid spamming
 /// the user when a background check runs often.
@@ -83,14 +86,15 @@ Future<List<DueRotation>> findDueRotations(AppDatabase db) async {
 }
 
 /// Creates/updates the Android channel so [Importance.high] is honoured.
-Future<void> _ensureAndroidChannel(FlutterLocalNotificationsPlugin plugin) async {
+Future<void> _ensureAndroidChannel(
+    FlutterLocalNotificationsPlugin plugin, AppLocalizations l10n) async {
   final android = plugin.resolvePlatformSpecificImplementation<
       AndroidFlutterLocalNotificationsPlugin>();
   await android?.createNotificationChannel(
-    const AndroidNotificationChannel(
+    AndroidNotificationChannel(
       _kChannelId,
-      _kChannelName,
-      description: _kChannelDesc,
+      l10n.notifRotationChannelName,
+      description: l10n.notifRotationChannelDesc,
       importance: Importance.high,
     ),
   );
@@ -110,29 +114,30 @@ const String _kApprovalPayload = '__approve_login__';
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
   DueRotation item,
+  AppLocalizations l10n,
 ) async {
-  const details = NotificationDetails(
+  final details = NotificationDetails(
     android: AndroidNotificationDetails(
       _kChannelId,
-      _kChannelName,
-      channelDescription: _kChannelDesc,
+      l10n.notifRotationChannelName,
+      channelDescription: l10n.notifRotationChannelDesc,
       importance: Importance.high,
       priority: Priority.high,
       actions: <AndroidNotificationAction>[
         AndroidNotificationAction(
           _kActionChangePassword,
-          'Cambiar contraseña',
+          l10n.notifActionChangePassword,
           showsUserInterface: true,
         ),
-        AndroidNotificationAction(_kActionSnooze3d, 'Posponer 3 días'),
+        AndroidNotificationAction(_kActionSnooze3d, l10n.notifActionSnooze3d),
       ],
     ),
-    iOS: DarwinNotificationDetails(),
+    iOS: const DarwinNotificationDetails(),
   );
   await plugin.show(
     id: item.id.hashCode,
-    title: _kRotationTitle,
-    body: _rotationBody(item.title),
+    title: l10n.notifRotationTitle,
+    body: l10n.notifRotationBody(item.title),
     notificationDetails: details,
     payload: item.id,
   );
@@ -171,11 +176,12 @@ Future<void> runBackgroundRotationCheck() async {
       android: AndroidInitializationSettings('@mipmap/ic_launcher'),
     );
     await plugin.initialize(settings: init);
-    await _ensureAndroidChannel(plugin);
+    final l10n = await _loadNotifL10n();
+    await _ensureAndroidChannel(plugin, l10n);
 
     final stampedAt = DateTime.now().millisecondsSinceEpoch;
     for (final item in due) {
-      await _showMobileRotation(plugin, item);
+      await _showMobileRotation(plugin, item, l10n);
       await db.credentialDao.markRotationPrompted(item.id, stampedAt);
     }
   } catch (_) {
@@ -216,7 +222,7 @@ class NotificationService {
           onDidReceiveBackgroundNotificationResponse:
               notificationActionBackground,
         );
-        await _ensureAndroidChannel(_mobilePlugin);
+        await _ensureAndroidChannel(_mobilePlugin, await _loadNotifL10n());
 
         final android = _mobilePlugin.resolvePlatformSpecificImplementation<
             AndroidFlutterLocalNotificationsPlugin>();
@@ -259,22 +265,23 @@ class NotificationService {
   Future<void> showLoginApprovalRequest({String desktopName = ''}) async {
     await initialize();
     if (!_isMobile) return;
-    const details = NotificationDetails(
+    final l10n = await _loadNotifL10n();
+    final details = NotificationDetails(
       android: AndroidNotificationDetails(
         _kChannelId,
-        _kChannelName,
-        channelDescription: _kChannelDesc,
+        l10n.notifRotationChannelName,
+        channelDescription: l10n.notifRotationChannelDesc,
         importance: Importance.high,
         priority: Priority.high,
       ),
-      iOS: DarwinNotificationDetails(),
+      iOS: const DarwinNotificationDetails(),
     );
     await _mobilePlugin.show(
       id: _kApprovalNotificationId,
-      title: 'Aprobar inicio de sesion',
+      title: l10n.notifApprovalTitle,
       body: desktopName.isEmpty
-          ? 'Tu computadora pide desbloquearse. Toca para aprobar.'
-          : 'Desbloquear "$desktopName"? Toca para aprobar.',
+          ? l10n.notifApprovalBody
+          : l10n.notifApprovalBodyNamed(desktopName),
       notificationDetails: details,
       payload: _kApprovalPayload,
     );
@@ -287,12 +294,13 @@ class NotificationService {
       final due = await findDueRotations(_db);
       if (due.isEmpty) return;
 
+      final l10n = await _loadNotifL10n();
       final stampedAt = DateTime.now().millisecondsSinceEpoch;
       for (final item in due) {
         if (_isDesktop) {
-          await _showDesktopRotation(item);
+          await _showDesktopRotation(item, l10n);
         } else if (_isMobile) {
-          await _showMobileRotation(_mobilePlugin, item);
+          await _showMobileRotation(_mobilePlugin, item, l10n);
         }
         await _db.credentialDao.markRotationPrompted(item.id, stampedAt);
       }
@@ -313,10 +321,11 @@ class NotificationService {
     );
   }
 
-  Future<void> _showDesktopRotation(DueRotation item) async {
+  Future<void> _showDesktopRotation(
+      DueRotation item, AppLocalizations l10n) async {
     final notification = LocalNotification(
-      title: _kRotationTitle,
-      body: _rotationBody(item.title),
+      title: l10n.notifRotationTitle,
+      body: l10n.notifRotationBody(item.title),
     );
     notification.onClick = () {
       windowManager.show();

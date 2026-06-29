@@ -8,17 +8,45 @@ import '../../features/credentials/domain/repositories/i_credential_repository.d
 
 enum AuditSeverity { critical, warning, info }
 
+/// Categorised audit finding. Carries a [type] + numeric params instead of
+/// display text, so the presentation layer (which has a BuildContext) localizes
+/// it. Keeps the service free of UI strings.
+enum AuditIssueType {
+  tooShort,
+  weakLettersOnly,
+  weakNumbersOnly,
+  reused,
+  breached,
+  noPassword,
+  rotationDue,
+  stale,
+}
+
 class AuditIssue {
   const AuditIssue({
     required this.credential,
     required this.severity,
-    required this.title,
-    required this.description,
+    required this.type,
+    this.breachCount = 0,
+    this.daysOverdue = 0,
+    this.intervalDays = 0,
+    this.daysSinceUpdate = 0,
   });
   final Credential credential;
   final AuditSeverity severity;
-  final String title;
-  final String description;
+  final AuditIssueType type;
+
+  /// Number of breaches ([AuditIssueType.breached]).
+  final int breachCount;
+
+  /// Days past the rotation window ([AuditIssueType.rotationDue]).
+  final int daysOverdue;
+
+  /// Configured rotation interval in days ([AuditIssueType.rotationDue]).
+  final int intervalDays;
+
+  /// Days since last update ([AuditIssueType.stale]).
+  final int daysSinceUpdate;
 }
 
 @lazySingleton
@@ -57,22 +85,19 @@ class SecurityAuditService {
           issues.add(AuditIssue(
             credential: c,
             severity: AuditSeverity.critical,
-            title: 'Contraseña demasiado corta',
-            description: 'Tiene menos de 8 caracteres.',
+            type: AuditIssueType.tooShort,
           ));
         } else if (_isOnlyLetters(pwd)) {
           issues.add(AuditIssue(
             credential: c,
             severity: AuditSeverity.warning,
-            title: 'Contraseña débil',
-            description: 'Solo letras, sin números ni símbolos.',
+            type: AuditIssueType.weakLettersOnly,
           ));
         } else if (_isOnlyNumbers(pwd)) {
           issues.add(AuditIssue(
             credential: c,
             severity: AuditSeverity.warning,
-            title: 'Contraseña débil',
-            description: 'Solo números.',
+            type: AuditIssueType.weakNumbersOnly,
           ));
         }
 
@@ -81,8 +106,7 @@ class SecurityAuditService {
           issues.add(AuditIssue(
             credential: c,
             severity: AuditSeverity.warning,
-            title: 'Contraseña reutilizada',
-            description: 'Esta contraseña está usada en múltiples cuentas.',
+            type: AuditIssueType.reused,
           ));
         }
 
@@ -94,8 +118,8 @@ class SecurityAuditService {
               issues.add(AuditIssue(
                 credential: c,
                 severity: AuditSeverity.critical,
-                title: 'Contraseña filtrada',
-                description: 'Esta contraseña aparece en $count filtraciones de datos en internet. ¡Cámbiala de inmediato!',
+                type: AuditIssueType.breached,
+                breachCount: count,
               ));
             }
           }());
@@ -105,8 +129,7 @@ class SecurityAuditService {
         issues.add(AuditIssue(
           credential: c,
           severity: AuditSeverity.critical,
-          title: 'Sin contraseña guardada',
-          description: 'Esta credencial no tiene contraseña registrada.',
+          type: AuditIssueType.noPassword,
         ));
       }
 
@@ -126,8 +149,9 @@ class SecurityAuditService {
             issues.add(AuditIssue(
               credential: c,
               severity: AuditSeverity.warning,
-              title: 'Rotación requerida',
-              description: 'Expiró hace ${daysSinceUpdate - days} días (establecido cada $days días).',
+              type: AuditIssueType.rotationDue,
+              daysOverdue: daysSinceUpdate - days,
+              intervalDays: days,
             ));
           }
         }
@@ -137,8 +161,8 @@ class SecurityAuditService {
           issues.add(AuditIssue(
             credential: c,
             severity: AuditSeverity.info,
-            title: 'Contraseña antigua',
-            description: 'No se ha actualizado en más de 6 meses ($daysSinceUpdate días).',
+            type: AuditIssueType.stale,
+            daysSinceUpdate: daysSinceUpdate,
           ));
         }
       }

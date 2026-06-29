@@ -89,11 +89,13 @@ void main() {
       final service = SecurityAuditService(repo);
       final issues = await service.runAudit();
 
-      final shortIssues = issues.where((i) => i.title == 'Contraseña demasiado corta');
+      final shortIssues = issues.where((i) => i.type == AuditIssueType.tooShort);
       expect(shortIssues.length, 1);
       expect(shortIssues.first.credential.id, '1');
 
-      final weakIssues = issues.where((i) => i.title == 'Contraseña débil');
+      final weakIssues = issues.where((i) =>
+          i.type == AuditIssueType.weakLettersOnly ||
+          i.type == AuditIssueType.weakNumbersOnly);
       expect(weakIssues.length, 2);
     });
 
@@ -130,7 +132,7 @@ void main() {
       final service = SecurityAuditService(repo);
       final issues = await service.runAudit();
 
-      final reusedIssues = issues.where((i) => i.title == 'Contraseña reutilizada');
+      final reusedIssues = issues.where((i) => i.type == AuditIssueType.reused);
       expect(reusedIssues.length, 2);
       expect(reusedIssues.any((i) => i.credential.id == '1'), isTrue);
       expect(reusedIssues.any((i) => i.credential.id == '2'), isTrue);
@@ -156,7 +158,7 @@ void main() {
       final service = SecurityAuditService(repo);
       final issues = await service.runAudit();
 
-      final oldIssues = issues.where((i) => i.title == 'Contraseña antigua');
+      final oldIssues = issues.where((i) => i.type == AuditIssueType.stale);
       expect(oldIssues.length, 1);
       expect(oldIssues.first.credential.id, '1');
     });
@@ -178,7 +180,7 @@ void main() {
       final service = SecurityAuditService(repo);
       final issues = await service.runAudit();
 
-      final missingIssues = issues.where((i) => i.title == 'Sin contraseña guardada');
+      final missingIssues = issues.where((i) => i.type == AuditIssueType.noPassword);
       expect(missingIssues.length, 1);
     });
 
@@ -207,7 +209,7 @@ void main() {
       final service = SecurityAuditService(repo);
       final issues = await service.runAudit();
 
-      final shortIssues = issues.where((i) => i.title == 'Contraseña demasiado corta');
+      final shortIssues = issues.where((i) => i.type == AuditIssueType.tooShort);
       expect(shortIssues.length, 0);
     });
 
@@ -237,14 +239,14 @@ void main() {
 
       // checkBreaches = false
       final issuesNormal = await service.runAudit(checkBreaches: false);
-      expect(issuesNormal.any((i) => i.title == 'Contraseña filtrada'), isFalse);
+      expect(issuesNormal.any((i) => i.type == AuditIssueType.breached), isFalse);
 
       // checkBreaches = true
       final issuesWithBreach = await service.runAudit(checkBreaches: true);
-      final breachedIssues = issuesWithBreach.where((i) => i.title == 'Contraseña filtrada');
+      final breachedIssues = issuesWithBreach.where((i) => i.type == AuditIssueType.breached);
       expect(breachedIssues.length, 1);
       expect(breachedIssues.first.credential.id, '1');
-      expect(breachedIssues.first.description.contains('15'), isTrue);
+      expect(breachedIssues.first.breachCount, 15);
     });
   });
 }

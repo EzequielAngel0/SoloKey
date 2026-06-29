@@ -2983,6 +2983,150 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Could not connect. Make sure the PC is on and on the same Wi-Fi network.'**
   String get syncConnectFailCheck;
+
+  /// No description provided for @auditIssueTooShortTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password too short'**
+  String get auditIssueTooShortTitle;
+
+  /// No description provided for @auditIssueTooShortDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'It has fewer than 8 characters.'**
+  String get auditIssueTooShortDesc;
+
+  /// No description provided for @auditIssueWeakTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak password'**
+  String get auditIssueWeakTitle;
+
+  /// No description provided for @auditIssueWeakLettersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Only letters, no numbers or symbols.'**
+  String get auditIssueWeakLettersDesc;
+
+  /// No description provided for @auditIssueWeakNumbersDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Only numbers.'**
+  String get auditIssueWeakNumbersDesc;
+
+  /// No description provided for @auditIssueReusedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Reused password'**
+  String get auditIssueReusedTitle;
+
+  /// No description provided for @auditIssueReusedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This password is used on multiple accounts.'**
+  String get auditIssueReusedDesc;
+
+  /// No description provided for @auditIssueBreachedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Leaked password'**
+  String get auditIssueBreachedTitle;
+
+  /// No description provided for @auditIssueBreachedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This password appears in {count} data breaches online. Change it now!'**
+  String auditIssueBreachedDesc(int count);
+
+  /// No description provided for @auditIssueNoPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'No password saved'**
+  String get auditIssueNoPasswordTitle;
+
+  /// No description provided for @auditIssueNoPasswordDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'This credential has no password stored.'**
+  String get auditIssueNoPasswordDesc;
+
+  /// No description provided for @auditIssueRotationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotation required'**
+  String get auditIssueRotationTitle;
+
+  /// No description provided for @auditIssueRotationDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired {days} days ago (set every {interval} days).'**
+  String auditIssueRotationDesc(int days, int interval);
+
+  /// No description provided for @auditIssueStaleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Old password'**
+  String get auditIssueStaleTitle;
+
+  /// No description provided for @auditIssueStaleDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Not updated in over 6 months ({days} days).'**
+  String auditIssueStaleDesc(int days);
+
+  /// No description provided for @notifRotationChannelName.
+  ///
+  /// In en, this message translates to:
+  /// **'Rotation reminders'**
+  String get notifRotationChannelName;
+
+  /// No description provided for @notifRotationChannelDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Alerts when a password should be rotated for security.'**
+  String get notifRotationChannelDesc;
+
+  /// No description provided for @notifRotationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Password rotation required'**
+  String get notifRotationTitle;
+
+  /// No description provided for @notifRotationBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your password for \"{title}\" has expired. Change it now for security.'**
+  String notifRotationBody(String title);
+
+  /// No description provided for @notifActionChangePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Change password'**
+  String get notifActionChangePassword;
+
+  /// No description provided for @notifActionSnooze3d.
+  ///
+  /// In en, this message translates to:
+  /// **'Snooze 3 days'**
+  String get notifActionSnooze3d;
+
+  /// No description provided for @notifApprovalTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve sign-in'**
+  String get notifApprovalTitle;
+
+  /// No description provided for @notifApprovalBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your computer is asking to unlock. Tap to approve.'**
+  String get notifApprovalBody;
+
+  /// No description provided for @notifApprovalBodyNamed.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock \"{name}\"? Tap to approve.'**
+  String notifApprovalBodyNamed(String name);
 }
 
 class _AppLocalizationsDelegate

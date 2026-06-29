@@ -1576,4 +1576,91 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get syncConnectFailCheck =>
       'No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.';
+
+  @override
+  String get auditIssueTooShortTitle => 'Contraseña demasiado corta';
+
+  @override
+  String get auditIssueTooShortDesc => 'Tiene menos de 8 caracteres.';
+
+  @override
+  String get auditIssueWeakTitle => 'Contraseña débil';
+
+  @override
+  String get auditIssueWeakLettersDesc =>
+      'Solo letras, sin números ni símbolos.';
+
+  @override
+  String get auditIssueWeakNumbersDesc => 'Solo números.';
+
+  @override
+  String get auditIssueReusedTitle => 'Contraseña reutilizada';
+
+  @override
+  String get auditIssueReusedDesc =>
+      'Esta contraseña está usada en múltiples cuentas.';
+
+  @override
+  String get auditIssueBreachedTitle => 'Contraseña filtrada';
+
+  @override
+  String auditIssueBreachedDesc(int count) {
+    return 'Esta contraseña aparece en $count filtraciones de datos en internet. ¡Cámbiala de inmediato!';
+  }
+
+  @override
+  String get auditIssueNoPasswordTitle => 'Sin contraseña guardada';
+
+  @override
+  String get auditIssueNoPasswordDesc =>
+      'Esta credencial no tiene contraseña registrada.';
+
+  @override
+  String get auditIssueRotationTitle => 'Rotación requerida';
+
+  @override
+  String auditIssueRotationDesc(int days, int interval) {
+    return 'Expiró hace $days días (establecido cada $interval días).';
+  }
+
+  @override
+  String get auditIssueStaleTitle => 'Contraseña antigua';
+
+  @override
+  String auditIssueStaleDesc(int days) {
+    return 'No se ha actualizado en más de 6 meses ($days días).';
+  }
+
+  @override
+  String get notifRotationChannelName => 'Recordatorios de rotación';
+
+  @override
+  String get notifRotationChannelDesc =>
+      'Alertas cuando una contraseña debe rotarse por seguridad.';
+
+  @override
+  String get notifRotationTitle => 'Rotación de contraseña requerida';
+
+  @override
+  String notifRotationBody(String title) {
+    return 'Tu contraseña para \"$title\" ha expirado. Cámbiala ahora por seguridad.';
+  }
+
+  @override
+  String get notifActionChangePassword => 'Cambiar contraseña';
+
+  @override
+  String get notifActionSnooze3d => 'Posponer 3 días';
+
+  @override
+  String get notifApprovalTitle => 'Aprobar inicio de sesión';
+
+  @override
+  String get notifApprovalBody =>
+      'Tu computadora pide desbloquearse. Toca para aprobar.';
+
+  @override
+  String notifApprovalBodyNamed(String name) {
+    return '¿Desbloquear \"$name\"? Toca para aprobar.';
+  }
 }

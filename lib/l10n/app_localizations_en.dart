@@ -1561,4 +1561,91 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get syncConnectFailCheck =>
       'Could not connect. Make sure the PC is on and on the same Wi-Fi network.';
+
+  @override
+  String get auditIssueTooShortTitle => 'Password too short';
+
+  @override
+  String get auditIssueTooShortDesc => 'It has fewer than 8 characters.';
+
+  @override
+  String get auditIssueWeakTitle => 'Weak password';
+
+  @override
+  String get auditIssueWeakLettersDesc =>
+      'Only letters, no numbers or symbols.';
+
+  @override
+  String get auditIssueWeakNumbersDesc => 'Only numbers.';
+
+  @override
+  String get auditIssueReusedTitle => 'Reused password';
+
+  @override
+  String get auditIssueReusedDesc =>
+      'This password is used on multiple accounts.';
+
+  @override
+  String get auditIssueBreachedTitle => 'Leaked password';
+
+  @override
+  String auditIssueBreachedDesc(int count) {
+    return 'This password appears in $count data breaches online. Change it now!';
+  }
+
+  @override
+  String get auditIssueNoPasswordTitle => 'No password saved';
+
+  @override
+  String get auditIssueNoPasswordDesc =>
+      'This credential has no password stored.';
+
+  @override
+  String get auditIssueRotationTitle => 'Rotation required';
+
+  @override
+  String auditIssueRotationDesc(int days, int interval) {
+    return 'Expired $days days ago (set every $interval days).';
+  }
+
+  @override
+  String get auditIssueStaleTitle => 'Old password';
+
+  @override
+  String auditIssueStaleDesc(int days) {
+    return 'Not updated in over 6 months ($days days).';
+  }
+
+  @override
+  String get notifRotationChannelName => 'Rotation reminders';
+
+  @override
+  String get notifRotationChannelDesc =>
+      'Alerts when a password should be rotated for security.';
+
+  @override
+  String get notifRotationTitle => 'Password rotation required';
+
+  @override
+  String notifRotationBody(String title) {
+    return 'Your password for \"$title\" has expired. Change it now for security.';
+  }
+
+  @override
+  String get notifActionChangePassword => 'Change password';
+
+  @override
+  String get notifActionSnooze3d => 'Snooze 3 days';
+
+  @override
+  String get notifApprovalTitle => 'Approve sign-in';
+
+  @override
+  String get notifApprovalBody =>
+      'Your computer is asking to unlock. Tap to approve.';
+
+  @override
+  String notifApprovalBodyNamed(String name) {
+    return 'Unlock \"$name\"? Tap to approve.';
+  }
 }
