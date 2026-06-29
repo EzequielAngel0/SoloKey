@@ -403,7 +403,7 @@ Verificación hecha (header ICO): `images=1 → 256x256 32bpp`. Eso lo confirma.
 | UI-2 | **Tema + tipografía** | Inter + JetBrains Mono; large titles, botones/inputs/cards a tokens nuevos en `app_theme.dart`. | 🟡 | ✅ |
 | UI-3 | **Componentes compartidos** | `vault_app_bar`, `secure_text_field`, `password_strength_indicator`, `shimmer_loader`, chips de filtro, segmented type selector. | 🟡 | ✅ |
 | UI-4 | **Navegación móvil** | `BottomNavigationBar` → `NavigationBar` M3; Favoritos → chip; hub de Seguridad; búsqueda pill. | 🟡 | ✅ |
-| UI-5 | **Navegación escritorio** | `desktop_main_layout.dart`: sidebar + master-detail; paleta de comandos Ctrl+K. | 🔴 | ⬜ |
+| UI-5 | **Navegación escritorio** | `desktop_main_layout.dart`: sidebar + master-detail; paleta de comandos Ctrl+K. | 🔴 | ✅ |
 | UI-6 | **Pantallas** | Aplicar a setup/unlock/detalle/form/ajustes/sync (§4). | 🔴 | ⬜ |
 | UI-7 | **Logo nuevo** | Generar con Nano Banana (§5), aprobar maestro, sustituir `assets/logo/`. | 🟢 | ✅ |
 | UI-8 | **Íconos** | `.ico` multi-tamaño (16–256) ✅ + adaptive Android ✅ + `flutter_launcher_icons` ✅. Pendiente: rebuild Windows para verificar + (opcional) `WM_SETICON`. | 🟢 | 🟦 |

@@ -242,6 +242,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get generatorSheetTitle => 'Generate password';
 
   @override
+  String get commandNoResults => 'No results';
+
+  @override
   String get homeSearchHint => 'Search credentials…';
 
   @override

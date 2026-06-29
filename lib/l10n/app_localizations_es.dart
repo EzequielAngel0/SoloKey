@@ -244,6 +244,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get generatorSheetTitle => 'Generar contraseña';
 
   @override
+  String get commandNoResults => 'Sin resultados';
+
+  @override
   String get homeSearchHint => 'Buscar credenciales…';
 
   @override

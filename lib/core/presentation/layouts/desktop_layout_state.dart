@@ -16,3 +16,6 @@ final desktopRightPaneModeProvider = StateProvider<RightPaneMode>((ref) => Right
 
 // Track the folder ID selected in folders view for desktop details
 final desktopSelectedFolderIdProvider = StateProvider<String?>((ref) => null);
+
+// Sidebar collapsed (icon-only, 72px) vs expanded (240px).
+final desktopSidebarCollapsedProvider = StateProvider<bool>((ref) => false);

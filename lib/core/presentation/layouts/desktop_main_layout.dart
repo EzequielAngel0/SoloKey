@@ -6,11 +6,13 @@ import 'package:go_router/go_router.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
+import '../../../../theme/app_theme.dart';
 import '../../../../features/credentials/application/credentials_provider.dart';
 import '../../../../features/credentials/domain/entities/credential.dart';
 import '../../../../features/credentials/presentation/credential_detail_screen.dart';
 import '../../../../features/credentials/presentation/credential_form_screen.dart';
 import '../../../../features/credentials/presentation/security_audit_screen.dart';
+import '../../../../features/credentials/presentation/widgets/command_palette.dart';
 import '../../../../features/credentials/presentation/widgets/credential_card.dart';
 import '../../../../features/credentials/presentation/widgets/credential_list_widget.dart';
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
@@ -46,21 +48,30 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     final activeTab = ref.watch(desktopSelectedNavigationProvider);
 
     return AutoLockManager(
-      child: Scaffold(
-        body: Row(
-          children: [
-            // Column 1: Sidebar Navigation
-            const _DesktopSidebar(),
-            // Vertical divider
-            Container(
-              width: 1,
-              color: palette.divider,
+      child: CallbackShortcuts(
+        bindings: {
+          const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
+              CommandPalette.show(context),
+        },
+        child: Focus(
+          autofocus: true,
+          child: Scaffold(
+            body: Row(
+              children: [
+                // Column 1: Sidebar Navigation
+                const _DesktopSidebar(),
+                // Vertical divider
+                Container(
+                  width: 1,
+                  color: palette.divider,
+                ),
+                // Content Area (Middle Column + Right Column)
+                Expanded(
+                  child: _buildContentArea(activeTab),
+                ),
+              ],
             ),
-            // Content Area (Middle Column + Right Column)
-            Expanded(
-              child: _buildContentArea(activeTab),
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -116,12 +127,12 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     final foldersAsync = ref.watch(foldersNotifierProvider);
 
     return Scaffold(
-      backgroundColor: palette.cardDark,
+      backgroundColor: palette.background,
       appBar: AppBar(
-        backgroundColor: palette.cardDark,
+        backgroundColor: palette.background,
         title: Text(
           tabIndex == 0
-              ? l10n.navCredentials
+              ? l10n.navVault
               : tabIndex == 1
                   ? l10n.navFolders
                   : l10n.navFavorites,
@@ -169,10 +180,18 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                             )
                           : null,
                       filled: true,
-                      fillColor: palette.drawer,
+                      fillColor: palette.card,
                       border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        borderSide: BorderSide.none,
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: palette.divider),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: palette.divider),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide(color: palette.primary, width: 1.5),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     ),
@@ -373,64 +392,82 @@ class _DesktopSidebar extends ConsumerWidget {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final selectedIndex = ref.watch(desktopSelectedNavigationProvider);
+    final collapsed = ref.watch(desktopSidebarCollapsedProvider);
 
     final menuItems = [
-      _SidebarItemData(icon: Icons.lock_rounded, label: l10n.navCredentials, index: 0),
+      _SidebarItemData(icon: Icons.inventory_2_rounded, label: l10n.navVault, index: 0),
       _SidebarItemData(icon: Icons.folder_rounded, label: l10n.navFolders, index: 1),
       _SidebarItemData(icon: Icons.star_rounded, label: l10n.navFavorites, index: 2),
-      _SidebarItemData(icon: Icons.security_rounded, label: l10n.navAudit, index: 3),
+      _SidebarItemData(icon: Icons.shield_rounded, label: l10n.navAudit, index: 3),
       _SidebarItemData(icon: Icons.folder_shared_rounded, label: l10n.navSecureFiles, index: 6),
       _SidebarItemData(icon: Icons.settings_rounded, label: l10n.navSettings, index: 4),
       _SidebarItemData(icon: Icons.sync_rounded, label: l10n.navSync, index: 5),
     ];
 
-    return Container(
-      width: 240,
-      color: palette.background,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      width: collapsed ? 72 : 240,
+      color: palette.surface,
       child: Column(
         children: [
-          // Sidebar Header
+          // Sidebar Header: brand + collapse toggle
           Padding(
-            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            padding: EdgeInsets.fromLTRB(collapsed ? 0 : 16, 20, collapsed ? 0 : 8, 12),
             child: Row(
+              mainAxisAlignment:
+                  collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  width: 34,
+                  height: 34,
+                  padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(
                     color: palette.primary.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: Icon(
-                    Icons.vpn_key_rounded,
-                    color: palette.primary,
-                    size: 24,
+                  child: Image.asset(
+                    'assets/logo/solokey_mark.png',
+                    errorBuilder: (_, _, _) =>
+                        Icon(Icons.shield_rounded, color: palette.primary, size: 20),
                   ),
                 ),
-                const SizedBox(width: 12),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
+                if (!collapsed) ...[
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
                       'SoloKey',
                       style: TextStyle(
                         color: palette.textPrimary,
                         fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 0.5,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.2,
                       ),
                     ),
-                    Text(
-                      'Secure Vault',
-                      style: TextStyle(
-                        color: palette.textDisabled,
-                        fontSize: 11,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.menu_open_rounded, color: palette.textMuted, size: 20),
+                    tooltip: 'Colapsar',
+                    onPressed: () => ref
+                        .read(desktopSidebarCollapsedProvider.notifier)
+                        .state = true,
+                  ),
+                ],
               ],
             ),
+          ),
+          if (collapsed)
+            IconButton(
+              icon: Icon(Icons.menu_rounded, color: palette.textMuted, size: 20),
+              tooltip: 'Expandir',
+              onPressed: () => ref
+                  .read(desktopSidebarCollapsedProvider.notifier)
+                  .state = false,
+            ),
+          // Global search / command palette (Ctrl+K)
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: collapsed ? 0 : 12),
+            child: _SidebarSearchButton(collapsed: collapsed),
           ),
           const SizedBox(height: 8),
           // Menu Items
@@ -445,6 +482,7 @@ class _DesktopSidebar extends ConsumerWidget {
                   icon: item.icon,
                   label: item.label,
                   isSelected: isSelected,
+                  collapsed: collapsed,
                   onTap: () {
                     ref.read(desktopSelectedNavigationProvider.notifier).state = item.index;
                     // Reset details state on tab switch
@@ -458,35 +496,100 @@ class _DesktopSidebar extends ConsumerWidget {
           ),
           // Sidebar Footer with Lock Button
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.all(12.0),
             child: InkWell(
               onTap: () {
                 HapticFeedback.heavyImpact();
                 ref.read(vaultNotifierProvider.notifier).lock();
                 context.go(AppRoutes.unlock);
               },
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                padding: EdgeInsets.symmetric(
+                    vertical: 12, horizontal: collapsed ? 0 : 16),
                 decoration: BoxDecoration(
-                  border: Border.all(color: palette.error.withValues(alpha: 0.2)),
-                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: palette.error.withValues(alpha: 0.25)),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Icon(Icons.lock_outline_rounded, color: palette.error, size: 18),
-                    const SizedBox(width: 10),
-                    Text(
-                      'Bloquear Bóveda',
-                      style: TextStyle(color: palette.error, fontWeight: FontWeight.w600, fontSize: 13),
-                    ),
+                    if (!collapsed) ...[
+                      const SizedBox(width: 10),
+                      Text(
+                        l10n.homeLockTooltip,
+                        style: TextStyle(
+                            color: palette.error,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13),
+                      ),
+                    ],
                   ],
                 ),
               ),
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Sidebar entry that opens the global command palette (Ctrl+K).
+class _SidebarSearchButton extends StatelessWidget {
+  const _SidebarSearchButton({required this.collapsed});
+
+  final bool collapsed;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Material(
+      color: p.card,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+        side: BorderSide(color: p.divider),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => CommandPalette.show(context),
+        child: Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: collapsed ? 0 : 12, vertical: 9),
+          child: Row(
+            mainAxisAlignment:
+                collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+            children: [
+              Icon(Icons.search_rounded, color: p.textMuted, size: 18),
+              if (!collapsed) ...[
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    AppLocalizations.of(context).commonSearch,
+                    style: TextStyle(color: p.textMuted, fontSize: 13),
+                  ),
+                ),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: p.divider),
+                  ),
+                  child: Text(
+                    'Ctrl K',
+                    style: TextStyle(
+                      color: p.textDisabled,
+                      fontSize: 10.5,
+                      fontFamily: AppTheme.monoFamily,
+                    ),
+                  ),
+                ),
+              ],
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -510,11 +613,13 @@ class _SidebarItem extends StatefulWidget {
     required this.label,
     required this.isSelected,
     required this.onTap,
+    this.collapsed = false,
   });
 
   final IconData icon;
   final String label;
   final bool isSelected;
+  final bool collapsed;
   final VoidCallback onTap;
 
   @override
@@ -529,63 +634,74 @@ class _SidebarItemState extends State<_SidebarItem> {
     final palette = context.palette;
     final activeColor = palette.primary;
     final isSelected = widget.isSelected;
+    final collapsed = widget.collapsed;
 
-    return MouseRegion(
+    final iconColor = isSelected
+        ? activeColor
+        : _isHovered
+            ? palette.textPrimary
+            : palette.textMuted;
+
+    final item = MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: InkWell(
         onTap: widget.onTap,
+        borderRadius: BorderRadius.circular(10),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
-          margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          margin: EdgeInsets.symmetric(
+              horizontal: collapsed ? 10 : 12, vertical: 4),
+          padding: EdgeInsets.symmetric(
+              horizontal: collapsed ? 0 : 16, vertical: 12),
           decoration: BoxDecoration(
             color: isSelected
-                ? activeColor.withValues(alpha: 0.08)
+                ? activeColor.withValues(alpha: 0.12)
                 : _isHovered
-                    ? Colors.white.withValues(alpha: 0.03)
+                    ? palette.textPrimary.withValues(alpha: 0.04)
                     : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
-          child: Row(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                width: 4,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: isSelected ? activeColor : Colors.transparent,
-                  borderRadius: BorderRadius.circular(2),
+          child: collapsed
+              ? Center(child: Icon(widget.icon, color: iconColor, size: 20))
+              : Row(
+                  children: [
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      width: 4,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: isSelected ? activeColor : Colors.transparent,
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                    SizedBox(width: isSelected ? 12 : 16),
+                    Icon(widget.icon, color: iconColor, size: 20),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        widget.label,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: isSelected
+                              ? palette.textPrimary
+                              : _isHovered
+                                  ? palette.textPrimary
+                                  : palette.textMuted,
+                          fontWeight:
+                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                          fontSize: 13.5,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-              SizedBox(width: isSelected ? 12 : 16),
-              Icon(
-                widget.icon,
-                color: isSelected
-                    ? activeColor
-                    : _isHovered
-                        ? palette.textPrimary
-                        : palette.textMuted,
-                size: 20,
-              ),
-              const SizedBox(width: 12),
-              Text(
-                widget.label,
-                style: TextStyle(
-                  color: isSelected
-                      ? palette.textPrimary
-                      : _isHovered
-                          ? palette.textPrimary
-                          : palette.textMuted,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                  fontSize: 13.5,
-                ),
-              ),
-            ],
-          ),
         ),
       ),
     );
+
+    if (!collapsed) return item;
+    return Tooltip(message: widget.label, child: item);
   }
 }
 

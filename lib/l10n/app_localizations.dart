@@ -536,6 +536,12 @@ abstract class AppLocalizations {
   /// **'Generate password'**
   String get generatorSheetTitle;
 
+  /// No description provided for @commandNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results'**
+  String get commandNoResults;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:

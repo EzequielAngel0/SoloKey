@@ -84,6 +84,7 @@
   "securityHubSyncDesc": "Vincula este dispositivo en tu red",
   "securityHubRecoveryDesc": "Restablece tu contraseña maestra",
   "generatorSheetTitle": "Generar contraseña",
+  "commandNoResults": "Sin resultados",
 
   "homeSearchHint": "Buscar credenciales…",
   "homeLockTooltip": "Bloquear",

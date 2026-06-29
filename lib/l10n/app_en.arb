@@ -99,6 +99,7 @@
   "securityHubSyncDesc": "Pair this device over your network",
   "securityHubRecoveryDesc": "Reset your master password",
   "generatorSheetTitle": "Generate password",
+  "commandNoResults": "No results",
 
   "homeSearchHint": "Search credentials…",
   "homeLockTooltip": "Lock",
