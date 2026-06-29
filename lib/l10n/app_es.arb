@@ -85,6 +85,9 @@
   "securityHubRecoveryDesc": "Restablece tu contraseña maestra",
   "generatorSheetTitle": "Generar contraseña",
   "commandNoResults": "Sin resultados",
+  "detailAdvanced": "Avanzado",
+  "detailTotpSecret": "Secreto (semilla)",
+  "detailCopyCode": "Copiar código",
 
   "homeSearchHint": "Buscar credenciales…",
   "homeLockTooltip": "Bloquear",

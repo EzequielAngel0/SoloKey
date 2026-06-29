@@ -542,6 +542,24 @@ abstract class AppLocalizations {
   /// **'No results'**
   String get commandNoResults;
 
+  /// No description provided for @detailAdvanced.
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get detailAdvanced;
+
+  /// No description provided for @detailTotpSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Secret (seed)'**
+  String get detailTotpSecret;
+
+  /// No description provided for @detailCopyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy code'**
+  String get detailCopyCode;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:

@@ -247,6 +247,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commandNoResults => 'Sin resultados';
 
   @override
+  String get detailAdvanced => 'Avanzado';
+
+  @override
+  String get detailTotpSecret => 'Secreto (semilla)';
+
+  @override
+  String get detailCopyCode => 'Copiar código';
+
+  @override
   String get homeSearchHint => 'Buscar credenciales…';
 
   @override

@@ -19,6 +19,34 @@ import '../../../core/services/biometric_auth_service.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
 
+// ── Type helpers ──────────────────────────────────────────────────────────────
+Color _typeColor(CredentialType t, AppPalette p) => switch (t) {
+      CredentialType.password => p.typePassword,
+      CredentialType.apiKey => p.typeApiKey,
+      CredentialType.secureNote => p.typeNote,
+      CredentialType.totp => p.typeTotp,
+      CredentialType.passkey => p.typePasskey,
+      CredentialType.sshKey => p.typeSshKey,
+    };
+
+IconData _typeIcon(CredentialType t) => switch (t) {
+      CredentialType.password => Icons.lock_rounded,
+      CredentialType.apiKey => Icons.key_rounded,
+      CredentialType.secureNote => Icons.note_rounded,
+      CredentialType.totp => Icons.timer_rounded,
+      CredentialType.passkey => Icons.fingerprint_rounded,
+      CredentialType.sshKey => Icons.terminal_rounded,
+    };
+
+String _typeLabel(AppLocalizations l10n, CredentialType t) => switch (t) {
+      CredentialType.password => l10n.typePassword,
+      CredentialType.apiKey => l10n.typeApiKey,
+      CredentialType.secureNote => l10n.typeSecureNote,
+      CredentialType.totp => l10n.typeTotp,
+      CredentialType.passkey => l10n.typePasskey,
+      CredentialType.sshKey => l10n.typeSshKey,
+    };
+
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
   final String credentialId;
@@ -31,7 +59,7 @@ class CredentialDetailScreen extends ConsumerWidget {
 
     return credentialsAsync.when(
       loading: () => Scaffold(
-        body: Center(child: CircularProgressIndicator(color: palette.accent)),
+        body: Center(child: CircularProgressIndicator(color: palette.primary)),
       ),
       error: (e, _) => Scaffold(
         body: Center(child: Text(l10n.commonErrorDetail('$e'))),
@@ -58,14 +86,21 @@ class _DetailView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
+
+    final primary = _primaryRows(context, l10n);
+    final advanced = _advancedRows(context, l10n);
+
     return Scaffold(
       appBar: VaultAppBar(
         title: credential.title,
-        leading: ResponsiveLayout.isDesktop(context) ? const SizedBox.shrink() : null,
+        leading:
+            ResponsiveLayout.isDesktop(context) ? const SizedBox.shrink() : null,
         actions: [
           IconButton(
             icon: Icon(
-              credential.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
+              credential.isFavorite
+                  ? Icons.star_rounded
+                  : Icons.star_border_rounded,
               color: palette.warning,
             ),
             tooltip: credential.isFavorite
@@ -103,7 +138,8 @@ class _DetailView extends ConsumerWidget {
             icon: const Icon(Icons.edit_rounded),
             onPressed: () {
               if (ResponsiveLayout.isDesktop(context)) {
-                ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.edit;
+                ref.read(desktopRightPaneModeProvider.notifier).state =
+                    RightPaneMode.edit;
               } else {
                 context.push(
                   AppRoutes.credentialEdit.replaceFirst(':id', credential.id),
@@ -112,97 +148,29 @@ class _DetailView extends ConsumerWidget {
             },
           ),
           IconButton(
-            icon: Icon(Icons.delete_outline_rounded,
-                color: palette.danger),
+            icon: Icon(Icons.delete_outline_rounded, color: palette.danger),
             onPressed: () => _confirmDelete(context, ref),
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
-          _TypeBadge(type: credential.type),
-          const SizedBox(height: 24),
-          if (credential.username != null)
-            _SecretTile(
-              icon: Icons.person_rounded,
-              label: l10n.fieldUsername,
-              value: credential.username!,
-              isSecret: false,
-            ),
-          if (credential.password != null && credential.type != CredentialType.sshKey)
-            _SecretTile(
-              icon: Icons.lock_rounded,
-              label: l10n.fieldPassword,
-              value: credential.password!,
-              isSecret: true,
-              isDoubleEncrypted: credential.isDoubleEncrypted,
-              credentialId: credential.id,
-            ),
-          if (credential.website != null)
-            _SecretTile(
-              icon: Icons.language_rounded,
-              label: l10n.fieldWebsite,
-              value: credential.website!,
-              isSecret: false,
-            ),
-          if (credential.notes != null && credential.notes!.isNotEmpty)
-            _SecretTile(
-              icon: Icons.notes_rounded,
-              label: l10n.fieldNotes,
-              value: credential.notes!,
-              isSecret: false,
-              multiline: true,
-            ),
-          if (credential.type == CredentialType.sshKey && credential.sshKeyMetadata != null) ...[
-            _SecretTile(
-              icon: Icons.vpn_key_rounded,
-              label: l10n.fieldKeyType,
-              value: credential.sshKeyMetadata!.keyType,
-              isSecret: false,
-            ),
-            _SecretTile(
-              icon: Icons.terminal_rounded,
-              label: l10n.fieldPrivateKey,
-              value: credential.sshKeyMetadata!.privateKey,
-              isSecret: true,
-              multiline: true,
-              isDoubleEncrypted: credential.isDoubleEncrypted,
-              credentialId: credential.id,
-            ),
-            if (credential.sshKeyMetadata!.publicKey.isNotEmpty)
-              _SecretTile(
-                icon: Icons.public_rounded,
-                label: l10n.fieldPublicKey,
-                value: credential.sshKeyMetadata!.publicKey,
-                isSecret: false,
-                multiline: true,
-              ),
-            if (credential.sshKeyMetadata!.passphrase != null && credential.sshKeyMetadata!.passphrase!.isNotEmpty)
-              _SecretTile(
-                icon: Icons.vpn_key_outlined,
-                label: l10n.fieldKeyPassphrase,
-                value: credential.sshKeyMetadata!.passphrase!,
-                isSecret: true,
-                isDoubleEncrypted: credential.isDoubleEncrypted,
-                credentialId: credential.id,
-              ),
-          ],
-          ...credential.customFields.map(
-            (f) => _SecretTile(
-              icon: Icons.code_rounded,
-              label: f.label,
-              value: f.value,
-              isSecret: f.isSecret,
-              isDoubleEncrypted: credential.isDoubleEncrypted,
-              credentialId: credential.id,
-            ),
-          ),
+          _DetailHeader(credential: credential),
+          const SizedBox(height: 18),
+          // TOTP: the live code is the hero, first thing you see.
           if (credential.type == CredentialType.totp &&
-              credential.password != null)
+              credential.password != null) ...[
             _TotpTile(secretId: credential.password!),
+            const SizedBox(height: 14),
+          ],
+          if (primary.isNotEmpty) _Group(children: primary),
+          if (advanced.isNotEmpty) ...[
+            _SectionHeader(text: l10n.detailAdvanced),
+            _Group(children: advanced),
+          ],
           _buildRotationStatusTile(context),
-          const SizedBox(height: 16),
+          const SizedBox(height: 8),
           Center(
             child: TextButton.icon(
               onPressed: () => context.push(
@@ -211,7 +179,7 @@ class _DetailView extends ConsumerWidget {
               icon: const Icon(Icons.history_rounded, size: 18),
               label: Text(l10n.detailViewHistory),
               style: TextButton.styleFrom(
-                foregroundColor: palette.accent,
+                foregroundColor: palette.primary,
                 textStyle: const TextStyle(fontSize: 13),
               ),
             ),
@@ -219,6 +187,150 @@ class _DetailView extends ConsumerWidget {
         ],
       ),
     );
+  }
+
+  /// Rows shown in the main (always-visible) group, ordered by type so the most
+  /// useful field comes first. Secrets here (e.g. login password) reveal inline.
+  List<Widget> _primaryRows(BuildContext context, AppLocalizations l10n) {
+    final rows = <Widget>[];
+    final c = credential;
+
+    switch (c.type) {
+      case CredentialType.sshKey:
+        if (c.sshKeyMetadata != null) {
+          rows.add(_DetailRow(
+            icon: Icons.vpn_key_rounded,
+            label: l10n.fieldKeyType,
+            value: c.sshKeyMetadata!.keyType,
+            isSecret: false,
+          ));
+          if (c.sshKeyMetadata!.publicKey.isNotEmpty) {
+            rows.add(_DetailRow(
+              icon: Icons.public_rounded,
+              label: l10n.fieldPublicKey,
+              value: c.sshKeyMetadata!.publicKey,
+              isSecret: false,
+              multiline: true,
+              mono: true,
+            ));
+          }
+        }
+        break;
+      case CredentialType.totp:
+        if (c.username != null) {
+          rows.add(_DetailRow(
+            icon: Icons.person_rounded,
+            label: l10n.fieldUsername,
+            value: c.username!,
+            isSecret: false,
+          ));
+        }
+        break;
+      default:
+        if (c.username != null) {
+          rows.add(_DetailRow(
+            icon: Icons.person_rounded,
+            label: l10n.fieldUsername,
+            value: c.username!,
+            isSecret: false,
+          ));
+        }
+        if (c.password != null) {
+          rows.add(_DetailRow(
+            icon: c.type == CredentialType.apiKey
+                ? Icons.key_rounded
+                : Icons.lock_rounded,
+            label: c.type == CredentialType.apiKey
+                ? l10n.typeApiKey
+                : l10n.fieldPassword,
+            value: c.password!,
+            isSecret: true,
+            mono: true,
+            isDoubleEncrypted: c.isDoubleEncrypted,
+            credentialId: c.id,
+          ));
+        }
+    }
+
+    if (c.website != null) {
+      rows.add(_DetailRow(
+        icon: Icons.language_rounded,
+        label: l10n.fieldWebsite,
+        value: c.website!,
+        isSecret: false,
+      ));
+    }
+
+    // Custom fields (e.g. TOTP issuer, API scopes) go in the main group.
+    for (final f in c.customFields) {
+      rows.add(_DetailRow(
+        icon: Icons.code_rounded,
+        label: f.label,
+        value: f.value,
+        isSecret: f.isSecret,
+        mono: f.isSecret,
+        isDoubleEncrypted: c.isDoubleEncrypted,
+        credentialId: c.id,
+      ));
+    }
+
+    if (c.notes != null && c.notes!.isNotEmpty) {
+      rows.add(_DetailRow(
+        icon: Icons.notes_rounded,
+        label: l10n.fieldNotes,
+        value: c.notes!,
+        isSecret: false,
+        multiline: true,
+      ));
+    }
+
+    return rows;
+  }
+
+  /// Sensitive material tucked under "Advanced": the TOTP seed and the SSH
+  /// private key / passphrase. Hidden by default; reveal/copy require auth.
+  List<Widget> _advancedRows(BuildContext context, AppLocalizations l10n) {
+    final rows = <Widget>[];
+    final c = credential;
+
+    if (c.type == CredentialType.totp && c.password != null) {
+      rows.add(_DetailRow(
+        icon: Icons.key_rounded,
+        label: l10n.detailTotpSecret,
+        value: c.password!,
+        isSecret: true,
+        mono: true,
+        isDoubleEncrypted: c.isDoubleEncrypted,
+        credentialId: c.id,
+      ));
+    }
+
+    if (c.type == CredentialType.sshKey && c.sshKeyMetadata != null) {
+      rows.add(_DetailRow(
+        icon: Icons.terminal_rounded,
+        label: l10n.fieldPrivateKey,
+        value: c.sshKeyMetadata!.privateKey,
+        isSecret: true,
+        multiline: true,
+        mono: true,
+        isDoubleEncrypted: c.isDoubleEncrypted,
+        credentialId: c.id,
+      ));
+      final pass = c.sshKeyMetadata!.passphrase;
+      if (pass != null && pass.isNotEmpty) {
+        rows.add(_DetailRow(
+          icon: Icons.vpn_key_outlined,
+          label: l10n.fieldKeyPassphrase,
+          value: pass,
+          isSecret: true,
+          mono: true,
+          isDoubleEncrypted: c.isDoubleEncrypted,
+          credentialId: c.id,
+        ));
+      }
+    }
+
+    return rows;
   }
 
   Widget _buildRotationStatusTile(BuildContext context) {
@@ -246,28 +358,22 @@ class _DetailView extends ConsumerWidget {
     final nextRotation = lastChanged.add(Duration(days: days));
     final daysRemaining = nextRotation.difference(DateTime.now()).inDays;
     final isOverdue = daysRemaining <= 0;
+    final accent = isOverdue ? palette.danger : palette.secondary;
 
     return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(top: 4, bottom: 8),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isOverdue
-            ? palette.danger.withValues(alpha: 0.1)
-            : palette.secondary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: isOverdue
-              ? palette.danger.withValues(alpha: 0.3)
-              : palette.secondary.withValues(alpha: 0.3),
-        ),
+        color: accent.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: accent.withValues(alpha: 0.3)),
       ),
       child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Icon(
             isOverdue ? Icons.warning_amber_rounded : Icons.lock_clock_rounded,
-            color: isOverdue ? palette.danger : palette.secondary,
-            size: 24,
+            color: accent,
+            size: 22,
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -279,7 +385,7 @@ class _DetailView extends ConsumerWidget {
                       ? l10n.rotationOverdueTitle
                       : l10n.rotationReminderTitle,
                   style: TextStyle(
-                    color: isOverdue ? palette.danger : palette.secondary,
+                    color: accent,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 0.5,
@@ -310,7 +416,7 @@ class _DetailView extends ConsumerWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: palette.drawer,
+        backgroundColor: palette.surface,
         title: Text(l10n.detailDeleteTitle,
             style: TextStyle(color: palette.textPrimary)),
         content: Text(
@@ -332,7 +438,8 @@ class _DetailView extends ConsumerWidget {
     );
     if (confirmed == true) {
       if (!context.mounted) return;
-      final auth = await AuthHelper.requireAuth(context, reason: l10n.detailDeleteAuthReason);
+      final auth = await AuthHelper.requireAuth(context,
+          reason: l10n.detailDeleteAuthReason);
       if (!auth) return;
 
       await ref
@@ -341,7 +448,8 @@ class _DetailView extends ConsumerWidget {
       if (context.mounted) {
         if (ResponsiveLayout.isDesktop(context)) {
           ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
-          ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+          ref.read(desktopRightPaneModeProvider.notifier).state =
+              RightPaneMode.none;
         } else {
           context.pop();
         }
@@ -350,57 +458,156 @@ class _DetailView extends ConsumerWidget {
   }
 }
 
-class _TypeBadge extends StatelessWidget {
-  const _TypeBadge({required this.type});
-  final CredentialType type;
+/// Compact header: type-colored avatar + title + type/subtitle line.
+class _DetailHeader extends StatelessWidget {
+  const _DetailHeader({required this.credential});
+  final Credential credential;
 
-  static String _label(AppLocalizations l10n, CredentialType type) =>
-      switch (type) {
-        CredentialType.password => l10n.typePassword,
-        CredentialType.apiKey => l10n.typeApiKey,
-        CredentialType.secureNote => l10n.typeSecureNote,
-        CredentialType.totp => l10n.typeTotp,
-        CredentialType.passkey => l10n.typePasskey,
-        CredentialType.sshKey => l10n.typeSshKey,
-      };
+  String? _subtitle() {
+    if (credential.website != null && credential.website!.isNotEmpty) {
+      return credential.website;
+    }
+    if (credential.username != null && credential.username!.isNotEmpty) {
+      return credential.username;
+    }
+    return null;
+  }
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
+    final p = context.palette;
     final l10n = AppLocalizations.of(context);
-    final color = switch (type) {
-      CredentialType.password => palette.typePassword,
-      CredentialType.apiKey => palette.typeApiKey,
-      CredentialType.secureNote => palette.typeNote,
-      CredentialType.totp => palette.typeTotp,
-      CredentialType.passkey => palette.typePasskey,
-      CredentialType.sshKey => palette.typeSshKey,
-    };
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(8),
-      ),
+    final color = _typeColor(credential.type, p);
+    final subtitle = _subtitle();
+
+    return Row(
+      children: [
+        Container(
+          width: 52,
+          height: 52,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: Icon(_typeIcon(credential.type), color: color, size: 24),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                credential.title,
+                style: TextStyle(
+                  color: p.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: -0.3,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 3),
+              Row(
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(7),
+                    ),
+                    child: Text(
+                      _typeLabel(l10n, credential.type),
+                      style: TextStyle(
+                        color: color,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                  if (subtitle != null) ...[
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        subtitle,
+                        style: TextStyle(color: p.textMuted, fontSize: 12.5),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// Section label ("Avanzado") above a group.
+class _SectionHeader extends StatelessWidget {
+  const _SectionHeader({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
       child: Text(
-        _label(l10n, type),
+        text.toUpperCase(),
         style: TextStyle(
-          color: color,
-          fontSize: 12,
-          fontWeight: FontWeight.w600,
+          color: context.palette.textMuted,
+          fontSize: 11,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
         ),
       ),
     );
   }
 }
 
-class _SecretTile extends StatefulWidget {
-  const _SecretTile({
+/// Grouped card with hairline dividers between dense rows (1Password-like).
+class _Group extends StatelessWidget {
+  const _Group({required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    if (children.isEmpty) return const SizedBox.shrink();
+    final items = <Widget>[];
+    for (var i = 0; i < children.length; i++) {
+      items.add(children[i]);
+      if (i != children.length - 1) {
+        items.add(Divider(height: 1, thickness: 1, color: p.divider));
+      }
+    }
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: BoxDecoration(
+        color: p.card,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: p.divider),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: items),
+    );
+  }
+}
+
+/// Dense key/value row. Handles plain values, inline secrets (reveal + copy with
+/// auth) and double-encrypted fields (PIN/biometric decrypt on demand).
+class _DetailRow extends StatefulWidget {
+  const _DetailRow({
     required this.icon,
     required this.label,
     required this.value,
     required this.isSecret,
     this.multiline = false,
+    this.mono = false,
     this.isDoubleEncrypted = false,
     this.credentialId = '',
   });
@@ -410,20 +617,22 @@ class _SecretTile extends StatefulWidget {
   final String value;
   final bool isSecret;
   final bool multiline;
+  final bool mono;
   final bool isDoubleEncrypted;
   final String credentialId;
 
   @override
-  State<_SecretTile> createState() => _SecretTileState();
+  State<_DetailRow> createState() => _DetailRowState();
 }
 
-class _SecretTileState extends State<_SecretTile> {
+class _DetailRowState extends State<_DetailRow> {
   bool _revealed = false;
   String? _decryptedValue;
   bool _decrypting = false;
 
   Future<String?> _getPlainValue(BuildContext context) async {
-    if (!widget.isDoubleEncrypted || !widget.value.startsWith('double_enc_v1:')) {
+    if (!widget.isDoubleEncrypted ||
+        !widget.value.startsWith('double_enc_v1:')) {
       return widget.value;
     }
     if (_decryptedValue != null) {
@@ -436,10 +645,11 @@ class _SecretTileState extends State<_SecretTile> {
       final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
       final bioService = getIt<BiometricAuthService>();
 
-      final savedPin = await doubleEnvelopeService.getPinFromSecureStorage(widget.credentialId);
+      final savedPin = await doubleEnvelopeService
+          .getPinFromSecureStorage(widget.credentialId);
       if (savedPin != null) {
-        final auth = await bioService.authenticate(
-            reason: l10n.secretDecryptAuthReason);
+        final auth =
+            await bioService.authenticate(reason: l10n.secretDecryptAuthReason);
         if (auth) {
           final plain = await doubleEnvelopeService.decryptField(
             encryptedValue: widget.value,
@@ -483,17 +693,16 @@ class _SecretTileState extends State<_SecretTile> {
     return showDialog<String>(
       context: context,
       builder: (diagContext) => AlertDialog(
-        backgroundColor: palette.drawer,
-        title: Text(l10n.pinDialogTitle, style: TextStyle(color: palette.textPrimary, fontSize: 16)),
+        backgroundColor: palette.surface,
+        title: Text(l10n.pinDialogTitle,
+            style: TextStyle(color: palette.textPrimary, fontSize: 16)),
         content: TextField(
           controller: controller,
           obscureText: true,
           autofocus: true,
           keyboardType: TextInputType.number,
           style: TextStyle(color: palette.textPrimary),
-          decoration: InputDecoration(
-            labelText: l10n.pinDialogLabel,
-          ),
+          decoration: InputDecoration(labelText: l10n.pinDialogLabel),
         ),
         actions: [
           TextButton(
@@ -526,87 +735,114 @@ class _SecretTileState extends State<_SecretTile> {
     );
   }
 
+  Future<void> _toggleReveal() async {
+    if (_revealed) {
+      setState(() {
+        _revealed = false;
+        _decryptedValue = null; // Clear plaintext from memory when hidden.
+      });
+    } else {
+      final plain = await _getPlainValue(context);
+      if (plain != null) setState(() => _revealed = true);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final displayValue = _decrypting
+    final p = context.palette;
+    final hidden = widget.isSecret && !_revealed && !_decrypting;
+    final display = _decrypting
         ? AppLocalizations.of(context).secretDecrypting
-        : (widget.isSecret && !_revealed ? '••••••••••••' : (_decryptedValue ?? widget.value));
+        : (hidden ? '••••••••••••' : (_decryptedValue ?? widget.value));
 
-    final palette = context.palette;
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: palette.card,
-        borderRadius: BorderRadius.circular(14),
+    final valueStyle = TextStyle(
+      color: p.textPrimary,
+      fontSize: 14,
+      height: widget.multiline ? 1.45 : 1.2,
+      fontFamily: (widget.mono || (widget.isSecret && !hidden))
+          ? AppTheme.monoFamily
+          : null,
+      letterSpacing: hidden ? 2 : 0,
+    );
+
+    final labelWidget = Text(
+      widget.label,
+      style: TextStyle(
+        color: p.textMuted,
+        fontSize: 11.5,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.3,
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(widget.icon, color: palette.accent, size: 20),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      maxLines: 1,
+      overflow: TextOverflow.ellipsis,
+    );
+
+    final actions = <Widget>[
+      if (widget.isSecret)
+        IconButton(
+          icon: Icon(
+            _revealed ? Icons.visibility_off_rounded : Icons.visibility_rounded,
+            color: p.textMuted,
+            size: 18,
+          ),
+          onPressed: _toggleReveal,
+          padding: EdgeInsets.zero,
+          constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        ),
+      Padding(
+        padding: const EdgeInsets.only(left: 4, right: 2),
+        child: CopyFeedbackButton(onCopy: () => _copy(context)),
+      ),
+    ];
+
+    if (widget.multiline) {
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(14, 12, 8, 12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: palette.textMuted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  displayValue,
-                  style: TextStyle(
-                    color: palette.textPrimary,
-                    fontSize: 14,
-                    letterSpacing: widget.isSecret && !_revealed && !_decrypting ? 2 : 0,
-                  ),
-                  maxLines: widget.multiline ? null : 1,
-                  overflow: widget.multiline
-                      ? null
-                      : TextOverflow.ellipsis,
-                ),
+                Icon(widget.icon, color: p.textMuted, size: 16),
+                const SizedBox(width: 8),
+                Expanded(child: labelWidget),
+                ...actions,
               ],
             ),
+            const SizedBox(height: 8),
+            Text(display, style: valueStyle),
+          ],
+        ),
+      );
+    }
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(14, 10, 8, 10),
+      child: Row(
+        children: [
+          Icon(widget.icon, color: p.textMuted, size: 16),
+          const SizedBox(width: 10),
+          SizedBox(
+            width: 84,
+            child: labelWidget,
           ),
-          if (widget.isSecret)
-            IconButton(
-              icon: Icon(
-                _revealed
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded,
-                color: palette.textMuted,
-                size: 18,
-              ),
-              onPressed: () async {
-                if (_revealed) {
-                  setState(() {
-                    _revealed = false;
-                    _decryptedValue = null; // Clear from memory when hidden!
-                  });
-                } else {
-                  final plain = await _getPlainValue(context);
-                  if (plain != null) {
-                    setState(() => _revealed = true);
-                  }
-                }
-              },
-              padding: EdgeInsets.zero,
-              constraints: const BoxConstraints(),
-            ),
           const SizedBox(width: 8),
-          CopyFeedbackButton(onCopy: () => _copy(context)),
+          Expanded(
+            child: Text(
+              display,
+              style: valueStyle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          ...actions,
         ],
       ),
     );
   }
 }
 
+/// The live TOTP code — the hero of a TOTP credential's detail.
 class _TotpTile extends StatefulWidget {
   const _TotpTile({required this.secretId});
   final String secretId;
@@ -622,6 +858,7 @@ class _TotpTileState extends State<_TotpTile> {
   late Timer _timer;
   String _code = '--- ---';
   double _progress = 1.0;
+  int _remaining = 30;
 
   @override
   void initState() {
@@ -639,28 +876,25 @@ class _TotpTileState extends State<_TotpTile> {
   void _updateProgress() {
     final now = DateTime.now().millisecondsSinceEpoch;
     final remaining = 30 - ((now / 1000).round() % 30);
-    
-    // Si acaba de reiniciar, recalcula el código
     if (remaining == 30) {
       _updateCode();
     }
-    
     setState(() {
+      _remaining = remaining;
       _progress = remaining / 30.0;
     });
   }
 
   void _updateCode() {
     try {
-      // Limpiar secret de espacios o guiones
-      final cleanSecret = widget.secretId.replaceAll(RegExp(r'\s|-'), '').toUpperCase();
+      final cleanSecret =
+          widget.secretId.replaceAll(RegExp(r'\s|-'), '').toUpperCase();
       final code = OTP.generateTOTPCodeString(
         cleanSecret,
         DateTime.now().millisecondsSinceEpoch,
         algorithm: Algorithm.SHA1,
         isGoogle: true,
       );
-      // Poner espacio en medio
       setState(() {
         _code = '${code.substring(0, 3)} ${code.substring(3)}';
       });
@@ -689,68 +923,90 @@ class _TotpTileState extends State<_TotpTile> {
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
+    final p = context.palette;
     final l10n = AppLocalizations.of(context);
-    final displayCode = _code == _kInvalid ? l10n.totpInvalid : _code;
-    return Container(
-      margin: const EdgeInsets.only(top: 8, bottom: 12),
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: palette.typeTotp.withValues(alpha: 0.1),
+    final accent = p.typeTotp;
+    final invalid = _code == _kInvalid;
+    final displayCode = invalid ? l10n.totpInvalid : _code;
+
+    return Material(
+      color: accent.withValues(alpha: 0.10),
+      shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: palette.typeTotp.withValues(alpha: 0.3)),
+        side: BorderSide(color: accent.withValues(alpha: 0.35)),
       ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Icon(Icons.timer_rounded, color: palette.typeTotp, size: 20),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Text(
-                  l10n.totpTitle,
-                  style: TextStyle(
-                    color: palette.typeTotp,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0.5,
-                  ),
-                ),
-              ),
-              CopyFeedbackButton(
-                onCopy: () => _copy(context),
-                color: palette.typeTotp,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: invalid ? null : () => _copy(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 14, 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                displayCode,
+                l10n.totpTitle.toUpperCase(),
                 style: TextStyle(
-                  color: palette.textPrimary,
-                  fontSize: 36,
-                  fontWeight: FontWeight.w900,
-                  letterSpacing: 4,
-                  fontFamily: AppTheme.monoFamily,
+                  color: accent,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 0.8,
                 ),
               ),
-              const SizedBox(width: 24),
-              SizedBox(
-                width: 32,
-                height: 32,
-                child: CircularProgressIndicator(
-                  value: _progress,
-                  backgroundColor: palette.drawer,
-                  color: palette.typeTotp,
-                  strokeWidth: 4,
-                ),
+              const SizedBox(height: 10),
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      displayCode,
+                      style: TextStyle(
+                        color: invalid ? p.danger : p.textPrimary,
+                        fontSize: invalid ? 18 : 34,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: invalid ? 0 : 5,
+                        fontFamily: AppTheme.monoFamily,
+                      ),
+                    ),
+                  ),
+                  if (!invalid) ...[
+                    SizedBox(
+                      width: 34,
+                      height: 34,
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          SizedBox(
+                            width: 34,
+                            height: 34,
+                            child: CircularProgressIndicator(
+                              value: _progress,
+                              backgroundColor: accent.withValues(alpha: 0.2),
+                              color: accent,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                          Text(
+                            '$_remaining',
+                            style: TextStyle(
+                              color: p.textBody,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              fontFamily: AppTheme.monoFamily,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    CopyFeedbackButton(
+                      onCopy: () => _copy(context),
+                      color: accent,
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
   }

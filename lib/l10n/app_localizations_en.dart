@@ -245,6 +245,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commandNoResults => 'No results';
 
   @override
+  String get detailAdvanced => 'Advanced';
+
+  @override
+  String get detailTotpSecret => 'Secret (seed)';
+
+  @override
+  String get detailCopyCode => 'Copy code';
+
+  @override
   String get homeSearchHint => 'Search credentials…';
 
   @override
