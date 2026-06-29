@@ -17,7 +17,8 @@ import '../../../../features/credentials/presentation/widgets/credential_card.da
 import '../../../../features/credentials/presentation/widgets/credential_list_widget.dart';
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
-import '../../../../features/folders/presentation/folder_screen.dart';
+import '../../../../features/folders/presentation/widgets/folder_tree.dart';
+import '../../../../shared/widgets/empty_state.dart';
 import '../../../../features/secure_files/presentation/secure_files_screen.dart';
 import '../../../../features/settings/presentation/settings_screen.dart';
 import '../../../../features/vault_access/application/vault_state_provider.dart';
@@ -209,79 +210,68 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         ),
         data: (creds) {
           if (tabIndex == 1) {
-            // Folders view
+            // Folders: tree (navigate) on top + credentials of the selected
+            // folder below. Clicking a credential opens it in the right pane.
             final folders = foldersAsync.valueOrNull ?? [];
-            final rootFolders = folders.where((f) => f.parentId == null).toList();
-            final noFolderCreds = creds.where((c) => c.categoryId == null).toList();
+            final selFolderId = ref.watch(desktopSelectedFolderIdProvider);
+            final folderCreds = creds
+                .where((c) => c.categoryId == selFolderId && !c.isHidden)
+                .toList();
+            final selFolder = selFolderId == null
+                ? null
+                : folders.where((f) => f.id == selFolderId).firstOrNull;
+            final headerName = selFolder?.name ?? l10n.transferNoFolder;
 
-            if (rootFolders.isEmpty && noFolderCreds.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.folder_open_rounded, size: 48, color: palette.divider),
-                    const SizedBox(height: 12),
-                    Text(l10n.desktopEmptyVault, style: TextStyle(color: palette.textMuted)),
-                    const SizedBox(height: 12),
-                    OutlinedButton.icon(
-                      onPressed: () => _createRootFolder(context, ref),
-                      icon: const Icon(Icons.create_new_folder_rounded, size: 16),
-                      label: Text(l10n.desktopCreateFolder),
-                    )
-                  ],
-                ),
-              );
-            }
-
-            return ListView(
-              padding: const EdgeInsets.all(16),
+            return Column(
               children: [
-                ...rootFolders.map((f) {
-                  final activeFolderId = ref.watch(desktopSelectedFolderIdProvider);
-                  final isSelected = activeFolderId == f.id;
-                  Color folderColor;
-                  try {
-                    folderColor = Color(int.parse('FF${f.colorHex.replaceFirst('#', '')}', radix: 16));
-                  } catch (_) {
-                    folderColor = palette.accent;
-                  }
-
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 6),
-                    child: ListTile(
-                      onTap: () {
-                        ref.read(desktopSelectedFolderIdProvider.notifier).state = f.id;
-                        ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
-                      },
-                      selected: isSelected,
-                      selectedTileColor: palette.surface,
-                      tileColor: palette.card,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                      leading: Icon(
-                        f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded,
-                        color: folderColor,
-                      ),
-                      title: Text(
-                        f.name,
-                        style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500, fontSize: 14),
-                      ),
-                      trailing: const Icon(Icons.chevron_right_rounded, color: Colors.white24, size: 18),
-                    ),
-                  );
-                }),
-                if (noFolderCreds.isNotEmpty) ...[
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 12),
-                    child: Text(
-                      l10n.transferNoFolder,
-                      style: TextStyle(color: palette.textDisabled, fontSize: 11, fontWeight: FontWeight.bold),
-                    ),
+                Expanded(
+                  flex: 5,
+                  child: FolderTree(
+                    folders: folders,
+                    selectedId: selFolderId,
+                    onSelect: (id) {
+                      ref.read(desktopSelectedFolderIdProvider.notifier).state =
+                          id;
+                      ref
+                          .read(desktopSelectedCredentialIdProvider.notifier)
+                          .state = null;
+                      ref.read(desktopRightPaneModeProvider.notifier).state =
+                          RightPaneMode.none;
+                    },
                   ),
-                  ...noFolderCreds.map((c) => Padding(
-                        padding: const EdgeInsets.only(bottom: 8),
-                        child: CredentialCard(credential: c),
-                      )),
-                ]
+                ),
+                Divider(height: 1, color: palette.divider),
+                Expanded(
+                  flex: 4,
+                  child: folderCreds.isEmpty
+                      ? EmptyState(
+                          icon: Icons.lock_open_rounded,
+                          title: l10n.folderEmptyTitle,
+                          subtitle: l10n.folderEmptyDesc,
+                          compact: true,
+                        )
+                      : ListView(
+                          padding: const EdgeInsets.all(12),
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
+                              child: Text(
+                                '$headerName · ${folderCreds.length}',
+                                style: TextStyle(
+                                  color: palette.textMuted,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w700,
+                                  letterSpacing: 0.6,
+                                ),
+                              ),
+                            ),
+                            ...folderCreds.map((c) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: CredentialCard(credential: c),
+                                )),
+                          ],
+                        ),
+                ),
               ],
             );
           }
@@ -317,20 +307,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
   Widget _buildRightPane(int tabIndex) {
     final l10n = AppLocalizations.of(context);
-    if (tabIndex == 1) {
-      // Folder View in Right Column
-      final folderId = ref.watch(desktopSelectedFolderIdProvider);
-      if (folderId == null) {
-        return _EmptyStateRightPane(
-          icon: Icons.folder_rounded,
-          title: l10n.desktopSelectFolderTitle,
-          subtitle: l10n.desktopSelectFolderSub,
-        );
-      }
-      return FolderScreen(folderId: folderId);
-    }
-
-    // Credentials / Favorites Right Pane (Details or Form)
+    // Details/Form pane for Vault, Favorites AND Folders: selecting a credential
+    // (incl. one inside a folder) shows its detail here.
     final mode = ref.watch(desktopRightPaneModeProvider);
     final selectedId = ref.watch(desktopSelectedCredentialIdProvider);
 
