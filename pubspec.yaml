@@ -99,6 +99,16 @@ flutter:
   assets:
     - assets/logo/
 
+  # Tipografia bundleada offline (sin red, coherente con local-first).
+  # Variable fonts: Flutter mapea fontWeight al eje `wght` del .ttf.
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter.ttf
+    - family: JetBrains Mono
+      fonts:
+        - asset: assets/fonts/JetBrainsMono.ttf
+
 flutter_launcher_icons:
   android: true
   ios: false
