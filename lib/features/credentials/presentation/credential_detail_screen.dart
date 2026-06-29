@@ -8,6 +8,7 @@ import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/copy_feedback_button.dart';
+import '../../../shared/widgets/detail_group.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../application/credentials_provider.dart';
 import '../domain/entities/credential.dart';
@@ -164,10 +165,10 @@ class _DetailView extends ConsumerWidget {
             _TotpTile(secretId: credential.password!),
             const SizedBox(height: 14),
           ],
-          if (primary.isNotEmpty) _Group(children: primary),
+          if (primary.isNotEmpty) DetailGroup(children: primary),
           if (advanced.isNotEmpty) ...[
-            _SectionHeader(text: l10n.detailAdvanced),
-            _Group(children: advanced),
+            SectionHeader(text: l10n.detailAdvanced),
+            DetailGroup(children: advanced),
           ],
           _buildRotationStatusTile(context),
           const SizedBox(height: 8),
@@ -543,57 +544,6 @@ class _DetailHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Section label ("Avanzado") above a group.
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.text});
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(4, 14, 4, 8),
-      child: Text(
-        text.toUpperCase(),
-        style: TextStyle(
-          color: context.palette.textMuted,
-          fontSize: 11,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.8,
-        ),
-      ),
-    );
-  }
-}
-
-/// Grouped card with hairline dividers between dense rows (1Password-like).
-class _Group extends StatelessWidget {
-  const _Group({required this.children});
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    final p = context.palette;
-    if (children.isEmpty) return const SizedBox.shrink();
-    final items = <Widget>[];
-    for (var i = 0; i < children.length; i++) {
-      items.add(children[i]);
-      if (i != children.length - 1) {
-        items.add(Divider(height: 1, thickness: 1, color: p.divider));
-      }
-    }
-    return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      decoration: BoxDecoration(
-        color: p.card,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: p.divider),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: items),
     );
   }
 }
