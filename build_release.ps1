@@ -181,7 +181,10 @@ function Build-Windows {
 
 # ── Instalador Inno Setup (Windows) ──────────────────────────────────────────────
 function Build-Inno {
-    $relDir = Build-Windows
+    # No capturar el retorno de Build-Windows: filtra el stdout de 'flutter build'
+    # al valor de retorno y contaminaria /DSourceDir. Resolvemos la ruta aparte.
+    Build-Windows
+    $relDir = Find-WindowsRelease
     if (-not $script:Iscc) { $script:Iscc = Find-Iscc }
     Write-Step 'Generando instalador con Inno Setup (SoloKey-setup.exe)'
     & $script:Iscc "/DMyAppVersion=$Version" "/DSourceDir=$relDir" (Join-Path $Root 'installer\SoloKey.iss')
