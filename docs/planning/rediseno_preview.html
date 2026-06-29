@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SoloKey — Preview Rediseño "Graphite Pro"</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B0B0F; --surface:#121218; --card:#17171F; --card2:#1E1E26;
+    --divider:#262630; --primary:#3B82F6; --primary2:#2563EB; --emerald:#10B981;
+    --text:#F3F4F7; --body:#C7C8D1; --muted:#8A8B97; --disabled:#56575F;
+    --danger:#F26D6D; --warning:#F5A524; --info:#38BDF8;
+    --t-password:#3B82F6; --t-apikey:#10B981; --t-note:#F5A524;
+    --t-totp:#8B5CF6; --t-passkey:#14B8A6; --t-ssh:#0EA5E9;
+    --r-card:16px; --r-btn:14px; --r-input:12px;
+    --shadow:0 8px 24px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box; margin:0; padding:0}
+  body{
+    font-family:'Inter',system-ui,sans-serif; background:var(--bg); color:var(--text);
+    -webkit-font-smoothing:antialiased; line-height:1.45; padding:0 0 80px;
+  }
+  .mono{font-family:'JetBrains Mono',monospace}
+  .wrap{max-width:1180px; margin:0 auto; padding:0 24px}
+
+  /* ── Page header ───────────────────────────── */
+  header.top{
+    border-bottom:1px solid var(--divider); padding:40px 0 32px; margin-bottom:48px;
+    background:linear-gradient(180deg,#15151C,var(--bg));
+  }
+  .brand{display:flex; align-items:center; gap:16px}
+  .logo{
+    width:64px; height:64px; border-radius:18px; flex:none;
+    background:linear-gradient(160deg,#1b1b24,#0c0c11);
+    border:1px solid var(--divider);
+    display:grid; place-items:center; position:relative;
+  }
+  .logo span{
+    font-weight:800; font-size:40px; letter-spacing:-2px;
+    background:linear-gradient(180deg,var(--primary),var(--primary2));
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+  }
+  .logo small{position:absolute; right:9px; bottom:11px; width:9px; height:9px; border-radius:50%; background:var(--bg); box-shadow:0 0 0 3px var(--primary)}
+  h1{font-size:30px; font-weight:800; letter-spacing:-.6px}
+  .sub{color:var(--muted); font-size:15px; margin-top:2px}
+  .pill-note{display:inline-flex; gap:8px; align-items:center; margin-top:18px; padding:8px 14px; border:1px solid var(--divider); border-radius:999px; font-size:13px; color:var(--body); background:var(--surface)}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--emerald)}
+
+  section{margin-bottom:56px}
+  h2{font-size:13px; font-weight:700; letter-spacing:1.4px; text-transform:uppercase; color:var(--muted); margin-bottom:18px}
+  .grid{display:grid; gap:24px}
+
+  /* ── Palette ───────────────────────────────── */
+  .swatches{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:14px}
+  .sw{border:1px solid var(--divider); border-radius:12px; overflow:hidden; background:var(--card)}
+  .sw .chip{height:64px}
+  .sw .meta{padding:9px 11px}
+  .sw .name{font-size:12.5px; font-weight:600}
+  .sw .hex{font-size:11.5px; color:var(--muted); font-family:'JetBrains Mono',monospace; margin-top:1px}
+
+  /* ── Type sample ───────────────────────────── */
+  .type-card{border:1px solid var(--divider); border-radius:var(--r-card); padding:24px 26px; background:var(--card)}
+  .type-card .d{font-size:30px; font-weight:800; letter-spacing:-.6px}
+  .type-card .h{font-size:22px; font-weight:600; margin-top:8px}
+  .type-card .b{font-size:15px; color:var(--body); margin-top:8px; max-width:560px}
+  .type-card .m{margin-top:14px; font-size:14px; color:var(--body); background:var(--card2); border:1px solid var(--divider); padding:10px 14px; border-radius:10px; display:inline-block}
+
+  /* ── Components ────────────────────────────── */
+  .comp{display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:24px}
+  .panel{border:1px solid var(--divider); border-radius:var(--r-card); padding:22px; background:var(--card)}
+  .panel h3{font-size:12px; text-transform:uppercase; letter-spacing:1px; color:var(--muted); margin-bottom:16px; font-weight:700}
+  .row{display:flex; flex-wrap:wrap; gap:12px; align-items:center}
+
+  .btn{border:none; border-radius:var(--r-btn); font:inherit; font-weight:600; font-size:14px; padding:13px 20px; cursor:pointer; color:#fff}
+  .btn.primary{background:var(--primary)}
+  .btn.tonal{background:rgba(59,130,246,.14); color:#9cc0ff}
+  .btn.ghost{background:transparent; color:var(--primary); border:1px solid var(--divider)}
+  .btn.danger{background:transparent; color:var(--danger); border:1px solid rgba(242,109,109,.4)}
+
+  .search{display:flex; align-items:center; gap:10px; background:var(--card2); border:1px solid var(--divider); border-radius:999px; padding:12px 18px; color:var(--muted); font-size:14px}
+  .input{width:100%; background:var(--card2); border:1px solid var(--divider); border-radius:var(--r-input); padding:13px 15px; color:var(--text); font:inherit; font-size:14px}
+  .input.focus{border-color:var(--primary); box-shadow:0 0 0 3px rgba(59,130,246,.18)}
+  .lbl{font-size:12px; color:var(--muted); margin-bottom:7px; display:block}
+
+  .chips{display:flex; gap:9px; flex-wrap:wrap}
+  .fchip{padding:8px 15px; border-radius:999px; font-size:13px; font-weight:500; border:1px solid var(--divider); color:var(--body); background:var(--surface); cursor:pointer}
+  .fchip.on{background:var(--primary); color:#fff; border-color:var(--primary)}
+
+  .badge{display:inline-flex; align-items:center; gap:7px; padding:6px 11px; border-radius:8px; font-size:12px; font-weight:600}
+  .badge i{width:8px; height:8px; border-radius:2px; display:inline-block}
+
+  /* ── Phone mockup ──────────────────────────── */
+  .stage{display:grid; grid-template-columns:390px 1fr; gap:40px; align-items:start}
+  @media(max-width:920px){.stage{grid-template-columns:1fr}}
+  .phone{width:390px; border:1px solid var(--divider); border-radius:38px; background:var(--bg); overflow:hidden; box-shadow:var(--shadow)}
+  .statusbar{display:flex; justify-content:space-between; padding:14px 24px 6px; font-size:12px; color:var(--muted)}
+  .scr{padding:6px 18px 0}
+  .scr .big-title{font-size:28px; font-weight:800; letter-spacing:-.5px; margin:10px 4px 16px}
+  .scr .lock{float:right; color:var(--muted); font-size:20px; margin-top:4px}
+
+  .score{border:1px solid var(--divider); border-radius:var(--r-card); padding:18px; background:linear-gradient(135deg,#17171F,#13131a); margin:14px 0 18px; display:flex; align-items:center; gap:16px}
+  .ring{width:54px;height:54px;border-radius:50%; flex:none; display:grid; place-items:center; font-weight:800; font-size:16px; color:#fff;
+    background:conic-gradient(var(--emerald) 0 82%, #2a2a33 82% 100%)}
+  .ring b{width:42px;height:42px;border-radius:50%;background:var(--card);display:grid;place-items:center}
+  .score .t{font-size:14.5px; font-weight:600}
+  .score .s{font-size:12.5px; color:var(--muted); margin-top:2px}
+
+  .ccard{display:flex; align-items:center; gap:13px; padding:13px 14px; border:1px solid var(--divider); border-radius:14px; background:var(--card); margin-bottom:10px}
+  .av{width:42px; height:42px; border-radius:12px; flex:none; display:grid; place-items:center; font-weight:700; font-size:16px; color:#fff}
+  .ccard .nm{font-size:14.5px; font-weight:600}
+  .ccard .un{font-size:12.5px; color:var(--muted); margin-top:2px}
+  .ccard .tb{margin-left:auto}
+  .mini-badge{font-size:10.5px; font-weight:700; padding:4px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:.5px}
+
+  .navbar{display:flex; justify-content:space-around; padding:12px 8px 18px; border-top:1px solid var(--divider); margin-top:14px; background:var(--surface)}
+  .nav-i{display:flex; flex-direction:column; align-items:center; gap:5px; font-size:11px; color:var(--disabled)}
+  .nav-i.on{color:var(--primary)}
+  .nav-i .ic{width:46px;height:30px;border-radius:999px;display:grid;place-items:center;font-size:18px}
+  .nav-i.on .ic{background:rgba(59,130,246,.16)}
+  .fab{position:relative; float:right; margin:-2px 6px 14px 0; background:var(--primary); color:#fff; border:none; border-radius:16px; padding:13px 20px; font:inherit; font-weight:600; font-size:14px; display:inline-flex; gap:8px; align-items:center; box-shadow:0 6px 16px rgba(37,99,235,.4); cursor:pointer}
+
+  .note{color:var(--muted); font-size:13.5px; max-width:560px}
+  .note b{color:var(--body)}
+
+  /* ── Desktop mockup ────────────────────────── */
+  .desk{border:1px solid var(--divider); border-radius:18px; overflow:hidden; background:var(--bg); box-shadow:var(--shadow); margin-top:8px}
+  .desk .bar{display:flex; align-items:center; gap:8px; padding:11px 16px; border-bottom:1px solid var(--divider); background:var(--surface)}
+  .desk .bar i{width:11px;height:11px;border-radius:50%}
+  .desk-body{display:grid; grid-template-columns:210px 300px 1fr; min-height:460px}
+  .side{border-right:1px solid var(--divider); padding:18px 12px; background:var(--surface); display:flex; flex-direction:column}
+  .side .sbrand{display:flex; align-items:center; gap:10px; padding:6px 8px 18px}
+  .side .sbrand .lg{width:30px;height:30px;border-radius:9px;background:linear-gradient(160deg,#1b1b24,#0c0c11);border:1px solid var(--divider);display:grid;place-items:center;font-weight:800;font-size:17px;color:transparent;background-clip:text;-webkit-background-clip:text;background-image:linear-gradient(180deg,var(--primary),var(--primary2))}
+  .si{display:flex; align-items:center; gap:11px; padding:10px 12px; border-radius:10px; font-size:13.5px; color:var(--body); margin-bottom:3px}
+  .si.on{background:rgba(59,130,246,.14); color:#bcd5ff; font-weight:600}
+  .si .ic{font-size:16px; width:18px; text-align:center}
+  .side .foot{margin-top:auto; border-top:1px solid var(--divider); padding-top:12px; font-size:12.5px; color:var(--muted); display:flex; align-items:center; gap:8px}
+  .list{border-right:1px solid var(--divider); padding:14px}
+  .list .lsearch{display:flex; align-items:center; gap:8px; background:var(--card2); border:1px solid var(--divider); border-radius:10px; padding:9px 12px; color:var(--muted); font-size:12.5px; margin-bottom:12px}
+  .lrow{display:flex; align-items:center; gap:11px; padding:10px 11px; border-radius:11px; margin-bottom:4px; cursor:pointer}
+  .lrow.on{background:var(--card)}
+  .lrow .av{width:34px;height:34px;border-radius:10px;font-size:13px}
+  .lrow .nm{font-size:13.5px;font-weight:600}
+  .lrow .un{font-size:11.5px;color:var(--muted)}
+  .detail{padding:26px}
+  .detail .dhead{display:flex; align-items:center; gap:15px; margin-bottom:22px}
+  .detail .dhead .av{width:56px;height:56px;border-radius:15px;font-size:22px}
+  .detail .dname{font-size:20px;font-weight:700}
+  .detail .durl{font-size:13px;color:var(--info)}
+  .field{border:1px solid var(--divider); border-radius:12px; padding:13px 16px; margin-bottom:12px; background:var(--card); display:flex; align-items:center; justify-content:space-between}
+  .field .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .field .v{font-size:14px;margin-top:3px}
+  .field .act{display:flex;gap:14px;color:var(--muted);font-size:16px}
+  .totp{display:flex;align-items:center;gap:14px}
+  .totp .code{font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:700;letter-spacing:3px;color:var(--t-totp)}
+  .totp .tring{width:30px;height:30px;border-radius:50%;background:conic-gradient(var(--t-totp) 0 62%, #2a2a33 62%)}
+
+  footer{border-top:1px solid var(--divider); padding-top:24px; color:var(--muted); font-size:13px}
+
+  /* light mini */
+  .light{--bg:#F7F7F9;--surface:#fff;--card:#fff;--card2:#F1F1F7;--divider:#E6E6EC;--text:#15161A;--body:#3A3B42;--muted:#6B6C77;--primary:#2563EB;--emerald:#059669;
+    background:var(--bg); color:var(--text); border:1px solid var(--divider); border-radius:18px; padding:24px}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap">
+    <div class="brand">
+      <div class="logo"><span>S</span><small></small></div>
+      <div>
+        <h1>SoloKey · Rediseño "Graphite Pro"</h1>
+        <div class="sub">Preview visual del nuevo sistema de diseño — Android + Windows · plano, sin glassmorphism</div>
+      </div>
+    </div>
+    <div class="pill-note"><span class="dot"></span> Mockup de referencia (no es la app real). Tipografía Inter + JetBrains Mono.</div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <!-- PALETTE -->
+  <section>
+    <h2>1 · Paleta — superficies grafito</h2>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#0B0B0F"></div><div class="meta"><div class="name">background</div><div class="hex">#0B0B0F</div></div></div>
+      <div class="sw"><div class="chip" style="background:#121218"></div><div class="meta"><div class="name">surface</div><div class="hex">#121218</div></div></div>
+      <div class="sw"><div class="chip" style="background:#17171F"></div><div class="meta"><div class="name">card</div><div class="hex">#17171F</div></div></div>
+      <div class="sw"><div class="chip" style="background:#1E1E26"></div><div class="meta"><div class="name">card2 / inset</div><div class="hex">#1E1E26</div></div></div>
+      <div class="sw"><div class="chip" style="background:#262630"></div><div class="meta"><div class="name">divider</div><div class="hex">#262630</div></div></div>
+    </div>
+    <div style="height:14px"></div>
+    <h2 style="margin-top:8px">Acentos y estados</h2>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#3B82F6"></div><div class="meta"><div class="name">primary</div><div class="hex">#3B82F6</div></div></div>
+      <div class="sw"><div class="chip" style="background:#2563EB"></div><div class="meta"><div class="name">primary press</div><div class="hex">#2563EB</div></div></div>
+      <div class="sw"><div class="chip" style="background:#10B981"></div><div class="meta"><div class="name">success</div><div class="hex">#10B981</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F5A524"></div><div class="meta"><div class="name">warning</div><div class="hex">#F5A524</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F26D6D"></div><div class="meta"><div class="name">danger</div><div class="hex">#F26D6D</div></div></div>
+      <div class="sw"><div class="chip" style="background:#38BDF8"></div><div class="meta"><div class="name">info</div><div class="hex">#38BDF8</div></div></div>
+    </div>
+    <div style="height:14px"></div>
+    <h2 style="margin-top:8px">Tipos de credencial (calmados)</h2>
+    <div class="swatches">
+      <div class="sw"><div class="chip" style="background:#3B82F6"></div><div class="meta"><div class="name">Password</div><div class="hex">#3B82F6</div></div></div>
+      <div class="sw"><div class="chip" style="background:#10B981"></div><div class="meta"><div class="name">API Key</div><div class="hex">#10B981</div></div></div>
+      <div class="sw"><div class="chip" style="background:#F5A524"></div><div class="meta"><div class="name">Note</div><div class="hex">#F5A524</div></div></div>
+      <div class="sw"><div class="chip" style="background:#8B5CF6"></div><div class="meta"><div class="name">TOTP</div><div class="hex">#8B5CF6</div></div></div>
+      <div class="sw"><div class="chip" style="background:#14B8A6"></div><div class="meta"><div class="name">Passkey</div><div class="hex">#14B8A6</div></div></div>
+      <div class="sw"><div class="chip" style="background:#0EA5E9"></div><div class="meta"><div class="name">SSH Key</div><div class="hex">#0EA5E9</div></div></div>
+    </div>
+  </section>
+
+  <!-- TYPOGRAPHY -->
+  <section>
+    <h2>2 · Tipografía — Inter + JetBrains Mono</h2>
+    <div class="type-card">
+      <div class="d">Tu bóveda, simple y segura.</div>
+      <div class="h">Headline · Inter SemiBold</div>
+      <div class="b">Body · Inter Regular. Superficies grafito, mucho aire, jerarquía por tamaño y peso — no por cajas de colores. Cero glassmorphism, cero neón.</div>
+      <div class="m mono">8f3a·2b91·d7e0  ·  secretos y códigos en JetBrains Mono tabular</div>
+    </div>
+  </section>
+
+  <!-- COMPONENTS -->
+  <section>
+    <h2>3 · Componentes</h2>
+    <div class="comp">
+      <div class="panel">
+        <h3>Botones</h3>
+        <div class="row" style="flex-direction:column; align-items:stretch; gap:12px">
+          <button class="btn primary">Guardar credencial</button>
+          <button class="btn tonal">Generar contraseña</button>
+          <button class="btn ghost">Cancelar</button>
+          <button class="btn danger">Bloquear ahora</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Entradas</h3>
+        <span class="lbl">Búsqueda</span>
+        <div class="search">🔍 Buscar en la bóveda…</div>
+        <div style="height:14px"></div>
+        <span class="lbl">Campo (foco)</span>
+        <input class="input focus" value="usuario@correo.com">
+      </div>
+      <div class="panel">
+        <h3>Chips de filtro</h3>
+        <div class="chips">
+          <span class="fchip on">Todos</span>
+          <span class="fchip">★ Favoritos</span>
+          <span class="fchip">Contraseñas</span>
+          <span class="fchip">TOTP</span>
+          <span class="fchip">Passkeys</span>
+          <span class="fchip">SSH</span>
+        </div>
+        <h3 style="margin-top:22px">Type badges</h3>
+        <div class="row">
+          <span class="badge" style="background:rgba(59,130,246,.14);color:#9cc0ff"><i style="background:#3B82F6"></i>Password</span>
+          <span class="badge" style="background:rgba(16,185,129,.14);color:#7ee0bf"><i style="background:#10B981"></i>API Key</span>
+          <span class="badge" style="background:rgba(139,92,246,.14);color:#c4b1f7"><i style="background:#8B5CF6"></i>TOTP</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MOBILE -->
+  <section>
+    <h2>4 · Android — pantalla "Bóveda"</h2>
+    <div class="stage">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>📶 🔋</span></div>
+        <div class="scr">
+          <span class="lock">🔒</span>
+          <div class="big-title">Bóveda</div>
+          <div class="search">🔍 Buscar…</div>
+          <div style="height:14px"></div>
+          <div class="chips">
+            <span class="fchip on">Todos</span>
+            <span class="fchip">★ Favoritos</span>
+            <span class="fchip">Contraseñas</span>
+            <span class="fchip">TOTP</span>
+          </div>
+          <div class="score">
+            <div class="ring"><b>82</b></div>
+            <div>
+              <div class="t">Salud de la bóveda · Buena</div>
+              <div class="s">2 contraseñas débiles · 1 reutilizada</div>
+            </div>
+          </div>
+          <div class="ccard">
+            <div class="av" style="background:#3B82F6">G</div>
+            <div><div class="nm">GitHub</div><div class="un">angelez@dev.com</div></div>
+            <div class="tb"><span class="mini-badge" style="background:rgba(59,130,246,.16);color:#9cc0ff">PASS</span></div>
+          </div>
+          <div class="ccard">
+            <div class="av" style="background:#8B5CF6">A</div>
+            <div><div class="nm">AWS Console</div><div class="un mono">2FA · 318 942</div></div>
+            <div class="tb"><span class="mini-badge" style="background:rgba(139,92,246,.16);color:#c4b1f7">TOTP</span></div>
+          </div>
+          <div class="ccard">
+            <div class="av" style="background:#10B981">S</div>
+            <div><div class="nm">Stripe API</div><div class="un">sk_live_••••4f2a</div></div>
+            <div class="tb"><span class="mini-badge" style="background:rgba(16,185,129,.16);color:#7ee0bf">KEY</span></div>
+          </div>
+          <div class="ccard">
+            <div class="av" style="background:#0EA5E9">D</div>
+            <div><div class="nm">droplet-prod</div><div class="un">ed25519 · root</div></div>
+            <div class="tb"><span class="mini-badge" style="background:rgba(14,165,233,.16);color:#8fd6f7">SSH</span></div>
+          </div>
+          <button class="fab">＋ Nueva</button>
+          <div style="clear:both"></div>
+          <div class="navbar">
+            <div class="nav-i on"><div class="ic">🗄️</div>Bóveda</div>
+            <div class="nav-i"><div class="ic">📁</div>Carpetas</div>
+            <div class="nav-i"><div class="ic">🛡️</div>Seguridad</div>
+            <div class="nav-i"><div class="ic">⚙️</div>Ajustes</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h3 style="font-size:16px;font-weight:700;margin-bottom:12px">Qué cambia en móvil</h3>
+        <p class="note">
+          • <b>NavigationBar M3</b> de 4 destinos (indicador pill). <b>Favoritos</b> deja de ser
+          pestaña y pasa a ser un <b>chip de filtro</b>.<br><br>
+          • <b>Búsqueda persistente</b> tipo pill arriba de la Bóveda.<br><br>
+          • Nuevo <b>hub de Seguridad</b> que unifica auditoría, generador, import/export, HIBP y
+          recuperación (hoy dispersos).<br><br>
+          • <b>Tarjeta de Salud</b> con score arriba de la lista.<br><br>
+          • Tarjetas planas con <b>borde hairline</b>, avatares por tipo, badges sobrios.
+          Cero glow, cero vidrio.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- DESKTOP -->
+  <section>
+    <h2>5 · Windows — sidebar + master-detail</h2>
+    <div class="desk">
+      <div class="bar"><i style="background:#F26D6D"></i><i style="background:#F5A524"></i><i style="background:#10B981"></i>
+        <span style="margin-left:10px;font-size:12.5px;color:var(--muted)">SoloKey</span></div>
+      <div class="desk-body">
+        <div class="side">
+          <div class="sbrand"><div class="lg">S</div><b style="font-size:15px">SoloKey</b></div>
+          <div class="si on"><span class="ic">🗄️</span> Bóveda</div>
+          <div class="si"><span class="ic">📁</span> Carpetas</div>
+          <div class="si"><span class="ic">🛡️</span> Seguridad</div>
+          <div class="si"><span class="ic">⇅</span> Sincronizar</div>
+          <div class="si"><span class="ic">⚙️</span> Ajustes</div>
+          <div class="foot"><span class="dot"></span> Sync activo · 🔒 Bloquear</div>
+        </div>
+        <div class="list">
+          <div class="lsearch">🔍 Buscar  ·  ⌘K</div>
+          <div class="lrow on">
+            <div class="av" style="background:#3B82F6">G</div>
+            <div><div class="nm">GitHub</div><div class="un">angelez@dev.com</div></div>
+          </div>
+          <div class="lrow">
+            <div class="av" style="background:#8B5CF6">A</div>
+            <div><div class="nm">AWS Console</div><div class="un">2FA</div></div>
+          </div>
+          <div class="lrow">
+            <div class="av" style="background:#10B981">S</div>
+            <div><div class="nm">Stripe API</div><div class="un">API key</div></div>
+          </div>
+          <div class="lrow">
+            <div class="av" style="background:#0EA5E9">D</div>
+            <div><div class="nm">droplet-prod</div><div class="un">SSH</div></div>
+          </div>
+        </div>
+        <div class="detail">
+          <div class="dhead">
+            <div class="av" style="background:#3B82F6">G</div>
+            <div><div class="dname">GitHub</div><div class="durl">github.com</div></div>
+            <button class="btn tonal" style="margin-left:auto">★ Favorito</button>
+          </div>
+          <div class="field">
+            <div><div class="k">Usuario</div><div class="v">angelez@dev.com</div></div>
+            <div class="act">📋</div>
+          </div>
+          <div class="field">
+            <div><div class="k">Contraseña</div><div class="v mono">•••••••••••••</div></div>
+            <div class="act">👁️ 📋</div>
+          </div>
+          <div class="field">
+            <div><div class="k">Código 2FA</div>
+              <div class="totp"><span class="code">318 942</span><span class="tring"></span></div>
+            </div>
+            <div class="act">📋</div>
+          </div>
+          <p class="note" style="margin-top:16px">
+            El <b>detalle se actualiza in-place</b> al seleccionar en la lista — sin salir de la
+            pantalla. En ventanas anchas: <b>3 columnas</b> (sidebar + lista + detalle); en angostas
+            colapsa a 2. Paleta de comandos con <b>Ctrl/⌘ K</b>.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- LIGHT -->
+  <section>
+    <h2>6 · Modo claro (mismo sistema)</h2>
+    <div class="light">
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+        <div style="width:42px;height:42px;border-radius:12px;background:linear-gradient(160deg,#fff,#eef);border:1px solid #E6E6EC;display:grid;place-items:center;font-weight:800;font-size:22px;color:#2563EB">S</div>
+        <div><div style="font-weight:700;font-size:16px">Bóveda</div><div style="font-size:12.5px;color:#6B6C77">Dark es la referencia · light correcto y de alto contraste</div></div>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn" style="background:#2563EB">Guardar</button>
+        <span class="fchip" style="background:#2563EB;color:#fff;border-color:#2563EB">Todos</span>
+        <span class="fchip" style="background:#fff;color:#3A3B42;border-color:#E6E6EC">★ Favoritos</span>
+        <div style="display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #E6E6EC;border-radius:12px;padding:11px 14px;color:#3A3B42;font-size:13.5px;min-width:200px">
+          <div style="width:30px;height:30px;border-radius:9px;background:#2563EB;color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px">G</div>
+          GitHub · angelez@dev.com
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    Preview generado para el rediseño <b style="color:var(--body)">Graphite Pro</b> ·
+    documento completo en <span class="mono">docs/planning/rediseno_ui_2026.md</span> ·
+    el logo definitivo (monograma S + keyhole) se integra en la fase UI-7/UI-8.
+  </footer>
+
+</div>
+</body>
+</html>
