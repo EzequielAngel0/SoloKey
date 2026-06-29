@@ -126,6 +126,21 @@ Future<void> main(List<String> args) async {
           titleBarStyle: TitleBarStyle.normal,
         );
         windowManager.waitUntilReadyToShow(windowOptions, () async {
+          // Plan B del icono: ademas del WM_SETICON nativo del runner, fijamos el
+          // icono de la ventana/taskbar desde Dart con el .ico bundleado junto al
+          // .exe, por si window_manager recrea la ventana tras el set nativo.
+          try {
+            final sep = Platform.pathSeparator;
+            final exeDir = File(Platform.resolvedExecutable).parent.path;
+            final iconPath =
+                '$exeDir${sep}data${sep}flutter_assets${sep}assets${sep}logo${sep}SoloKey.ico';
+            if (File(iconPath).existsSync()) {
+              await windowManager.setIcon(iconPath);
+            }
+          } catch (_) {
+            // best-effort; no debe impedir el arranque.
+          }
+
           if (startMinimized) {
             // Arranque automatico: queda en la bandeja (icono del tray).
             await windowManager.hide();
