@@ -84,7 +84,7 @@ commit de una línea ASCII.
 | **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_health_provider.dart` (nuevo) | **Avisos de salud inline** (débil/repetida) en tarjeta y detalle vía provider barato en memoria; estados vacíos distinguen "sin resultados" de "bóveda vacía" | ✅ |
 | **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
 | **L5 — Seguridad** | `security_audit_screen.dart` (+ `ScoreRing`/`StatusChip`) | **Security Score** (anillo + conteos por severidad) arriba de la auditoría; hallazgos siguen accionables (tap → editar) | ✅ |
-| **L6 — Ajustes** | `settings_screen.dart` | Lista agrupada, selector de tema con preview, secciones densas | ⬜ |
+| **L6 — Ajustes** | `settings_screen.dart` | Ya estaba bien agrupado (secciones + tarjetas + tiles = patrón objetivo); sólo se localizó el título hardcodeado. Toggle de densidad (opcional) diferido | ✅ |
 | **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Estados (vacío/conectando/error), pasos claros, filas densas | ⬜ |
 | **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Onboarding/stepper limpios, Hello/biometría primero, estados de error | ⬜ |
 | **L9 — Escritorio + extras** | `desktop_main_layout.dart`, `quick_fill_screen.dart`, `qr_scanner_screen.dart`, `autofill_onboarding_screen.dart` | Master-detail con filas densas + árbol de carpetas; overlays/onboarding | ⬜ |

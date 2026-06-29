@@ -97,9 +97,9 @@ class SettingsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      appBar: VaultAppBar(title: 'Ajustes de seguridad'),
-      body: SettingsView(),
+    return Scaffold(
+      appBar: VaultAppBar(title: AppLocalizations.of(context).navSettings),
+      body: const SettingsView(),
     );
   }
 }
