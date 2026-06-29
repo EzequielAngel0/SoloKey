@@ -80,18 +80,15 @@ class TypeSelectorPremium extends StatelessWidget {
                         : palette.card,
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
-                  color: isSelected ? color : Colors.transparent,
+                  color: isSelected ? color : palette.divider,
                   width: isSelected ? 1.5 : 1,
                 ),
-                boxShadow: isSelected
-                    ? [BoxShadow(color: color.withValues(alpha: 0.15), blurRadius: 8, offset: const Offset(0, 2))]
-                    : null,
               ),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   AnimatedScale(
-                    scale: isSelected ? 1.15 : 1.0,
+                    scale: isSelected ? 1.08 : 1.0,
                     duration: const Duration(milliseconds: 200),
                     child: Icon(
                       item.icon,

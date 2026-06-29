@@ -37,7 +37,7 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
-    final block = palette.divider;
+    final block = palette.shimmerHighlight;
     return AnimatedBuilder(
       animation: _opacityAnim,
       builder: (context, child) {
@@ -51,9 +51,9 @@ class _ShimmerLoaderState extends State<ShimmerLoader>
               height: 72,
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: palette.card,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: palette.card),
+                color: palette.shimmerBase,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: palette.divider),
               ),
               child: Row(
                 children: [

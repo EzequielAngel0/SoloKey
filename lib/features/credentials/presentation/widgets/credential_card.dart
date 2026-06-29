@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
 import '../../../../theme/app_palette.dart';
+import '../../../../theme/app_theme.dart';
 import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
 import 'credential_icon.dart';
@@ -196,7 +197,7 @@ class CredentialCard extends ConsumerWidget {
               itemCount: folders.length,
               itemBuilder: (context, i) {
                 final f = folders[i];
-                final color = Color(int.tryParse('FF${f.colorHex.replaceFirst('#', '')}', radix: 16) ?? 0xFF6C63FF);
+                final color = Color(int.tryParse('FF${f.colorHex.replaceFirst('#', '')}', radix: 16) ?? 0xFF3B82F6);
                 return ListTile(
                   leading: Icon(Icons.folder_rounded, color: color),
                   title: Text(f.name, style: TextStyle(color: palette.textPrimary)),
@@ -233,7 +234,11 @@ class CredentialCard extends ConsumerWidget {
     // long-press options sheet and the credential detail screen.
     return Material(
       color: palette.card,
-      borderRadius: BorderRadius.circular(16),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: palette.divider),
+      ),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
           borderRadius: BorderRadius.circular(16),
           onTap: () {
@@ -393,7 +398,7 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
               fontSize: 13,
               fontWeight: FontWeight.bold,
               letterSpacing: 1,
-              fontFamily: 'monospace',
+              fontFamily: AppTheme.monoFamily,
             ),
           ),
           const SizedBox(width: 8),

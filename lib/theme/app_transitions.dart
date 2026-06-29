@@ -13,14 +13,15 @@ class SlideUpFadeTransition extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
+    // Graphite Pro motion: subtle, "pro" — not a show-off slide.
     final slide = Tween<Offset>(
-      begin: const Offset(0, 0.06),
+      begin: const Offset(0, 0.03),
       end: Offset.zero,
     ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
 
     final fade = CurvedAnimation(parent: animation, curve: Curves.easeIn);
 
-    final secondaryFade = Tween<double>(begin: 1.0, end: 0.92).animate(
+    final secondaryFade = Tween<double>(begin: 1.0, end: 0.96).animate(
       CurvedAnimation(parent: secondaryAnimation, curve: Curves.easeIn),
     );
 

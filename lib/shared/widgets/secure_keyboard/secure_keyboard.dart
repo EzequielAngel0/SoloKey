@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../theme/app_palette.dart';
+import '../../../theme/app_theme.dart';
 
 /// A secure, on-screen keyboard widget for entering sensitive text.
 ///
@@ -379,7 +380,7 @@ class _SecureKeyboardState extends State<SecureKeyboard>
               style: TextStyle(
                 color: palette.textPrimary,
                 fontSize: 15,
-                fontFamily: 'monospace',
+                fontFamily: AppTheme.monoFamily,
               ),
             ),
           ),
