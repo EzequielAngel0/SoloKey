@@ -200,6 +200,48 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navFavorites => 'Favourites';
 
   @override
+  String get navVault => 'Vault';
+
+  @override
+  String get navSecurity => 'Security';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get filterPasswords => 'Passwords';
+
+  @override
+  String get securityHubSubtitle => 'Tools to keep your vault healthy';
+
+  @override
+  String get securityHubAuditDesc => 'Weak, reused and breached passwords';
+
+  @override
+  String get securityHubGenerator => 'Password generator';
+
+  @override
+  String get securityHubGeneratorDesc => 'Create strong, unique passwords';
+
+  @override
+  String get securityHubTransferDesc => 'Export or import your vault';
+
+  @override
+  String get securityHubSecureFilesDesc => 'Encrypted documents and images';
+
+  @override
+  String get securityHubPasskeysDesc => 'Manage your encrypted passkey backups';
+
+  @override
+  String get securityHubSyncDesc => 'Pair this device over your network';
+
+  @override
+  String get securityHubRecoveryDesc => 'Reset your master password';
+
+  @override
+  String get generatorSheetTitle => 'Generate password';
+
+  @override
   String get homeSearchHint => 'Search credentials…';
 
   @override

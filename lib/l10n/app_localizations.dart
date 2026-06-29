@@ -452,6 +452,90 @@ abstract class AppLocalizations {
   /// **'Favourites'**
   String get navFavorites;
 
+  /// No description provided for @navVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault'**
+  String get navVault;
+
+  /// No description provided for @navSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get navSecurity;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @filterPasswords.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords'**
+  String get filterPasswords;
+
+  /// No description provided for @securityHubSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Tools to keep your vault healthy'**
+  String get securityHubSubtitle;
+
+  /// No description provided for @securityHubAuditDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Weak, reused and breached passwords'**
+  String get securityHubAuditDesc;
+
+  /// No description provided for @securityHubGenerator.
+  ///
+  /// In en, this message translates to:
+  /// **'Password generator'**
+  String get securityHubGenerator;
+
+  /// No description provided for @securityHubGeneratorDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Create strong, unique passwords'**
+  String get securityHubGeneratorDesc;
+
+  /// No description provided for @securityHubTransferDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Export or import your vault'**
+  String get securityHubTransferDesc;
+
+  /// No description provided for @securityHubSecureFilesDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypted documents and images'**
+  String get securityHubSecureFilesDesc;
+
+  /// No description provided for @securityHubPasskeysDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage your encrypted passkey backups'**
+  String get securityHubPasskeysDesc;
+
+  /// No description provided for @securityHubSyncDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair this device over your network'**
+  String get securityHubSyncDesc;
+
+  /// No description provided for @securityHubRecoveryDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset your master password'**
+  String get securityHubRecoveryDesc;
+
+  /// No description provided for @generatorSheetTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Generate password'**
+  String get generatorSheetTitle;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:

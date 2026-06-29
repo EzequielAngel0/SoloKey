@@ -92,24 +92,35 @@ ISettingsRepository settingsRepository(Ref ref) {
 
 // ── Screen ────────────────────────────────────────────────────────────────────
 
-class SettingsScreen extends ConsumerWidget {
+class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      appBar: VaultAppBar(title: 'Ajustes de seguridad'),
+      body: SettingsView(),
+    );
+  }
+}
+
+/// Body-only settings content (no [Scaffold]/[AppBar]). Used standalone in
+/// [SettingsScreen] (desktop / pushed route) and embedded as the mobile
+/// "Ajustes" navigation destination.
+class SettingsView extends ConsumerWidget {
+  const SettingsView({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final settingsAsync = ref.watch(settingsNotifierProvider);
 
-    return Scaffold(
-      appBar: const VaultAppBar(title: 'Ajustes de seguridad'),
-      body: settingsAsync.when(
-        loading: () =>
-            Center(child: CircularProgressIndicator(color: context.palette.accent)),
-        error: (e, _) => Center(child: Text('Error: $e')),
-        data: (settings) => _SettingsBody(
-          settings: settings,
-          onUpdate: (s) =>
-              ref.read(settingsNotifierProvider.notifier).save(s),
-        ),
+    return settingsAsync.when(
+      loading: () =>
+          Center(child: CircularProgressIndicator(color: context.palette.accent)),
+      error: (e, _) => Center(child: Text('Error: $e')),
+      data: (settings) => _SettingsBody(
+        settings: settings,
+        onUpdate: (s) => ref.read(settingsNotifierProvider.notifier).save(s),
       ),
     );
   }

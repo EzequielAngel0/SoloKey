@@ -7,18 +7,24 @@ import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
+import '../../../shared/widgets/solo_filter_chip.dart';
 import '../../../theme/app_palette.dart';
+import '../../settings/presentation/settings_screen.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../application/credentials_provider.dart';
 import '../domain/entities/credential.dart';
-import 'widgets/favorites_view.dart';
 import 'widgets/folder_list_view.dart';
 import 'widgets/credential_list_widget.dart';
 import 'widgets/empty_state_widget.dart';
+import 'widgets/security_hub_view.dart';
 
 import '../../../../core/presentation/layouts/desktop_main_layout.dart';
 import '../../../../core/presentation/layouts/responsive_layout.dart';
+
+/// Filters available as pill chips on the Vault destination. Favorites is now a
+/// filter chip instead of a whole navigation tab.
+enum VaultFilter { all, favorites, password, totp, passkey, ssh }
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -42,9 +48,9 @@ class MobileHomeScreen extends ConsumerStatefulWidget {
 class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   final _searchCtrl = TextEditingController();
   int _currentIndex = 0;
-  // When true the Credentials tab shows the "Ocultas" view instead of the
-  // active list.
+  // When true the Vault destination shows the "Ocultas" set instead of active.
   bool _showHidden = false;
+  VaultFilter _filter = VaultFilter.all;
 
   /// Persists the new manual order after a drag in the Credentials list.
   void _onReorder(List<Credential> visible, int oldIndex, int newIndex) {
@@ -55,33 +61,36 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     ref.read(credentialsNotifierProvider.notifier).reorder(ids);
   }
 
+  bool _matchesFilter(Credential c) => switch (_filter) {
+        VaultFilter.all => true,
+        VaultFilter.favorites => c.isFavorite,
+        VaultFilter.password => c.type == CredentialType.password,
+        VaultFilter.totp => c.type == CredentialType.totp,
+        VaultFilter.passkey => c.type == CredentialType.passkey,
+        VaultFilter.ssh => c.type == CredentialType.sshKey,
+      };
+
   @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
   }
 
+  String _titleFor(AppLocalizations l10n) => switch (_currentIndex) {
+        1 => l10n.navFolders,
+        2 => l10n.navSecurity,
+        3 => l10n.navSettings,
+        _ => l10n.navVault,
+      };
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final credentialsAsync = ref.watch(filteredCredentialsProvider);
-    final foldersAsync = ref.watch(foldersNotifierProvider);
-
-    final credentials = credentialsAsync.valueOrNull ?? [];
-    List<Credential> filtered = [];
-
-    if (_currentIndex == 0) {
-      filtered = credentials
-          .where((c) => _showHidden ? c.isHidden : !c.isHidden)
-          .toList();
-    } else if (_currentIndex == 2) {
-      filtered = credentials.where((c) => c.isFavorite).toList();
-    }
 
     return Scaffold(
       appBar: VaultAppBar(
-        title: 'SoloKey',
+        title: _titleFor(l10n),
         actions: [
           if (_currentIndex == 0)
             IconButton(
@@ -89,7 +98,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                 _showHidden
                     ? Icons.visibility_off_rounded
                     : Icons.visibility_rounded,
-                color: _showHidden ? palette.accent : palette.textMuted,
+                color: _showHidden ? palette.primary : palette.textMuted,
               ),
               tooltip: _showHidden ? l10n.homeShowActive : l10n.homeShowHidden,
               onPressed: () => setState(() => _showHidden = !_showHidden),
@@ -103,163 +112,181 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
               context.go(AppRoutes.unlock);
             },
           ),
-          PopupMenuButton<String>(
-            icon: Icon(Icons.more_vert_rounded, color: palette.textPrimary),
-            color: palette.drawer,
-            onSelected: (val) {
-              if (val == 'audit') context.push(AppRoutes.securityAudit);
-              if (val == 'secureFiles') context.push(AppRoutes.secureFiles);
-              if (val == 'settings') context.push(AppRoutes.settings);
-            },
-            itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'audit',
-                child: Row(
-                  children: [
-                    Icon(Icons.security_rounded, color: palette.textPrimary, size: 20),
-                    const SizedBox(width: 12),
-                    Text(l10n.navAudit, style: TextStyle(color: palette.textPrimary)),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'secureFiles',
-                child: Row(
-                  children: [
-                    Icon(Icons.folder_shared_rounded, color: palette.textPrimary, size: 20),
-                    const SizedBox(width: 12),
-                    Text(l10n.navSecureFiles, style: TextStyle(color: palette.textPrimary)),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'settings',
-                child: Row(
-                  children: [
-                    Icon(Icons.settings_rounded, color: palette.textPrimary, size: 20),
-                    const SizedBox(width: 12),
-                    Text(l10n.navSettings, style: TextStyle(color: palette.textPrimary)),
-                  ],
-                ),
-              ),
-            ],
+        ],
+      ),
+      floatingActionButton: switch (_currentIndex) {
+        0 => FloatingActionButton.extended(
+            onPressed: () => context.push(AppRoutes.credentialCreate),
+            icon: const Icon(Icons.add_rounded),
+            label: Text(l10n.homeFabNew),
+          ),
+        1 => FloatingActionButton.extended(
+            onPressed: () => _createRootFolder(context, ref),
+            icon: const Icon(Icons.create_new_folder_rounded),
+            label: Text(l10n.homeFabFolder),
+          ),
+        _ => null,
+      },
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: _currentIndex,
+        onDestinationSelected: (i) => setState(() => _currentIndex = i),
+        destinations: [
+          NavigationDestination(
+            icon: const Icon(Icons.inventory_2_outlined),
+            selectedIcon: const Icon(Icons.inventory_2_rounded),
+            label: l10n.navVault,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.folder_outlined),
+            selectedIcon: const Icon(Icons.folder_rounded),
+            label: l10n.navFolders,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.shield_outlined),
+            selectedIcon: const Icon(Icons.shield_rounded),
+            label: l10n.navSecurity,
+          ),
+          NavigationDestination(
+            icon: const Icon(Icons.settings_outlined),
+            selectedIcon: const Icon(Icons.settings_rounded),
+            label: l10n.navSettings,
           ),
         ],
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-            child: TextField(
-              controller: _searchCtrl,
-              onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
-              style: TextStyle(color: palette.textPrimary),
-              decoration: InputDecoration(
-                hintText: l10n.homeSearchHint,
-                prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted),
-                suffixIcon: _searchCtrl.text.isNotEmpty
-                    ? IconButton(
-                        icon: Icon(Icons.close_rounded, color: palette.textMuted),
-                        onPressed: () {
-                          _searchCtrl.clear();
-                          ref.read(credentialSearchNotifierProvider.notifier).update('');
-                        },
-                      )
-                    : null,
-                filled: true,
-                fillColor: palette.card,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 10),
-              ),
+      ),
+      body: switch (_currentIndex) {
+        2 => const SecurityHubView(),
+        3 => const SettingsView(),
+        1 => _buildFolders(palette),
+        _ => _buildVault(l10n, palette),
+      },
+    );
+  }
+
+  Widget _buildFolders(AppPalette palette) {
+    final credentialsAsync = ref.watch(filteredCredentialsProvider);
+    final foldersAsync = ref.watch(foldersNotifierProvider);
+    return RefreshIndicator(
+      color: palette.primary,
+      backgroundColor: palette.drawer,
+      onRefresh: () async {
+        await ref.read(credentialsNotifierProvider.notifier).refresh();
+        await ref.read(foldersNotifierProvider.notifier).refresh();
+      },
+      child: credentialsAsync.isLoading
+          ? const ShimmerLoader()
+          : FolderListView(
+              folders: foldersAsync.valueOrNull ?? [],
+              credentials: credentialsAsync.valueOrNull ?? [],
             ),
+    );
+  }
+
+  Widget _buildVault(AppLocalizations l10n, AppPalette palette) {
+    final credentialsAsync = ref.watch(filteredCredentialsProvider);
+    final credentials = credentialsAsync.valueOrNull ?? [];
+    final filtered = credentials
+        .where((c) => _showHidden ? c.isHidden : !c.isHidden)
+        .where(_matchesFilter)
+        .toList();
+    final canReorder = _filter == VaultFilter.all &&
+        _searchCtrl.text.isEmpty &&
+        !_showHidden;
+
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
+          child: _SearchField(
+            controller: _searchCtrl,
+            hint: l10n.homeSearchHint,
+            onChanged: (v) =>
+                ref.read(credentialSearchNotifierProvider.notifier).update(v),
+            onClear: () {
+              _searchCtrl.clear();
+              ref.read(credentialSearchNotifierProvider.notifier).update('');
+            },
           ),
         ),
-      ),
-      floatingActionButton: _currentIndex == 2
-          ? null // No FAB on Favorites tab
-          : FloatingActionButton.extended(
-              onPressed: _currentIndex == 1
-                  ? () => _createRootFolder(context, ref)
-                  : () => context.push(AppRoutes.credentialCreate),
-              backgroundColor: palette.accent,
-              icon: Icon(
-                _currentIndex == 1 ? Icons.create_new_folder_rounded : Icons.add_rounded,
-                color: palette.onPrimary,
-              ),
-              label: Text(
-                _currentIndex == 1 ? l10n.homeFabFolder : l10n.homeFabNew,
-                style: TextStyle(color: palette.onPrimary, fontWeight: FontWeight.w600),
-              ),
+        SoloFilterChipBar(
+          children: [
+            SoloFilterChip(
+              label: l10n.filterAll,
+              selected: _filter == VaultFilter.all,
+              onTap: () => setState(() => _filter = VaultFilter.all),
             ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: palette.background,
-        selectedItemColor: palette.accent,
-        unselectedItemColor: palette.textDisabled,
-        currentIndex: _currentIndex,
-        onTap: (i) => setState(() => _currentIndex = i),
-        items: [
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.all_inbox_rounded),
-              label: l10n.navCredentials),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.account_tree_rounded),
-              label: l10n.navFolders),
-          BottomNavigationBarItem(
-              icon: const Icon(Icons.star_rounded), label: l10n.navFavorites),
-        ],
-      ),
-      body: RefreshIndicator(
-        color: palette.accent,
-        backgroundColor: palette.drawer,
-        onRefresh: () async {
-          await ref.read(credentialsNotifierProvider.notifier).refresh();
-          await ref.read(foldersNotifierProvider.notifier).refresh();
-        },
-        child: credentialsAsync.isLoading
-            ? const ShimmerLoader()
-            : credentialsAsync.hasError
-                ? Center(
-                    child: Text(
-                      l10n.homeLoadError('${credentialsAsync.error}'),
-                      style: TextStyle(color: palette.danger),
-                    ),
-                  )
-                : (_currentIndex == 1)
-                    ? FolderListView(
-                        folders: foldersAsync.valueOrNull ?? [],
-                        credentials: credentials,
+            SoloFilterChip(
+              label: l10n.navFavorites,
+              icon: Icons.star_rounded,
+              accent: palette.warning,
+              selected: _filter == VaultFilter.favorites,
+              onTap: () => setState(() => _filter = VaultFilter.favorites),
+            ),
+            SoloFilterChip(
+              label: l10n.filterPasswords,
+              accent: palette.typePassword,
+              selected: _filter == VaultFilter.password,
+              onTap: () => setState(() => _filter = VaultFilter.password),
+            ),
+            SoloFilterChip(
+              label: l10n.typeSelTotp,
+              accent: palette.typeTotp,
+              selected: _filter == VaultFilter.totp,
+              onTap: () => setState(() => _filter = VaultFilter.totp),
+            ),
+            SoloFilterChip(
+              label: l10n.typeSelPasskey,
+              accent: palette.typePasskey,
+              selected: _filter == VaultFilter.passkey,
+              onTap: () => setState(() => _filter = VaultFilter.passkey),
+            ),
+            SoloFilterChip(
+              label: l10n.typeSshKey,
+              accent: palette.typeSshKey,
+              selected: _filter == VaultFilter.ssh,
+              onTap: () => setState(() => _filter = VaultFilter.ssh),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        Expanded(
+          child: RefreshIndicator(
+            color: palette.primary,
+            backgroundColor: palette.drawer,
+            onRefresh: () async {
+              await ref.read(credentialsNotifierProvider.notifier).refresh();
+              await ref.read(foldersNotifierProvider.notifier).refresh();
+            },
+            child: credentialsAsync.isLoading
+                ? const ShimmerLoader()
+                : credentialsAsync.hasError
+                    ? Center(
+                        child: Text(
+                          l10n.homeLoadError('${credentialsAsync.error}'),
+                          style: TextStyle(color: palette.danger),
+                        ),
                       )
-                    : (_currentIndex == 2)
-                        ? FavoritesView(
-                            folders: foldersAsync.valueOrNull ?? [],
-                            credentials: credentials,
-                          )
-                        : filtered.isEmpty
-                            ? (_showHidden
-                                ? Center(
-                                    child: Text(
-                                      l10n.homeNoHidden,
-                                      style:
-                                          TextStyle(color: palette.textMuted),
-                                    ),
-                                  )
-                                : EmptyStateWidget(
-                                    message: l10n.homeEmptyVault,
-                                    onAdd: () => context
-                                        .push(AppRoutes.credentialCreate),
-                                  ))
-                            : CredentialListWidget(
-                                credentials: filtered,
-                                // Reordenar solo en la lista activa sin busqueda
-                                // (el orden no aplica a resultados filtrados).
-                                onReorder:
-                                    (_searchCtrl.text.isEmpty && !_showHidden)
-                                        ? (o, n) => _onReorder(filtered, o, n)
-                                        : null,
-                              ),
-      ),
+                    : filtered.isEmpty
+                        ? (_showHidden
+                            ? Center(
+                                child: Text(
+                                  l10n.homeNoHidden,
+                                  style: TextStyle(color: palette.textMuted),
+                                ),
+                              )
+                            : EmptyStateWidget(
+                                message: l10n.homeEmptyVault,
+                                onAdd: () =>
+                                    context.push(AppRoutes.credentialCreate),
+                              ))
+                        : CredentialListWidget(
+                            credentials: filtered,
+                            onReorder: canReorder
+                                ? (o, n) => _onReorder(filtered, o, n)
+                                : null,
+                          ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -295,5 +322,60 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     if (name != null && name.isNotEmpty) {
       await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: null);
     }
+  }
+}
+
+/// Persistent pill-shaped search field for the Vault destination.
+class _SearchField extends StatelessWidget {
+  const _SearchField({
+    required this.controller,
+    required this.hint,
+    required this.onChanged,
+    required this.onClear,
+  });
+
+  final TextEditingController controller;
+  final String hint;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      style: TextStyle(color: p.textPrimary),
+      decoration: InputDecoration(
+        hintText: hint,
+        isDense: true,
+        prefixIcon: Icon(Icons.search_rounded, color: p.textMuted),
+        suffixIcon: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (_, value, _) => value.text.isEmpty
+              ? const SizedBox.shrink()
+              : IconButton(
+                  icon: Icon(Icons.close_rounded, color: p.textMuted),
+                  onPressed: onClear,
+                ),
+        ),
+        filled: true,
+        fillColor: p.card,
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(999),
+          borderSide: BorderSide(color: p.divider),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(999),
+          borderSide: BorderSide(color: p.divider),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(999),
+          borderSide: BorderSide(color: p.primary, width: 1.5),
+        ),
+      ),
+    );
   }
 }

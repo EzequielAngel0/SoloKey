@@ -200,6 +200,50 @@ class AppLocalizationsEs extends AppLocalizations {
   String get navFavorites => 'Favoritas';
 
   @override
+  String get navVault => 'Bóveda';
+
+  @override
+  String get navSecurity => 'Seguridad';
+
+  @override
+  String get filterAll => 'Todos';
+
+  @override
+  String get filterPasswords => 'Contraseñas';
+
+  @override
+  String get securityHubSubtitle => 'Herramientas para mantener tu bóveda sana';
+
+  @override
+  String get securityHubAuditDesc =>
+      'Contraseñas débiles, repetidas y filtradas';
+
+  @override
+  String get securityHubGenerator => 'Generador de contraseñas';
+
+  @override
+  String get securityHubGeneratorDesc => 'Crea contraseñas fuertes y únicas';
+
+  @override
+  String get securityHubTransferDesc => 'Exporta o importa tu bóveda';
+
+  @override
+  String get securityHubSecureFilesDesc => 'Documentos e imágenes cifradas';
+
+  @override
+  String get securityHubPasskeysDesc =>
+      'Gestiona tus respaldos de passkey cifrados';
+
+  @override
+  String get securityHubSyncDesc => 'Vincula este dispositivo en tu red';
+
+  @override
+  String get securityHubRecoveryDesc => 'Restablece tu contraseña maestra';
+
+  @override
+  String get generatorSheetTitle => 'Generar contraseña';
+
+  @override
   String get homeSearchHint => 'Buscar credenciales…';
 
   @override

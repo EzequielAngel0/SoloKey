@@ -83,6 +83,22 @@
   "navCredentials": "Credentials",
   "navFolders": "Folders",
   "navFavorites": "Favourites",
+  "navVault": "Vault",
+  "navSecurity": "Security",
+
+  "filterAll": "All",
+  "filterPasswords": "Passwords",
+
+  "securityHubSubtitle": "Tools to keep your vault healthy",
+  "securityHubAuditDesc": "Weak, reused and breached passwords",
+  "securityHubGenerator": "Password generator",
+  "securityHubGeneratorDesc": "Create strong, unique passwords",
+  "securityHubTransferDesc": "Export or import your vault",
+  "securityHubSecureFilesDesc": "Encrypted documents and images",
+  "securityHubPasskeysDesc": "Manage your encrypted passkey backups",
+  "securityHubSyncDesc": "Pair this device over your network",
+  "securityHubRecoveryDesc": "Reset your master password",
+  "generatorSheetTitle": "Generate password",
 
   "homeSearchHint": "Search credentials…",
   "homeLockTooltip": "Lock",
