@@ -94,9 +94,42 @@ begin
   Result := '';
 end;
 
-// Tambien al desinstalar, para no dejar el proceso bloqueando la carpeta.
+// Al desinstalar: recordar que la boveda NO se borra y ofrecer exportar un
+// respaldo cifrado (.skvault) ANTES de continuar. El respaldo restaurable solo
+// puede hacerlo la app (necesita la contrasena maestra para descifrar), por eso
+// abrimos SoloKey en vez de copiar archivos crudos (los secretos viven cifrados
+// en el Keystore de Windows, no solo en la carpeta de datos).
 function InitializeUninstall(): Boolean;
+var
+  Answer, ResultCode: Integer;
 begin
+  Answer := MsgBox(
+    'Antes de desinstalar SoloKey:' + #13#10 + #13#10 +
+    'Tus credenciales y archivos cifrados NO se eliminan al desinstalar.' + #13#10 +
+    'Para conservarlos de forma restaurable, exporta un respaldo desde la app:' + #13#10 +
+    'Ajustes > Transferir datos > Exportar (.skvault).' + #13#10 + #13#10 +
+    'SI: abrir SoloKey ahora para exportar (se cancela la desinstalacion).' + #13#10 +
+    'NO: desinstalar de todos modos.' + #13#10 +
+    'CANCELAR: no desinstalar.',
+    mbConfirmation, MB_YESNOCANCEL);
+
+  if Answer = IDYES then
+  begin
+    // Abrir la app para exportar y cancelar esta desinstalacion; el usuario
+    // vuelve a desinstalar cuando termine su respaldo.
+    ShellExec('open', ExpandConstant('{app}\{#MyAppExeName}'), '', '',
+      SW_SHOW, ewNoWait, ResultCode);
+    Result := False;
+    exit;
+  end;
+
+  if Answer = IDCANCEL then
+  begin
+    Result := False;
+    exit;
+  end;
+
+  // IDNO: continuar. Matamos el proceso para no dejarlo bloqueando la carpeta.
   KillRunningApp;
   Result := True;
 end;
