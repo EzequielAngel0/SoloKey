@@ -31,8 +31,15 @@ direcciones coherentes sobre las pantallas que más molestan:
 - **Dirección B — "Compacta / pro":** filas key/value densas estilo 1Password, más
   datos por pantalla, encaja con el master-detail de escritorio.
 
-> ⏳ **PENDIENTE DE ELECCIÓN:** el dueño debe elegir **A** o **B** (o una mezcla)
-> sobre el prototipo. Hasta entonces no se codea.
+> ✅ **DIRECCIÓN ELEGIDA (2026-06-29):** **mezcla** —
+> **Detalle de credencial → Dirección B (filas densas / "pro" estilo 1Password)**;
+> **Carpetas → Dirección A (breadcrumbs / migas)**. Estos dos patrones se aplican
+> de forma consistente a TODAS las pantallas que correspondan.
+>
+> ✅ **ALCANCE AMPLIADO:** el dueño pidió **mejorar por completo TODAS las pantallas**
+> de la app (no sólo las dolorosas). Cada pantalla se rehace de verdad (layout +
+> estados + interacciones), no se recolorea. Se trabaja en `feature/ux-overhaul`
+> por lotes revisables.
 
 ---
 
@@ -63,21 +70,26 @@ reflejarlo (no un layout único):
 
 ---
 
-## 3. Plan por fases (tras elegir A/B)
+## 3. Plan por lotes — TODAS las pantallas
 
-| # | Fase | Alcance | Esf. | Estado |
-| :-- | :--- | :--- | :--- | :--- |
-| UX-0 | **Prototipo + dirección** | `ux_overhaul_preview.html`; el dueño elige A/B | 🟢 | 🟦 (espera elección) |
-| UX-1 | **Detalle por tipo** | Reescribir `credential_detail_screen` con detalle por tipo; TOTP con código héroe; semilla en "Avanzado" | 🔴 | ⬜ |
-| UX-2 | **Carpetas** | Breadcrumbs + atrás real (móvil) / árbol en sidebar (escritorio); fin del "volver a la raíz" | 🔴 | ⬜ |
-| UX-3 | **Formulario** | Crear/editar por tipo con validación y estados claros | 🟡 | ⬜ |
-| UX-4 | **Bóveda / lista** | Secciones, orden, estados vacío/carga/error pulidos | 🟡 | ⬜ |
-| UX-5 | **Escritorio** | Reflejar A/B en el master-detail; árbol de carpetas en sidebar si B | 🟡 | ⬜ |
-| UX-6 | **Resto** | Generador, Auditoría, Ajustes, Sync: jerarquía y estados | 🟡 | ⬜ |
-| WIN-ICON | **Ícono taskbar** | `WM_SETICON` big/small en `win32_window.cpp` + AUMID en instalador + rebuild | 🟢 | ⬜ |
+Patrones fijos: detalle = **filas densas (B)**; carpetas = **breadcrumbs (A)**.
+Cada lote: rama `feature/ux-overhaul`, revisable, `flutter analyze` 0 + tests verde,
+commit de una línea ASCII.
 
-Cada fase: rama `feature/ux-overhaul`, lote revisable, `flutter analyze` 0 + tests
-verde, commit de una línea ASCII.
+| Lote | Pantallas / archivos | Qué se rehace | Estado |
+| :-- | :--- | :--- | :--- |
+| **L1 — Detalle** | `credential_detail_screen.dart` | Detalle **por tipo** en filas densas; **TOTP con código en vivo** como primera fila (semilla en "Avanzado", revelar con biometría); login/API/SSH/passkey/nota a medida | 🟦 |
+| **L2 — Carpetas** | `folder_screen.dart`, `home_screen` (tab Carpetas), `folder_list_view.dart` | **Breadcrumbs + atrás real**; subcarpetas claras; fin del "volver a la raíz"; en escritorio, árbol en el sidebar | ⬜ |
+| **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_list_widget.dart` | Lista densa con secciones, orden, estados vacío/carga/error; cabecera y chips pulidos | ⬜ |
+| **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
+| **L5 — Seguridad** | `security_audit_screen.dart`, `security_hub_view.dart`, generador, `password_history_screen.dart` | Score + hallazgos accionables; generador y historial con jerarquía y estados | ⬜ |
+| **L6 — Ajustes** | `settings_screen.dart` | Lista agrupada, selector de tema con preview, secciones densas | ⬜ |
+| **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Estados (vacío/conectando/error), pasos claros, filas densas | ⬜ |
+| **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Onboarding/stepper limpios, Hello/biometría primero, estados de error | ⬜ |
+| **L9 — Escritorio + extras** | `desktop_main_layout.dart`, `quick_fill_screen.dart`, `qr_scanner_screen.dart`, `autofill_onboarding_screen.dart` | Master-detail con filas densas + árbol de carpetas; overlays/onboarding | ⬜ |
+| **WIN-ICON** | `windows/runner/win32_window.cpp`, instalador | `WM_SETICON` big/small + AUMID + rebuild (independiente del diseño) | ⬜ |
+
+Tras cada lote se reporta para que el dueño valide antes de seguir.
 
 ---
 
