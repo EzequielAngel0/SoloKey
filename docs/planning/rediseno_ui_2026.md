@@ -399,7 +399,7 @@ Verificación hecha (header ICO): `images=1 → 256x256 32bpp`. Eso lo confirma.
 
 | # | Fase | Alcance | Esfuerzo | Estado |
 | :-- | :--- | :--- | :--- | :--- |
-| UI-1 | **Retune de tokens** | Sustituir hex en `app_palette.dart` (dark/light/dim/oled) por Graphite Pro. Deprecar `app_colors.dart` → `context.palette`. | 🟢 | ⬜ |
+| UI-1 | **Retune de tokens** | Sustituir hex en `app_palette.dart` (dark/light/dim/oled) por Graphite Pro. Deprecar `app_colors.dart` → `context.palette`. | 🟢 | ✅ |
 | UI-2 | **Tema + tipografía** | Inter + JetBrains Mono; large titles, botones/inputs/cards a tokens nuevos en `app_theme.dart`. | 🟡 | ⬜ |
 | UI-3 | **Componentes compartidos** | `vault_app_bar`, `secure_text_field`, `password_strength_indicator`, `shimmer_loader`, chips de filtro, segmented type selector. | 🟡 | ⬜ |
 | UI-4 | **Navegación móvil** | `BottomNavigationBar` → `NavigationBar` M3; Favoritos → chip; hub de Seguridad; búsqueda pill. | 🟡 | ⬜ |
