@@ -257,6 +257,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get healthReused => 'Reused';
 
   @override
+  String get auditScoreTitle => 'Vault health';
+
+  @override
+  String auditScoreIssues(int count) {
+    return '$count issues to review';
+  }
+
+  @override
   String get homeSearchHint => 'Search credentials…';
 
   @override

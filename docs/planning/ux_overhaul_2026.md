@@ -83,7 +83,7 @@ commit de una línea ASCII.
 | **L2 — Carpetas** | `folder_screen.dart`, `folder_breadcrumbs.dart` (nuevo) | **Breadcrumbs** con salto a cualquier ancestro (escritorio: setea provider; móvil: pop N) → fin del "volver a la raíz" | ✅ |
 | **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_health_provider.dart` (nuevo) | **Avisos de salud inline** (débil/repetida) en tarjeta y detalle vía provider barato en memoria; estados vacíos distinguen "sin resultados" de "bóveda vacía" | ✅ |
 | **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
-| **L5 — Seguridad** | `security_audit_screen.dart`, `security_hub_view.dart`, generador, `password_history_screen.dart` | Score + hallazgos accionables; generador y historial con jerarquía y estados | ⬜ |
+| **L5 — Seguridad** | `security_audit_screen.dart` (+ `ScoreRing`/`StatusChip`) | **Security Score** (anillo + conteos por severidad) arriba de la auditoría; hallazgos siguen accionables (tap → editar) | ✅ |
 | **L6 — Ajustes** | `settings_screen.dart` | Lista agrupada, selector de tema con preview, secciones densas | ⬜ |
 | **L7 — Sync/Transfer/Archivos/Passkeys** | `pairing_screen.dart`, `transfer_screen.dart`, `secure_files_screen.dart`, `passkeys_screen.dart` | Estados (vacío/conectando/error), pasos claros, filas densas | ⬜ |
 | **L8 — Acceso** | `splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`, `recovery_screen.dart` | Onboarding/stepper limpios, Hello/biometría primero, estados de error | ⬜ |

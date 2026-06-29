@@ -259,6 +259,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get healthReused => 'Repetida';
 
   @override
+  String get auditScoreTitle => 'Salud de la bóveda';
+
+  @override
+  String auditScoreIssues(int count) {
+    return '$count problemas por revisar';
+  }
+
+  @override
   String get homeSearchHint => 'Buscar credenciales…';
 
   @override

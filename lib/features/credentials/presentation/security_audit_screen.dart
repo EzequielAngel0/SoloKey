@@ -8,6 +8,8 @@ import '../../../app/di/injection.dart';
 import '../../../core/services/security_audit_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
+import '../../../shared/widgets/score_ring.dart';
+import '../../../shared/widgets/status_chip.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 
@@ -32,12 +34,16 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final auditAsync = ref.watch(auditResultsProvider(_checkBreaches));
+    final issues = auditAsync.valueOrNull;
 
     return Scaffold(
       appBar: VaultAppBar(title: l10n.auditTitle),
       body: CustomScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
         slivers: [
+          // Security Score — at-a-glance vault health.
+          if (issues != null)
+            SliverToBoxAdapter(child: _ScoreCard(issues: issues)),
           // Header card with statistics & description
           SliverToBoxAdapter(
             child: Padding(
@@ -181,6 +187,100 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Vault Security Score header: a ring gauge + per-severity counts. The score
+/// starts at 100 and drops by weighted penalties per finding.
+class _ScoreCard extends StatelessWidget {
+  const _ScoreCard({required this.issues});
+  final List<AuditIssue> issues;
+
+  int get _critical =>
+      issues.where((i) => i.severity == AuditSeverity.critical).length;
+  int get _warning =>
+      issues.where((i) => i.severity == AuditSeverity.warning).length;
+  int get _info => issues.where((i) => i.severity == AuditSeverity.info).length;
+
+  int get _score {
+    final raw = 100 - (_critical * 15 + _warning * 8 + _info * 3);
+    return raw.clamp(0, 100);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: p.card,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.divider),
+        ),
+        child: Row(
+          children: [
+            ScoreRing(score: _score, size: 60),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.auditScoreTitle,
+                    style: TextStyle(
+                      color: p.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  const SizedBox(height: 3),
+                  Text(
+                    issues.isEmpty
+                        ? l10n.auditAllGoodTitle
+                        : l10n.auditScoreIssues(issues.length),
+                    style: TextStyle(color: p.textMuted, fontSize: 13),
+                  ),
+                  if (issues.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 6,
+                      children: [
+                        if (_critical > 0)
+                          StatusChip(
+                            label: '$_critical ${l10n.auditSeverityCritical}',
+                            color: p.danger,
+                            icon: Icons.error_rounded,
+                            dense: true,
+                          ),
+                        if (_warning > 0)
+                          StatusChip(
+                            label: '$_warning ${l10n.auditSeverityWarning}',
+                            color: p.warning,
+                            icon: Icons.warning_rounded,
+                            dense: true,
+                          ),
+                        if (_info > 0)
+                          StatusChip(
+                            label: '$_info ${l10n.auditSeverityInfo}',
+                            color: p.info,
+                            icon: Icons.info_rounded,
+                            dense: true,
+                          ),
+                      ],
+                    ),
+                  ],
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

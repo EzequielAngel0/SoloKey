@@ -104,6 +104,9 @@
   "detailTotpSecret": "Secret (seed)",
   "detailCopyCode": "Copy code",
   "healthReused": "Reused",
+  "auditScoreTitle": "Vault health",
+  "auditScoreIssues": "{count} issues to review",
+  "@auditScoreIssues": { "placeholders": { "count": { "type": "int" } } },
 
   "homeSearchHint": "Search credentials…",
   "homeLockTooltip": "Lock",

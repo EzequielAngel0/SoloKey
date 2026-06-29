@@ -566,6 +566,18 @@ abstract class AppLocalizations {
   /// **'Reused'**
   String get healthReused;
 
+  /// No description provided for @auditScoreTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault health'**
+  String get auditScoreTitle;
+
+  /// No description provided for @auditScoreIssues.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} issues to review'**
+  String auditScoreIssues(int count);
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:

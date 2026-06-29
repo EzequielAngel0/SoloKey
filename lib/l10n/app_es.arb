@@ -89,6 +89,9 @@
   "detailTotpSecret": "Secreto (semilla)",
   "detailCopyCode": "Copiar código",
   "healthReused": "Repetida",
+  "auditScoreTitle": "Salud de la bóveda",
+  "auditScoreIssues": "{count} problemas por revisar",
+  "@auditScoreIssues": { "placeholders": { "count": { "type": "int" } } },
 
   "homeSearchHint": "Buscar credenciales…",
   "homeLockTooltip": "Bloquear",
