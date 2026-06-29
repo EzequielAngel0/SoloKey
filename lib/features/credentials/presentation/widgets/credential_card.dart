@@ -256,6 +256,7 @@ class CredentialCard extends ConsumerWidget {
             }
           },
           onLongPress: () => _showOptionsSheet(context, ref),
+          onSecondaryTap: () => _showOptionsSheet(context, ref), // desktop right-click
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
             child: Row(

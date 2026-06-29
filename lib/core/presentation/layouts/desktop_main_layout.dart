@@ -53,6 +53,18 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         bindings: {
           const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
               CommandPalette.show(context),
+          // Ctrl+N: nueva credencial (en la pestaña Boveda).
+          const SingleActivator(LogicalKeyboardKey.keyN, control: true): () {
+            ref.read(desktopSelectedNavigationProvider.notifier).state = 0;
+            ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+            ref.read(desktopRightPaneModeProvider.notifier).state =
+                RightPaneMode.create;
+          },
+          // Ctrl+L: bloquear la boveda.
+          const SingleActivator(LogicalKeyboardKey.keyL, control: true): () {
+            ref.read(vaultNotifierProvider.notifier).lock();
+            context.go(AppRoutes.unlock);
+          },
         },
         child: Focus(
           autofocus: true,
