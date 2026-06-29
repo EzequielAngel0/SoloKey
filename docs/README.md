@@ -15,15 +15,27 @@ docs/
 
 ---
 
+## 🟢 Estado del proyecto (2026-06-28)
+
+Estabilización **cerrada**, i18n **completo** (es/en, UI + servicios), `flutter
+analyze` sin issues y **56/56 tests verde**. Artefactos de release generados en
+`dist/` (APKs + instalador Windows) vía `build_release.ps1`.
+
+**Pendiente real:** probar el flujo PC↔celular (reconexión / sync continua /
+aprobación de login — implementado pero sin prueba en dispositivos) y el
+empaquetado macOS/Linux/iOS (diferido).
+
 ## 🟢 Empezar por aquí
 
-- **¿Qué falta y qué está roto?** → [planning/pendientes_y_bugs.md](planning/pendientes_y_bugs.md) — backlog de estabilización vigente (bugs activos B1/B2, gap G1, mejoras M1–M3) con causas raíz y arreglos.
-- **¿Qué se ha hecho y en qué orden?** → [planning/roadmap_desarrollo.md](planning/roadmap_desarrollo.md) — documento vivo de lotes (temas, rename, autofill, seguridad, i18n…).
-- **Ideas a futuro** → [planning/feature_ideas.md](planning/feature_ideas.md).
+- **¿Qué falta / estado vigente?** → [planning/pendientes_y_bugs.md](planning/pendientes_y_bugs.md) — backlog con estado de cada item, build de release y notas.
+- **¿Qué se ha hecho y en qué orden?** → [planning/roadmap_desarrollo.md](planning/roadmap_desarrollo.md) — documento vivo de lotes.
+- **Ideas a futuro** → [planning/feature_ideas.md](planning/feature_ideas.md) (ya separa "implementado" de "pendiente").
 
-> Nota: el roadmap "Fases 9–13" del `CLAUDE.md` raíz quedó **histórico**; la
-> mayoría ya está implementada. La fuente de verdad del trabajo pendiente es
-> `planning/pendientes_y_bugs.md`.
+> Documentos **vivos** (se mantienen al día): los de `planning/` y este índice.
+> Documentos **históricos / punto-en-el-tiempo** (no se reescriben): `spec/` (la
+> especificación fundacional), `security/security_audit_report.md` y los planes de
+> `features/`. El roadmap "Fases 9–13" del `CLAUDE.md` raíz quedó histórico — la
+> fuente de verdad del estado es `planning/`.
 
 ---
 

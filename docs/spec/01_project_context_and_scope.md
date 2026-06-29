@@ -1,5 +1,13 @@
 # Contexto del Proyecto y Alcance del MVP
 
+> **🕰️ HISTÓRICO (alcance del MVP original).** Este documento describe el
+> **MVP inicial** (solo Android, sin sync/autofill/passkeys/import-export). El
+> proyecto creció mucho desde entonces: hoy SoloKey es **multiplataforma**
+> (Android + companion de escritorio Windows) con sync P2P E2EE, autofill,
+> teclado seguro, TOTP, llaves SSH, passkeys (respaldo), import/export, auditoría
+> y más. Para el **estado actual** ver `../planning/pendientes_y_bugs.md` y
+> `../planning/roadmap_desarrollo.md`. Se conserva como registro de diseño.
+
 ## Objetivo
 Desarrollar una aplicación de seguridad personal (Password Manager) para Android utilizando Flutter y Dart, diseñada con Clean Architecture para soportar una futura evolución hacia una bóveda digital completa de identidad.
 

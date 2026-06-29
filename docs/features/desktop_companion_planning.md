@@ -1,5 +1,14 @@
 # 🖥️ SoloKey Desktop Companion — Plan Maestro de Arquitectura e Implementación
 
+> **✅ ESTADO (2026-06-28): IMPLEMENTADO.** Este plan ya está realizado en
+> `features/sync/` + el runner de Windows. El companion de escritorio existe
+> (Windows), con emparejado por QR (X25519 + token), WebSocket E2EE (AES-256-GCM),
+> Delta-Sync LWW, bandeja del sistema, hotkeys, instalador Inno Setup,
+> reconexión sin QR (handshake resume) y desbloqueo/aprobación desde el celular.
+> Pendientes: empaquetado **macOS/Linux** y probar el flujo PC↔celular en
+> dispositivos reales. El estado vigente está en `../planning/pendientes_y_bugs.md`.
+> Este documento se conserva como **referencia de diseño** (histórico).
+
 Este documento sirve como la guía técnica definitiva y el plan de implementación paso a paso para desarrollar el **SoloKey Desktop Companion** (Windows, macOS y Linux) en un chat posterior. Permite la reutilización directa de la lógica de negocio (Clean Architecture) y criptografía de la app móvil.
 
 ---
