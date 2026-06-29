@@ -79,7 +79,7 @@ commit de una línea ASCII.
 | Lote | Pantallas / archivos | Qué se rehace | Estado |
 | :-- | :--- | :--- | :--- |
 | **L1 — Detalle** | `credential_detail_screen.dart` | Detalle **por tipo** en filas densas; **TOTP con código en vivo** como primera fila (semilla en "Avanzado", revelar con biometría); login/API/SSH/passkey/nota a medida | ✅ |
-| **L2 — Carpetas** | `folder_screen.dart`, `home_screen` (tab Carpetas), `folder_list_view.dart` | **Breadcrumbs + atrás real**; subcarpetas claras; fin del "volver a la raíz"; en escritorio, árbol en el sidebar | ⬜ |
+| **L2 — Carpetas** | `folder_screen.dart`, `folder_breadcrumbs.dart` (nuevo) | **Breadcrumbs** con salto a cualquier ancestro (escritorio: setea provider; móvil: pop N) → fin del "volver a la raíz" | ✅ |
 | **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_list_widget.dart` | Lista densa con secciones, orden, estados vacío/carga/error; cabecera y chips pulidos | ⬜ |
 | **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
 | **L5 — Seguridad** | `security_audit_screen.dart`, `security_hub_view.dart`, generador, `password_history_screen.dart` | Score + hallazgos accionables; generador y historial con jerarquía y estados | ⬜ |

@@ -12,6 +12,7 @@ import '../../credentials/presentation/widgets/credential_card.dart';
 import '../../../theme/app_palette.dart';
 import '../application/folders_provider.dart';
 import '../domain/entities/folder.dart';
+import 'widgets/folder_breadcrumbs.dart';
 
 class FolderScreen extends ConsumerWidget {
   const FolderScreen({super.key, required this.folderId});
@@ -217,12 +218,16 @@ class FolderScreen extends ConsumerWidget {
         backgroundColor: palette.accent,
         child: Icon(Icons.add_rounded, color: palette.onPrimary),
       ),
-      body: RefreshIndicator(
-        color: palette.accent,
-        backgroundColor: palette.drawer,
-        onRefresh: () async {
-          await ref.read(credentialsNotifierProvider.notifier).refresh();
-        },
+      body: Column(
+        children: [
+          FolderBreadcrumbs(folders: folders, currentId: folderId),
+          Expanded(
+            child: RefreshIndicator(
+              color: palette.accent,
+              backgroundColor: palette.drawer,
+              onRefresh: () async {
+                await ref.read(credentialsNotifierProvider.notifier).refresh();
+              },
         child: (subFolders.isEmpty && subCredentials.isEmpty)
             ? ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
@@ -278,6 +283,9 @@ class FolderScreen extends ConsumerWidget {
                       )),
                 ],
               ),
+            ),
+          ),
+        ],
       ),
     );
   }
