@@ -210,7 +210,7 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 | — | Tests de integración del sync (deltas/apply/LWW con DB en memoria) | Deuda | 🟡 | 🟡 | ✅ |
 | — | i18n de los textos NUEVOS (ocultar/mostrar + aprobación) en home/detalle/unlock | Deuda | 🟢 | 🟢 | ✅ |
 | — | i18n: pantalla de Sincronizar (pairing) + textos del layout de escritorio | Deuda | 🟢 | 🟡 | ✅ |
-| — | i18n restante: notificaciones y SecurityAuditService (strings en capa de servicio, sin BuildContext) | Deuda | 🟢 | 🟡 | ⬜ |
+| — | i18n de capa de servicio: SecurityAuditService (tipo+params) y NotificationService (carga AppLocalizations por locale del sistema) | Deuda | 🟢 | 🟡 | ✅ |
 | — | Lint preexistente (crypto dep, deprecaciones Flutter 3.4x, underscores) | Deuda | 🟢 | 🟢 | ✅ |
 | — | Reorden (drag) de credenciales en el companion de escritorio | Deuda | 🟢 | 🟡 | ✅ |
 | — | Empaquetado macOS/Linux/iOS (diferido: sin Mac/iPhone) | Deuda | 🟢 | 🔴 | ⏸️ |
@@ -219,14 +219,16 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 > pero marcados 🟦 porque el flujo cruzado PC↔celular (handshake resume, sync continua,
 > push de aprobación) **no se pudo probar en dispositivos reales** desde este entorno —
 > requieren verificación con un celular y un PC en la misma red antes de confiar en ellos.
-> Tests de sync (lógica pura + integración con DB en memoria), i18n de la pantalla de
-> Sincronizar y del escritorio, reorden por drag en escritorio, y limpieza del lint
-> preexistente: **hechos**. `isHidden`/`sortOrder` ahora viajan en el sync.
+> Tests de sync (lógica pura + integración con DB en memoria), **i18n completo** (UI +
+> capa de servicio), reorden por drag en escritorio, y limpieza del lint preexistente:
+> **hechos**. `isHidden`/`sortOrder` ahora viajan en el sync.
 > `flutter analyze`: **sin issues** (lib+test); **56/56 tests verde**.
 >
-> Único i18n que queda: strings en capa de servicio (notificaciones de rotación/aprobación
-> y `SecurityAuditService`), que no tienen `BuildContext`; localizarlos requiere devolver
-> claves en vez de texto (refactor aparte). El resto de la app está en es/en.
+> **i18n cerrado:** `SecurityAuditService` ahora devuelve un `type` + parámetros (la
+> pantalla traduce), y `NotificationService` carga `AppLocalizations` por el locale del
+> sistema (funciona en el isolate de fondo, sin `BuildContext`). La app está 100% es/en.
+> Lo único que NO sigue el idioma de la app es la notificación de fondo, que usa el
+> locale del **sistema** (limitación aceptada; en primer plano podría leerse de Ajustes).
 >
 > **Cómo funciona M3 sin FCM:** el celular (app abierta/conectada por resume) recibe la
 > petición por el canal E2EE y muestra una **notificación local**; al tocarla abre Sincronizar
