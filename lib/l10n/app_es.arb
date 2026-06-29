@@ -88,6 +88,7 @@
   "detailAdvanced": "Avanzado",
   "detailTotpSecret": "Secreto (semilla)",
   "detailCopyCode": "Copiar código",
+  "healthReused": "Repetida",
 
   "homeSearchHint": "Buscar credenciales…",
   "homeLockTooltip": "Bloquear",

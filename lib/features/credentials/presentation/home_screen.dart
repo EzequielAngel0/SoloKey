@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
 import '../../../shared/widgets/solo_filter_chip.dart';
 import '../../../theme/app_palette.dart';
@@ -266,18 +267,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                         ),
                       )
                     : filtered.isEmpty
-                        ? (_showHidden
-                            ? Center(
-                                child: Text(
-                                  l10n.homeNoHidden,
-                                  style: TextStyle(color: palette.textMuted),
-                                ),
-                              )
-                            : EmptyStateWidget(
-                                message: l10n.homeEmptyVault,
-                                onAdd: () =>
-                                    context.push(AppRoutes.credentialCreate),
-                              ))
+                        ? _buildEmpty(context, l10n)
                         : CredentialListWidget(
                             credentials: filtered,
                             onReorder: canReorder
@@ -287,6 +277,28 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  /// Distinguishes a truly empty vault (offer "add first") from "no results"
+  /// when a search/filter is active or the hidden view is on.
+  Widget _buildEmpty(BuildContext context, AppLocalizations l10n) {
+    if (_showHidden) {
+      return EmptyState(
+        icon: Icons.visibility_off_rounded,
+        title: l10n.homeNoHidden,
+      );
+    }
+    final filtering = _searchCtrl.text.isNotEmpty || _filter != VaultFilter.all;
+    if (filtering) {
+      return EmptyState(
+        icon: Icons.search_off_rounded,
+        title: l10n.commandNoResults,
+      );
+    }
+    return EmptyStateWidget(
+      message: l10n.homeEmptyVault,
+      onAdd: () => context.push(AppRoutes.credentialCreate),
     );
   }
 

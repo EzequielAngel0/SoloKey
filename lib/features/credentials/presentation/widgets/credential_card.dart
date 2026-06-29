@@ -9,10 +9,12 @@ import '../../../../core/utils/auth_helper.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
+import '../../../../shared/widgets/status_chip.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
 import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
+import '../../application/credential_health_provider.dart';
 import 'credential_icon.dart';
 import '../../../folders/application/folders_provider.dart';
 
@@ -227,8 +229,10 @@ class CredentialCard extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final icon = _typeIcons[credential.type] ?? Icons.lock_rounded;
     final color = credentialTypeColor(credential.type, palette);
+    final health = ref.watch(credentialHealthProvider)[credential.id];
 
     // Swipe-to-delete intentionally removed: deletion is available via the
     // long-press options sheet and the credential detail screen.
@@ -291,14 +295,31 @@ class CredentialCard extends ConsumerWidget {
                     ],
                   ),
                 ),
+                if (health != null) ...[
+                  const SizedBox(width: 6),
+                  health.contains(CredentialHealth.reused)
+                      ? StatusChip(
+                          label: l10n.healthReused,
+                          color: palette.danger,
+                          icon: Icons.content_copy_rounded,
+                          dense: true,
+                        )
+                      : StatusChip(
+                          label: l10n.strengthWeak,
+                          color: palette.warning,
+                          icon: Icons.warning_amber_rounded,
+                          dense: true,
+                        ),
+                ],
                 if (credential.isDoubleEncrypted) ...[
                   const SizedBox(width: 6),
                   Icon(Icons.enhanced_encryption_rounded,
                       color: palette.typeSshKey, size: 16),
                 ],
-                if (credential.isFavorite)
-                  Icon(Icons.star_rounded,
-                      color: palette.warning, size: 18),
+                if (credential.isFavorite) ...[
+                  const SizedBox(width: 6),
+                  Icon(Icons.star_rounded, color: palette.warning, size: 18),
+                ],
                 if (credential.type == CredentialType.totp)
                   _TotpVisualizer(credential: credential),
               ],

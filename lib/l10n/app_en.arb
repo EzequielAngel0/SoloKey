@@ -103,6 +103,7 @@
   "detailAdvanced": "Advanced",
   "detailTotpSecret": "Secret (seed)",
   "detailCopyCode": "Copy code",
+  "healthReused": "Reused",
 
   "homeSearchHint": "Search credentials…",
   "homeLockTooltip": "Lock",

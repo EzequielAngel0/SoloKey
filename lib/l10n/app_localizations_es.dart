@@ -256,6 +256,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get detailCopyCode => 'Copiar código';
 
   @override
+  String get healthReused => 'Repetida';
+
+  @override
   String get homeSearchHint => 'Buscar credenciales…';
 
   @override

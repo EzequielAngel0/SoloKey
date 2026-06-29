@@ -11,6 +11,8 @@ import '../../../shared/widgets/copy_feedback_button.dart';
 import '../../../shared/widgets/detail_group.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../application/credentials_provider.dart';
+import '../application/credential_health_provider.dart';
+import '../../../shared/widgets/status_chip.dart';
 import '../domain/entities/credential.dart';
 import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
@@ -90,6 +92,7 @@ class _DetailView extends ConsumerWidget {
 
     final primary = _primaryRows(context, l10n);
     final advanced = _advancedRows(context, l10n);
+    final health = ref.watch(credentialHealthProvider)[credential.id];
 
     return Scaffold(
       appBar: VaultAppBar(
@@ -158,6 +161,27 @@ class _DetailView extends ConsumerWidget {
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
           _DetailHeader(credential: credential),
+          if (health != null) ...[
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 8,
+              runSpacing: 8,
+              children: [
+                if (health.contains(CredentialHealth.weak))
+                  StatusChip(
+                    label: l10n.strengthWeak,
+                    color: palette.warning,
+                    icon: Icons.warning_amber_rounded,
+                  ),
+                if (health.contains(CredentialHealth.reused))
+                  StatusChip(
+                    label: l10n.healthReused,
+                    color: palette.danger,
+                    icon: Icons.content_copy_rounded,
+                  ),
+              ],
+            ),
+          ],
           const SizedBox(height: 18),
           // TOTP: the live code is the hero, first thing you see.
           if (credential.type == CredentialType.totp &&

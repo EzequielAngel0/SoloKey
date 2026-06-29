@@ -81,7 +81,7 @@ commit de una línea ASCII.
 | **L0 — Kit** | `shared/widgets/` (`KvRow`/`DetailGroup`, `SectionHeader`, `EmptyState`, `StatHeader`, `StatusChip`) | Componentes compartidos extraídos de L1/L2 para que las 12 pantallas sean **consistentes** y el resto de lotes vaya más rápido | ⬜ |
 | **L1 — Detalle** | `credential_detail_screen.dart` | Detalle **por tipo** en filas densas; **TOTP con código en vivo** como primera fila (semilla en "Avanzado", revelar con biometría); login/API/SSH/passkey/nota a medida | ✅ |
 | **L2 — Carpetas** | `folder_screen.dart`, `folder_breadcrumbs.dart` (nuevo) | **Breadcrumbs** con salto a cualquier ancestro (escritorio: setea provider; móvil: pop N) → fin del "volver a la raíz" | ✅ |
-| **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_list_widget.dart` | Lista densa con secciones, orden, estados vacío/carga/error; cabecera y chips pulidos | ⬜ |
+| **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_health_provider.dart` (nuevo) | **Avisos de salud inline** (débil/repetida) en tarjeta y detalle vía provider barato en memoria; estados vacíos distinguen "sin resultados" de "bóveda vacía" | ✅ |
 | **L4 — Formulario** | `credential_form_screen.dart` + `widgets/` | Crear/editar **por tipo**, validación y estados claros, secciones densas | ⬜ |
 | **L5 — Seguridad** | `security_audit_screen.dart`, `security_hub_view.dart`, generador, `password_history_screen.dart` | Score + hallazgos accionables; generador y historial con jerarquía y estados | ⬜ |
 | **L6 — Ajustes** | `settings_screen.dart` | Lista agrupada, selector de tema con preview, secciones densas | ⬜ |

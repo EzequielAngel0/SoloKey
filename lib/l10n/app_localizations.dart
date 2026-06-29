@@ -560,6 +560,12 @@ abstract class AppLocalizations {
   /// **'Copy code'**
   String get detailCopyCode;
 
+  /// No description provided for @healthReused.
+  ///
+  /// In en, this message translates to:
+  /// **'Reused'**
+  String get healthReused;
+
   /// No description provided for @homeSearchHint.
   ///
   /// In en, this message translates to:
