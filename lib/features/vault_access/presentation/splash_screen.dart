@@ -29,8 +29,9 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       duration: const Duration(milliseconds: 1200),
     );
     _fade = CurvedAnimation(parent: _ctrl, curve: Curves.easeIn);
-    _scale = Tween<double>(begin: 0.8, end: 1.0).animate(
-      CurvedAnimation(parent: _ctrl, curve: Curves.elasticOut),
+    // Graphite Pro: subtle fade + a small settle, no exaggerated bounce.
+    _scale = Tween<double>(begin: 0.94, end: 1.0).animate(
+      CurvedAnimation(parent: _ctrl, curve: Curves.easeOutCubic),
     );
     _ctrl.forward();
     _navigate();
@@ -63,29 +64,14 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 96,
-                  height: 96,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    gradient: RadialGradient(
-                      colors: [
-                        palette.accent,
-                        palette.accent.withValues(alpha: 0.7),
-                      ],
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: palette.accent.withValues(alpha: 0.4),
-                        blurRadius: 32,
-                        spreadRadius: 4,
-                      ),
-                    ],
-                  ),
-                  child: Image.asset(
+                Image.asset(
+                  'assets/logo/solokey_mark.png',
+                  height: 104,
+                  width: 104,
+                  errorBuilder: (_, _, _) => Image.asset(
                     'assets/logo/SoloKey.png',
-                    height: 100,
-                    width: 100,
+                    height: 104,
+                    width: 104,
                   ),
                 ),
                 const SizedBox(height: 24),

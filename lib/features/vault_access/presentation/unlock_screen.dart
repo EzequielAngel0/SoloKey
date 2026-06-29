@@ -268,31 +268,16 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                   children: [
                     const Spacer(),
 
-                    // Logo
+                    // Logo (flat, no glow)
                     Center(
-                      child: Container(
-                        width: 80,
-                        height: 80,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: RadialGradient(
-                            colors: [
-                              palette.accent,
-                              palette.accent.withValues(alpha: 0.7),
-                            ],
-                          ),
-                          boxShadow: [
-                            BoxShadow(
-                              color: palette.accent.withValues(alpha: 0.4),
-                              blurRadius: 28,
-                              spreadRadius: 4,
-                            ),
-                          ],
-                        ),
-                        child: Image.asset(
+                      child: Image.asset(
+                        'assets/logo/solokey_mark.png',
+                        height: 84,
+                        width: 84,
+                        errorBuilder: (_, _, _) => Image.asset(
                           'assets/logo/SoloKey.png',
-                          height: 80,
-                          width: 80,
+                          height: 84,
+                          width: 84,
                         ),
                       ),
                     ),

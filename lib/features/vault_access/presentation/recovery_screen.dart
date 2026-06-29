@@ -9,6 +9,7 @@ import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
 import '../../../theme/app_palette.dart';
+import '../../../theme/app_theme.dart';
 
 /// Recovery Step 1: Enter recovery code → unlock.
 /// Recovery Step 2: Set new master password.
@@ -163,7 +164,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
             controller: _codeCtrl,
             style: TextStyle(
               color: palette.textPrimary,
-              fontFamily: 'monospace',
+              fontFamily: AppTheme.monoFamily,
               letterSpacing: 1.5,
               fontSize: 14,
             ),
@@ -335,7 +336,7 @@ class RecoveryCodeDisplay extends StatelessWidget {
                 code,
                 style: TextStyle(
                   color: palette.textPrimary,
-                  fontFamily: 'monospace',
+                  fontFamily: AppTheme.monoFamily,
                   fontSize: 16,
                   letterSpacing: 1.0,
                 ),

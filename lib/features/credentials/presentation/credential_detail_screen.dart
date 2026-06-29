@@ -17,6 +17,7 @@ import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/double_envelope_service.dart';
 import '../../../core/services/biometric_auth_service.dart';
 import '../../../theme/app_palette.dart';
+import '../../../theme/app_theme.dart';
 
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
@@ -733,7 +734,7 @@ class _TotpTileState extends State<_TotpTile> {
                   fontSize: 36,
                   fontWeight: FontWeight.w900,
                   letterSpacing: 4,
-                  fontFamily: 'monospace',
+                  fontFamily: AppTheme.monoFamily,
                 ),
               ),
               const SizedBox(width: 24),

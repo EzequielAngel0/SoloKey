@@ -96,31 +96,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
               children: [
                 const SizedBox(height: 20),
                 Center(
-                  child: Container(
-                    width: 72,
-                    height: 72,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          palette.accent,
-                          palette.accent.withValues(alpha: 0.7),
-                        ],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      boxShadow: [
-                        BoxShadow(
-                          color: palette.accent.withValues(alpha: 0.35),
-                          blurRadius: 20,
-                          spreadRadius: 2,
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
+                  child: Image.asset(
+                    'assets/logo/solokey_mark.png',
+                    height: 76,
+                    width: 76,
+                    errorBuilder: (_, _, _) => Image.asset(
                       'assets/logo/SoloKey.png',
-                      height: 56,
-                      width: 56,
+                      height: 76,
+                      width: 76,
                     ),
                   ),
                 ),
