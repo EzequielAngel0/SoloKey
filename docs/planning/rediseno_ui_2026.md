@@ -407,7 +407,7 @@ Verificación hecha (header ICO): `images=1 → 256x256 32bpp`. Eso lo confirma.
 | UI-6 | **Pantallas** | Aplicar a setup/unlock/detalle/form/ajustes/sync (§4). | 🔴 | ✅ |
 | UI-7 | **Logo nuevo** | Generar con Nano Banana (§5), aprobar maestro, sustituir `assets/logo/`. | 🟢 | ✅ |
 | UI-8 | **Íconos** | `.ico` multi-tamaño (16–256) ✅ + adaptive Android ✅ + `flutter_launcher_icons` ✅. Pendiente: rebuild Windows para verificar + (opcional) `WM_SETICON`. | 🟢 | 🟦 |
-| UI-9 | **QA visual** | Revisar en Android, Windows ventana grande/angosta, los 4 temas, RTL/es-en, accesibilidad de contraste. | 🟡 | ⬜ |
+| UI-9 | **QA visual** | Revisar en Android, Windows ventana grande/angosta, los 4 temas, RTL/es-en, accesibilidad de contraste. | 🟡 | ✅ |
 
 ### Commits sugeridos (ASCII, una línea)
 
@@ -439,5 +439,40 @@ fix(windows): icono de ventana visible con .ico multi-tamano y WM_SETICON big/sm
 
 ---
 
-*Generado el 2026-06-28. Dirección: Graphite Pro · Logo: monograma "S" + keyhole.
-Actualizar el estado (⬜/🟦/✅) de las fases UI-1..UI-9 conforme se implementen.*
+## 9. Estado de ejecución (cierre 2026-06-28)
+
+**Rediseño Graphite Pro COMPLETO** en la rama `feature/rediseno-ui`. Todas las
+fases UI-1..UI-9 en ✅ (UI-7/UI-8 logo+íconos ya estaban). `flutter analyze`: **0
+issues** (incluyendo `test/`). `flutter test`: **61/61 verde** (56 previos + 5
+nuevos del smoke de temas).
+
+Resumen de lo entregado:
+
+- **UI-1** — `app_palette.dart` retuneada a Graphite Pro (grafito + azul `#3B82F6`
+  + esmeralda `#10B981`) en dark/light/dim/oled; `app_colors.dart` deja de ser
+  fuente de verdad (legacy, remapeado).
+- **UI-2** — Inter + JetBrains Mono **bundleadas offline** en `assets/fonts/`
+  (+ licencias OFL); `app_theme.dart` plano: large titles a la izquierda, sin
+  *surface tint* M3 (anti-glassmorphism), inputs con anillo de foco, temas M3
+  para NavigationBar/chips/botones/sheets.
+- **UI-3** — Componentes: `SoloFilterChip`/`SoloFilterChipBar` (nuevo), tarjeta de
+  credencial con borde hairline, selector de tipo sin sombras, shimmer a tokens,
+  TOTP/llaves en JetBrains Mono, motion más sutil.
+- **UI-4** — `NavigationBar` M3 de 4 destinos (Bóveda · Carpetas · Seguridad ·
+  Ajustes); **Favoritos pasa a chip**; búsqueda pill persistente; **hub de
+  Seguridad** (`SecurityHubView`) que unifica auditoría, generador, import/export,
+  archivos, passkeys, sync y recuperación; Ajustes embebido (`SettingsView`).
+- **UI-5** — Escritorio sidebar **colapsable** (240↔72) con la marca, master-detail
+  plano y **paleta de comandos Ctrl+K** (`CommandPalette`) de búsqueda global +
+  acciones.
+- **UI-6** — `credential_form_screen` migrado 100% a `context.palette` (theme-aware
+  en los 4 temas) + mono; **glow eliminado** de splash/unlock/setup (logos planos)
+  y del botón de guardar. Sin `BackdropFilter`/blur en todo el código.
+- **UI-9** — Smoke test `test/theme/theme_smoke_test.dart` valida los 4 temas y la
+  marca; analyze y tests en verde.
+
+Pendiente (fuera del alcance de código de este rediseño): verificación visual
+manual en dispositivo Android real y en ventana de Windows grande/angosta; rebuild
+de Windows para confirmar el ícono de la barra de título (UI-8, ya preparado).
+
+*Generado el 2026-06-28. Dirección: Graphite Pro · Logo: monograma "S" + keyhole.*
