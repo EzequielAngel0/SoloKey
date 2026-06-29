@@ -78,6 +78,7 @@ commit de una línea ASCII.
 
 | Lote | Pantallas / archivos | Qué se rehace | Estado |
 | :-- | :--- | :--- | :--- |
+| **L0 — Kit** | `shared/widgets/` (`KvRow`/`DetailGroup`, `SectionHeader`, `EmptyState`, `StatHeader`, `StatusChip`) | Componentes compartidos extraídos de L1/L2 para que las 12 pantallas sean **consistentes** y el resto de lotes vaya más rápido | ⬜ |
 | **L1 — Detalle** | `credential_detail_screen.dart` | Detalle **por tipo** en filas densas; **TOTP con código en vivo** como primera fila (semilla en "Avanzado", revelar con biometría); login/API/SSH/passkey/nota a medida | ✅ |
 | **L2 — Carpetas** | `folder_screen.dart`, `folder_breadcrumbs.dart` (nuevo) | **Breadcrumbs** con salto a cualquier ancestro (escritorio: setea provider; móvil: pop N) → fin del "volver a la raíz" | ✅ |
 | **L3 — Bóveda/lista** | `home_screen.dart`, `credential_card.dart`, `credential_list_widget.dart` | Lista densa con secciones, orden, estados vacío/carga/error; cabecera y chips pulidos | ⬜ |
@@ -93,7 +94,86 @@ Tras cada lote se reporta para que el dueño valide antes de seguir.
 
 ---
 
-## 4. Qué NO se toca
+## 4. Estándares transversales (aplican a TODAS las pantallas)
+
+Acordados con el dueño el 2026-06-29 como mejoras de calidad sobre la dirección
+elegida (filas densas + breadcrumbs, look grafito intacto):
+
+**Ergonomía y consistencia**
+1. **Densidad responsiva:** denso en *información*, pero con objetivos de toque
+   ≥44px y algo más de aire en móvil; más compacto en escritorio.
+2. **Kit de componentes (L0):** `KvRow`/`DetailGroup`, `SectionHeader`,
+   `EmptyState`, `StatHeader`, `StatusChip`, breadcrumbs — reutilizados en todos
+   los lotes para que no diverjan.
+3. **Tipo nunca sólo por color:** siempre **color + ícono + etiqueta**; verificar
+   contraste del texto muted sobre grafito (a11y / daltonismo).
+4. **Acción primaria real:** login añade **"Abrir sitio"** (`url_launcher`, ya es
+   dependencia); en móvil, acciones secundarias (favorito/ocultar/editar/borrar)
+   van a un menú **"⋯"** en vez de saturar la AppBar.
+14. **Responsive intermedio:** breakpoint tablet/ventana mediana para que el
+    master-detail no salte feo entre teléfono y escritorio.
+
+**Seguridad / privacidad**
+7. **Favicons sin fuga:** por defecto **avatar por tipo**; favicons **opt-in** y
+   **cacheados localmente**, nunca llamando a Google en silencio (hoy
+   `CredentialIcon` hace `Image.network` a `google.com/s2/favicons` por cada
+   credencial — fuga de dominios + falla offline).
+8. **Auto-ocultar secretos revelados** tras ~20–30 s y al ir a segundo plano.
+9. **Avisos de salud inline:** chip de débil/reutilizada/filtrada en la **lista y
+   el detalle**, no sólo en Auditoría.
+13. **Copiado y confirmaciones uniformes:** toda copia con countdown de limpieza
+    de portapapeles; toda acción destructiva con confirm + auth, igual en
+    credenciales/carpetas/archivos.
+
+**Escritorio / accesibilidad**
+10. **Teclado y a11y:** `Semantics`/tooltips en botones de sólo-ícono, navegación
+    por teclado en listas (flechas/Enter/Esc), foco visible.
+12. **Persistir estado de UI:** sidebar colapsado, última pestaña, tamaño/posición
+    de ventana.
+
+**Búsqueda y rendimiento**
+11. **Búsqueda mejor:** en móvil incluir carpetas + resaltar coincidencias +
+    recientes (escritorio ya tiene Ctrl+K global).
+5. **TOTP eficiente en listas:** un único ticker compartido, no N `Timer`s.
+6. **QA:** validar en tema claro (smoke test) y repaso en dispositivo/ventana real
+   tras L3 antes de ir a lo ancho.
+
+> 🔸 **Decisión abierta:** carpetas en **escritorio** — ¿breadcrumbs solamente (ya
+> hecho) o **breadcrumbs + árbol expandible** en el panel/sidebar? (recomendado el
+> árbol; se haría en L9).
+
+---
+
+## 5. Detalle por pantalla (qué se rehace en cada lote)
+
+- **L3 · Bóveda/lista:** filas de credencial densas e informativas (avatar por
+  tipo, título, subtítulo usuario/emisor, badge de tipo, **código TOTP inline**);
+  agrupación opcional por secciones bajo los chips; estados vacío/carga/error y
+  vista de "ocultas" más claros.
+- **L4 · Formulario:** secciones densas **por tipo** con el lenguaje de filas del
+  detalle; selector de tipo arriba; sólo campos relevantes; **validación inline**;
+  secretos con revelar/generar; estado "guardando".
+- **L5 · Seguridad:** Auditoría con cabecera de **Security Score** + hallazgos
+  **accionables** (débiles/reutilizadas/filtradas/antiguas) que saltan a la
+  credencial; Generador con controles limpios y fuerza en vivo; Historial como
+  línea de tiempo con revelar/copiar valores anteriores.
+- **L6 · Ajustes:** secciones agrupadas (Seguridad · Apariencia · Sync · Datos ·
+  Acerca de) con control a la derecha; **selector de tema con preview**; zona
+  peligrosa separada.
+- **L7 · Sync/Transfer/Archivos/Passkeys:** Sync con estados claros (activo ·
+  esperando · conectando · sincronizando · error) + QR prominente + lista de
+  dispositivos; Transfer con dos modos y progreso; Archivos en grid con estado
+  vacío; Passkeys lista densa + estado vacío explicativo.
+- **L8 · Acceso:** Setup stepper (crear master → recovery code → listo) con
+  fortaleza y checklist; Unlock con **Hello/biometría primero** + fallback; Recovery
+  de 2 pasos con estados; Splash ya plano (sólo pulido).
+- **L9 · Escritorio + extras:** detalle con filas densas; **carpetas como árbol**
+  en el sidebar/panel (según decisión abierta); densidad afinada a ventana ancha;
+  Quick-fill / QR / onboarding limpios.
+
+---
+
+## 6. Qué NO se toca
 
 - Lógica de cripto/persistencia/sync (sólo presentación).
 - Paleta/tokens Graphite Pro (se mantienen; esto es UX, no recolor).
