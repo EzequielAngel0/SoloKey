@@ -1,29 +1,38 @@
 # 📚 Documentación de SoloKey
 
 Índice de toda la documentación del proyecto, organizada por propósito.
-Última reorganización: **2026-06-28**.
+Última reorganización: **2026-07-03**.
 
 ```
 docs/
 ├── spec/          Especificación fundacional (set secuenciado 00–05)
 ├── architecture/  Evolución arquitectónica
+├── design/        Rediseño de UI/UX (Graphite Pro) — planes + previews
+├── prompts/       Prompts detallados por pantalla (uno por chat) ← EMPEZAR AQUI para mejorar
 ├── security/      Auditorías e informes de seguridad
 ├── features/      Planes/diseño de features concretas
 ├── planning/      Roadmap, backlog vigente e ideas
 └── release/       Empaquetado y publicación por plataforma
 ```
 
+> **¿Vas a mejorar una pantalla?** Ve a [`prompts/`](prompts/README.md): trae un
+> prompt detallado por pantalla (móvil + escritorio) con audit → plan → ejecución,
+> features propuestas y guardarraíles. Úsalo uno por chat.
+
 ---
 
-## 🟢 Estado del proyecto (2026-06-28)
+## 🟢 Estado del proyecto (2026-07-03)
 
 Estabilización **cerrada**, i18n **completo** (es/en, UI + servicios), `flutter
-analyze` sin issues y **56/56 tests verde**. Artefactos de release generados en
-`dist/` (APKs + instalador Windows) vía `build_release.ps1`.
+analyze` sin issues y **61 tests verde**. Artefactos de release generados en
+`dist/` (APKs + instalador Windows) vía `build_release.ps1`. **Rediseño UI/UX
+Graphite Pro** mergeado a `main` (ver [`design/`](design/)); trabajo continuo por
+pantalla vía [`prompts/`](prompts/README.md).
 
-**Pendiente real:** probar el flujo PC↔celular (reconexión / sync continua /
-aprobación de login — implementado pero sin prueba en dispositivos) y el
-empaquetado macOS/Linux/iOS (diferido).
+**Pendiente real / próximo:** auto-refresh de la Bóveda de Windows al sincronizar,
+editar/eliminar carpetas en escritorio, ver qué se sincronizó, captura de QR en
+Windows para TOTP (todo con prompt en `prompts/`); probar el flujo PC↔celular en
+dispositivos; empaquetado macOS/Linux/iOS (diferido).
 
 ## 🟢 Empezar por aquí
 
@@ -55,6 +64,21 @@ empaquetado macOS/Linux/iOS (diferido).
 | Doc | Contenido |
 | :--- | :--- |
 | [architecture_v2.md](architecture/architecture_v2.md) | Revisión arquitectónica posterior |
+
+### `design/` — Rediseño de UI/UX (Graphite Pro)
+| Doc | Contenido |
+| :--- | :--- |
+| [rediseno_ui_2026.md](design/rediseno_ui_2026.md) | Capa visual Graphite Pro (tokens, tema, nav) — **hecho** |
+| [rediseno_preview.html](design/rediseno_preview.html) | Preview visual del sistema de diseño |
+| [ux_overhaul_2026.md](design/ux_overhaul_2026.md) | Rediseño UX pantalla por pantalla (lotes L0–L9) — **hecho** |
+| [ux_overhaul_preview.html](design/ux_overhaul_preview.html) | Prototipo A/B del rediseño UX |
+
+### `prompts/` — Prompts de mejora por pantalla
+| Doc | Contenido |
+| :--- | :--- |
+| [README.md](prompts/README.md) | Índice + cómo usar (uno por chat) |
+| [00_contexto_compartido.md](prompts/00_contexto_compartido.md) | Preámbulo (reglas/gates) a pegar antes de cada prompt |
+| 10–90 | Prompts detallados: bóveda, detalle, formulario, carpetas, seguridad, sync, transferencia, ajustes, archivos/passkeys, acceso, escritorio, captura QR, transversal |
 
 ### `security/` — Auditorías
 | Doc | Contenido |
