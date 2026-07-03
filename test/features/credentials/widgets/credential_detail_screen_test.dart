@@ -145,6 +145,45 @@ void main() {
       expect(find.text('prod-server'), findsWidgets);
       expect(find.text('Ed25519'), findsOneWidget);
     });
+
+    testWidgets('passkey renders its metadata but never the raw handle',
+        (tester) async {
+      await pumpDetail(
+        tester,
+        _cred(
+          type: CredentialType.passkey,
+          title: 'GitHub Passkey',
+          username: null,
+          password: 'ENCRYPTED_HANDLE_BLOB',
+          passkey: const PasskeyMetadata(
+            rpId: 'github.com',
+            rpName: 'GitHub',
+            credentialId: 'CRED-ID-123',
+          ),
+        ),
+      );
+      expect(find.text('github.com'), findsOneWidget);
+      expect(find.text('CRED-ID-123'), findsOneWidget);
+      // The encrypted private-key handle must never be shown, even masked.
+      expect(find.text('ENCRYPTED_HANDLE_BLOB'), findsNothing);
+      expect(find.byIcon(Icons.visibility_rounded), findsNothing);
+    });
+  });
+
+  group('CredentialDetailScreen — open site', () {
+    testWidgets('login with a website shows the open-site action',
+        (tester) async {
+      await pumpDetail(
+        tester,
+        _cred(password: 'x', website: 'https://github.com'),
+      );
+      expect(find.byIcon(Icons.open_in_new_rounded), findsOneWidget);
+    });
+
+    testWidgets('no website means no open-site action', (tester) async {
+      await pumpDetail(tester, _cred(password: 'x'));
+      expect(find.byIcon(Icons.open_in_new_rounded), findsNothing);
+    });
   });
 
   group('CredentialDetailScreen — TOTP hero', () {

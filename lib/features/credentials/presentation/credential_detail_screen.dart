@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import '../application/credentials_provider.dart';
 import '../application/credential_health_provider.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../domain/entities/credential.dart';
+import 'widgets/credential_card.dart' show credentialTypeColor, credentialTypeLabel;
 import '../../../core/utils/auth_helper.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
 import '../../../app/di/injection.dart';
@@ -23,15 +25,9 @@ import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
 
 // ── Type helpers ──────────────────────────────────────────────────────────────
-Color _typeColor(CredentialType t, AppPalette p) => switch (t) {
-      CredentialType.password => p.typePassword,
-      CredentialType.apiKey => p.typeApiKey,
-      CredentialType.secureNote => p.typeNote,
-      CredentialType.totp => p.typeTotp,
-      CredentialType.passkey => p.typePasskey,
-      CredentialType.sshKey => p.typeSshKey,
-    };
-
+// Color + localized label are shared with the card (credentialTypeColor /
+// credentialTypeLabel in credential_card.dart) so wording stays consistent.
+// Only the detail-specific icon mapping lives here.
 IconData _typeIcon(CredentialType t) => switch (t) {
       CredentialType.password => Icons.lock_rounded,
       CredentialType.apiKey => Icons.key_rounded,
@@ -41,14 +37,32 @@ IconData _typeIcon(CredentialType t) => switch (t) {
       CredentialType.sshKey => Icons.terminal_rounded,
     };
 
-String _typeLabel(AppLocalizations l10n, CredentialType t) => switch (t) {
-      CredentialType.password => l10n.typePassword,
-      CredentialType.apiKey => l10n.typeApiKey,
-      CredentialType.secureNote => l10n.typeSecureNote,
-      CredentialType.totp => l10n.typeTotp,
-      CredentialType.passkey => l10n.typePasskey,
-      CredentialType.sshKey => l10n.typeSshKey,
-    };
+/// Normalizes a user-entered site into a launchable https URL and opens it in
+/// the external browser. Shows a localized error snackbar on failure.
+Future<void> _launchSite(BuildContext context, String raw) async {
+  final l10n = AppLocalizations.of(context);
+  var url = raw.trim();
+  if (url.isEmpty) return;
+  if (!url.contains('://')) url = 'https://$url';
+  final uri = Uri.tryParse(url);
+  var ok = false;
+  if (uri != null) {
+    try {
+      ok = await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } catch (_) {
+      ok = false;
+    }
+  }
+  if (!ok && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.detailOpenSiteError),
+        backgroundColor: context.palette.danger,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+}
 
 class CredentialDetailScreen extends ConsumerWidget {
   const CredentialDetailScreen({super.key, required this.credentialId});
@@ -97,8 +111,22 @@ class _DetailView extends ConsumerWidget {
     return Scaffold(
       appBar: VaultAppBar(
         title: credential.title,
-        leading:
-            ResponsiveLayout.isDesktop(context) ? const SizedBox.shrink() : null,
+        // Desktop has no router back stack for the right pane, so give it an
+        // explicit close that clears the selection (mobile keeps the default
+        // router back arrow).
+        leading: ResponsiveLayout.isDesktop(context)
+            ? IconButton(
+                icon: const Icon(Icons.close_rounded),
+                tooltip: l10n.commonClose,
+                onPressed: () {
+                  ref
+                      .read(desktopSelectedCredentialIdProvider.notifier)
+                      .state = null;
+                  ref.read(desktopRightPaneModeProvider.notifier).state =
+                      RightPaneMode.none;
+                },
+              )
+            : null,
         actions: [
           IconButton(
             icon: Icon(
@@ -251,6 +279,43 @@ class _DetailView extends ConsumerWidget {
           ));
         }
         break;
+      case CredentialType.passkey:
+        // Show the passkey's identifying metadata; the encrypted private-key
+        // handle in [c.password] is an internal blob and is never surfaced.
+        if (c.username != null) {
+          rows.add(_DetailRow(
+            icon: Icons.person_rounded,
+            label: l10n.fieldUsername,
+            value: c.username!,
+            isSecret: false,
+          ));
+        }
+        final m = c.passkeyMetadata;
+        if (m != null) {
+          rows.add(_DetailRow(
+            icon: Icons.language_rounded,
+            label: l10n.passkeyDomain,
+            value: m.rpId,
+            isSecret: false,
+          ));
+          final rpName = m.rpName;
+          if (rpName != null && rpName.isNotEmpty) {
+            rows.add(_DetailRow(
+              icon: Icons.business_rounded,
+              label: l10n.passkeyService,
+              value: rpName,
+              isSecret: false,
+            ));
+          }
+          rows.add(_DetailRow(
+            icon: Icons.badge_rounded,
+            label: l10n.passkeyCredentialId,
+            value: m.credentialId,
+            isSecret: false,
+            mono: true,
+          ));
+        }
+        break;
       default:
         if (c.username != null) {
           rows.add(_DetailRow(
@@ -277,12 +342,13 @@ class _DetailView extends ConsumerWidget {
         }
     }
 
-    if (c.website != null) {
+    if (c.website != null && c.website!.trim().isNotEmpty) {
       rows.add(_DetailRow(
         icon: Icons.language_rounded,
         label: l10n.fieldWebsite,
         value: c.website!,
         isSecret: false,
+        openUrl: c.website,
       ));
     }
 
@@ -502,7 +568,7 @@ class _DetailHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = AppLocalizations.of(context);
-    final color = _typeColor(credential.type, p);
+    final color = credentialTypeColor(credential.type, p);
     final subtitle = _subtitle();
 
     return Row(
@@ -543,7 +609,7 @@ class _DetailHeader extends StatelessWidget {
                       borderRadius: BorderRadius.circular(7),
                     ),
                     child: Text(
-                      _typeLabel(l10n, credential.type),
+                      credentialTypeLabel(credential.type, l10n),
                       style: TextStyle(
                         color: color,
                         fontSize: 11,
@@ -584,6 +650,7 @@ class _DetailRow extends StatefulWidget {
     this.mono = false,
     this.isDoubleEncrypted = false,
     this.credentialId = '',
+    this.openUrl,
   });
 
   final IconData icon;
@@ -594,6 +661,9 @@ class _DetailRow extends StatefulWidget {
   final bool mono;
   final bool isDoubleEncrypted;
   final String credentialId;
+
+  /// When set, an "open site" action is shown that launches this URL externally.
+  final String? openUrl;
 
   @override
   State<_DetailRow> createState() => _DetailRowState();
@@ -819,6 +889,18 @@ class _DetailRowState extends State<_DetailRow> with WidgetsBindingObserver {
     );
 
     final actions = <Widget>[
+      if (widget.openUrl != null)
+        Semantics(
+          button: true,
+          label: l10n.detailOpenSite,
+          child: IconButton(
+            icon: Icon(Icons.open_in_new_rounded, color: p.primary, size: 18),
+            tooltip: l10n.detailOpenSite,
+            onPressed: () => _launchSite(context, widget.openUrl!),
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+          ),
+        ),
       if (widget.isSecret && _revealed && _secondsLeft > 0)
         Semantics(
           label: l10n.detailHideCountdown(_secondsLeft),
