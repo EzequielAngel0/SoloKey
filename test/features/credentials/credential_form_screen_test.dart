@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:password_manager/features/credentials/application/credentials_provider.dart';
@@ -239,5 +240,39 @@ void main() {
 
     expect(find.text('Invalid Base32 secret (only A–Z and 2–7)'),
         findsOneWidget);
+  });
+
+  testWidgets('pasting an otpauth link fills the TOTP fields', (tester) async {
+    const uri =
+        'otpauth://totp/GitHub:octocat?secret=JBSWY3DPEHPK3PXP&issuer=GitHub';
+    tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(
+      SystemChannels.platform,
+      (call) async {
+        if (call.method == 'Clipboard.getData') {
+          return <String, dynamic>{'text': uri};
+        }
+        return null;
+      },
+    );
+    addTearDown(() => tester.binding.defaultBinaryMessenger
+        .setMockMethodCallHandler(SystemChannels.platform, null));
+
+    await pumpForm(tester);
+    await tester.pump();
+
+    await tester.tap(find.text('TOTP'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pump(const Duration(milliseconds: 350));
+
+    final pasteBtn = find.text('Paste otpauth link');
+    await tester.ensureVisible(pasteBtn);
+    await tester.tap(pasteBtn);
+    await tester.pump();
+    await tester.pump();
+
+    // Issuer + title (plain fields) reflect the parsed otpauth URI.
+    expect(find.widgetWithText(TextFormField, 'GitHub'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'octocat'), findsOneWidget);
   });
 }

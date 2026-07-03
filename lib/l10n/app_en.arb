@@ -428,6 +428,16 @@
   "formDiscardLeave": "Discard",
   "formErrInvalidUrl": "Enter a valid URL",
   "formErrInvalidTotp": "Invalid Base32 secret (only A–Z and 2–7)",
+  "formPasteTotp": "Paste otpauth link",
+  "formPasteApplied": "TOTP filled from clipboard",
+  "formPasteNoOtpauth": "No valid otpauth:// link in the clipboard",
+  "formDupTitle": "Possible duplicate",
+  "formDupMessage": "\"{title}\" already uses this username. Save anyway?",
+  "@formDupMessage": {
+    "placeholders": { "title": { "type": "String" } }
+  },
+  "formDupReview": "Review",
+  "formDupSaveAnyway": "Save anyway",
 
   "commonLoading": "Loading…",
   "folderNewSubfolder": "New subfolder",

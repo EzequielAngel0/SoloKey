@@ -1114,6 +1114,30 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formErrInvalidTotp => 'Secreto Base32 invalido (solo A-Z y 2-7)';
 
   @override
+  String get formPasteTotp => 'Pegar enlace otpauth';
+
+  @override
+  String get formPasteApplied => 'TOTP rellenado desde el portapapeles';
+
+  @override
+  String get formPasteNoOtpauth =>
+      'No hay un enlace otpauth:// valido en el portapapeles';
+
+  @override
+  String get formDupTitle => 'Posible duplicado';
+
+  @override
+  String formDupMessage(String title) {
+    return '\"$title\" ya usa este usuario. ¿Guardar de todos modos?';
+  }
+
+  @override
+  String get formDupReview => 'Revisar';
+
+  @override
+  String get formDupSaveAnyway => 'Guardar de todos modos';
+
+  @override
   String get commonLoading => 'Cargando…';
 
   @override

@@ -1105,6 +1105,29 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formErrInvalidTotp => 'Invalid Base32 secret (only A–Z and 2–7)';
 
   @override
+  String get formPasteTotp => 'Paste otpauth link';
+
+  @override
+  String get formPasteApplied => 'TOTP filled from clipboard';
+
+  @override
+  String get formPasteNoOtpauth => 'No valid otpauth:// link in the clipboard';
+
+  @override
+  String get formDupTitle => 'Possible duplicate';
+
+  @override
+  String formDupMessage(String title) {
+    return '\"$title\" already uses this username. Save anyway?';
+  }
+
+  @override
+  String get formDupReview => 'Review';
+
+  @override
+  String get formDupSaveAnyway => 'Save anyway';
+
+  @override
   String get commonLoading => 'Loading…';
 
   @override

@@ -11,6 +11,7 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
 import '../application/credentials_provider.dart';
+import '../application/duplicate_detector.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/entities/credential.dart';
 import 'qr_scanner_screen.dart';
@@ -386,6 +387,23 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final l10n = AppLocalizations.of(context);
+
+    // Warn (non-blocking) about a likely duplicate when creating a new entry.
+    if (_existing == null) {
+      final all = ref.read(credentialsNotifierProvider).valueOrNull ?? const [];
+      final dup = findDuplicate(
+        all: all,
+        type: _type,
+        username: _type == CredentialType.apiKey
+            ? _serviceCtrl.text
+            : _usernameCtrl.text,
+        website: _type == CredentialType.apiKey
+            ? _endpointCtrl.text
+            : _websiteCtrl.text,
+      );
+      if (dup != null && !await _confirmDuplicate(dup.title)) return;
+    }
+
     await _saveAnimCtrl.forward();
     await _saveAnimCtrl.reverse();
     setState(() => _isLoading = true);
@@ -591,72 +609,88 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     }
   }
 
+  /// Parses an `otpauth://` URI and fills the TOTP fields (secret, and issuer /
+  /// title when empty). Returns true on success. Shared by QR scan and paste.
+  bool _applyOtpauth(String code) {
+    final Uri uri;
+    try {
+      uri = Uri.parse(code);
+    } catch (_) {
+      return false;
+    }
+    if (uri.scheme.toLowerCase() != 'otpauth') return false;
+    final secret = uri.queryParameters['secret'];
+    if (secret == null || secret.isEmpty) return false;
+
+    String? titleFromPath;
+    if (uri.pathSegments.isNotEmpty) {
+      titleFromPath = uri.pathSegments.first;
+      if (titleFromPath.contains(':')) {
+        titleFromPath = titleFromPath.split(':').last;
+      }
+    }
+    final issuer =
+        uri.queryParameters['issuer'] ??
+        (uri.pathSegments.isNotEmpty && uri.pathSegments.first.contains(':')
+            ? Uri.decodeComponent(uri.pathSegments.first.split(':').first)
+            : null);
+
+    setState(() {
+      _totpSecretCtrl.text = secret;
+      if (issuer != null && _totpIssuerCtrl.text.isEmpty) {
+        _totpIssuerCtrl.text = issuer;
+      }
+      if (titleFromPath != null && _titleCtrl.text.isEmpty) {
+        _titleCtrl.text = Uri.decodeComponent(titleFromPath);
+      }
+    });
+    return true;
+  }
+
+  void _showTotpAppliedSnackBar(String message) {
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.check_circle_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Text(message),
+          ],
+        ),
+        backgroundColor: context.palette.success,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
   Future<void> _scanQr() async {
     final l10n = AppLocalizations.of(context);
     final code = await Navigator.of(
       context,
     ).push<String>(MaterialPageRoute(builder: (_) => const QrScannerScreen()));
-    if (code == null) return;
+    if (code == null || !mounted) return;
+    if (_applyOtpauth(code)) {
+      _showTotpAppliedSnackBar(l10n.formQrScanned);
+    } else {
+      _showError(l10n.formQrNotTotp);
+    }
+  }
 
-    try {
-      final uri = Uri.parse(code);
-      if (uri.scheme.toLowerCase() != 'otpauth') {
-        _showError(l10n.formQrNotTotp);
-        return;
-      }
-
-      String? titleFromPath;
-      if (uri.pathSegments.isNotEmpty) {
-        titleFromPath = uri.pathSegments.first;
-        if (titleFromPath.contains(':')) {
-          titleFromPath = titleFromPath.split(':').last;
-        }
-      }
-
-      final secret = uri.queryParameters['secret'];
-      final issuer =
-          uri.queryParameters['issuer'] ??
-          (uri.pathSegments.isNotEmpty && uri.pathSegments.first.contains(':')
-              ? Uri.decodeComponent(uri.pathSegments.first.split(':').first)
-              : null);
-
-      if (secret != null && secret.isNotEmpty) {
-        setState(() {
-          _totpSecretCtrl.text = secret;
-          if (issuer != null && _totpIssuerCtrl.text.isEmpty) {
-            _totpIssuerCtrl.text = issuer;
-          }
-          if (titleFromPath != null && _titleCtrl.text.isEmpty) {
-            _titleCtrl.text = Uri.decodeComponent(titleFromPath);
-          }
-        });
-        HapticFeedback.mediumImpact();
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(
-                  Icons.qr_code_rounded,
-                  color: Colors.white,
-                  size: 18,
-                ),
-                const SizedBox(width: 8),
-                Text(l10n.formQrScanned),
-              ],
-            ),
-            backgroundColor: context.palette.success,
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
-            ),
-          ),
-        );
-      } else {
-        _showError(l10n.formQrNoSecret);
-      }
-    } catch (e) {
-      _showError(l10n.formQrReadError);
+  Future<void> _pasteTotpFromClipboard() async {
+    final l10n = AppLocalizations.of(context);
+    final data = await Clipboard.getData(Clipboard.kTextPlain);
+    if (!mounted) return;
+    final text = data?.text?.trim() ?? '';
+    if (text.isNotEmpty && _applyOtpauth(text)) {
+      _showTotpAppliedSnackBar(l10n.formPasteApplied);
+    } else {
+      _showError(l10n.formPasteNoOtpauth);
     }
   }
 
@@ -670,6 +704,52 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         behavior: SnackBarBehavior.floating,
       ),
     );
+  }
+
+  /// Warns that [title] looks like a duplicate. Returns `true` to save anyway,
+  /// `false` to go back and review (non-blocking, per the "aviso, no bloqueo").
+  Future<bool> _confirmDuplicate(String title) async {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final proceed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: palette.drawer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          l10n.formDupTitle,
+          style: TextStyle(
+            color: palette.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          l10n.formDupMessage(title),
+          style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              l10n.formDupReview,
+              style: TextStyle(color: palette.textMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              l10n.formDupSaveAnyway,
+              style: TextStyle(
+                color: palette.warning,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return proceed ?? false;
   }
 
   /// Asks the user to confirm leaving the form when there are unsaved changes.
@@ -1573,7 +1653,23 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           ),
         ),
 
-        const SizedBox(height: 16),
+        const SizedBox(height: 8),
+        Center(
+          child: TextButton.icon(
+            onPressed: _pasteTotpFromClipboard,
+            icon: Icon(
+              Icons.content_paste_rounded,
+              size: 16,
+              color: context.palette.typeTotp,
+            ),
+            label: Text(l10n.formPasteTotp),
+            style: TextButton.styleFrom(
+              foregroundColor: context.palette.typeTotp,
+            ),
+          ),
+        ),
+
+        const SizedBox(height: 8),
         Row(
           children: [
             Expanded(

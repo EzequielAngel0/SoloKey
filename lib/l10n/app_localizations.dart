@@ -2126,6 +2126,48 @@ abstract class AppLocalizations {
   /// **'Invalid Base32 secret (only A–Z and 2–7)'**
   String get formErrInvalidTotp;
 
+  /// No description provided for @formPasteTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'Paste otpauth link'**
+  String get formPasteTotp;
+
+  /// No description provided for @formPasteApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP filled from clipboard'**
+  String get formPasteApplied;
+
+  /// No description provided for @formPasteNoOtpauth.
+  ///
+  /// In en, this message translates to:
+  /// **'No valid otpauth:// link in the clipboard'**
+  String get formPasteNoOtpauth;
+
+  /// No description provided for @formDupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Possible duplicate'**
+  String get formDupTitle;
+
+  /// No description provided for @formDupMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{title}\" already uses this username. Save anyway?'**
+  String formDupMessage(String title);
+
+  /// No description provided for @formDupReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Review'**
+  String get formDupReview;
+
+  /// No description provided for @formDupSaveAnyway.
+  ///
+  /// In en, this message translates to:
+  /// **'Save anyway'**
+  String get formDupSaveAnyway;
+
   /// No description provided for @commonLoading.
   ///
   /// In en, this message translates to:

@@ -24,15 +24,16 @@ final passwordStrengthProvider = AutoDisposeProvider<PasswordStrength>.internal(
 // ignore: unused_element
 typedef PasswordStrengthRef = AutoDisposeProviderRef<PasswordStrength>;
 String _$passwordConfigNotifierHash() =>
-    r'940599d661b1b4b127a783cccdb40ecd03224616';
+    r'3d582f8b79f51715853499620537660ac8a965c0';
 
-/// See also [PasswordConfigNotifier].
+/// Kept alive so the user's last generation preferences (length, charsets)
+/// persist across opening the generator again during the session, instead of
+/// resetting to defaults each time.
+///
+/// Copied from [PasswordConfigNotifier].
 @ProviderFor(PasswordConfigNotifier)
 final passwordConfigNotifierProvider =
-    AutoDisposeNotifierProvider<
-      PasswordConfigNotifier,
-      PasswordConfig
-    >.internal(
+    NotifierProvider<PasswordConfigNotifier, PasswordConfig>.internal(
       PasswordConfigNotifier.new,
       name: r'passwordConfigNotifierProvider',
       debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -42,7 +43,7 @@ final passwordConfigNotifierProvider =
       allTransitiveDependencies: null,
     );
 
-typedef _$PasswordConfigNotifier = AutoDisposeNotifier<PasswordConfig>;
+typedef _$PasswordConfigNotifier = Notifier<PasswordConfig>;
 String _$generatedPasswordNotifierHash() =>
     r'87cd3199d2b8bc7313ef74d1f4d5f9103e8a88c5';
 

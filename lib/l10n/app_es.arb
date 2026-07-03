@@ -375,6 +375,13 @@
   "formDiscardLeave": "Descartar",
   "formErrInvalidUrl": "Ingresa una URL valida",
   "formErrInvalidTotp": "Secreto Base32 invalido (solo A-Z y 2-7)",
+  "formPasteTotp": "Pegar enlace otpauth",
+  "formPasteApplied": "TOTP rellenado desde el portapapeles",
+  "formPasteNoOtpauth": "No hay un enlace otpauth:// valido en el portapapeles",
+  "formDupTitle": "Posible duplicado",
+  "formDupMessage": "\"{title}\" ya usa este usuario. ¿Guardar de todos modos?",
+  "formDupReview": "Revisar",
+  "formDupSaveAnyway": "Guardar de todos modos",
 
   "commonLoading": "Cargando…",
   "folderNewSubfolder": "Nueva subcarpeta",
