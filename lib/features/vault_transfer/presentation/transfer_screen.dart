@@ -220,11 +220,14 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   /// Shows the selection sheet for [backup], then performs a selective import
   /// of the chosen credential types and folders.
   Future<void> _runSelectiveImport(DecryptedBackup backup) async {
+    final existing =
+        ref.read(credentialsNotifierProvider).valueOrNull ?? const [];
     final selection = await showModalBottomSheet<_ImportSelection>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _ImportSelectionSheet(backup: backup),
+      builder: (_) =>
+          _ImportSelectionSheet(backup: backup, existing: existing),
     );
     if (selection == null || !mounted) return;
 
@@ -812,9 +815,13 @@ class _ImportSelection {
 /// Bottom sheet that previews a decrypted backup and lets the user pick which
 /// credential types and folders to import before anything is persisted.
 class _ImportSelectionSheet extends StatefulWidget {
-  const _ImportSelectionSheet({required this.backup});
+  const _ImportSelectionSheet({required this.backup, required this.existing});
 
   final DecryptedBackup backup;
+
+  /// Current vault credentials, used to preview how many of the selected items
+  /// already exist (duplicates) before applying the import.
+  final List<Credential> existing;
 
   @override
   State<_ImportSelectionSheet> createState() => _ImportSelectionSheetState();
@@ -861,6 +868,16 @@ class _ImportSelectionSheetState extends State<_ImportSelectionSheet> {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final typeList = _typeCounts.keys.toList();
+
+    // Duplicates among the CURRENT selection vs the existing vault.
+    final selectedIncoming = widget.backup.credentials
+        .where((c) =>
+            _selectedTypes.contains(c.type) &&
+            _selectedFolderKeys.contains(c.categoryId ?? kNoFolderFilterId))
+        .toList();
+    final duplicateCount =
+        VaultExportService.countDuplicates(selectedIncoming, widget.existing);
+
     final folderList = _folderCounts.keys.toList()
       ..sort((a, b) {
         if (a == kNoFolderFilterId) return 1; // push "no folder" last
@@ -971,6 +988,14 @@ class _ImportSelectionSheetState extends State<_ImportSelectionSheet> {
                             ),
                           ),
                       ],
+                    ),
+                  ],
+                  if (duplicateCount > 0) ...[
+                    const SizedBox(height: 20),
+                    _InfoBanner(
+                      icon: Icons.copy_all_rounded,
+                      color: palette.warning,
+                      text: l10n.transferDuplicatesWarning(duplicateCount),
                     ),
                   ],
                   const SizedBox(height: 24),

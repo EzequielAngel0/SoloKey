@@ -1447,6 +1447,17 @@ class AppLocalizationsEn extends AppLocalizations {
       'Google Authenticator export QRs aren\'t supported. Export individual otpauth:// links instead.';
 
   @override
+  String transferDuplicatesWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count selected items already exist in your vault',
+      one: '1 selected item already exists in your vault',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get transferImportDone => 'Import completed';
 
   @override

@@ -485,6 +485,8 @@
   "transferImportOtpauth": "Importar autenticadores (otpauth)",
   "transferOtpauthNone": "No se encontraron enlaces otpauth:// en ese archivo",
   "transferOtpauthMigrationUnsupported": "Los QR de exportación de Google Authenticator no son compatibles. Exporta enlaces otpauth:// individuales.",
+  "transferDuplicatesWarning": "{count, plural, =1{1 elemento seleccionado ya existe en tu bóveda} other{{count} elementos seleccionados ya existen en tu bóveda}}",
+  "@transferDuplicatesWarning": { "placeholders": { "count": { "type": "int" } } },
   "transferImportDone": "Importación completada",
   "transferExportSelectFolders": "Carpetas a exportar",
   "transferNoFolder": "Sin carpeta",

@@ -565,6 +565,8 @@
   "transferImportOtpauth": "Import authenticators (otpauth)",
   "transferOtpauthNone": "No otpauth:// links found in that file",
   "transferOtpauthMigrationUnsupported": "Google Authenticator export QRs aren't supported. Export individual otpauth:// links instead.",
+  "transferDuplicatesWarning": "{count, plural, =1{1 selected item already exists in your vault} other{{count} selected items already exist in your vault}}",
+  "@transferDuplicatesWarning": { "placeholders": { "count": { "type": "int" } } },
   "transferImportDone": "Import completed",
   "transferExportSelectFolders": "Folders to export",
   "transferNoFolder": "No folder",

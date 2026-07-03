@@ -2732,6 +2732,12 @@ abstract class AppLocalizations {
   /// **'Google Authenticator export QRs aren\'t supported. Export individual otpauth:// links instead.'**
   String get transferOtpauthMigrationUnsupported;
 
+  /// No description provided for @transferDuplicatesWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 selected item already exists in your vault} other{{count} selected items already exist in your vault}}'**
+  String transferDuplicatesWarning(int count);
+
   /// No description provided for @transferImportDone.
   ///
   /// In en, this message translates to:

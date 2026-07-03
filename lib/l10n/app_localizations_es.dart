@@ -1461,6 +1461,17 @@ class AppLocalizationsEs extends AppLocalizations {
       'Los QR de exportación de Google Authenticator no son compatibles. Exporta enlaces otpauth:// individuales.';
 
   @override
+  String transferDuplicatesWarning(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementos seleccionados ya existen en tu bóveda',
+      one: '1 elemento seleccionado ya existe en tu bóveda',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get transferImportDone => 'Importación completada';
 
   @override

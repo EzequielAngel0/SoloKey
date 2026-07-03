@@ -267,6 +267,34 @@ void main() {
     );
   });
 
+  test('countDuplicates matches by id and by title+username', () {
+    final existing = [
+      _cred('a', CredentialType.password),
+      _cred('b', CredentialType.password),
+    ];
+
+    // Same id as an existing one.
+    final sameId = _cred('a', CredentialType.totp);
+    // Fresh id but same title+username as 'b' (e.g. re-imported CSV row).
+    final sameContent = Credential(
+      id: 'brand-new-id',
+      type: CredentialType.password,
+      title: 'title-b',
+      username: 'user-b',
+      createdAt: DateTime(2022),
+      updatedAt: DateTime(2022),
+    );
+    // Genuinely new.
+    final fresh = _cred('z', CredentialType.password);
+
+    expect(
+      VaultExportService.countDuplicates([sameId, sameContent, fresh], existing),
+      2,
+    );
+    expect(VaultExportService.countDuplicates([fresh], existing), 0);
+    expect(VaultExportService.countDuplicates(const [], existing), 0);
+  });
+
   test('export zeroes the derived key after use', () async {
     final spy = _SpySecurity(security);
     final svc = VaultExportService(

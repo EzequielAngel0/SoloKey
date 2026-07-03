@@ -342,6 +342,27 @@ class VaultExportService {
     return DecryptedBackup(credentials: credentials, folders: []);
   }
 
+  /// Counts how many of [incoming] already look present in [existing]. A match
+  /// is either the same id or the same normalized (title + username) key, so it
+  /// also catches re-imported CSV/otpauth items that were assigned fresh ids.
+  /// Used to warn the user about duplicates before an import is applied.
+  static int countDuplicates(
+    List<Credential> incoming,
+    List<Credential> existing,
+  ) {
+    final ids = existing.map((c) => c.id).toSet();
+    final keys = existing.map(_dupKey).toSet();
+    var count = 0;
+    for (final c in incoming) {
+      if (ids.contains(c.id) || keys.contains(_dupKey(c))) count++;
+    }
+    return count;
+  }
+
+  static String _dupKey(Credential c) =>
+      '${c.title.trim().toLowerCase()} '
+      '${(c.username ?? '').trim().toLowerCase()}';
+
   /// Saves selected elements from [backup] to the database.
   Future<ImportResult> performSelectiveImport({
     required DecryptedBackup backup,
