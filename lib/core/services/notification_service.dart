@@ -58,8 +58,10 @@ class DueRotation {
 /// Scans the local SQLite vault for credentials whose rotation window has
 /// elapsed. Reads ONLY plain (non-encrypted) columns, so it works without the
 /// master key — safe to call from a background isolate.
-Future<List<DueRotation>> findDueRotations(AppDatabase db) async {
-  final now = DateTime.now();
+/// [now] is injectable so tests can pin the clock deterministically; it
+/// defaults to the wall clock in production. No behavioural change.
+Future<List<DueRotation>> findDueRotations(AppDatabase db, {DateTime? now}) async {
+  final at = now ?? DateTime.now();
   final entries = await db.credentialDao.getAll();
   final due = <DueRotation>[];
 
@@ -70,14 +72,14 @@ Future<List<DueRotation>> findDueRotations(AppDatabase db) async {
     if (days <= 0) continue;
 
     final updatedAt = DateTime.fromMillisecondsSinceEpoch(e.updatedAt);
-    final daysSinceUpdate = now.difference(updatedAt).inDays;
+    final daysSinceUpdate = at.difference(updatedAt).inDays;
     if (daysSinceUpdate < days) continue; // still within rotation window
 
     // Skip if we already prompted recently (prevents notification fatigue).
     final last = e.lastRotationPromptedAt;
     if (last != null) {
       final lastDt = DateTime.fromMillisecondsSinceEpoch(last);
-      if (now.difference(lastDt) < _kRepromptCooldown) continue;
+      if (at.difference(lastDt) < _kRepromptCooldown) continue;
     }
 
     due.add(DueRotation(e.id, e.title, daysSinceUpdate - days));

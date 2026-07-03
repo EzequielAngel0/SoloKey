@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../../theme/app_palette.dart';
 import '../../domain/entities/folder.dart';
+import '../../domain/folder_tree.dart';
 
 /// Expandable folder tree for the desktop master-detail. Lets the user jump to
 /// ANY folder/level in one click (no "go back to root"), with the full
@@ -41,22 +42,11 @@ class _FolderTreeState extends State<FolderTree> {
   }
 
   void _expandAncestors() {
-    final byId = {for (final f in widget.folders) f.id: f};
-    Folder? cur = widget.selectedId == null ? null : byId[widget.selectedId];
-    final guard = <String>{};
-    while (cur != null && guard.add(cur.id)) {
-      _expanded.add(cur.id);
-      final pid = cur.parentId;
-      cur = pid == null ? null : byId[pid];
-    }
+    _expanded.addAll(folderAncestorIds(widget.folders, widget.selectedId));
   }
 
-  List<Folder> _childrenOf(String? parentId) {
-    final list =
-        widget.folders.where((f) => f.parentId == parentId).toList();
-    list.sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
-    return list;
-  }
+  List<Folder> _childrenOf(String? parentId) =>
+      folderChildren(widget.folders, parentId);
 
   void _append(List<Widget> rows, Folder f, int depth) {
     final children = _childrenOf(f.id);
