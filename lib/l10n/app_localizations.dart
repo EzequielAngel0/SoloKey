@@ -626,6 +626,30 @@ abstract class AppLocalizations {
   /// **'{count, plural, =1{1 issue} other{{count} issues}}'**
   String homeIssuesChip(int count);
 
+  /// No description provided for @homeGreetingMorning.
+  ///
+  /// In en, this message translates to:
+  /// **'Good morning'**
+  String get homeGreetingMorning;
+
+  /// No description provided for @homeGreetingAfternoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Good afternoon'**
+  String get homeGreetingAfternoon;
+
+  /// No description provided for @homeGreetingEvening.
+  ///
+  /// In en, this message translates to:
+  /// **'Good evening'**
+  String get homeGreetingEvening;
+
+  /// No description provided for @homeHealthTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault health — tap for details'**
+  String get homeHealthTooltip;
+
   /// No description provided for @homeSortTooltip.
   ///
   /// In en, this message translates to:
@@ -751,6 +775,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Verify to delete this credential'**
   String get detailDeleteAuthReason;
+
+  /// No description provided for @detailRevealAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to reveal this secret'**
+  String get detailRevealAuthReason;
+
+  /// No description provided for @detailRevealSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal secret'**
+  String get detailRevealSecret;
+
+  /// No description provided for @detailHideSecret.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide secret'**
+  String get detailHideSecret;
+
+  /// No description provided for @detailCopyField.
+  ///
+  /// In en, this message translates to:
+  /// **'Copy {field}'**
+  String detailCopyField(String field);
+
+  /// No description provided for @detailHideCountdown.
+  ///
+  /// In en, this message translates to:
+  /// **'Auto-hides in {seconds}s'**
+  String detailHideCountdown(int seconds);
+
+  /// No description provided for @detailOpenSite.
+  ///
+  /// In en, this message translates to:
+  /// **'Open site'**
+  String get detailOpenSite;
+
+  /// No description provided for @detailOpenSiteError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not open the site'**
+  String get detailOpenSiteError;
+
+  /// No description provided for @detailPasskeyHandleNote.
+  ///
+  /// In en, this message translates to:
+  /// **'The private key handle stays encrypted in your vault.'**
+  String get detailPasskeyHandleNote;
+
+  /// No description provided for @detailTotpExportQr.
+  ///
+  /// In en, this message translates to:
+  /// **'Export as QR'**
+  String get detailTotpExportQr;
+
+  /// No description provided for @detailTotpExportQrAuthReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to show the TOTP QR'**
+  String get detailTotpExportQrAuthReason;
+
+  /// No description provided for @detailTotpExportQrTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan on another device'**
+  String get detailTotpExportQrTitle;
+
+  /// No description provided for @detailTotpExportQrWarning.
+  ///
+  /// In en, this message translates to:
+  /// **'Anyone who scans this can generate your codes. Keep it private.'**
+  String get detailTotpExportQrWarning;
 
   /// No description provided for @fieldUsername.
   ///

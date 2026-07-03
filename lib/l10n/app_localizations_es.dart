@@ -310,6 +310,18 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get homeGreetingMorning => 'Buenos dias';
+
+  @override
+  String get homeGreetingAfternoon => 'Buenas tardes';
+
+  @override
+  String get homeGreetingEvening => 'Buenas noches';
+
+  @override
+  String get homeHealthTooltip => 'Salud de la boveda: toca para ver detalles';
+
+  @override
   String get homeSortTooltip => 'Ordenar';
 
   @override
@@ -375,6 +387,50 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get detailDeleteAuthReason => 'Verifica para eliminar esta credencial';
+
+  @override
+  String get detailRevealAuthReason =>
+      'Autentifícate para revelar este secreto';
+
+  @override
+  String get detailRevealSecret => 'Revelar secreto';
+
+  @override
+  String get detailHideSecret => 'Ocultar secreto';
+
+  @override
+  String detailCopyField(String field) {
+    return 'Copiar $field';
+  }
+
+  @override
+  String detailHideCountdown(int seconds) {
+    return 'Se oculta en ${seconds}s';
+  }
+
+  @override
+  String get detailOpenSite => 'Abrir sitio';
+
+  @override
+  String get detailOpenSiteError => 'No se pudo abrir el sitio';
+
+  @override
+  String get detailPasskeyHandleNote =>
+      'El identificador de la clave privada permanece cifrado en tu bóveda.';
+
+  @override
+  String get detailTotpExportQr => 'Exportar como QR';
+
+  @override
+  String get detailTotpExportQrAuthReason =>
+      'Autentifícate para mostrar el QR del TOTP';
+
+  @override
+  String get detailTotpExportQrTitle => 'Escanea en otro dispositivo';
+
+  @override
+  String get detailTotpExportQrWarning =>
+      'Quien escanee esto podrá generar tus códigos. Manténlo privado.';
 
   @override
   String get fieldUsername => 'Usuario';

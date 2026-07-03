@@ -121,6 +121,10 @@
   "@homeCredentialCount": { "placeholders": { "count": { "type": "int" } } },
   "homeIssuesChip": "{count, plural, =1{1 issue} other{{count} issues}}",
   "@homeIssuesChip": { "placeholders": { "count": { "type": "int" } } },
+  "homeGreetingMorning": "Good morning",
+  "homeGreetingAfternoon": "Good afternoon",
+  "homeGreetingEvening": "Good evening",
+  "homeHealthTooltip": "Vault health — tap for details",
   "homeSortTooltip": "Sort",
   "sortManual": "Manual order",
   "sortTitleAsc": "Name (A–Z)",
@@ -152,6 +156,24 @@
     "placeholders": { "title": { "type": "String" } }
   },
   "detailDeleteAuthReason": "Verify to delete this credential",
+  "detailRevealAuthReason": "Authenticate to reveal this secret",
+  "detailRevealSecret": "Reveal secret",
+  "detailHideSecret": "Hide secret",
+  "detailCopyField": "Copy {field}",
+  "@detailCopyField": {
+    "placeholders": { "field": { "type": "String" } }
+  },
+  "detailHideCountdown": "Auto-hides in {seconds}s",
+  "@detailHideCountdown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "detailOpenSite": "Open site",
+  "detailOpenSiteError": "Could not open the site",
+  "detailPasskeyHandleNote": "The private key handle stays encrypted in your vault.",
+  "detailTotpExportQr": "Export as QR",
+  "detailTotpExportQrAuthReason": "Authenticate to show the TOTP QR",
+  "detailTotpExportQrTitle": "Scan on another device",
+  "detailTotpExportQrWarning": "Anyone who scans this can generate your codes. Keep it private.",
 
   "fieldUsername": "Username",
   "fieldPassword": "Password",

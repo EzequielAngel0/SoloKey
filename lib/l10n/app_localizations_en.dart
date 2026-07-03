@@ -308,6 +308,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get homeGreetingMorning => 'Good morning';
+
+  @override
+  String get homeGreetingAfternoon => 'Good afternoon';
+
+  @override
+  String get homeGreetingEvening => 'Good evening';
+
+  @override
+  String get homeHealthTooltip => 'Vault health — tap for details';
+
+  @override
   String get homeSortTooltip => 'Sort';
 
   @override
@@ -373,6 +385,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get detailDeleteAuthReason => 'Verify to delete this credential';
+
+  @override
+  String get detailRevealAuthReason => 'Authenticate to reveal this secret';
+
+  @override
+  String get detailRevealSecret => 'Reveal secret';
+
+  @override
+  String get detailHideSecret => 'Hide secret';
+
+  @override
+  String detailCopyField(String field) {
+    return 'Copy $field';
+  }
+
+  @override
+  String detailHideCountdown(int seconds) {
+    return 'Auto-hides in ${seconds}s';
+  }
+
+  @override
+  String get detailOpenSite => 'Open site';
+
+  @override
+  String get detailOpenSiteError => 'Could not open the site';
+
+  @override
+  String get detailPasskeyHandleNote =>
+      'The private key handle stays encrypted in your vault.';
+
+  @override
+  String get detailTotpExportQr => 'Export as QR';
+
+  @override
+  String get detailTotpExportQrAuthReason => 'Authenticate to show the TOTP QR';
+
+  @override
+  String get detailTotpExportQrTitle => 'Scan on another device';
+
+  @override
+  String get detailTotpExportQrWarning =>
+      'Anyone who scans this can generate your codes. Keep it private.';
 
   @override
   String get fieldUsername => 'Username';

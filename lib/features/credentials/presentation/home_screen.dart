@@ -11,6 +11,7 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
 import '../../../shared/widgets/solo_filter_chip.dart';
+import '../../../shared/widgets/score_ring.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
@@ -433,45 +434,91 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   }
 }
 
-/// Compact Vault header: a muted credential count plus a tappable "issues" chip
-/// that jumps to the Security tab when the vault has weak/reused passwords.
+/// Vault dashboard header: a time-of-day greeting with the credential count and
+/// a tappable "issues" chip, plus an at-a-glance [ScoreRing] on the right. Both
+/// the chip and the ring jump to the Security tab for the full audit.
 class _VaultHeader extends ConsumerWidget {
   const _VaultHeader({required this.count, required this.onOpenSecurity});
 
   final int count;
   final VoidCallback onOpenSecurity;
 
+  String _greeting(AppLocalizations l10n) {
+    final h = DateTime.now().hour;
+    if (h < 12) return l10n.homeGreetingMorning;
+    if (h < 19) return l10n.homeGreetingAfternoon;
+    return l10n.homeGreetingEvening;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final p = context.palette;
     final l10n = AppLocalizations.of(context);
     final issues = ref.watch(credentialHealthProvider).length;
+    final score = ref.watch(vaultHealthScoreProvider);
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 6, 16, 0),
+      padding: const EdgeInsets.fromLTRB(20, 10, 16, 2),
       child: Row(
         children: [
           Expanded(
-            child: Text(
-              l10n.homeCredentialCount(count),
-              style: TextStyle(
-                color: p.textMuted,
-                fontSize: 12.5,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.3,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  _greeting(l10n),
+                  style: TextStyle(
+                    color: p.textPrimary,
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: -0.3,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  children: [
+                    Text(
+                      l10n.homeCredentialCount(count),
+                      style: TextStyle(
+                        color: p.textMuted,
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
+                    if (issues > 0) ...[
+                      const SizedBox(width: 10),
+                      InkWell(
+                        borderRadius: BorderRadius.circular(7),
+                        onTap: onOpenSecurity,
+                        child: StatusChip(
+                          label: l10n.homeIssuesChip(issues),
+                          color: p.warning,
+                          icon: Icons.shield_rounded,
+                          dense: true,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ],
             ),
           ),
-          if (issues > 0)
-            InkWell(
-              borderRadius: BorderRadius.circular(7),
-              onTap: onOpenSecurity,
-              child: StatusChip(
-                label: l10n.homeIssuesChip(issues),
-                color: p.warning,
-                icon: Icons.shield_rounded,
-                dense: true,
+          // The ring only makes sense once there is something to score.
+          if (count > 0) ...[
+            const SizedBox(width: 12),
+            Tooltip(
+              message: l10n.homeHealthTooltip,
+              child: InkWell(
+                customBorder: const CircleBorder(),
+                onTap: onOpenSecurity,
+                child: Padding(
+                  padding: const EdgeInsets.all(4),
+                  child: ScoreRing(score: score, size: 44),
+                ),
               ),
             ),
+          ],
         ],
       ),
     );

@@ -51,3 +51,19 @@ final credentialHealthProvider =
   }
   return result;
 });
+
+/// Lightweight 0–100 vault health score for the Vault header. Derived ONLY from
+/// the cheap in-memory [credentialHealthProvider] (weak/reused) — NO decryption,
+/// NO network — so it is safe to keep on an always-visible header. It omits the
+/// breached/old checks that live in the full Security Audit, so it can read
+/// higher than the authoritative score there; tapping the header ring opens that
+/// screen. Starts at 100 and drops 8 per weak/reused flag (the audit's "warning"
+/// weight), so both agree when there are no breached/old findings.
+final vaultHealthScoreProvider = Provider<int>((ref) {
+  final health = ref.watch(credentialHealthProvider);
+  var flags = 0;
+  for (final set in health.values) {
+    flags += set.length;
+  }
+  return (100 - flags * 8).clamp(0, 100);
+});

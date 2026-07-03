@@ -349,8 +349,13 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
       return CredentialFormScreen(existingId: selectedId);
     }
 
-    // Default: Show Details
-    return CredentialDetailScreen(credentialId: selectedId);
+    // Default: Show Details. Keyed by id so switching credentials rebuilds the
+    // subtree from scratch — no revealed secret / decrypted plaintext (or the
+    // previous TOTP) leaks across selections.
+    return CredentialDetailScreen(
+      key: ValueKey(selectedId),
+      credentialId: selectedId,
+    );
   }
 
   Future<void> _createRootFolder(BuildContext context, WidgetRef ref) async {

@@ -599,10 +599,63 @@ class _DetailRow extends StatefulWidget {
   State<_DetailRow> createState() => _DetailRowState();
 }
 
-class _DetailRowState extends State<_DetailRow> {
+class _DetailRowState extends State<_DetailRow> with WidgetsBindingObserver {
+  // Revealed secrets auto-hide after this window (and immediately on background),
+  // so plaintext never lingers on screen or in RAM.
+  static const _revealHold = Duration(seconds: 30);
+
   bool _revealed = false;
   String? _decryptedValue;
   bool _decrypting = false;
+  Timer? _hideTimer;
+  int _secondsLeft = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    _hideTimer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Scrub any revealed plaintext the moment the app leaves the foreground.
+    if (state != AppLifecycleState.resumed && _revealed) {
+      _hideNow();
+    }
+  }
+
+  /// Hides the value and wipes the decrypted plaintext from RAM. Single choke
+  /// point for every hide path (manual toggle, countdown, background).
+  void _hideNow() {
+    _hideTimer?.cancel();
+    _hideTimer = null;
+    if (!mounted) return;
+    setState(() {
+      _revealed = false;
+      _decryptedValue = null;
+      _secondsLeft = 0;
+    });
+  }
+
+  void _startHideCountdown() {
+    _hideTimer?.cancel();
+    _secondsLeft = _revealHold.inSeconds;
+    _hideTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) {
+        t.cancel();
+        return;
+      }
+      setState(() => _secondsLeft--);
+      if (_secondsLeft <= 0) _hideNow();
+    });
+  }
 
   Future<String?> _getPlainValue(BuildContext context) async {
     if (!widget.isDoubleEncrypted ||
@@ -693,7 +746,9 @@ class _DetailRowState extends State<_DetailRow> {
   }
 
   Future<void> _copy(BuildContext context) async {
-    if (widget.isSecret) {
+    // Double-encrypted fields authenticate inside _getPlainValue (bio + PIN);
+    // gating here too would prompt twice. Plain secrets have no inner gate.
+    if (widget.isSecret && !widget.isDoubleEncrypted) {
       final auth = await AuthHelper.requireAuth(context);
       if (!auth) return;
     }
@@ -711,19 +766,31 @@ class _DetailRowState extends State<_DetailRow> {
 
   Future<void> _toggleReveal() async {
     if (_revealed) {
-      setState(() {
-        _revealed = false;
-        _decryptedValue = null; // Clear plaintext from memory when hidden.
-      });
-    } else {
-      final plain = await _getPlainValue(context);
-      if (plain != null) setState(() => _revealed = true);
+      _hideNow();
+      return;
+    }
+    // Revealing a secret requires auth. Non double-encrypted values are returned
+    // in the clear by _getPlainValue, so gate them here; double-encrypted ones
+    // are authed inside _getPlainValue.
+    if (widget.isSecret && !widget.isDoubleEncrypted) {
+      final l10n = AppLocalizations.of(context);
+      final auth = await AuthHelper.requireAuth(
+        context,
+        reason: l10n.detailRevealAuthReason,
+      );
+      if (!auth || !mounted) return;
+    }
+    final plain = await _getPlainValue(context);
+    if (plain != null && mounted) {
+      setState(() => _revealed = true);
+      _startHideCountdown();
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final l10n = AppLocalizations.of(context);
     final hidden = widget.isSecret && !_revealed && !_decrypting;
     final display = _decrypting
         ? AppLocalizations.of(context).secretDecrypting
@@ -752,20 +819,50 @@ class _DetailRowState extends State<_DetailRow> {
     );
 
     final actions = <Widget>[
-      if (widget.isSecret)
-        IconButton(
-          icon: Icon(
-            _revealed ? Icons.visibility_off_rounded : Icons.visibility_rounded,
-            color: p.textMuted,
-            size: 18,
+      if (widget.isSecret && _revealed && _secondsLeft > 0)
+        Semantics(
+          label: l10n.detailHideCountdown(_secondsLeft),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+            decoration: BoxDecoration(
+              color: p.card,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: p.divider),
+            ),
+            child: Text(
+              '${_secondsLeft}s',
+              style: TextStyle(
+                color: p.textMuted,
+                fontSize: 10.5,
+                fontFamily: AppTheme.monoFamily,
+              ),
+            ),
           ),
-          onPressed: _toggleReveal,
-          padding: EdgeInsets.zero,
-          constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+        ),
+      if (widget.isSecret)
+        Semantics(
+          button: true,
+          label: _revealed ? l10n.detailHideSecret : l10n.detailRevealSecret,
+          child: IconButton(
+            icon: Icon(
+              _revealed
+                  ? Icons.visibility_off_rounded
+                  : Icons.visibility_rounded,
+              color: p.textMuted,
+              size: 18,
+            ),
+            onPressed: _toggleReveal,
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 34, minHeight: 34),
+          ),
         ),
       Padding(
         padding: const EdgeInsets.only(left: 4, right: 2),
-        child: CopyFeedbackButton(onCopy: () => _copy(context)),
+        child: Semantics(
+          button: true,
+          label: l10n.detailCopyField(widget.label),
+          child: CopyFeedbackButton(onCopy: () => _copy(context)),
+        ),
       ),
     ];
 

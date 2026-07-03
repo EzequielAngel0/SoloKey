@@ -101,6 +101,10 @@
   "homeEmptyVault": "Tu bóveda está vacía",
   "homeCredentialCount": "{count, plural, =0{Sin credenciales} =1{1 credencial} other{{count} credenciales}}",
   "homeIssuesChip": "{count, plural, =1{1 aviso} other{{count} avisos}}",
+  "homeGreetingMorning": "Buenos dias",
+  "homeGreetingAfternoon": "Buenas tardes",
+  "homeGreetingEvening": "Buenas noches",
+  "homeHealthTooltip": "Salud de la boveda: toca para ver detalles",
   "homeSortTooltip": "Ordenar",
   "sortManual": "Orden manual",
   "sortTitleAsc": "Nombre (A–Z)",
@@ -126,6 +130,24 @@
   "detailDeleteTitle": "Eliminar credencial",
   "detailDeleteBody": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer.",
   "detailDeleteAuthReason": "Verifica para eliminar esta credencial",
+  "detailRevealAuthReason": "Autentifícate para revelar este secreto",
+  "detailRevealSecret": "Revelar secreto",
+  "detailHideSecret": "Ocultar secreto",
+  "detailCopyField": "Copiar {field}",
+  "@detailCopyField": {
+    "placeholders": { "field": { "type": "String" } }
+  },
+  "detailHideCountdown": "Se oculta en {seconds}s",
+  "@detailHideCountdown": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
+  "detailOpenSite": "Abrir sitio",
+  "detailOpenSiteError": "No se pudo abrir el sitio",
+  "detailPasskeyHandleNote": "El identificador de la clave privada permanece cifrado en tu bóveda.",
+  "detailTotpExportQr": "Exportar como QR",
+  "detailTotpExportQrAuthReason": "Autentifícate para mostrar el QR del TOTP",
+  "detailTotpExportQrTitle": "Escanea en otro dispositivo",
+  "detailTotpExportQrWarning": "Quien escanee esto podrá generar tus códigos. Manténlo privado.",
 
   "fieldUsername": "Usuario",
   "fieldPassword": "Contraseña",

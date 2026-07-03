@@ -6,6 +6,7 @@ import 'package:password_manager/features/credentials/domain/entities/credential
 import 'package:password_manager/features/credentials/presentation/home_screen.dart';
 import 'package:password_manager/features/credentials/presentation/widgets/credential_list_widget.dart';
 import 'package:password_manager/shared/widgets/empty_state.dart';
+import 'package:password_manager/shared/widgets/score_ring.dart';
 import 'package:password_manager/shared/widgets/shimmer_loader.dart';
 
 import '../../support/fake_credential_repository.dart';
@@ -74,6 +75,19 @@ void main() {
     await pumpHome(tester, creds: const []);
     await resolve(tester);
     expect(find.text('Your vault is empty'), findsOneWidget);
+  });
+
+  testWidgets('header shows the health score ring once the vault has items',
+      (tester) async {
+    await pumpHome(tester, creds: [_c('1', 'GitHub')]);
+    await resolve(tester);
+    expect(find.byType(ScoreRing), findsOneWidget);
+  });
+
+  testWidgets('empty vault hides the score ring', (tester) async {
+    await pumpHome(tester, creds: const []);
+    await resolve(tester);
+    expect(find.byType(ScoreRing), findsNothing);
   });
 
   testWidgets('the Passwords filter chip narrows the list by type',
