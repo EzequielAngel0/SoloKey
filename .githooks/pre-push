@@ -1,0 +1,20 @@
+#!/bin/sh
+# SoloKey — gate de cobertura antes de compartir (push).
+# Activar una vez con:  git config core.hooksPath .githooks
+# El umbral minimo vive en tool/coverage_min.txt (subelo al agregar tests).
+
+min=$(cat tool/coverage_min.txt 2>/dev/null | tr -d '[:space:]')
+if [ -z "$min" ]; then min=0; fi
+
+echo "[pre-push] flutter test --coverage (minimo ${min}%)..."
+if ! flutter test --coverage; then
+  echo "[pre-push] BLOQUEADO: tests en rojo." >&2
+  exit 1
+fi
+
+if ! dart run tool/check_coverage.dart "$min"; then
+  echo "[pre-push] BLOQUEADO: cobertura por debajo de ${min}%." >&2
+  exit 1
+fi
+
+echo "[pre-push] OK"

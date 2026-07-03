@@ -1,0 +1,23 @@
+#!/bin/sh
+# SoloKey — gate local: no permitir commits que rompan analyze/tests.
+# Activar una vez con:  git config core.hooksPath .githooks
+# Omite el gate si el commit no toca archivos .dart (docs-only, etc.).
+
+changed=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.dart$' || true)
+if [ -z "$changed" ]; then
+  exit 0
+fi
+
+echo "[pre-commit] flutter analyze..."
+if ! flutter analyze; then
+  echo "[pre-commit] BLOQUEADO: 'flutter analyze' con issues. Corrige o usa --no-verify si es intencional." >&2
+  exit 1
+fi
+
+echo "[pre-commit] flutter test..."
+if ! flutter test; then
+  echo "[pre-commit] BLOQUEADO: 'flutter test' en rojo." >&2
+  exit 1
+fi
+
+echo "[pre-commit] OK"

@@ -1,0 +1,33 @@
+name: tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  analyze-test-coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+
+      - name: Dependencies
+        run: flutter pub get
+
+      # Los archivos generados (.g.dart/.freezed.dart/l10n) estan versionados,
+      # asi que no hace falta build_runner/gen-l10n en CI.
+      - name: Analyze
+        run: flutter analyze
+
+      # Solo unit/widget (test/**). Los integration_test/** necesitan dispositivo
+      # y se corren a demanda en local (ver docs/prompts/PRUEBAS_INTEGRACION.md).
+      - name: Test + coverage
+        run: flutter test --coverage
+
+      - name: Coverage gate
+        run: dart run tool/check_coverage.dart "$(cat tool/coverage_min.txt)"
