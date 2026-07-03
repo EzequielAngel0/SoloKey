@@ -157,6 +157,13 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     if (mounted) setState(() => _biometricAvailable = available);
     if (!available) return;
 
+    // Test seam: integration tests can't drive the native local_auth dialog, so
+    // `--dart-define=TEST_DISABLE_BIOMETRIC=1` skips ONLY the auto-prompt (the
+    // biometric button stays available). Defaults to false → no prod change.
+    const disableBiometricAutoPrompt =
+        bool.fromEnvironment('TEST_DISABLE_BIOMETRIC');
+    if (disableBiometricAutoPrompt) return;
+
     final settings = await getIt<ISettingsRepository>().getSettings();
     if (settings.biometricEnabled) _tryBiometric();
   }

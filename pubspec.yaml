@@ -81,6 +81,10 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  # ── Integration testing (E2E on a real device/desktop) ────────
+  integration_test:
+    sdk: flutter
+
   # ── Code Generation ───────────────────────────────────────────
   build_runner: ^2.4.15
   freezed: ^2.5.7
