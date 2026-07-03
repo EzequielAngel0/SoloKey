@@ -842,6 +842,16 @@ class _TotpTileState extends State<_TotpTile> {
   }
 
   @override
+  void didUpdateWidget(covariant _TotpTile old) {
+    super.didUpdateWidget(old);
+    // Desktop reuses this State when the selected credential changes; recompute
+    // so it doesn't keep showing the previous TOTP's code.
+    if (old.secretId != widget.secretId) {
+      _updateCode();
+    }
+  }
+
+  @override
   void dispose() {
     _timer.cancel();
     super.dispose();
