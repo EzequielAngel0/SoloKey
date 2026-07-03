@@ -1,5 +1,20 @@
 # 10 · Bóveda, lista y tarjeta de credencial
 
+## 📋 Prompt para pegar en el chat
+
+> Copia **solo** este bloque en un chat nuevo abierto en la raíz del repo. Ya referencia
+> el contexto compartido (`00`); no necesitas pegar nada más.
+
+```text
+Trabaja en el repo SoloKey (raíz del proyecto). Primero lee y respeta
+docs/prompts/00_contexto_compartido.md: reglas duras, arquitectura, gates y método de
+trabajo. Luego desarrolla lo descrito en docs/prompts/10_boveda_lista.md — audita el área,
+propón un plan priorizado (impacto/esfuerzo) y ejecútalo por lotes revisables. Deja
+`flutter analyze` en 0 y `flutter test` en verde; corre `dart run build_runner build
+--delete-conflicting-outputs` y `flutter gen-l10n` cuando toques codegen o `.arb`; y
+commitea por lote con el formato del proyecto (una sola línea, ascii sin acentos, sin firma).
+```
+
 Enfócate SOLO en la **pantalla principal de la Bóveda** y su lista:
 `features/credentials/presentation/home_screen.dart` (móvil: `NavigationBar` M3 +
 búsqueda pill + `SoloFilterChip`), `widgets/credential_card.dart`,

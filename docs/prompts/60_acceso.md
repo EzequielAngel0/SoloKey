@@ -1,5 +1,20 @@
 # 60 · Acceso (splash / setup / unlock / recovery)
 
+## 📋 Prompt para pegar en el chat
+
+> Copia **solo** este bloque en un chat nuevo abierto en la raíz del repo. Ya referencia
+> el contexto compartido (`00`); no necesitas pegar nada más.
+
+```text
+Trabaja en el repo SoloKey (raíz del proyecto). Primero lee y respeta
+docs/prompts/00_contexto_compartido.md: reglas duras, arquitectura, gates y método de
+trabajo. Luego desarrolla lo descrito en docs/prompts/60_acceso.md — audita el área,
+propón un plan priorizado (impacto/esfuerzo) y ejecútalo por lotes revisables. Deja
+`flutter analyze` en 0 y `flutter test` en verde; corre `dart run build_runner build
+--delete-conflicting-outputs` y `flutter gen-l10n` cuando toques codegen o `.arb`; y
+commitea por lote con el formato del proyecto (una sola línea, ascii sin acentos, sin firma).
+```
+
 Enfócate SOLO en el flujo de acceso: `features/vault_access/presentation/`
 (`splash_screen.dart`, `setup_screen.dart`, `unlock_screen.dart`,
 `recovery_screen.dart`), sus use cases (`setup_vault_use_case`,

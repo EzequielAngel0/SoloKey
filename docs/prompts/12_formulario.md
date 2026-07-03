@@ -1,5 +1,20 @@
 # 12 · Formulario crear/editar credencial
 
+## 📋 Prompt para pegar en el chat
+
+> Copia **solo** este bloque en un chat nuevo abierto en la raíz del repo. Ya referencia
+> el contexto compartido (`00`); no necesitas pegar nada más.
+
+```text
+Trabaja en el repo SoloKey (raíz del proyecto). Primero lee y respeta
+docs/prompts/00_contexto_compartido.md: reglas duras, arquitectura, gates y método de
+trabajo. Luego desarrolla lo descrito en docs/prompts/12_formulario.md — audita el área,
+propón un plan priorizado (impacto/esfuerzo) y ejecútalo por lotes revisables. Deja
+`flutter analyze` en 0 y `flutter test` en verde; corre `dart run build_runner build
+--delete-conflicting-outputs` y `flutter gen-l10n` cuando toques codegen o `.arb`; y
+commitea por lote con el formato del proyecto (una sola línea, ascii sin acentos, sin firma).
+```
+
 Enfócate SOLO en `features/credentials/presentation/credential_form_screen.dart` y
 sus `widgets/` (`type_selector_premium.dart`, `password_row_widget.dart`,
 `password_generator_widget.dart`, `form_section.dart`, `save_button.dart`,

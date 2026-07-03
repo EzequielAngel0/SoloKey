@@ -9,13 +9,16 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 ## Cómo usar
 
 1. Abre un chat nuevo con el agente en la raíz del repo.
-2. Pega **primero** el bloque de [`00_contexto_compartido.md`](00_contexto_compartido.md)
-   (las reglas y gates del proyecto).
-3. Pega **debajo** el prompt de la pantalla que quieras (uno por chat).
+2. Abre el prompt de la pantalla que quieras y copia **solo** el bloque
+   **“📋 Prompt para pegar en el chat”** que aparece al inicio del archivo.
+3. Pégalo y envíalo. Ese bloque **ya referencia** el contexto compartido
+   (`00_contexto_compartido.md`), así que **no** hace falta pegar nada más.
 4. Deja que audite y proponga el plan; apruébalo o ajústalo; luego que ejecute.
 
-> Los prompts referencian archivos/providers reales del repo. Si algo se movió,
-> el propio agente debe localizar el equivalente con búsqueda estructural.
+> Un chat por pantalla. Cada prompt lleva su propio bloque listo para pegar (no
+> tienes que escribir “en base a docs/…”); el agente lee el `00` y el prompt por su
+> ruta. Si algún archivo/provider se movió, el agente localiza el equivalente con
+> búsqueda estructural.
 
 ## Índice de prompts
 

@@ -1,7 +1,10 @@
-# 00 · Contexto compartido (pégalo ANTES de cualquier prompt)
+# 00 · Contexto compartido (reglas, arquitectura y gates)
 
-> Copia este bloque completo al inicio de cada chat, y debajo el prompt de la
-> pantalla. Da al agente las reglas, la arquitectura y los gates del proyecto.
+> **No necesitas pegar este archivo manualmente.** Cada prompt de pantalla (10–90)
+> trae al inicio un bloque **“📋 Prompt para pegar en el chat”** que ya referencia
+> este `00` por su ruta: el agente lo lee solo. Este documento es la fuente de
+> verdad de las reglas, la arquitectura y los gates; edítalo aquí y todos los
+> prompts lo heredan.
 
 ---
 
