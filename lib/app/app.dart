@@ -9,6 +9,7 @@ import 'package:tray_manager/tray_manager.dart';
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../core/services/notification_service.dart';
 import '../core/services/scheduled_backup_service.dart';
+import '../features/sync/application/sync_status_provider.dart';
 import '../features/sync/infrastructure/sync_service.dart';
 import '../features/settings/domain/repositories/i_settings_repository.dart';
 import '../features/settings/presentation/settings_screen.dart';
@@ -42,6 +43,16 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
         ref.read(vaultNotifierProvider.notifier).lock();
       }
     };
+
+    // Instantiate the app-wide sync status provider so it starts listening from
+    // launch: it refreshes the vault lists the moment a background delta lands
+    // (server residente) and drives the sidebar sync badge. Kept alive by
+    // keepAlive:true. Guarded because DI/SyncService may be absent in tests.
+    try {
+      ref.read(syncStatusProvider);
+    } catch (_) {
+      // Sync layer unavailable (e.g. widget tests without DI) — ignore.
+    }
 
     // M3: en movil, cuando el escritorio pide aprobacion de login por el canal
     // E2EE, mostramos una notificacion local (sin FCM). Al tocarla se abre la

@@ -6,6 +6,7 @@ import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../domain/sync_summary.dart';
 
 /// DTO exchanged over the E2EE WebSocket channel for delta-sync.
 /// Each item carries enough metadata for LWW comparison plus the
@@ -271,23 +272,41 @@ class DeltaSyncManager {
   // Applying remote rows to local DB
   // ─────────────────────────────────────────────────────────────────────────
 
-  /// Applies a list of full credential rows received from the remote device.
-  Future<int> applyRemoteCredentials(List<SyncManifestItem> items) async {
-    var applied = 0;
+  /// Applies a list of full credential rows received from the remote device and
+  /// returns the list of changes actually applied locally (with plain titles and
+  /// added/updated/deleted action), so the caller can build a sync summary.
+  Future<List<SyncItemChange>> applyRemoteCredentials(
+      List<SyncManifestItem> items) async {
+    final changes = <SyncItemChange>[];
     for (final item in items) {
-      if (item.rowData == null) continue;
-
+      // Deletes carry no row data; handle them first (order matters — a null
+      // rowData must not skip a tombstone).
       if (item.isDeleted) {
+        final existing = await _db.credentialDao.getById(item.id);
         await _db.credentialDao.deleteById(item.id);
-        applied++;
+        changes.add(SyncItemChange(
+          id: item.id,
+          name: existing?.title ?? item.id,
+          kind: SyncEntityKind.credential,
+          action: SyncChangeAction.deleted,
+        ));
         continue;
       }
 
+      if (item.rowData == null) continue;
+
+      final existing = await _db.credentialDao.getById(item.id);
       final companion = await _jsonToCredentialCompanion(item.rowData!);
       await _db.credentialDao.upsert(companion);
-      applied++;
+      changes.add(SyncItemChange(
+        id: item.id,
+        name: item.rowData!['title'] as String? ?? item.id,
+        kind: SyncEntityKind.credential,
+        action:
+            existing == null ? SyncChangeAction.added : SyncChangeAction.updated,
+      ));
     }
-    return applied;
+    return changes;
   }
 
   /// Builds a single push item for a requested credential id, re-keying its
@@ -312,23 +331,38 @@ class DeltaSyncManager {
     );
   }
 
-  /// Applies a list of full folder rows received from the remote device.
-  Future<int> applyRemoteFolders(List<SyncManifestItem> items) async {
-    var applied = 0;
+  /// Applies a list of full folder rows received from the remote device and
+  /// returns the changes actually applied (name + added/updated/deleted).
+  Future<List<SyncItemChange>> applyRemoteFolders(
+      List<SyncManifestItem> items) async {
+    final changes = <SyncItemChange>[];
     for (final item in items) {
-      if (item.rowData == null) continue;
-
       if (item.isDeleted) {
+        final existing = await _db.folderDao.getById(item.id);
         await _db.folderDao.deleteById(item.id);
-        applied++;
+        changes.add(SyncItemChange(
+          id: item.id,
+          name: existing?.name ?? item.id,
+          kind: SyncEntityKind.folder,
+          action: SyncChangeAction.deleted,
+        ));
         continue;
       }
 
+      if (item.rowData == null) continue;
+
+      final existing = await _db.folderDao.getById(item.id);
       final companion = _jsonToFolderCompanion(item.rowData!);
       await _db.folderDao.upsert(companion);
-      applied++;
+      changes.add(SyncItemChange(
+        id: item.id,
+        name: item.rowData!['name'] as String? ?? item.id,
+        kind: SyncEntityKind.folder,
+        action:
+            existing == null ? SyncChangeAction.added : SyncChangeAction.updated,
+      ));
     }
-    return applied;
+    return changes;
   }
 
   // ─────────────────────────────────────────────────────────────────────────

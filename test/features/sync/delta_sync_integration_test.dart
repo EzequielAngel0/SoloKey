@@ -7,6 +7,7 @@ import 'package:password_manager/core/infrastructure/security/i_security_service
 import 'package:password_manager/core/infrastructure/security/session_manager.dart';
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/infrastructure/credential_dto.dart';
+import 'package:password_manager/features/sync/domain/sync_summary.dart';
 import 'package:password_manager/features/sync/infrastructure/delta_sync_manager.dart';
 
 /// Identity "crypto": exercises the sync data path deterministically without the
@@ -108,10 +109,34 @@ void main() {
         },
       );
       final applied = await mgr.applyRemoteFolders([item]);
-      expect(applied, 1);
+      expect(applied.length, 1);
+      expect(applied.single.action, SyncChangeAction.added);
+      expect(applied.single.name, 'Imported');
+      expect(applied.single.kind, SyncEntityKind.folder);
       final row = await db.folderDao.getById('X');
       expect(row, isNotNull);
       expect(row!.name, 'Imported');
+    });
+
+    test('re-applying an existing folder reports it as updated', () async {
+      await putFolder('Y', 5, name: 'Original');
+      const item = SyncManifestItem(
+        id: 'Y',
+        updatedAt: 20,
+        isDeleted: false,
+        rowData: {
+          'id': 'Y',
+          'parent_id': null,
+          'name': 'Renamed',
+          'icon': 'folder',
+          'color_hex': '#6C63FF',
+          'is_favorite': false,
+          'created_at': 20,
+        },
+      );
+      final applied = await mgr.applyRemoteFolders([item]);
+      expect(applied.single.action, SyncChangeAction.updated);
+      expect(applied.single.name, 'Renamed');
     });
   });
 
@@ -139,10 +164,22 @@ void main() {
       // Wipe and re-apply as if received from a peer.
       await db.credentialDao.deleteById('c1');
       final applied = await mgr.applyRemoteCredentials([pushItem]);
-      expect(applied, 1);
+      expect(applied.length, 1);
+      expect(applied.single.action, SyncChangeAction.added);
+      expect(applied.single.name, 'cred-c1');
+      expect(applied.single.kind, SyncEntityKind.credential);
       final row = await db.credentialDao.getById('c1');
       expect(row, isNotNull);
       expect(row!.categoryId, 'folderA');
+    });
+
+    test('applying an update over an existing credential reports updated',
+        () async {
+      await putCredential('c2', 100);
+      final pushItem = await mgr.buildCredentialPushItem('c2');
+      // Row still present → applying again is an update, not an add.
+      final applied = await mgr.applyRemoteCredentials([pushItem!]);
+      expect(applied.single.action, SyncChangeAction.updated);
     });
   });
 }

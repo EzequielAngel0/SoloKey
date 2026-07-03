@@ -18,10 +18,12 @@ import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
 import '../domain/pairing_payload.dart';
+import '../domain/sync_events_source.dart';
+import '../domain/sync_summary.dart';
 import 'delta_sync_manager.dart';
 
 @lazySingleton
-class SyncService {
+class SyncService implements SyncEventsSource {
   SyncService(
       this._storage, this._db, this._securityService, this._sessionManager);
 
@@ -44,6 +46,12 @@ class SyncService {
   // almacena la contrasena maestra en texto plano.
   static const String _kWrappedKeyName = 'solokey_remote_unlock_wrapped';
   static const String _kRemoteUnlockToken = 'solokey_remote_unlock_token';
+  // Historial de las ultimas rondas de sync aplicadas en ESTE dispositivo
+  // (fecha, dispositivo, cambios con nombre). Guardado cifrado en Keystore/DPAPI
+  // porque los titulos de credenciales son datos del usuario. Solo nombres +
+  // contadores: nunca secretos ni la clave de sesion.
+  static const String _kSyncHistoryName = 'solokey_sync_history';
+  static const int _kSyncHistoryMax = 20;
 
   // Desktop Server State
   HttpServer? _server;
@@ -70,7 +78,20 @@ class SyncService {
 
   final StreamController<String> _serverEventController =
       StreamController<String>.broadcast();
+  @override
   Stream<String> get serverEvents => _serverEventController.stream;
+
+  /// Fires once per applied delta with what changed in the LOCAL vault, so the
+  /// Riverpod layer can refresh the lists and show a "what synced" summary.
+  final StreamController<SyncSummary> _vaultChangesController =
+      StreamController<SyncSummary>.broadcast();
+  @override
+  Stream<SyncSummary> get vaultChanges => _vaultChangesController.stream;
+
+  /// Most recent applied summary (may be empty when the last round changed
+  /// nothing). Exposed so a screen opened after a sync can show the last result.
+  SyncSummary? _lastSummary;
+  SyncSummary? get lastSummary => _lastSummary;
 
   // Mobile Client State
   WebSocketChannel? _clientChannel;
@@ -82,10 +103,16 @@ class SyncService {
   bool _autoReconnect = false;
   final StreamController<String> _clientEventController =
       StreamController<String>.broadcast();
+  @override
   Stream<String> get clientEvents => _clientEventController.stream;
 
+  @override
   bool get isServerRunning => _server != null;
+  @override
   bool get isClientConnected => _clientChannel != null;
+
+  @override
+  int get connectedDeviceCount => connectedDevices.length;
 
   late final DeltaSyncManager _deltaSyncManager =
       DeltaSyncManager(_db, _securityService, _sessionManager);
@@ -496,7 +523,7 @@ class SyncService {
               .map((i) =>
                   SyncManifestItem.fromJson(i as Map<String, dynamic>))
               .toList();
-      final credApplied =
+      final credChanges =
           await _deltaSyncManager.applyRemoteCredentials(remoteCredentials);
 
       // Apply received folder rows
@@ -504,17 +531,20 @@ class SyncService {
           .map(
               (i) => SyncManifestItem.fromJson(i as Map<String, dynamic>))
           .toList();
-      final folderApplied =
+      final folderChanges =
           await _deltaSyncManager.applyRemoteFolders(remoteFolders);
 
-      // Acknowledge sync completion
+      // Acknowledge sync completion (wire format unchanged: counts only).
       await _sendEncryptedMessage(ws, {
         'action': 'sync_complete',
         'payload': {
-          'credentials_applied': credApplied,
-          'folders_applied': folderApplied,
+          'credentials_applied': credChanges.length,
+          'folders_applied': folderChanges.length,
         },
       }, peer);
+
+      // Record what changed on THIS (desktop) vault and refresh the UI.
+      await _recordApplied([...credChanges, ...folderChanges], peer.name);
 
       peer.status = DeviceSyncStatus.synced;
       _serverEventController.add('devices_changed');
@@ -848,7 +878,8 @@ class SyncService {
           .map((i) =>
               SyncManifestItem.fromJson(i as Map<String, dynamic>))
           .toList();
-      await _deltaSyncManager.applyRemoteCredentials(pushedCreds);
+      final credChanges =
+          await _deltaSyncManager.applyRemoteCredentials(pushedCreds);
 
       // Apply folders the server pushed to us
       final pushedFolders =
@@ -856,7 +887,12 @@ class SyncService {
               .map((i) =>
                   SyncManifestItem.fromJson(i as Map<String, dynamic>))
               .toList();
-      await _deltaSyncManager.applyRemoteFolders(pushedFolders);
+      final folderChanges =
+          await _deltaSyncManager.applyRemoteFolders(pushedFolders);
+
+      // Record what changed on THIS (mobile) vault and refresh the UI. The
+      // desktop's name is not known on the client side, so leave it null.
+      await _recordApplied([...credChanges, ...folderChanges], null);
 
       // Now send the rows the server requested from us
       final requestedCredIds =
@@ -1153,6 +1189,8 @@ class SyncService {
     await _storage.delete(key: _kRemoteUnlockToken);
     await _storage.delete(key: _kServerDeviceKeysName);
     await _storage.delete(key: _kDesktopEndpointName);
+    await _storage.delete(key: _kSyncHistoryName);
+    _lastSummary = null;
     for (final p in _peers) {
       if (p.key != null) zeroBuffer(p.key!);
     }
@@ -1176,6 +1214,50 @@ class SyncService {
     final devices = await _loadPairedDevices();
     devices[id] = name;
     await _storage.write(key: _kSyncDevicesName, value: jsonEncode(devices));
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
+  // Sync summary + history (what changed on THIS device each round)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  /// Records the changes applied in the current round: keeps the last summary,
+  /// appends non-empty rounds to the persisted history, and notifies the UI via
+  /// [vaultChanges] so the credential/folder lists refresh without reopening.
+  Future<void> _recordApplied(
+      List<SyncItemChange> changes, String? deviceName) async {
+    final summary = SyncSummary(
+      timestamp: DateTime.now(),
+      changes: changes,
+      deviceName: deviceName,
+    );
+    _lastSummary = summary;
+    if (summary.isNotEmpty) {
+      await _appendHistory(summary);
+    }
+    _vaultChangesController.add(summary);
+  }
+
+  @override
+  Future<List<SyncSummary>> loadHistory() async {
+    final raw = await _storage.read(key: _kSyncHistoryName);
+    if (raw == null) return [];
+    try {
+      return (jsonDecode(raw) as List)
+          .map((e) => SyncSummary.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (_) {
+      return [];
+    }
+  }
+
+  Future<void> _appendHistory(SyncSummary summary) async {
+    final history = await loadHistory();
+    history.insert(0, summary);
+    final trimmed = history.take(_kSyncHistoryMax).toList();
+    await _storage.write(
+      key: _kSyncHistoryName,
+      value: jsonEncode(trimmed.map((e) => e.toJson()).toList()),
+    );
   }
 
   /// Persisted per-device K_sync map for the desktop server (resume support).
@@ -1338,6 +1420,7 @@ class SyncService {
     }
     await _serverEventController.close();
     await _clientEventController.close();
+    await _vaultChangesController.close();
   }
 }
 
