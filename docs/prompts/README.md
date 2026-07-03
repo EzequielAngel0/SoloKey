@@ -43,7 +43,7 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 > **Testing:** el prompt **95** construye la red de pruebas completa en **un solo
 > chat** (lógica, widget e integración) y, al final, actualiza los demás prompts para
 > que cada cambio futuro **cree/edite** sus tests. Guía técnica del motor
-> `integration_test` y patrones anti-flaky: [`PRUEBAS_INTEGRACION_FLUTTER.md`](PRUEBAS_INTEGRACION_FLUTTER.md).
+> `integration_test` y patrones anti-flaky: [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md).
 
 ## Estado conocido (bugs/pedidos ya identificados a resolver en estos prompts)
 

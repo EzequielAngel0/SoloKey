@@ -10,8 +10,8 @@
 ```text
 Trabaja en el repo SoloKey (raíz del proyecto). Primero lee y respeta
 docs/prompts/00_contexto_compartido.md (reglas duras, arquitectura, gates y método) y
-docs/prompts/PRUEBAS_INTEGRACION_FLUTTER.md (motor integration_test y patrones anti-flaky;
-OJO: esa guía es de una app con backend, SoloKey es local-first sin backend). Luego
+docs/prompts/PRUEBAS_INTEGRACION.md (guía del motor integration_test y patrones
+anti-flaky, ya adaptada a SoloKey local-first). Luego
 desarrolla lo descrito en docs/prompts/95_pruebas.md: audita la cobertura de tests,
 propón un plan priorizado (impacto/esfuerzo) y ejecútalo POR FASES y POR LOTES
 revisables — Fase 1 lógica, Fase 2 widget, Fase 3 integración, Fase 4 actualizar los
@@ -28,8 +28,8 @@ integración) y dejar el proceso **auto-sostenible**, de modo que cada trabajo f
 pantalla **cree/edite** los tests que le tocan. Hazlo en **un solo chat, por fases**.
 
 SoloKey es **local-first sin backend**: el "backend" es la **DB cifrada local
-(Drift/SQLite) + el Keystore/DPAPI**, y el estado limpio es una **bóveda nueva**. Ignora
-todo lo de API/staging/túnel/seed remoto de la guía de referencia.
+(Drift/SQLite) + el Keystore/DPAPI**, y el estado limpio es una **bóveda nueva** (no un
+seed remoto). La guía `PRUEBAS_INTEGRACION.md` ya está escrita con este supuesto.
 
 ## Convenciones y gotchas (léelos antes de escribir tests)
 
@@ -128,7 +128,7 @@ Prioriza las pantallas de mayor tráfico/estado. Usa la envoltura de arriba.
 
 ## Fase 3 — Integración (`integration_test`, recorridos reales)
 
-Adapta el motor y los patrones de `PRUEBAS_INTEGRACION_FLUTTER.md` a local-first.
+Sigue el motor y los patrones de `PRUEBAS_INTEGRACION.md` (ya adaptado a SoloKey local-first).
 
 1. **Setup** dev-dep + carpeta `integration_test/` + helper `waitFor` por condición.
 2. **Recorrido feliz** (`vault_e2e_test.dart`): **crear bóveda** (setup con contraseña
