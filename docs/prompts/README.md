@@ -40,10 +40,13 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 | 90 | [Transversal + features de app](90_transversal.md) | toda la app | búsqueda global, a11y, perf, biometría |
 | 95 | [Pruebas (lógica + UI + integración)](95_pruebas.md) | `test/**`, `integration_test/**` | pirámide unit→widget→e2e; **un solo chat**; deja el proceso auto-sostenible |
 
-> **Testing:** el prompt **95** construye la red de pruebas completa en **un solo
-> chat** (lógica, widget e integración) y, al final, actualiza los demás prompts para
-> que cada cambio futuro **cree/edite** sus tests. Guía técnica del motor
-> `integration_test` y patrones anti-flaky: [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md).
+> **Testing:** la red de pruebas **ya existe** — pirámide unit → widget → e2e en
+> `test/**` (espeja `lib/**`, con harness compartido `test/support/widget_harness.dart`)
+> e `integration_test/**` (motor `integration_test`, corre con `-d windows`). Regla
+> viva: **toca código → toca sus tests** (unit para lógica, widget para UI); cada
+> prompt 10–90 trae una sección **Tests** que dice qué crear/extender. El prompt **95**
+> construyó y mantiene esta red. Guía técnica del motor y patrones anti-flaky:
+> [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md).
 
 ## Estado conocido (bugs/pedidos ya identificados a resolver en estos prompts)
 

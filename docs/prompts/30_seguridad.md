@@ -49,6 +49,16 @@ problemas en la nav/sidebar; (b) **acciones en lote** ("rotar todas las débiles
 (c) **puntuación por credencial** visible en el detalle; (d) **recordatorio
 programado** de auditoría; (e) **exportar reporte** de salud (sin secretos).
 
+**Tests (obligatorio):**
+
+- **Auditoría** → extiende `test/core/security_audit_service_test.dart` (débiles,
+  reutilizadas, antiguas; SSH/passkey nunca "weak"; HIBP con `checkBreachCount`
+  mockeado — nunca envíes el password completo).
+- **Salud inline** → extiende
+  `test/features/credentials/credential_health_provider_test.dart`
+  (`_isWeak`/`_isCheckable`, reutilización, tipos no-password).
+- **Persistencia del switch HIBP** → cúbrela con un test del provider de settings.
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; activa HIBP, cambia de
 módulo y verifica que sigue activo.
 

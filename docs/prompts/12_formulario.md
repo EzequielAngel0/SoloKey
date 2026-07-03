@@ -48,6 +48,16 @@ lo escrito; (b) **detección de duplicados** al crear (mismo sitio/usuario);
 (d) **plantillas** por servicio popular (icono + campos); (e) **evaluación de fuerza
 y filtración** del password antes de guardar (aviso, no bloqueo).
 
+**Tests (obligatorio):**
+
+- **Formulario** → extiende `test/features/credentials/credential_form_screen_test.dart`
+  (título requerido, el selector de tipo cambia los campos, el generador se revela).
+  El `FormSection` es opaco: usa `tolerateInkHiddenPaintWarnings()` del harness.
+- **Mapeo del payload** → si tocas `CredentialDto`/campos cifrados, extiende
+  `test/features/credentials/credential_dto_test.dart` (round-trip payload + tipos).
+- **Generación** → los invariantes viven en
+  `test/features/password_generator/password_generator_test.dart`.
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; crea/edita una de cada
 tipo en móvil y escritorio.
 

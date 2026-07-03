@@ -50,6 +50,15 @@ fecha) con acción por tipo; (c) **"revelar por 10 s"** con cuenta regresiva vis
 (d) **QR de la credencial** (p. ej. exportar un TOTP a otro dispositivo) protegido
 por auth; (e) **marca de "verificado sin filtración"** integrando el resultado HIBP.
 
+**Tests (obligatorio):**
+
+- **Nuevo widget test** `test/features/credentials/widgets/credential_detail_screen_test.dart`:
+  render por tipo (password/apiKey/note/totp/passkey/ssh), TOTP inline (bombea
+  frames, no `pumpAndSettle`), copiar por campo con `AuthHelper`/biometría
+  **mockeada** (override del servicio) — nunca vuelques el secreto al log.
+- **Extiende** `test/features/credentials/widgets/credential_card_test.dart` para el
+  código TOTP y el chip de salud. Usa `test/support/widget_harness.dart`.
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; prueba abrir varios
 TOTP seguidos en escritorio.
 

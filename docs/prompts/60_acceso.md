@@ -45,6 +45,23 @@ la master (con re-auth periódica); (c) **teclado seguro** activable para la mas
 (d) **onboarding** de primer uso (tour breve); (e) **bloqueo de emergencia** por
 atajo.
 
+**Tests (obligatorio):**
+
+- **E2E (recorridos reales)** → `integration_test/app_boot_test.dart` (cold boot →
+  Setup **o** Unlock; **no destructivo**, seguro en cualquier equipo) y
+  `integration_test/vault_e2e_test.dart` (setup → recovery → app desbloqueada;
+  **destructivo**). El de arranque corre con
+  `flutter test integration_test/app_boot_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1`.
+  ⚠️ El recorrido feliz **borra la bóveda local** (`resetVault`), así que está
+  **gateado tras `--dart-define=E2E_ALLOW_WIPE=1`** y solo debe correrse en un
+  **equipo/emulador desechable**, nunca en uno con una bóveda real:
+  `flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1`.
+  Los finders son **locale-agnostic** (por tipo/icono, no por texto). Si tocas
+  splash/setup/unlock/recovery, **actualiza** estos e2e y sus helpers
+  (`integration_test/support/e2e_helpers.dart`: `waitFor`/`resetVault`).
+- **Cripto de deriva/verify** (Argon2id, verify sin almacenar clave) → cubierta en
+  `test/core/security_service_test.dart`; no la dupliques, extiéndela si cambia.
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; prueba setup nuevo,
 unlock con biometría y fallback, y el flujo de recovery.
 

@@ -56,6 +56,17 @@ Primero **audita** y propón un plan priorizado (impacto/esfuerzo); luego ejecú
 arrastrar a carpeta; (c) **orden configurable** (reciente, alfabético, más usadas);
 (d) **"usadas recientemente"** arriba; (e) **etiquetas/tags** además de carpetas.
 
+**Tests (obligatorio):**
+
+- **Lógica de filtro/orden** → extiende `test/features/credentials/vault_view_test.dart`
+  (`matchesVaultFilter`, `sortCredentials`).
+- **Home/estados** → extiende `test/features/credentials/mobile_home_screen_test.dart`
+  (chips, búsqueda con debounce >250ms, vacío/"sin resultados"/carga/error).
+- **Tarjeta/lista** → `test/features/credentials/widgets/credential_card_test.dart`
+  (favorito, doble-cifrado, chip de salud, TOTP inline — bombea frames, no
+  `pumpAndSettle`) y `.../credential_list_widget_test.dart` (filas densas + asa en
+  `reorderMode`). Usa el harness `test/support/widget_harness.dart`.
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; prueba en móvil y en
 la ventana de escritorio (`./build_release.ps1 -Target inno`).
 

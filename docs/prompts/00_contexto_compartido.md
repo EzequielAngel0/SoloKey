@@ -59,6 +59,14 @@ no reescribir de cero.
 - `dart run build_runner build --delete-conflicting-outputs` si tocas
   freezed / riverpod-annotation / drift.
 - `flutter gen-l10n` si tocas `.arb`.
+- **Tocaste código → tocaste sus tests.** Todo cambio de lógica crea/actualiza un
+  **unit test**; todo cambio de UI, un **widget test**; y `flutter test` queda
+  verde. Seguimos la **pirámide** unit → widget → integración: la mayoría son unit
+  (rápidos, `test/**` espeja `lib/**`), varios widget (con el harness compartido
+  `test/support/widget_harness.dart`) y unos pocos recorridos e2e en
+  `integration_test/**` (motor `integration_test`, ver `PRUEBAS_INTEGRACION.md`).
+  El prompt **95** construye y mantiene esta red; su sección "Tests" en cada prompt
+  dice qué crear/extender.
 
 ## Commits
 

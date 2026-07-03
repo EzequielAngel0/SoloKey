@@ -214,6 +214,16 @@ La suite **escribe de verdad** (crea la bóveda, guarda credenciales cifradas en
 local), pero todo vive **en el dispositivo de prueba** y se borra al reiniciar el estado.
 No hay nada remoto que tocar.
 
+> ⚠️ **`resetVault` es DESTRUCTIVO y apunta al MISMO almacenamiento que la app real
+> de escritorio** (secure storage + `Documents/vault_guard_db.sqlite`). En una
+> máquina con una bóveda real **borraría los datos del usuario**. Por eso el helper
+> `resetVault()` y el test `vault_e2e_test.dart` están **gateados tras
+> `--dart-define=E2E_ALLOW_WIPE=1`**: sin ese define, `resetVault` es un **no-op** y
+> el recorrido feliz se **omite** (`skip`). Aun con el define, `resetVault` copia
+> cada archivo a un `.e2e-backup` antes de borrar. **Corre el e2e destructivo solo en
+> un equipo/emulador desechable.** El `app_boot_test.dart` NO borra nada (solo
+> verifica que el arranque llega a Setup o Unlock) y es seguro en cualquier equipo.
+
 ## Qué NO se puede automatizar (y cómo sortearlo)
 
 - **Biometría (`local_auth`)**: los diálogos nativos no son automatizables → conduce por

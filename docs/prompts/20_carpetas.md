@@ -52,6 +52,16 @@ carpetas (escritorio); (b) **color/emoji** por carpeta; (c) **carpetas
 inteligentes** (por tipo/etiqueta/salud, solo-lectura); (d) **contador y tamaño**
 por carpeta; (e) **ordenar carpetas** manualmente.
 
+**Tests (obligatorio):**
+
+- **Lógica del árbol** (pura) → extiende
+  `test/features/folders/folder_tree_test.dart` (`folderChildren`,
+  `folderAncestorIds`, `flattenVisibleFolders` en
+  `lib/features/folders/domain/folder_tree.dart`): jerarquía, orden, huérfanos,
+  ancestros, ciclos. Si enredas nueva lógica en un widget, **extráela** ahí.
+- **Widget** de editar/eliminar/mover → crea un widget test con el harness
+  `test/support/widget_harness.dart` (overrides de `foldersNotifierProvider`).
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; en escritorio
 (`./build_release.ps1 -Target inno`) crea/edita/elimina carpetas y mueve credenciales.
 
