@@ -38,19 +38,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   final _formKey = GlobalKey<FormState>();
 
   // Shared controllers
-  final _titleCtrl    = TextEditingController();
-  final _notesCtrl    = TextEditingController();
+  final _titleCtrl = TextEditingController();
+  final _notesCtrl = TextEditingController();
 
   // Password / Login
   final _usernameCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final _websiteCtrl  = TextEditingController();
+  final _websiteCtrl = TextEditingController();
 
   // API Key
-  final _serviceCtrl  = TextEditingController();
-  final _apiKeyCtrl   = TextEditingController();
+  final _serviceCtrl = TextEditingController();
+  final _apiKeyCtrl = TextEditingController();
   final _endpointCtrl = TextEditingController();
-  final _scopesCtrl   = TextEditingController();
+  final _scopesCtrl = TextEditingController();
 
   // TOTP
   final _totpSecretCtrl = TextEditingController();
@@ -59,13 +59,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   CredentialType _type = CredentialType.password;
   String? _folderId;
   bool _isFavorite = false;
-  bool _isLoading  = false;
+  bool _isLoading = false;
   bool _showGenerator = false;
   Credential? _existing;
 
+  /// Snapshot of the form right after load; used to detect unsaved changes.
+  String _baseline = '';
+
   // SSH Key specific controllers
   final _sshPrivateKeyCtrl = TextEditingController();
-  final _sshPublicKeyCtrl  = TextEditingController();
+  final _sshPublicKeyCtrl = TextEditingController();
   final _sshPassphraseCtrl = TextEditingController();
   String _sshKeyType = 'Ed25519';
 
@@ -86,7 +89,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   late AnimationController _saveAnimCtrl;
   late Animation<double> _saveScale;
 
-
   @override
   void initState() {
     super.initState();
@@ -94,13 +96,15 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       vsync: this,
       duration: const Duration(milliseconds: 200),
     );
-    _saveScale = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _saveAnimCtrl, curve: Curves.easeInOut),
-    );
+    _saveScale = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(parent: _saveAnimCtrl, curve: Curves.easeInOut));
     if (widget.existingId != null) {
       _loadExisting();
     } else {
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
         if (ResponsiveLayout.isDesktop(context)) {
           final activeFolderId = ref.read(desktopSelectedFolderIdProvider);
           if (activeFolderId != null) {
@@ -109,9 +113,44 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             });
           }
         }
+        _captureBaseline();
       });
     }
+    _captureBaseline();
   }
+
+  /// Serialises every user-editable field into a single string so we can detect
+  /// unsaved changes by comparing against the baseline captured after load.
+  String _currentSnapshot() => [
+    _type.name,
+    _titleCtrl.text,
+    _notesCtrl.text,
+    _usernameCtrl.text,
+    _passwordCtrl.text,
+    _websiteCtrl.text,
+    _serviceCtrl.text,
+    _apiKeyCtrl.text,
+    _endpointCtrl.text,
+    _scopesCtrl.text,
+    _totpSecretCtrl.text,
+    _totpIssuerCtrl.text,
+    _sshPrivateKeyCtrl.text,
+    _sshPublicKeyCtrl.text,
+    _sshPassphraseCtrl.text,
+    _secondaryPinCtrl.text,
+    _customRotationDaysCtrl.text,
+    _sshKeyType,
+    _folderId ?? '',
+    _rotationInterval,
+    '$_isFavorite',
+    '$_isDoubleEncrypted',
+    '$_savePinBiometrically',
+    _customFields.map((f) => '${f.label}${f.value}${f.isSecret}').join(''),
+  ].join('');
+
+  void _captureBaseline() => _baseline = _currentSnapshot();
+
+  bool get _isDirty => _currentSnapshot() != _baseline;
 
   void _loadExisting() {
     final creds = ref.read(credentialsNotifierProvider).valueOrNull;
@@ -128,11 +167,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       final cf = {for (final f in _existing!.customFields) f.label: f.value};
       _usernameCtrl.text = _existing!.username ?? '';
       _passwordCtrl.text = _existing!.password ?? '';
-      _websiteCtrl.text  = _existing!.website ?? '';
-      _serviceCtrl.text  = cf['service'] ?? '';
-      _apiKeyCtrl.text   = _existing!.password ?? '';
+      _websiteCtrl.text = _existing!.website ?? '';
+      _serviceCtrl.text = cf['service'] ?? '';
+      _apiKeyCtrl.text = _existing!.password ?? '';
       _endpointCtrl.text = cf['endpoint'] ?? '';
-      _scopesCtrl.text   = cf['scopes'] ?? '';
+      _scopesCtrl.text = cf['scopes'] ?? '';
       _totpSecretCtrl.text = _existing!.password ?? '';
       _totpIssuerCtrl.text = cf['issuer'] ?? '';
 
@@ -146,14 +185,17 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
       // Check if biometric PIN was saved
       if (_isDoubleEncrypted) {
-        getIt<DoubleEnvelopeService>().getPinFromSecureStorage(_existing!.id).then((savedPin) {
-          if (mounted && savedPin != null) {
-            setState(() {
-              _savePinBiometrically = true;
-              _secondaryPinCtrl.text = savedPin;
+        getIt<DoubleEnvelopeService>()
+            .getPinFromSecureStorage(_existing!.id)
+            .then((savedPin) {
+              if (mounted && savedPin != null) {
+                setState(() {
+                  _savePinBiometrically = true;
+                  _secondaryPinCtrl.text = savedPin;
+                });
+                _captureBaseline();
+              }
             });
-          }
-        });
       }
       _customFields = _existing!.customFields
           .where((f) => f.label != 'scopes' && f.label != 'issuer')
@@ -162,6 +204,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       _customRotationDays = _existing!.customRotationDays;
       _lastRotationPromptedAt = _existing!.lastRotationPromptedAt;
       _customRotationDaysCtrl.text = _customRotationDays?.toString() ?? '';
+      _captureBaseline();
     }
   }
 
@@ -169,11 +212,22 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   void dispose() {
     _saveAnimCtrl.dispose();
     for (final c in [
-      _titleCtrl, _notesCtrl, _usernameCtrl, _passwordCtrl, _websiteCtrl,
-      _serviceCtrl, _apiKeyCtrl, _endpointCtrl, _scopesCtrl,
-      _totpSecretCtrl, _totpIssuerCtrl,
-      _sshPrivateKeyCtrl, _sshPublicKeyCtrl, _sshPassphraseCtrl,
-      _secondaryPinCtrl, _customRotationDaysCtrl,
+      _titleCtrl,
+      _notesCtrl,
+      _usernameCtrl,
+      _passwordCtrl,
+      _websiteCtrl,
+      _serviceCtrl,
+      _apiKeyCtrl,
+      _endpointCtrl,
+      _scopesCtrl,
+      _totpSecretCtrl,
+      _totpIssuerCtrl,
+      _sshPrivateKeyCtrl,
+      _sshPublicKeyCtrl,
+      _sshPassphraseCtrl,
+      _secondaryPinCtrl,
+      _customRotationDaysCtrl,
     ]) {
       c.dispose();
     }
@@ -186,15 +240,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     // Check if secret was rotated to reset lastRotationPromptedAt
     bool isPasswordChanged = false;
     if (_existing != null) {
-      if (_type == CredentialType.password && _passwordCtrl.text != _existing!.password) {
+      if (_type == CredentialType.password &&
+          _passwordCtrl.text != _existing!.password) {
         isPasswordChanged = true;
-      } else if (_type == CredentialType.apiKey && _apiKeyCtrl.text != _existing!.password) {
+      } else if (_type == CredentialType.apiKey &&
+          _apiKeyCtrl.text != _existing!.password) {
         isPasswordChanged = true;
-      } else if (_type == CredentialType.sshKey && _sshPrivateKeyCtrl.text != _existing!.password) {
+      } else if (_type == CredentialType.sshKey &&
+          _sshPrivateKeyCtrl.text != _existing!.password) {
         isPasswordChanged = true;
       }
     }
-    final resolvedLastPrompted = isPasswordChanged ? null : _lastRotationPromptedAt;
+    final resolvedLastPrompted = isPasswordChanged
+        ? null
+        : _lastRotationPromptedAt;
 
     switch (_type) {
       case CredentialType.password:
@@ -202,9 +261,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           id: _existing?.id ?? const Uuid().v4(),
           type: _type,
           title: _titleCtrl.text.trim(),
-          username: _usernameCtrl.text.trim().isEmpty ? null : _usernameCtrl.text.trim(),
+          username: _usernameCtrl.text.trim().isEmpty
+              ? null
+              : _usernameCtrl.text.trim(),
           password: _passwordCtrl.text.isEmpty ? null : _passwordCtrl.text,
-          website:  _websiteCtrl.text.trim().isEmpty ? null : _websiteCtrl.text.trim(),
+          website: _websiteCtrl.text.trim().isEmpty
+              ? null
+              : _websiteCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           customFields: _customFields,
           isFavorite: _isFavorite,
@@ -221,9 +284,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           id: _existing?.id ?? const Uuid().v4(),
           type: _type,
           title: _titleCtrl.text.trim(),
-          username: _serviceCtrl.text.trim().isEmpty ? null : _serviceCtrl.text.trim(),
+          username: _serviceCtrl.text.trim().isEmpty
+              ? null
+              : _serviceCtrl.text.trim(),
           password: _apiKeyCtrl.text.isEmpty ? null : _apiKeyCtrl.text,
-          website: _endpointCtrl.text.trim().isEmpty ? null : _endpointCtrl.text.trim(),
+          website: _endpointCtrl.text.trim().isEmpty
+              ? null
+              : _endpointCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           customFields: [
             ..._customFields,
@@ -260,7 +327,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           id: _existing?.id ?? const Uuid().v4(),
           type: _type,
           title: _titleCtrl.text.trim(),
-          password: _totpSecretCtrl.text.isEmpty ? null : _totpSecretCtrl.text.trim(),
+          password: _totpSecretCtrl.text.isEmpty
+              ? null
+              : _totpSecretCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           customFields: [
             ..._customFields,
@@ -281,7 +350,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           id: _existing?.id ?? const Uuid().v4(),
           type: _type,
           title: _titleCtrl.text.trim(),
-          password: _sshPrivateKeyCtrl.text.isEmpty ? null : _sshPrivateKeyCtrl.text.trim(),
+          password: _sshPrivateKeyCtrl.text.isEmpty
+              ? null
+              : _sshPrivateKeyCtrl.text.trim(),
           notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
           customFields: _customFields,
           isFavorite: _isFavorite,
@@ -292,7 +363,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           sshKeyMetadata: SshKeyMetadata(
             privateKey: _sshPrivateKeyCtrl.text.trim(),
             publicKey: _sshPublicKeyCtrl.text.trim(),
-            passphrase: _sshPassphraseCtrl.text.isEmpty ? null : _sshPassphraseCtrl.text.trim(),
+            passphrase: _sshPassphraseCtrl.text.isEmpty
+                ? null
+                : _sshPassphraseCtrl.text.trim(),
             keyType: _sshKeyType,
           ),
           rotationInterval: _rotationInterval,
@@ -324,12 +397,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         if (pin.isEmpty && _existing == null) {
           throw Exception(l10n.formErrPinRequiredEnable);
         }
-        
+
         if (pin.isNotEmpty) {
           final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
-          
+
           String? encryptedPassword;
-          if (credential.password != null && !credential.password!.startsWith('double_enc_v1:')) {
+          if (credential.password != null &&
+              !credential.password!.startsWith('double_enc_v1:')) {
             encryptedPassword = await doubleEnvelopeService.encryptField(
               plaintext: credential.password!,
               pin: pin,
@@ -337,22 +411,30 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           } else {
             encryptedPassword = credential.password;
           }
-          
+
           SshKeyMetadata? encryptedSshMetadata;
           if (credential.sshKeyMetadata != null) {
             final ssh = credential.sshKeyMetadata!;
             final encPriv = ssh.privateKey.startsWith('double_enc_v1:')
                 ? ssh.privateKey
-                : await doubleEnvelopeService.encryptField(plaintext: ssh.privateKey, pin: pin);
-            final encPass = (ssh.passphrase != null && !ssh.passphrase!.startsWith('double_enc_v1:'))
-                ? await doubleEnvelopeService.encryptField(plaintext: ssh.passphrase!, pin: pin)
+                : await doubleEnvelopeService.encryptField(
+                    plaintext: ssh.privateKey,
+                    pin: pin,
+                  );
+            final encPass =
+                (ssh.passphrase != null &&
+                    !ssh.passphrase!.startsWith('double_enc_v1:'))
+                ? await doubleEnvelopeService.encryptField(
+                    plaintext: ssh.passphrase!,
+                    pin: pin,
+                  )
                 : ssh.passphrase;
             encryptedSshMetadata = ssh.copyWith(
               privateKey: encPriv,
               passphrase: encPass,
             );
           }
-          
+
           final List<CustomField> encryptedCustomFields = [];
           for (final field in credential.customFields) {
             if (field.isSecret && !field.value.startsWith('double_enc_v1:')) {
@@ -372,14 +454,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             customFields: encryptedCustomFields,
             isDoubleEncrypted: true,
           );
-          
+
           if (_savePinBiometrically) {
             await doubleEnvelopeService.savePinToSecureStorage(
               credentialId: credential.id,
               pin: pin,
             );
           } else {
-            await doubleEnvelopeService.deletePinFromSecureStorage(credential.id);
+            await doubleEnvelopeService.deletePinFromSecureStorage(
+              credential.id,
+            );
           }
         }
       } else {
@@ -389,9 +473,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             throw Exception(l10n.formErrPinRequiredDisable);
           }
           final doubleEnvelopeService = getIt<DoubleEnvelopeService>();
-          
+
           String? decryptedPassword;
-          if (credential.password != null && credential.password!.startsWith('double_enc_v1:')) {
+          if (credential.password != null &&
+              credential.password!.startsWith('double_enc_v1:')) {
             decryptedPassword = await doubleEnvelopeService.decryptField(
               encryptedValue: credential.password!,
               pin: pin,
@@ -399,15 +484,23 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           } else {
             decryptedPassword = credential.password;
           }
-          
+
           SshKeyMetadata? decryptedSshMetadata;
           if (credential.sshKeyMetadata != null) {
             final ssh = credential.sshKeyMetadata!;
             final decPriv = ssh.privateKey.startsWith('double_enc_v1:')
-                ? await doubleEnvelopeService.decryptField(encryptedValue: ssh.privateKey, pin: pin)
+                ? await doubleEnvelopeService.decryptField(
+                    encryptedValue: ssh.privateKey,
+                    pin: pin,
+                  )
                 : ssh.privateKey;
-            final decPass = (ssh.passphrase != null && ssh.passphrase!.startsWith('double_enc_v1:'))
-                ? await doubleEnvelopeService.decryptField(encryptedValue: ssh.passphrase!, pin: pin)
+            final decPass =
+                (ssh.passphrase != null &&
+                    ssh.passphrase!.startsWith('double_enc_v1:'))
+                ? await doubleEnvelopeService.decryptField(
+                    encryptedValue: ssh.passphrase!,
+                    pin: pin,
+                  )
                 : ssh.passphrase;
             decryptedSshMetadata = ssh.copyWith(
               privateKey: decPriv,
@@ -427,14 +520,14 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               decryptedCustomFields.add(field);
             }
           }
-          
+
           credential = credential.copyWith(
             password: decryptedPassword,
             sshKeyMetadata: decryptedSshMetadata,
             customFields: decryptedCustomFields,
             isDoubleEncrypted: false,
           );
-          
+
           await doubleEnvelopeService.deletePinFromSecureStorage(credential.id);
         }
       }
@@ -442,15 +535,22 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       if (_existing == null) {
         await ref.read(credentialsNotifierProvider.notifier).save(credential);
       } else {
-        await ref.read(credentialsNotifierProvider.notifier).updateCredential(credential);
+        await ref
+            .read(credentialsNotifierProvider.notifier)
+            .updateCredential(credential);
       }
       HapticFeedback.mediumImpact();
+      _captureBaseline(); // nothing left unsaved → exit guard won't fire
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                const Icon(
+                  Icons.check_circle_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(
                   _existing == null ? l10n.formCreated : l10n.formSaved,
@@ -461,12 +561,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             backgroundColor: context.palette.success,
             behavior: SnackBarBehavior.floating,
             duration: const Duration(seconds: 2),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
         if (ResponsiveLayout.isDesktop(context)) {
-          ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
-          ref.read(desktopSelectedCredentialIdProvider.notifier).state = credential.id;
+          ref.read(desktopRightPaneModeProvider.notifier).state =
+              RightPaneMode.details;
+          ref.read(desktopSelectedCredentialIdProvider.notifier).state =
+              credential.id;
         } else {
           context.pop();
         }
@@ -489,9 +593,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   Future<void> _scanQr() async {
     final l10n = AppLocalizations.of(context);
-    final code = await Navigator.of(context).push<String>(
-      MaterialPageRoute(builder: (_) => const QrScannerScreen()),
-    );
+    final code = await Navigator.of(
+      context,
+    ).push<String>(MaterialPageRoute(builder: (_) => const QrScannerScreen()));
     if (code == null) return;
 
     try {
@@ -500,7 +604,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         _showError(l10n.formQrNotTotp);
         return;
       }
-      
+
       String? titleFromPath;
       if (uri.pathSegments.isNotEmpty) {
         titleFromPath = uri.pathSegments.first;
@@ -510,7 +614,8 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       }
 
       final secret = uri.queryParameters['secret'];
-      final issuer = uri.queryParameters['issuer'] ??
+      final issuer =
+          uri.queryParameters['issuer'] ??
           (uri.pathSegments.isNotEmpty && uri.pathSegments.first.contains(':')
               ? Uri.decodeComponent(uri.pathSegments.first.split(':').first)
               : null);
@@ -531,14 +636,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.qr_code_rounded, color: Colors.white, size: 18),
+                const Icon(
+                  Icons.qr_code_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(l10n.formQrScanned),
               ],
             ),
             backgroundColor: context.palette.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       } else {
@@ -561,6 +672,63 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     );
   }
 
+  /// Asks the user to confirm leaving the form when there are unsaved changes.
+  /// Returns `true` when it's safe to leave (no changes, or the user discards).
+  Future<bool> _confirmDiscard() async {
+    if (!_isDirty || _isLoading) return true;
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final leave = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: palette.drawer,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: Text(
+          l10n.formDiscardTitle,
+          style: TextStyle(
+            color: palette.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        content: Text(
+          l10n.formDiscardMessage,
+          style: TextStyle(color: palette.textMuted, fontSize: 13, height: 1.4),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: Text(
+              l10n.formDiscardKeep,
+              style: TextStyle(color: palette.textMuted),
+            ),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            child: Text(
+              l10n.formDiscardLeave,
+              style: TextStyle(
+                color: palette.danger,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+    return leave ?? false;
+  }
+
+  /// Desktop close/back: confirm discard, then return the right pane to details
+  /// (edit) or the empty state (create).
+  Future<void> _handleDesktopClose() async {
+    if (!await _confirmDiscard()) return;
+    if (!mounted) return;
+    ref.read(desktopRightPaneModeProvider.notifier).state = _existing != null
+        ? RightPaneMode.details
+        : RightPaneMode.none;
+  }
+
   Future<void> _generateSshKey() async {
     final l10n = AppLocalizations.of(context);
     setState(() => _isGeneratingSshKey = true);
@@ -570,7 +738,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       final result = await generator.generateEd25519KeyPair(
         comment: _titleCtrl.text.trim().isEmpty
             ? 'solokey-generated'
-            : _titleCtrl.text.trim().toLowerCase().replaceAll(RegExp(r'\s+'), '-'),
+            : _titleCtrl.text.trim().toLowerCase().replaceAll(
+                RegExp(r'\s+'),
+                '-',
+              ),
       );
       if (mounted) {
         setState(() {
@@ -581,14 +752,20 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
+                const Icon(
+                  Icons.auto_awesome_rounded,
+                  color: Colors.white,
+                  size: 18,
+                ),
                 const SizedBox(width: 8),
                 Text(l10n.formSshGenerated),
               ],
             ),
             backgroundColor: context.palette.success,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
           ),
         );
       }
@@ -617,7 +794,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             padding: const EdgeInsets.symmetric(vertical: 8.0),
             child: Text(
               l10n.formNoCustomFields,
-              style: TextStyle(color: context.palette.textDisabled, fontSize: 13),
+              style: TextStyle(
+                color: context.palette.textDisabled,
+                fontSize: 13,
+              ),
             ),
           ),
         ...List.generate(_customFields.length, (index) {
@@ -647,7 +827,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                           const SizedBox(width: 8),
                           if (field.isSecret)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 6,
+                                vertical: 2,
+                              ),
                               decoration: BoxDecoration(
                                 color: typeColor.withValues(alpha: 0.15),
                                 borderRadius: BorderRadius.circular(4),
@@ -676,11 +859,19 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.edit_outlined, size: 20, color: context.palette.textMuted),
+                  icon: Icon(
+                    Icons.edit_outlined,
+                    size: 20,
+                    color: context.palette.textMuted,
+                  ),
                   onPressed: () => _showCustomFieldDialog(index: index),
                 ),
                 IconButton(
-                  icon: Icon(Icons.delete_outline_rounded, size: 20, color: context.palette.danger),
+                  icon: Icon(
+                    Icons.delete_outline_rounded,
+                    size: 20,
+                    color: context.palette.danger,
+                  ),
                   onPressed: () {
                     HapticFeedback.selectionClick();
                     setState(() {
@@ -702,7 +893,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             style: OutlinedButton.styleFrom(
               foregroundColor: typeColor,
               side: BorderSide(color: typeColor, width: 1.2),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
               padding: const EdgeInsets.symmetric(vertical: 12),
             ),
           ),
@@ -714,12 +907,18 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   Future<void> _showCustomFieldDialog({int? index}) async {
     final l10n = AppLocalizations.of(context);
     final isEditing = index != null;
-    final labelCtrl = TextEditingController(text: isEditing ? _customFields[index].label : '');
-    final valueCtrl = TextEditingController(text: isEditing ? _customFields[index].value : '');
+    final labelCtrl = TextEditingController(
+      text: isEditing ? _customFields[index].label : '',
+    );
+    final valueCtrl = TextEditingController(
+      text: isEditing ? _customFields[index].value : '',
+    );
     bool isSecret = isEditing ? _customFields[index].isSecret : false;
 
     // Check if the current value is double encrypted and decrypt it for editing
-    if (isEditing && _existing?.isDoubleEncrypted == true && valueCtrl.text.startsWith('double_enc_v1:')) {
+    if (isEditing &&
+        _existing?.isDoubleEncrypted == true &&
+        valueCtrl.text.startsWith('double_enc_v1:')) {
       final pin = _secondaryPinCtrl.text.trim();
       if (pin.isNotEmpty) {
         try {
@@ -743,10 +942,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           builder: (context, setDialogState) {
             return AlertDialog(
               backgroundColor: context.palette.drawer,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
               title: Text(
                 isEditing ? l10n.formEditField : l10n.formNewCustomField,
-                style: TextStyle(color: context.palette.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+                style: TextStyle(
+                  color: context.palette.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               content: Form(
                 key: dialogFormKey,
@@ -760,7 +965,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                         labelText: l10n.formFieldNameLabel,
                         hintText: l10n.formFieldNameHint,
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? l10n.formNameRequired : null,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? l10n.formNameRequired
+                          : null,
                       textCapitalization: TextCapitalization.sentences,
                     ),
                     const SizedBox(height: 14),
@@ -771,17 +978,28 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                         labelText: l10n.formFieldValueLabel,
                         hintText: l10n.formFieldValueHint,
                       ),
-                      validator: (v) => v == null || v.trim().isEmpty ? l10n.formValueRequired : null,
+                      validator: (v) => v == null || v.trim().isEmpty
+                          ? l10n.formValueRequired
+                          : null,
                     ),
                     const SizedBox(height: 12),
                     SwitchListTile(
                       value: isSecret,
                       activeThumbColor: _typeColor(_type),
                       contentPadding: EdgeInsets.zero,
-                      title: Text(l10n.formSecretField, style: TextStyle(color: context.palette.textPrimary, fontSize: 14)),
+                      title: Text(
+                        l10n.formSecretField,
+                        style: TextStyle(
+                          color: context.palette.textPrimary,
+                          fontSize: 14,
+                        ),
+                      ),
                       subtitle: Text(
                         l10n.formSecretFieldSub,
-                        style: TextStyle(color: context.palette.textMuted, fontSize: 11),
+                        style: TextStyle(
+                          color: context.palette.textMuted,
+                          fontSize: 11,
+                        ),
                       ),
                       onChanged: (v) {
                         HapticFeedback.selectionClick();
@@ -794,23 +1012,28 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(l10n.commonCancel, style: TextStyle(color: context.palette.textDisabled)),
+                  child: Text(
+                    l10n.commonCancel,
+                    style: TextStyle(color: context.palette.textDisabled),
+                  ),
                 ),
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _typeColor(_type),
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: () {
                     if (!dialogFormKey.currentState!.validate()) return;
-                    
+
                     final newField = CustomField(
                       label: labelCtrl.text.trim(),
                       value: valueCtrl.text.trim(),
                       isSecret: isSecret,
                     );
-                    
+
                     setState(() {
                       if (isEditing) {
                         _customFields[index] = newField;
@@ -818,7 +1041,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                         _customFields.add(newField);
                       }
                     });
-                    
+
                     HapticFeedback.mediumImpact();
                     Navigator.pop(context);
                   },
@@ -841,220 +1064,259 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     final typeColor = _typeColor(_type);
     final l10n = AppLocalizations.of(context);
 
-    return Scaffold(
-      appBar: VaultAppBar(
-        title: isEdit ? l10n.formEditTitle : l10n.formNewTitle,
-        leading: ResponsiveLayout.isDesktop(context)
-            ? IconButton(
-                icon: const Icon(Icons.close_rounded),
-                onPressed: () {
-                  if (isEdit) {
-                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
-                  } else {
-                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
-                  }
-                },
-              )
-            : null,
-        actions: [
-          if (!_isLoading)
-            TextButton.icon(
-              onPressed: _save,
-              icon: const Icon(Icons.check_rounded, size: 18),
-              label: Text(
-                isEdit ? l10n.commonSave : l10n.commonCreate,
-                style: const TextStyle(fontWeight: FontWeight.w600),
-              ),
-              style: TextButton.styleFrom(
-                foregroundColor: context.palette.primary,
-              ),
-            ),
-        ],
-      ),
-      body: Form(
-        key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-          children: [
-            TypeSelectorPremium(
-              selected: _type,
-              isEditing: isEdit,
-              onChanged: (t) => setState(() {
-                _type = t;
-                _showGenerator = false;
-              }),
-            ),
-            const SizedBox(height: 24),
-
-            FormSection(
-              icon: Icons.badge_rounded,
-              accentColor: typeColor,
-              title: l10n.formSectionIdentification,
-              children: [
-                TextFormField(
-                  controller: _titleCtrl,
-                  style: TextStyle(color: context.palette.textPrimary, fontSize: 16, fontWeight: FontWeight.w500),
-                  decoration: InputDecoration(
-                    labelText: l10n.formTitleLabel,
-                    hintText: _titleHintFor(l10n),
-                    prefixIcon: Icon(_typeIcon(_type), size: 18, color: typeColor.withValues(alpha: 0.7)),
-                  ),
-                  validator: (v) =>
-                      v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
-                  textCapitalization: TextCapitalization.sentences,
+    return PopScope(
+      // Always intercept: dirtiness is read live in the callback (typing in a
+      // field doesn't rebuild this State, so a build-time `canPop` would be stale).
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) async {
+        if (didPop) return;
+        final navigator = Navigator.of(context);
+        if (await _confirmDiscard() && context.mounted) {
+          navigator.pop();
+        }
+      },
+      child: Scaffold(
+        appBar: VaultAppBar(
+          title: isEdit ? l10n.formEditTitle : l10n.formNewTitle,
+          leading: ResponsiveLayout.isDesktop(context)
+              ? IconButton(
+                  icon: const Icon(Icons.close_rounded),
+                  onPressed: _handleDesktopClose,
+                )
+              : null,
+          actions: [
+            if (!_isLoading)
+              TextButton.icon(
+                onPressed: _save,
+                icon: const Icon(Icons.check_rounded, size: 18),
+                label: Text(
+                  isEdit ? l10n.commonSave : l10n.commonCreate,
+                  style: const TextStyle(fontWeight: FontWeight.w600),
                 ),
-                const SizedBox(height: 12),
-                FavoriteToggle(
-                  value: _isFavorite,
-                  onChanged: (v) {
-                    HapticFeedback.selectionClick();
-                    setState(() => _isFavorite = v);
-                  },
+                style: TextButton.styleFrom(
+                  foregroundColor: context.palette.primary,
                 ),
-              ],
-            ),
-            const SizedBox(height: 16),
+              ),
+          ],
+        ),
+        body: Form(
+          key: _formKey,
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+            children: [
+              TypeSelectorPremium(
+                selected: _type,
+                isEditing: isEdit,
+                onChanged: (t) => setState(() {
+                  _type = t;
+                  _showGenerator = false;
+                }),
+              ),
+              const SizedBox(height: 24),
 
-            _buildFieldsByType(),
-
-            if (_type != CredentialType.totp) ...[
-              const SizedBox(height: 16),
               FormSection(
-                icon: Icons.notes_rounded,
+                icon: Icons.badge_rounded,
                 accentColor: typeColor,
-                title: _type == CredentialType.secureNote ? l10n.formSectionContent : l10n.formSectionNotes,
+                title: l10n.formSectionIdentification,
                 children: [
                   TextFormField(
-                    controller: _notesCtrl,
-                    style: TextStyle(color: context.palette.textPrimary),
-                    maxLines: _type == CredentialType.secureNote ? 10 : 4,
-                    decoration: InputDecoration(
-                      labelText: _type == CredentialType.secureNote
-                          ? l10n.formSecureContentLabel
-                          : l10n.formNotesLabel,
-                      hintText: _type == CredentialType.secureNote
-                          ? l10n.formSecureContentHint
-                          : l10n.formNotesHint,
-                      alignLabelWithHint: true,
+                    controller: _titleCtrl,
+                    style: TextStyle(
+                      color: context.palette.textPrimary,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
                     ),
-                    validator: _type == CredentialType.secureNote
-                        ? (v) => v == null || v.trim().isEmpty
-                            ? l10n.formContentRequired
-                            : null
+                    decoration: InputDecoration(
+                      labelText: l10n.formTitleLabel,
+                      hintText: _titleHintFor(l10n),
+                      prefixIcon: Icon(
+                        _typeIcon(_type),
+                        size: 18,
+                        color: typeColor.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    validator: (v) => v == null || v.trim().isEmpty
+                        ? l10n.formFieldRequired
                         : null,
+                    textCapitalization: TextCapitalization.sentences,
+                  ),
+                  const SizedBox(height: 12),
+                  FavoriteToggle(
+                    value: _isFavorite,
+                    onChanged: (v) {
+                      HapticFeedback.selectionClick();
+                      setState(() => _isFavorite = v);
+                    },
                   ),
                 ],
               ),
-            ],
+              const SizedBox(height: 16),
 
-            const SizedBox(height: 16),
-            _buildCustomFieldsSection(),
+              _buildFieldsByType(),
 
-            const SizedBox(height: 16),
-            _buildDoubleEncryptionSection(),
-
-            const SizedBox(height: 16),
-            _buildRotationReminderSection(),
-
-            const SizedBox(height: 16),
-            FormSection(
-              icon: Icons.folder_rounded,
-              accentColor: context.palette.textMuted,
-              title: l10n.formSectionOrganization,
-              children: [
-                Consumer(
-                  builder: (context, ref, _) {
-                    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
-                    final currentFolder = folders.where((f) => f.id == _folderId).firstOrNull;
-                    
-                    return InkWell(
-                      onTap: () async {
-                        FocusScope.of(context).unfocus();
-                        final List<String?>? selection = await showModalBottomSheet<List<String?>>(
-                          context: context,
-                          isScrollControlled: true,
-                          backgroundColor: context.palette.drawer,
-                          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-                          builder: (_) => FolderPickerSheet(selectedFolderId: _folderId),
-                        );
-                        if (selection != null) {
-                          setState(() => _folderId = selection.first);
-                        }
-                      },
-                      borderRadius: BorderRadius.circular(12),
-                      child: InputDecorator(
-                        decoration: InputDecoration(
-                          labelText: l10n.formFolderLabel,
-                          prefixIcon: Icon(Icons.folder_outlined, color: context.palette.textMuted),
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                currentFolder?.name ?? l10n.formMainVault,
-                                style: TextStyle(
-                                  color: currentFolder == null ? context.palette.textMuted : context.palette.textPrimary,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                            Icon(Icons.arrow_drop_down_rounded, color: context.palette.textMuted),
-                          ],
-                        ),
+              if (_type != CredentialType.totp) ...[
+                const SizedBox(height: 16),
+                FormSection(
+                  icon: Icons.notes_rounded,
+                  accentColor: typeColor,
+                  title: _type == CredentialType.secureNote
+                      ? l10n.formSectionContent
+                      : l10n.formSectionNotes,
+                  children: [
+                    TextFormField(
+                      controller: _notesCtrl,
+                      style: TextStyle(color: context.palette.textPrimary),
+                      maxLines: _type == CredentialType.secureNote ? 10 : 4,
+                      decoration: InputDecoration(
+                        labelText: _type == CredentialType.secureNote
+                            ? l10n.formSecureContentLabel
+                            : l10n.formNotesLabel,
+                        hintText: _type == CredentialType.secureNote
+                            ? l10n.formSecureContentHint
+                            : l10n.formNotesHint,
+                        alignLabelWithHint: true,
                       ),
-                    );
-                  },
+                      validator: _type == CredentialType.secureNote
+                          ? (v) => v == null || v.trim().isEmpty
+                                ? l10n.formContentRequired
+                                : null
+                          : null,
+                    ),
+                  ],
                 ),
               ],
-            ),
 
-            const SizedBox(height: 32),
+              const SizedBox(height: 16),
+              _buildCustomFieldsSection(),
 
-            ScaleTransition(
-              scale: _saveScale,
-              child: _isLoading
-                  ? Center(
-                      child: CircularProgressIndicator(color: context.palette.accent),
-                    )
-                  : SaveButton(
-                      label: isEdit ? l10n.formSaveChanges : l10n.formCreateCredential,
-                      color: typeColor,
-                      onPressed: _save,
-                      icon: isEdit ? Icons.save_rounded : Icons.add_rounded,
-                    ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildDoubleEncryptionSection(),
+
+              const SizedBox(height: 16),
+              _buildRotationReminderSection(),
+
+              const SizedBox(height: 16),
+              FormSection(
+                icon: Icons.folder_rounded,
+                accentColor: context.palette.textMuted,
+                title: l10n.formSectionOrganization,
+                children: [
+                  Consumer(
+                    builder: (context, ref, _) {
+                      final folders =
+                          ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+                      final currentFolder = folders
+                          .where((f) => f.id == _folderId)
+                          .firstOrNull;
+
+                      return InkWell(
+                        onTap: () async {
+                          FocusScope.of(context).unfocus();
+                          final List<String?>? selection =
+                              await showModalBottomSheet<List<String?>>(
+                                context: context,
+                                isScrollControlled: true,
+                                backgroundColor: context.palette.drawer,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(20),
+                                  ),
+                                ),
+                                builder: (_) => FolderPickerSheet(
+                                  selectedFolderId: _folderId,
+                                ),
+                              );
+                          if (selection != null) {
+                            setState(() => _folderId = selection.first);
+                          }
+                        },
+                        borderRadius: BorderRadius.circular(12),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            labelText: l10n.formFolderLabel,
+                            prefixIcon: Icon(
+                              Icons.folder_outlined,
+                              color: context.palette.textMuted,
+                            ),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Text(
+                                  currentFolder?.name ?? l10n.formMainVault,
+                                  style: TextStyle(
+                                    color: currentFolder == null
+                                        ? context.palette.textMuted
+                                        : context.palette.textPrimary,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down_rounded,
+                                color: context.palette.textMuted,
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 32),
+
+              ScaleTransition(
+                scale: _saveScale,
+                child: _isLoading
+                    ? Center(
+                        child: CircularProgressIndicator(
+                          color: context.palette.accent,
+                        ),
+                      )
+                    : SaveButton(
+                        label: isEdit
+                            ? l10n.formSaveChanges
+                            : l10n.formCreateCredential,
+                        color: typeColor,
+                        onPressed: _save,
+                        icon: isEdit ? Icons.save_rounded : Icons.add_rounded,
+                      ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   String _titleHintFor(AppLocalizations l10n) => switch (_type) {
-    CredentialType.password   => l10n.formHintPassword,
-    CredentialType.apiKey     => l10n.formHintApiKey,
+    CredentialType.password => l10n.formHintPassword,
+    CredentialType.apiKey => l10n.formHintApiKey,
     CredentialType.secureNote => l10n.formHintSecureNote,
-    CredentialType.totp       => l10n.formHintTotp,
-    CredentialType.passkey    => l10n.formHintPasskey,
-    CredentialType.sshKey     => l10n.formHintSshKey,
+    CredentialType.totp => l10n.formHintTotp,
+    CredentialType.passkey => l10n.formHintPasskey,
+    CredentialType.sshKey => l10n.formHintSshKey,
   };
 
   IconData _typeIcon(CredentialType t) => switch (t) {
-    CredentialType.password   => Icons.lock_rounded,
-    CredentialType.apiKey     => Icons.key_rounded,
+    CredentialType.password => Icons.lock_rounded,
+    CredentialType.apiKey => Icons.key_rounded,
     CredentialType.secureNote => Icons.note_rounded,
-    CredentialType.totp       => Icons.access_time_rounded,
-    CredentialType.passkey    => Icons.fingerprint_rounded,
-    CredentialType.sshKey     => Icons.terminal_rounded,
+    CredentialType.totp => Icons.access_time_rounded,
+    CredentialType.passkey => Icons.fingerprint_rounded,
+    CredentialType.sshKey => Icons.terminal_rounded,
   };
 
   Color _typeColor(CredentialType t) => switch (t) {
-    CredentialType.password   => context.palette.typePassword,
-    CredentialType.apiKey     => context.palette.typeApiKey,
+    CredentialType.password => context.palette.typePassword,
+    CredentialType.apiKey => context.palette.typeApiKey,
     CredentialType.secureNote => context.palette.typeNote,
-    CredentialType.totp       => context.palette.typeTotp,
-    CredentialType.passkey    => context.palette.typePasskey,
-    CredentialType.sshKey     => context.palette.typeSshKey,
+    CredentialType.totp => context.palette.typeTotp,
+    CredentialType.passkey => context.palette.typePasskey,
+    CredentialType.sshKey => context.palette.typeSshKey,
   };
 
   Widget _buildFieldsByType() {
@@ -1076,11 +1338,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         key: ValueKey(_type),
         child: switch (_type) {
           CredentialType.password => _buildPasswordFields(),
-          CredentialType.apiKey   => _buildApiKeyFields(),
+          CredentialType.apiKey => _buildApiKeyFields(),
           CredentialType.secureNote => const SizedBox.shrink(),
-          CredentialType.totp     => _buildTotpFields(),
-          CredentialType.passkey  => _buildPasskeyInfo(),
-          CredentialType.sshKey   => _buildSshKeyFields(),
+          CredentialType.totp => _buildTotpFields(),
+          CredentialType.passkey => _buildPasskeyInfo(),
+          CredentialType.sshKey => _buildSshKeyFields(),
         },
       ),
     );
@@ -1099,7 +1361,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formUserEmailLabel,
             hintText: l10n.formUserEmailHint,
-            prefixIcon: Icon(Icons.person_outline_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.person_outline_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
           keyboardType: TextInputType.emailAddress,
         ),
@@ -1118,7 +1384,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formWebsiteLabel,
             hintText: l10n.formWebsiteHint,
-            prefixIcon: Icon(Icons.language_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.language_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
         ),
       ],
@@ -1138,7 +1408,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formServiceNameLabel,
             hintText: l10n.formServiceNameHint,
-            prefixIcon: Icon(Icons.cloud_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.cloud_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
           validator: (v) =>
               v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
@@ -1160,7 +1434,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formEndpointLabel,
             hintText: 'https://api.example.com/v1',
-            prefixIcon: Icon(Icons.link_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.link_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -1170,7 +1448,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formScopesLabel,
             hintText: 'read:user, write:repo…',
-            prefixIcon: Icon(Icons.security_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.security_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
         ),
       ],
@@ -1196,7 +1478,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Icon(Icons.info_outline_rounded, size: 16, color: context.palette.typeTotp.withValues(alpha: 0.8)),
+              Icon(
+                Icons.info_outline_rounded,
+                size: 16,
+                color: context.palette.typeTotp.withValues(alpha: 0.8),
+              ),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
@@ -1230,7 +1516,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.qr_code_scanner_rounded, color: context.palette.typeTotp, size: 22),
+                  Icon(
+                    Icons.qr_code_scanner_rounded,
+                    color: context.palette.typeTotp,
+                    size: 22,
+                  ),
                   const SizedBox(width: 10),
                   Text(
                     l10n.formScanQr,
@@ -1249,12 +1539,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         const SizedBox(height: 16),
         Row(
           children: [
-            Expanded(child: Divider(color: context.palette.divider.withValues(alpha: 0.5))),
+            Expanded(
+              child: Divider(
+                color: context.palette.divider.withValues(alpha: 0.5),
+              ),
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(l10n.formOrManually, style: TextStyle(color: context.palette.textDisabled, fontSize: 11)),
+              child: Text(
+                l10n.formOrManually,
+                style: TextStyle(
+                  color: context.palette.textDisabled,
+                  fontSize: 11,
+                ),
+              ),
             ),
-            Expanded(child: Divider(color: context.palette.divider.withValues(alpha: 0.5))),
+            Expanded(
+              child: Divider(
+                color: context.palette.divider.withValues(alpha: 0.5),
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 16),
@@ -1265,7 +1569,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           decoration: InputDecoration(
             labelText: l10n.formAccountIssuerLabel,
             hintText: l10n.formAccountIssuerHint,
-            prefixIcon: Icon(Icons.account_circle_outlined, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.account_circle_outlined,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -1297,17 +1605,29 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           ),
           child: Column(
             children: [
-              Icon(Icons.fingerprint_rounded, color: context.palette.typePasskey, size: 32),
+              Icon(
+                Icons.fingerprint_rounded,
+                color: context.palette.typePasskey,
+                size: 32,
+              ),
               const SizedBox(height: 12),
               Text(
                 l10n.formPasskeyDesc,
-                style: TextStyle(color: context.palette.textMuted, fontSize: 13, height: 1.5),
+                style: TextStyle(
+                  color: context.palette.textMuted,
+                  fontSize: 13,
+                  height: 1.5,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 8),
               Text(
                 l10n.formPasskeyHint,
-                style: TextStyle(color: context.palette.textDisabled, fontSize: 12, height: 1.4),
+                style: TextStyle(
+                  color: context.palette.textDisabled,
+                  fontSize: 12,
+                  height: 1.4,
+                ),
                 textAlign: TextAlign.center,
               ),
             ],
@@ -1330,7 +1650,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           dropdownColor: context.palette.drawer,
           decoration: InputDecoration(
             labelText: l10n.fieldKeyType,
-            prefixIcon: Icon(Icons.vpn_key_outlined, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.vpn_key_outlined,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
           items: const [
             DropdownMenuItem(value: 'Ed25519', child: Text('Ed25519')),
@@ -1349,7 +1673,10 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                 ? Center(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: CircularProgressIndicator(color: context.palette.typeSshKey, strokeWidth: 2.5),
+                      child: CircularProgressIndicator(
+                        color: context.palette.typeSshKey,
+                        strokeWidth: 2.5,
+                      ),
                     ),
                   )
                 : OutlinedButton.icon(
@@ -1358,8 +1685,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     label: Text(l10n.formGenerateSsh),
                     style: OutlinedButton.styleFrom(
                       foregroundColor: context.palette.typeSshKey,
-                      side: BorderSide(color: context.palette.typeSshKey, width: 1.5),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      side: BorderSide(
+                        color: context.palette.typeSshKey,
+                        width: 1.5,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 12),
                     ),
                   ),
@@ -1368,27 +1700,45 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         const SizedBox(height: 14),
         TextFormField(
           controller: _sshPrivateKeyCtrl,
-          style: TextStyle(color: context.palette.textPrimary, fontFamily: AppTheme.monoFamily, fontSize: 13),
+          style: TextStyle(
+            color: context.palette.textPrimary,
+            fontFamily: AppTheme.monoFamily,
+            fontSize: 13,
+          ),
           maxLines: 6,
           decoration: InputDecoration(
             labelText: l10n.fieldPrivateKey,
             hintText: '-----BEGIN OPENSSH PRIVATE KEY-----\n...',
             alignLabelWithHint: true,
-            prefixIcon: Icon(Icons.security_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.security_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
           validator: (v) =>
-              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty) ? l10n.formPrivateKeyRequired : null,
+              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty)
+              ? l10n.formPrivateKeyRequired
+              : null,
         ),
         const SizedBox(height: 14),
         TextFormField(
           controller: _sshPublicKeyCtrl,
-          style: TextStyle(color: context.palette.textPrimary, fontFamily: AppTheme.monoFamily, fontSize: 13),
+          style: TextStyle(
+            color: context.palette.textPrimary,
+            fontFamily: AppTheme.monoFamily,
+            fontSize: 13,
+          ),
           maxLines: 4,
           decoration: InputDecoration(
             labelText: l10n.formPublicKeyOptional,
             hintText: 'ssh-ed25519 AAAA...',
             alignLabelWithHint: true,
-            prefixIcon: Icon(Icons.public_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.public_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
         ),
         const SizedBox(height: 14),
@@ -1421,7 +1771,14 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               }
             });
           },
-          title: Text(l10n.formEnableDoubleEnc, style: TextStyle(color: context.palette.textPrimary, fontSize: 14, fontWeight: FontWeight.w600)),
+          title: Text(
+            l10n.formEnableDoubleEnc,
+            style: TextStyle(
+              color: context.palette.textPrimary,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
           subtitle: Text(
             l10n.formDoubleEncDesc,
             style: TextStyle(color: context.palette.textMuted, fontSize: 12),
@@ -1439,7 +1796,9 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             keyboardType: TextInputType.number,
             inputFormatters: [FilteringTextInputFormatter.digitsOnly],
             validator: (v) {
-              if (_isDoubleEncrypted && _existing == null && (v == null || v.trim().isEmpty)) {
+              if (_isDoubleEncrypted &&
+                  _existing == null &&
+                  (v == null || v.trim().isEmpty)) {
                 return l10n.formPinSecondaryRequired;
               }
               return null;
@@ -1452,7 +1811,13 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
               HapticFeedback.selectionClick();
               setState(() => _savePinBiometrically = v);
             },
-            title: Text(l10n.formBiometricUnlock, style: TextStyle(color: context.palette.textPrimary, fontSize: 13)),
+            title: Text(
+              l10n.formBiometricUnlock,
+              style: TextStyle(
+                color: context.palette.textPrimary,
+                fontSize: 13,
+              ),
+            ),
             subtitle: Text(
               l10n.formBiometricUnlockSub,
               style: TextStyle(color: context.palette.textMuted, fontSize: 11),
@@ -1486,13 +1851,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           dropdownColor: context.palette.drawer,
           decoration: InputDecoration(
             labelText: l10n.formRotationLabel,
-            prefixIcon: Icon(Icons.alarm_rounded, size: 18, color: context.palette.textMuted),
+            prefixIcon: Icon(
+              Icons.alarm_rounded,
+              size: 18,
+              color: context.palette.textMuted,
+            ),
           ),
           items: [
             DropdownMenuItem(value: 'none', child: Text(l10n.formRotNone)),
-            DropdownMenuItem(value: 'monthly', child: Text(l10n.formRotMonthly)),
-            DropdownMenuItem(value: 'quarterly', child: Text(l10n.rotationQuarterly)),
-            DropdownMenuItem(value: 'semiAnnually', child: Text(l10n.rotationSemiAnnually)),
+            DropdownMenuItem(
+              value: 'monthly',
+              child: Text(l10n.formRotMonthly),
+            ),
+            DropdownMenuItem(
+              value: 'quarterly',
+              child: Text(l10n.rotationQuarterly),
+            ),
+            DropdownMenuItem(
+              value: 'semiAnnually',
+              child: Text(l10n.rotationSemiAnnually),
+            ),
             DropdownMenuItem(value: 'custom', child: Text(l10n.formRotCustom)),
           ],
           onChanged: (val) {
@@ -1517,7 +1895,11 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             decoration: InputDecoration(
               labelText: l10n.formCustomDaysLabel,
               hintText: 'ej. 45, 90',
-              prefixIcon: Icon(Icons.date_range_rounded, size: 18, color: context.palette.textMuted),
+              prefixIcon: Icon(
+                Icons.date_range_rounded,
+                size: 18,
+                color: context.palette.textMuted,
+              ),
             ),
             validator: (v) {
               if (_rotationInterval == 'custom') {

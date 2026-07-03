@@ -1,9 +1,15 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:password_manager/features/credentials/application/credentials_provider.dart';
+import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/presentation/credential_form_screen.dart';
 import 'package:password_manager/features/credentials/presentation/widgets/password_generator_widget.dart';
 import 'package:password_manager/features/folders/application/folders_provider.dart';
 import 'package:password_manager/features/folders/domain/entities/folder.dart';
+import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:password_manager/theme/app_theme.dart';
 
 import '../../support/widget_harness.dart';
 
@@ -12,6 +18,15 @@ import '../../support/widget_harness.dart';
 class _EmptyFoldersNotifier extends FoldersNotifier {
   @override
   Future<List<Folder>> build() async => const [];
+}
+
+/// Serves a single credential synchronously so `_loadExisting` (which runs in
+/// `initState`, before any async build resolves) can read it via `valueOrNull`.
+class _OneCredentialNotifier extends CredentialsNotifier {
+  _OneCredentialNotifier(this.credential);
+  final Credential credential;
+  @override
+  Future<List<Credential>> build() => SynchronousFuture([credential]);
 }
 
 Future<void> pumpForm(WidgetTester tester) async {
@@ -26,6 +41,45 @@ Future<void> pumpForm(WidgetTester tester) async {
     ],
     surfaceSize: const Size(440, 1600),
   );
+}
+
+/// Pumps the form pushed onto a launcher route, so it has a real back button and
+/// a route to pop back to (needed to exercise the unsaved-changes guard).
+Future<void> pumpFormPushed(
+  WidgetTester tester, {
+  Widget form = const CredentialFormScreen(),
+  List<Override> overrides = const [],
+}) async {
+  tolerateInkHiddenPaintWarnings();
+  await tester.binding.setSurfaceSize(const Size(440, 1600));
+  addTearDown(() => tester.binding.setSurfaceSize(null));
+  await tester.pumpWidget(
+    ProviderScope(
+      overrides: [
+        foldersNotifierProvider.overrideWith(_EmptyFoldersNotifier.new),
+        ...overrides,
+      ],
+      child: MaterialApp(
+        theme: AppTheme.dark(),
+        localizationsDelegates: AppLocalizations.localizationsDelegates,
+        supportedLocales: AppLocalizations.supportedLocales,
+        home: Scaffold(
+          body: Builder(
+            builder: (context) => Center(
+              child: ElevatedButton(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(builder: (_) => form),
+                ),
+                child: const Text('open'),
+              ),
+            ),
+          ),
+        ),
+      ),
+    ),
+  );
+  await tester.tap(find.text('open'));
+  await tester.pumpAndSettle();
 }
 
 void main() {
@@ -75,5 +129,64 @@ void main() {
     // The generator surfaces its "Use & copy" action and a length slider.
     expect(find.text('Use & copy'), findsOneWidget);
     expect(find.byType(Slider), findsOneWidget);
+  });
+
+  testWidgets('edit mode preloads the existing credential fields',
+      (tester) async {
+    final cred = Credential(
+      id: 'c-1',
+      type: CredentialType.password,
+      title: 'GitHub',
+      username: 'octocat',
+      password: 's3cr3t',
+      website: 'https://github.com',
+      createdAt: DateTime(2020),
+      updatedAt: DateTime(2020),
+    );
+    await pumpFormPushed(
+      tester,
+      form: const CredentialFormScreen(existingId: 'c-1'),
+      overrides: [
+        credentialsNotifierProvider.overrideWith(
+          () => _OneCredentialNotifier(cred),
+        ),
+      ],
+    );
+
+    // Header + CTA reflect edit mode, and the title field shows the value.
+    expect(find.text('Edit credential'), findsOneWidget);
+    expect(find.text('Save changes'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'GitHub'), findsOneWidget);
+    expect(find.widgetWithText(TextFormField, 'octocat'), findsOneWidget);
+  });
+
+  testWidgets('editing a field then pressing back prompts to discard',
+      (tester) async {
+    await pumpFormPushed(tester);
+
+    await tester.enterText(find.byType(TextFormField).first, 'Draft entry');
+    await tester.pump();
+
+    // Simulate the system/app-bar back (routed through the form's PopScope).
+    await tester.state<NavigatorState>(find.byType(Navigator).first).maybePop();
+    await tester.pumpAndSettle();
+
+    // Guard dialog appears; "Keep editing" stays on the form.
+    expect(find.text('Discard changes?'), findsOneWidget);
+    await tester.tap(find.text('Keep editing'));
+    await tester.pumpAndSettle();
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(find.widgetWithText(TextFormField, 'Draft entry'), findsOneWidget);
+  });
+
+  testWidgets('an untouched form pops back without the discard prompt',
+      (tester) async {
+    await pumpFormPushed(tester);
+
+    await tester.state<NavigatorState>(find.byType(Navigator).first).maybePop();
+    await tester.pumpAndSettle();
+
+    expect(find.text('Discard changes?'), findsNothing);
+    expect(find.text('open'), findsOneWidget); // back on the launcher route
   });
 }

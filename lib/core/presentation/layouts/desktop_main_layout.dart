@@ -369,7 +369,12 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     }
 
     if (mode == RightPaneMode.edit) {
-      return CredentialFormScreen(existingId: selectedId);
+      // Keyed by id so switching the edited credential rebuilds the form State
+      // from scratch — no field values leak across edits.
+      return CredentialFormScreen(
+        key: ValueKey('edit-$selectedId'),
+        existingId: selectedId,
+      );
     }
 
     // Default: Show Details. Keyed by id so switching credentials rebuilds the
