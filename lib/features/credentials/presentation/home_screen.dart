@@ -366,6 +366,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                         : CredentialListWidget(
                             credentials: filtered,
                             reorderMode: reorderActive,
+                            sectioned: sort == VaultSort.titleAsc,
                             onReorder: canReorder
                                 ? (o, n) => _onReorder(filtered, o, n)
                                 : null,

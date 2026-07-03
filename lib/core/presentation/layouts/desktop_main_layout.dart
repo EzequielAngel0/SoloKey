@@ -318,6 +318,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
           return CredentialListWidget(
             credentials: list,
             reorderMode: canReorder,
+            sectioned: sort == VaultSort.titleAsc,
             onReorder:
                 canReorder ? (o, n) => _onReorder(list, o, n) : null,
           );
