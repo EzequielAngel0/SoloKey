@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -37,11 +39,34 @@ class DesktopMainLayout extends ConsumerStatefulWidget {
 
 class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   final _searchCtrl = TextEditingController();
+  Timer? _searchDebounce;
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  /// Debounced search, mirroring mobile: waits ~250ms after the last keystroke
+  /// before hitting the filtering provider so typing in a large vault does not
+  /// refilter per character. The immediate `setState` refreshes the clear button
+  /// / reorder affordance without waiting for the debounce.
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        ref.read(credentialSearchNotifierProvider.notifier).update(value);
+      }
+    });
+    setState(() {});
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchCtrl.clear();
+    ref.read(credentialSearchNotifierProvider.notifier).update('');
+    setState(() {});
   }
 
   @override
@@ -179,7 +204,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                   padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
                   child: TextField(
                     controller: _searchCtrl,
-                    onChanged: (v) => ref.read(credentialSearchNotifierProvider.notifier).update(v),
+                    onChanged: _onSearchChanged,
                     style: TextStyle(color: palette.textPrimary, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: l10n.commonSearch,
@@ -187,10 +212,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                       suffixIcon: _searchCtrl.text.isNotEmpty
                           ? IconButton(
                               icon: Icon(Icons.close_rounded, color: palette.textMuted, size: 18),
-                              onPressed: () {
-                                _searchCtrl.clear();
-                                ref.read(credentialSearchNotifierProvider.notifier).update('');
-                              },
+                              onPressed: _clearSearch,
                             )
                           : null,
                       filled: true,

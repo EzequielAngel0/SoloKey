@@ -44,4 +44,32 @@ void main() {
     expect(tester.takeException(), isNull);
     expect(find.text('GitHub'), findsWidgets);
   });
+
+  testWidgets('desktop search is debounced (>250ms) before it filters',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      const DesktopMainLayout(),
+      overrides: [
+        getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
+            FakeCredentialRepository([_c('1', 'GitHub'), _c('2', 'GitLab')]))),
+        foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+      ],
+      surfaceSize: const Size(1300, 900),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    await tester.enterText(find.byType(TextField), 'hub');
+    // Before the debounce elapses, both are still listed.
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('GitLab'), findsWidgets);
+
+    // After the debounce fires, only the match remains.
+    await tester.pump(const Duration(milliseconds: 250));
+    await tester.pump();
+    expect(find.text('GitHub'), findsWidgets);
+    expect(find.text('GitLab'), findsNothing);
+  });
 }
