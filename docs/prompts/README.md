@@ -39,6 +39,8 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 | 80 | [Captura de QR en Windows para TOTP](80_captura_qr_windows.md) | **feature nueva** | escanear QR desde la pantalla |
 | 90 | [Transversal + features de app](90_transversal.md) | toda la app | búsqueda global, a11y, perf, biometría |
 | 95 | [Pruebas (lógica + UI + integración)](95_pruebas.md) | `test/**`, `integration_test/**` | pirámide unit→widget→e2e; **un solo chat**; deja el proceso auto-sostenible |
+| 96 | [Pruebas del módulo Sync](96_pruebas_sync.md) | `sync_service`, `pairing_screen`, `test/support` | fake reutilizable de `SyncService`, lógica pura, widget tests de pairing |
+| 97 | [Subir cobertura + smoke→behavioral](97_pruebas_cobertura.md) | `credential_form`, detalle, ajustes, servicios | guardado por tipo, revelar con auth mockeada, eleva smoke a behavioral |
 
 > **Testing:** la red de pruebas **ya existe** — pirámide unit → widget → e2e en
 > `test/**` (espeja `lib/**`, con harness compartido `test/support/widget_harness.dart`)
