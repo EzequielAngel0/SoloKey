@@ -98,12 +98,23 @@ class CsvImportService {
     final totp = _getField(row, ['login_totp', 'totp', 'secret', 'otp']);
 
     final now = DateTime.now();
+    final titleLower = title.toLowerCase();
+    final hasPassword = password != null && password.isNotEmpty;
+    final hasTotp = totp != null && totp.isNotEmpty;
 
-    // Determine type
+    // Determine type. A row carrying BOTH a login password and a TOTP secret
+    // (a login with 2FA, e.g. Bitwarden) stays a password credential so its login
+    // password is preserved — turning it into a TOTP would store the login
+    // password as the "seed" and break code generation. Only TOTP-only rows
+    // become authenticators; standalone 2FA is best handled by the dedicated
+    // otpauth import.
     var type = CredentialType.password;
-    if (totp != null && totp.isNotEmpty) {
+    if (hasTotp && !hasPassword) {
       type = CredentialType.totp;
-    } else if (row.containsKey('api_key') || row.containsKey('key') || title.toLowerCase().contains('api key') || title.toLowerCase().contains('apikey')) {
+    } else if (row.containsKey('api_key') ||
+        row.containsKey('key') ||
+        titleLower.contains('api key') ||
+        titleLower.contains('apikey')) {
       type = CredentialType.apiKey;
     }
 
@@ -112,7 +123,9 @@ class CsvImportService {
       type: type,
       title: title,
       username: username,
-      password: password ?? totp,
+      // For TOTP-only rows the secret lives in [password] (where the TOTP tile
+      // reads it); otherwise keep the real login/API password.
+      password: hasPassword ? password : totp,
       website: website,
       notes: notes,
       createdAt: now,
