@@ -38,6 +38,12 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 | 70 | [Escritorio (layout/sidebar/paleta)](70_escritorio.md) | `desktop_main_layout`, `command_palette` | sidebar agrupada, master-detail, atajos |
 | 80 | [Captura de QR en Windows para TOTP](80_captura_qr_windows.md) | **feature nueva** | escanear QR desde la pantalla |
 | 90 | [Transversal + features de app](90_transversal.md) | toda la app | búsqueda global, a11y, perf, biometría |
+| 95 | [Pruebas (lógica + UI + integración)](95_pruebas.md) | `test/**`, `integration_test/**` | pirámide unit→widget→e2e; **un solo chat**; deja el proceso auto-sostenible |
+
+> **Testing:** el prompt **95** construye la red de pruebas completa en **un solo
+> chat** (lógica, widget e integración) y, al final, actualiza los demás prompts para
+> que cada cambio futuro **cree/edite** sus tests. Guía técnica del motor
+> `integration_test` y patrones anti-flaky: [`PRUEBAS_INTEGRACION_FLUTTER.md`](PRUEBAS_INTEGRACION_FLUTTER.md).
 
 ## Estado conocido (bugs/pedidos ya identificados a resolver en estos prompts)
 
