@@ -113,6 +113,11 @@ const Duration _kSnoozeDuration = Duration(days: 3);
 const int _kApprovalNotificationId = 990001;
 const String _kApprovalPayload = '__approve_login__';
 
+// "N changes synced" notification: fixed id + payload sentinel. Tapping it opens
+// the Sync screen, whose summary card shows what changed.
+const int _kSyncNotificationId = 990002;
+const String _kSyncPayload = '__synced__';
+
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
   DueRotation item,
@@ -243,7 +248,7 @@ class NotificationService {
             final until =
                 DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
             await _db.credentialDao.markRotationPrompted(payload, until);
-          } else if (payload == _kApprovalPayload) {
+          } else if (payload == _kApprovalPayload || payload == _kSyncPayload) {
             WidgetsBinding.instance.addPostFrameCallback(
               (_) => NotificationNavigation.openSync(),
             );
@@ -287,6 +292,45 @@ class NotificationService {
       notificationDetails: details,
       payload: _kApprovalPayload,
     );
+  }
+
+  /// Fires a local "N changes synced" banner after a delta lands on THIS device.
+  /// [count] is the number of vault items applied locally; no-op when <= 0.
+  /// Tapping opens the Sync screen (its summary card shows what changed).
+  Future<void> showSyncCompleted(int count) async {
+    if (count <= 0) return;
+    await initialize();
+    final l10n = await _loadNotifL10n();
+    if (_isDesktop) {
+      final notification = LocalNotification(
+        title: l10n.notifSyncTitle,
+        body: l10n.notifSyncBody(count),
+      );
+      notification.onClick = () {
+        windowManager.show();
+        windowManager.focus();
+        NotificationNavigation.openSync();
+      };
+      await notification.show();
+    } else if (_isMobile) {
+      final details = NotificationDetails(
+        android: AndroidNotificationDetails(
+          _kChannelId,
+          l10n.notifRotationChannelName,
+          channelDescription: l10n.notifRotationChannelDesc,
+          importance: Importance.defaultImportance,
+          priority: Priority.defaultPriority,
+        ),
+        iOS: const DarwinNotificationDetails(),
+      );
+      await _mobilePlugin.show(
+        id: _kSyncNotificationId,
+        title: l10n.notifSyncTitle,
+        body: l10n.notifSyncBody(count),
+        notificationDetails: details,
+        payload: _kSyncPayload,
+      );
+    }
   }
 
   /// Scans the vault and fires native reminders for every overdue credential.
@@ -342,6 +386,11 @@ class NotificationService {
     if (id == null) return;
     if (id == _kApprovalPayload) {
       // M3: abrir la pantalla de Sincronizar para aprobar el desbloqueo.
+      NotificationNavigation.openSync();
+      return;
+    }
+    if (id == _kSyncPayload) {
+      // "N cambios sincronizados": abre Sincronizar para ver el resumen.
       NotificationNavigation.openSync();
       return;
     }

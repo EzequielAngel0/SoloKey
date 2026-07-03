@@ -6,6 +6,7 @@ import 'package:password_manager/features/credentials/application/credentials_pr
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/folders/application/folders_provider.dart';
 import 'package:password_manager/features/folders/domain/entities/folder.dart';
+import 'package:password_manager/features/sync/application/sync_status_provider.dart';
 
 import '../support/fake_credential_repository.dart';
 import '../support/widget_harness.dart';
@@ -13,6 +14,12 @@ import '../support/widget_harness.dart';
 class _EmptyFolders extends FoldersNotifier {
   @override
   Future<List<Folder>> build() async => const [];
+}
+
+/// Fixed idle sync status so the sidebar badge renders without the sync engine.
+class _IdleSyncStatus extends SyncStatus {
+  @override
+  SyncStatusState build() => const SyncStatusState(phase: SyncPhase.idle);
 }
 
 Credential _c(String id, String title) => Credential(
@@ -35,6 +42,7 @@ void main() {
         getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
             FakeCredentialRepository([_c('1', 'GitHub'), _c('2', 'GitLab')]))),
         foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+        syncStatusProvider.overrideWith(_IdleSyncStatus.new),
       ],
       // Desktop breakpoint: give it a wide window.
       surfaceSize: const Size(1300, 900),
@@ -55,6 +63,7 @@ void main() {
         getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
             FakeCredentialRepository([_c('1', 'GitHub'), _c('2', 'GitLab')]))),
         foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+        syncStatusProvider.overrideWith(_IdleSyncStatus.new),
       ],
       surfaceSize: const Size(1300, 900),
     );

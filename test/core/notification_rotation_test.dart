@@ -136,4 +136,19 @@ void main() {
       expect(ids, ['due']);
     });
   });
+
+  group('showSyncCompleted', () {
+    late AppDatabase db;
+    setUp(() => db = AppDatabase.forTesting(NativeDatabase.memory()));
+    tearDown(() async => db.close());
+
+    test('no-op for a non-positive change count (never hits the platform)',
+        () async {
+      final service = NotificationService(db);
+      // count <= 0 returns before initialize()/plugin, so this must not throw
+      // even without any platform notification channel registered.
+      await expectLater(service.showSyncCompleted(0), completes);
+      await expectLater(service.showSyncCompleted(-3), completes);
+    });
+  });
 }

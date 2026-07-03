@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/di/injection.dart';
+import '../../../core/services/notification_service.dart';
 import '../../credentials/application/credentials_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/sync_events_source.dart';
@@ -124,6 +125,17 @@ class SyncStatus extends _$SyncStatus {
     if (summary.isNotEmpty) {
       ref.invalidate(credentialsNotifierProvider);
       ref.invalidate(foldersNotifierProvider);
+      _notifySynced(summary.total);
+    }
+  }
+
+  /// Fires the "N changes synced" native banner (feature b). Guarded because the
+  /// notification service (and DI) is absent in unit tests.
+  void _notifySynced(int count) {
+    try {
+      unawaited(getIt<NotificationService>().showSyncCompleted(count));
+    } catch (_) {
+      // No notification service available — ignore.
     }
   }
 

@@ -13,6 +13,7 @@ import '../../../theme/app_palette.dart';
 import '../../credentials/presentation/qr_scanner_screen.dart';
 import '../application/pairing_notifier.dart';
 import '../infrastructure/sync_service.dart';
+import 'widgets/sync_summary_card.dart';
 
 class PairingScreen extends ConsumerWidget {
   const PairingScreen({super.key});
@@ -319,7 +320,11 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
             ],
           ),
         ),
-        const SizedBox(height: 28),
+        const SizedBox(height: 16),
+
+        // "Qué se sincronizó" + historial de las ultimas rondas.
+        const SyncSummaryCard(),
+        const SizedBox(height: 24),
 
         Wrap(
           alignment: WrapAlignment.center,
@@ -664,6 +669,8 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                 Divider(color: palette.divider, height: 1),
                 const SizedBox(height: 28),
                 _buildSyncSection(),
+                const SizedBox(height: 16),
+                const SyncSummaryCard(),
                 const SizedBox(height: 24),
                 _buildWifiUnlockSection(),
               ],

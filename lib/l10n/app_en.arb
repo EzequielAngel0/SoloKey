@@ -546,6 +546,7 @@
   "transferEncryptionInfo": "The file is encrypted with AES-256-GCM + Argon2id. Only someone who knows the export password can open it.",
   "transferExportButton": "Export vault",
   "transferExportDone": "Export completed",
+  "transferBackupReminder": "It's been a while since your last backup. Export an encrypted copy and keep it somewhere safe.",
   "transferSavedTo": "Saved to: {path}",
   "@transferSavedTo": { "placeholders": { "path": { "type": "String" } } },
   "transferSummary": "{creds} credentials · {folders} folders",

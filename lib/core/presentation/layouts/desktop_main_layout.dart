@@ -21,6 +21,7 @@ import '../../../../features/credentials/presentation/widgets/credential_list_wi
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
 import '../../../../features/folders/presentation/widgets/folder_tree.dart';
+import '../../../../features/sync/application/sync_status_provider.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../features/secure_files/presentation/secure_files_screen.dart';
 import '../../../../features/settings/presentation/settings_screen.dart';
@@ -426,6 +427,8 @@ class _DesktopSidebar extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final selectedIndex = ref.watch(desktopSelectedNavigationProvider);
     final collapsed = ref.watch(desktopSidebarCollapsedProvider);
+    final syncStatus = ref.watch(syncStatusProvider);
+    final syncBadge = _syncBadge(context, syncStatus);
 
     final menuItems = [
       _SidebarItemData(icon: Icons.inventory_2_rounded, label: l10n.navVault, index: 0),
@@ -434,7 +437,11 @@ class _DesktopSidebar extends ConsumerWidget {
       _SidebarItemData(icon: Icons.shield_rounded, label: l10n.navAudit, index: 3),
       _SidebarItemData(icon: Icons.folder_shared_rounded, label: l10n.navSecureFiles, index: 6),
       _SidebarItemData(icon: Icons.settings_rounded, label: l10n.navSettings, index: 4),
-      _SidebarItemData(icon: Icons.sync_rounded, label: l10n.navSync, index: 5),
+      _SidebarItemData(
+          icon: Icons.sync_rounded,
+          label: l10n.navSync,
+          index: 5,
+          badge: syncBadge),
     ];
 
     return AnimatedContainer(
@@ -516,6 +523,7 @@ class _DesktopSidebar extends ConsumerWidget {
                   label: item.label,
                   isSelected: isSelected,
                   collapsed: collapsed,
+                  badge: item.badge,
                   onTap: () {
                     ref.read(desktopSelectedNavigationProvider.notifier).state = item.index;
                     // Reset details state on tab switch
@@ -628,16 +636,46 @@ class _SidebarSearchButton extends StatelessWidget {
   }
 }
 
+/// Small status dot/spinner shown on the Sync nav item, reflecting the app-wide
+/// [syncStatusProvider] phase (syncing · in-sync · error). Null when idle.
+Widget? _syncBadge(BuildContext context, SyncStatusState s) {
+  final p = context.palette;
+  Widget dot(Color c) => Container(
+        width: 8,
+        height: 8,
+        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+      );
+  switch (s.phase) {
+    case SyncPhase.connecting:
+    case SyncPhase.syncing:
+      return SizedBox(
+        width: 10,
+        height: 10,
+        child: CircularProgressIndicator(strokeWidth: 1.6, color: p.accent),
+      );
+    case SyncPhase.error:
+      return dot(p.danger);
+    case SyncPhase.success:
+      return dot(p.success);
+    case SyncPhase.active:
+      return dot(s.connectedDevices > 0 ? p.success : p.textMuted);
+    case SyncPhase.idle:
+      return null;
+  }
+}
+
 class _SidebarItemData {
   const _SidebarItemData({
     required this.icon,
     required this.label,
     required this.index,
+    this.badge,
   });
 
   final IconData icon;
   final String label;
   final int index;
+  final Widget? badge;
 }
 
 class _SidebarItem extends StatefulWidget {
@@ -647,12 +685,14 @@ class _SidebarItem extends StatefulWidget {
     required this.isSelected,
     required this.onTap,
     this.collapsed = false,
+    this.badge,
   });
 
   final IconData icon;
   final String label;
   final bool isSelected;
   final bool collapsed;
+  final Widget? badge;
   final VoidCallback onTap;
 
   @override
@@ -661,6 +701,19 @@ class _SidebarItem extends StatefulWidget {
 
 class _SidebarItemState extends State<_SidebarItem> {
   bool _isHovered = false;
+
+  /// The nav icon with the optional status badge pinned to its top-right.
+  Widget _iconWithBadge(Color iconColor) {
+    final icon = Icon(widget.icon, color: iconColor, size: 20);
+    if (widget.badge == null) return icon;
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        icon,
+        Positioned(right: -3, top: -3, child: widget.badge!),
+      ],
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -696,7 +749,7 @@ class _SidebarItemState extends State<_SidebarItem> {
             borderRadius: BorderRadius.circular(10),
           ),
           child: collapsed
-              ? Center(child: Icon(widget.icon, color: iconColor, size: 20))
+              ? Center(child: _iconWithBadge(iconColor))
               : Row(
                   children: [
                     AnimatedContainer(
@@ -709,7 +762,7 @@ class _SidebarItemState extends State<_SidebarItem> {
                       ),
                     ),
                     SizedBox(width: isSelected ? 12 : 16),
-                    Icon(widget.icon, color: iconColor, size: 20),
+                    _iconWithBadge(iconColor),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(

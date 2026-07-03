@@ -2642,6 +2642,12 @@ abstract class AppLocalizations {
   /// **'Export completed'**
   String get transferExportDone;
 
+  /// No description provided for @transferBackupReminder.
+  ///
+  /// In en, this message translates to:
+  /// **'It\'s been a while since your last backup. Export an encrypted copy and keep it somewhere safe.'**
+  String get transferBackupReminder;
+
   /// No description provided for @transferSavedTo.
   ///
   /// In en, this message translates to:

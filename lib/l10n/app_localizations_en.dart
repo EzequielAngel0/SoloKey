@@ -1393,6 +1393,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferExportDone => 'Export completed';
 
   @override
+  String get transferBackupReminder =>
+      'It\'s been a while since your last backup. Export an encrypted copy and keep it somewhere safe.';
+
+  @override
   String transferSavedTo(String path) {
     return 'Saved to: $path';
   }

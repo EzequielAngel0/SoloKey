@@ -3,11 +3,13 @@ import 'dart:convert';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/vault_export_service.dart';
 import '../../../core/services/csv_import_service.dart';
 import '../../../core/services/otpauth_import_service.dart';
+import '../../../core/services/backup_reminder_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
@@ -35,6 +37,11 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   bool _exporting = false;
   ExportSummary? _lastExport;
 
+  /// Whether it's been a while since the last backup (nudges the user to export).
+  /// Null when DI isn't configured (e.g. widget tests) — the reminder is skipped.
+  BackupReminderService? _reminder;
+  bool _backupStale = false;
+
   /// Ids of the credentials the user picked in the export tree. Empty = nothing
   /// selected yet (the tree starts collapsed; "Seleccionar todo" picks all).
   final Set<String> _selectedCredentialIds = {};
@@ -49,6 +56,19 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    try {
+      _reminder = BackupReminderService(getIt<FlutterSecureStorage>());
+    } catch (_) {
+      _reminder = null; // DI not configured (widget tests)
+    }
+    _loadReminder();
+  }
+
+  Future<void> _loadReminder() async {
+    final reminder = _reminder;
+    if (reminder == null) return;
+    final stale = await reminder.isBackupStale();
+    if (mounted) setState(() => _backupStale = stale);
   }
 
   @override
@@ -92,7 +112,11 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
         credentialIds: {..._selectedCredentialIds},
       );
       if (mounted && summary != null) {
-        setState(() => _lastExport = summary);
+        await _reminder?.markExportedNow();
+        setState(() {
+          _lastExport = summary;
+          _backupStale = false;
+        });
         _snack(
           l10n.transferExportedSummary(
               summary.totalCredentials, summary.totalFolders),
@@ -350,6 +374,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
             onExport: _exporting ? null : _doExport,
             isLoading: _exporting,
             lastSummary: _lastExport,
+            backupStale: _backupStale,
           ),
           _ImportTab(
             mode: _importMode,
@@ -380,6 +405,7 @@ class _ExportTab extends StatelessWidget {
     required this.onExport,
     required this.isLoading,
     required this.lastSummary,
+    required this.backupStale,
   });
 
   final List<Folder> folders;
@@ -391,6 +417,7 @@ class _ExportTab extends StatelessWidget {
   final VoidCallback? onExport;
   final bool isLoading;
   final ExportSummary? lastSummary;
+  final bool backupStale;
 
   @override
   Widget build(BuildContext context) {
@@ -399,6 +426,14 @@ class _ExportTab extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(20),
       children: [
+        if (backupStale) ...[
+          _InfoBanner(
+            icon: Icons.history_toggle_off_rounded,
+            color: palette.warning,
+            text: l10n.transferBackupReminder,
+          ),
+          const SizedBox(height: 20),
+        ],
         // ── Export password ──────────────────────────────────────────────────
         _SectionLabel(label: l10n.transferExportPasswordLabel),
         const SizedBox(height: 8),
