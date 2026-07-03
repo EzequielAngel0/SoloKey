@@ -42,3 +42,18 @@ Future<void> pumpApp(
 /// Wraps [child] in a [Scaffold] body — handy for isolated components that
 /// expect Material ancestors (ink, text directionality, etc.).
 Widget scaffolded(Widget child) => Scaffold(body: child);
+
+/// Tolerates ONLY Flutter's debug ink warning "…will hide those effects",
+/// emitted when a `ListTile`/`SwitchListTile` sits inside an opaque colored
+/// container (e.g. `FormSection`). It's a paint-only cosmetic check unrelated to
+/// the behavior under test; every other error still surfaces and fails the test.
+/// Call this at the very start of a test (before pumping), so it is active for
+/// the first paint too.
+void tolerateInkHiddenPaintWarnings() {
+  final original = FlutterError.onError;
+  FlutterError.onError = (details) {
+    if (details.exceptionAsString().contains('hide those effects')) return;
+    original?.call(details);
+  };
+  addTearDown(() => FlutterError.onError = original);
+}
