@@ -9,7 +9,6 @@ import '../../../l10n/app_localizations.dart';
 import '../../../shared/widgets/secure_text_field.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
-import '../../../theme/app_theme.dart';
 import '../application/credentials_provider.dart';
 import '../application/duplicate_detector.dart';
 import '../../folders/application/folders_provider.dart';
@@ -21,6 +20,8 @@ import 'widgets/type_selector_premium.dart';
 import 'widgets/password_row_widget.dart';
 import 'widgets/favorite_toggle.dart';
 import 'widgets/folder_picker_sheet.dart';
+import 'widgets/totp_fields_section.dart';
+import 'widgets/ssh_key_fields_section.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/double_envelope_service.dart';
 import '../../../core/services/ssh_key_generator_service.dart';
@@ -1577,145 +1578,12 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildTotpFields() {
-    final l10n = AppLocalizations.of(context);
-    return FormSection(
-      icon: Icons.access_time_rounded,
-      accentColor: context.palette.typeTotp,
-      title: l10n.formSection2fa,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: context.palette.typeTotp.withValues(alpha: 0.06),
-            borderRadius: BorderRadius.circular(10),
-            border: Border.all(
-              color: context.palette.typeTotp.withValues(alpha: 0.2),
-            ),
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Icon(
-                Icons.info_outline_rounded,
-                size: 16,
-                color: context.palette.typeTotp.withValues(alpha: 0.8),
-              ),
-              const SizedBox(width: 10),
-              Expanded(
-                child: Text(
-                  l10n.formTotpDesc,
-                  style: TextStyle(
-                    color: context.palette.textMuted,
-                    fontSize: 12,
-                    height: 1.5,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-
-        Material(
-          color: context.palette.typeTotp.withValues(alpha: 0.08),
-          borderRadius: BorderRadius.circular(14),
-          child: InkWell(
-            onTap: _scanQr,
-            borderRadius: BorderRadius.circular(14),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: context.palette.typeTotp.withValues(alpha: 0.25),
-                ),
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.qr_code_scanner_rounded,
-                    color: context.palette.typeTotp,
-                    size: 22,
-                  ),
-                  const SizedBox(width: 10),
-                  Text(
-                    l10n.formScanQr,
-                    style: TextStyle(
-                      color: context.palette.typeTotp,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 8),
-        Center(
-          child: TextButton.icon(
-            onPressed: _pasteTotpFromClipboard,
-            icon: Icon(
-              Icons.content_paste_rounded,
-              size: 16,
-              color: context.palette.typeTotp,
-            ),
-            label: Text(l10n.formPasteTotp),
-            style: TextButton.styleFrom(
-              foregroundColor: context.palette.typeTotp,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 8),
-        Row(
-          children: [
-            Expanded(
-              child: Divider(
-                color: context.palette.divider.withValues(alpha: 0.5),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                l10n.formOrManually,
-                style: TextStyle(
-                  color: context.palette.textDisabled,
-                  fontSize: 11,
-                ),
-              ),
-            ),
-            Expanded(
-              child: Divider(
-                color: context.palette.divider.withValues(alpha: 0.5),
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 16),
-
-        TextFormField(
-          controller: _totpIssuerCtrl,
-          style: TextStyle(color: context.palette.textPrimary),
-          decoration: InputDecoration(
-            labelText: l10n.formAccountIssuerLabel,
-            hintText: l10n.formAccountIssuerHint,
-            prefixIcon: Icon(
-              Icons.account_circle_outlined,
-              size: 18,
-              color: context.palette.textMuted,
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        SecureTextField(
-          controller: _totpSecretCtrl,
-          label: l10n.formTotpSecretLabel,
-          validator: _validateTotpSecret,
-        ),
-      ],
+    return TotpFieldsSection(
+      issuerCtrl: _totpIssuerCtrl,
+      secretCtrl: _totpSecretCtrl,
+      onScan: _scanQr,
+      onPaste: _pasteTotpFromClipboard,
+      secretValidator: _validateTotpSecret,
     );
   }
 
@@ -1771,114 +1639,16 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   Widget _buildSshKeyFields() {
     final l10n = AppLocalizations.of(context);
-    return FormSection(
-      icon: Icons.terminal_rounded,
-      accentColor: context.palette.typeSshKey,
-      title: l10n.formSectionSsh,
-      children: [
-        DropdownButtonFormField<String>(
-          initialValue: _sshKeyType,
-          style: TextStyle(color: context.palette.textPrimary),
-          dropdownColor: context.palette.drawer,
-          decoration: InputDecoration(
-            labelText: l10n.fieldKeyType,
-            prefixIcon: Icon(
-              Icons.vpn_key_outlined,
-              size: 18,
-              color: context.palette.textMuted,
-            ),
-          ),
-          items: const [
-            DropdownMenuItem(value: 'Ed25519', child: Text('Ed25519')),
-            DropdownMenuItem(value: 'RSA', child: Text('RSA')),
-            DropdownMenuItem(value: 'ECDSA', child: Text('ECDSA')),
-          ],
-          onChanged: (val) {
-            if (val != null) setState(() => _sshKeyType = val);
-          },
-        ),
-        if (_sshKeyType == 'Ed25519') ...[
-          const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: _isGeneratingSshKey
-                ? Center(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8),
-                      child: CircularProgressIndicator(
-                        color: context.palette.typeSshKey,
-                        strokeWidth: 2.5,
-                      ),
-                    ),
-                  )
-                : OutlinedButton.icon(
-                    onPressed: _generateSshKey,
-                    icon: const Icon(Icons.auto_awesome_rounded, size: 16),
-                    label: Text(l10n.formGenerateSsh),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: context.palette.typeSshKey,
-                      side: BorderSide(
-                        color: context.palette.typeSshKey,
-                        width: 1.5,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                    ),
-                  ),
-          ),
-        ],
-        const SizedBox(height: 14),
-        TextFormField(
-          controller: _sshPrivateKeyCtrl,
-          style: TextStyle(
-            color: context.palette.textPrimary,
-            fontFamily: AppTheme.monoFamily,
-            fontSize: 13,
-          ),
-          maxLines: 6,
-          decoration: InputDecoration(
-            labelText: l10n.fieldPrivateKey,
-            hintText: '-----BEGIN OPENSSH PRIVATE KEY-----\n...',
-            alignLabelWithHint: true,
-            prefixIcon: Icon(
-              Icons.security_rounded,
-              size: 18,
-              color: context.palette.textMuted,
-            ),
-          ),
-          validator: (v) =>
-              _type == CredentialType.sshKey && (v == null || v.trim().isEmpty)
-              ? l10n.formPrivateKeyRequired
-              : null,
-        ),
-        const SizedBox(height: 14),
-        TextFormField(
-          controller: _sshPublicKeyCtrl,
-          style: TextStyle(
-            color: context.palette.textPrimary,
-            fontFamily: AppTheme.monoFamily,
-            fontSize: 13,
-          ),
-          maxLines: 4,
-          decoration: InputDecoration(
-            labelText: l10n.formPublicKeyOptional,
-            hintText: 'ssh-ed25519 AAAA...',
-            alignLabelWithHint: true,
-            prefixIcon: Icon(
-              Icons.public_rounded,
-              size: 18,
-              color: context.palette.textMuted,
-            ),
-          ),
-        ),
-        const SizedBox(height: 14),
-        SecureTextField(
-          controller: _sshPassphraseCtrl,
-          label: l10n.formKeyPassphraseOptional,
-        ),
-      ],
+    return SshKeyFieldsSection(
+      keyType: _sshKeyType,
+      onKeyTypeChanged: (val) => setState(() => _sshKeyType = val),
+      isGenerating: _isGeneratingSshKey,
+      onGenerate: _generateSshKey,
+      privateKeyCtrl: _sshPrivateKeyCtrl,
+      publicKeyCtrl: _sshPublicKeyCtrl,
+      passphraseCtrl: _sshPassphraseCtrl,
+      privateKeyValidator: (v) =>
+          (v == null || v.trim().isEmpty) ? l10n.formPrivateKeyRequired : null,
     );
   }
 
