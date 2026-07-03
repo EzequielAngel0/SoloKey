@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:password_manager/core/services/biometric_auth_service.dart';
 import 'package:password_manager/features/credentials/application/credential_health_provider.dart';
 import 'package:password_manager/features/credentials/application/credentials_provider.dart';
@@ -211,6 +212,44 @@ void main() {
       );
       expect(_monoCode(), findsNothing);
       expect(find.text('Invalid'), findsOneWidget);
+    });
+  });
+
+  group('CredentialDetailScreen — TOTP QR export', () {
+    testWidgets('granted auth renders the QR', (tester) async {
+      bio.result = true;
+      await pumpDetail(
+        tester,
+        _cred(
+          type: CredentialType.totp,
+          title: 'Google',
+          password: 'JBSWY3DPEHPK3PXP',
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.qr_code_2_rounded));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400)); // sheet animates in
+
+      expect(bio.calls, greaterThan(0));
+      expect(find.byType(QrImageView), findsOneWidget);
+    });
+
+    testWidgets('denied auth does not render the QR', (tester) async {
+      bio.result = false;
+      await pumpDetail(
+        tester,
+        _cred(
+          type: CredentialType.totp,
+          title: 'Google',
+          password: 'JBSWY3DPEHPK3PXP',
+        ),
+      );
+      await tester.tap(find.byIcon(Icons.qr_code_2_rounded));
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 400));
+
+      expect(bio.calls, greaterThan(0));
+      expect(find.byType(QrImageView), findsNothing);
     });
   });
 

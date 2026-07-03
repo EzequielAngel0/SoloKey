@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:otp/otp.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
@@ -214,7 +215,11 @@ class _DetailView extends ConsumerWidget {
           // TOTP: the live code is the hero, first thing you see.
           if (credential.type == CredentialType.totp &&
               credential.password != null) ...[
-            _TotpTile(secretId: credential.password!),
+            _TotpTile(
+              secretId: credential.password!,
+              issuer: credential.title,
+              account: credential.username ?? '',
+            ),
             const SizedBox(height: 14),
           ],
           if (primary.isNotEmpty) DetailGroup(children: primary),
@@ -997,8 +1002,17 @@ class _DetailRowState extends State<_DetailRow> with WidgetsBindingObserver {
 
 /// The live TOTP code — the hero of a TOTP credential's detail.
 class _TotpTile extends StatefulWidget {
-  const _TotpTile({required this.secretId});
+  const _TotpTile({
+    required this.secretId,
+    this.issuer = '',
+    this.account = '',
+  });
+
   final String secretId;
+
+  /// Used to build the `otpauth://` URI for the QR export.
+  final String issuer;
+  final String account;
 
   @override
   State<_TotpTile> createState() => _TotpTileState();
@@ -1068,6 +1082,9 @@ class _TotpTileState extends State<_TotpTile> {
     }
   }
 
+  String get _cleanSecret =>
+      widget.secretId.replaceAll(RegExp(r'\s|-'), '').toUpperCase();
+
   Future<void> _copy(BuildContext context) async {
     if (_code == _kInvalid || _code == '--- ---') return;
 
@@ -1081,6 +1098,95 @@ class _TotpTileState extends State<_TotpTile> {
       context: context,
       label: l10n.totpClipboardLabel,
       value: cleanCode,
+    );
+  }
+
+  /// Builds the standard `otpauth://totp/...` provisioning URI so another
+  /// authenticator can import this seed by scanning the QR.
+  String _otpauthUri() {
+    final issuer = widget.issuer.trim();
+    final account = widget.account.trim();
+    final labelSource =
+        account.isEmpty ? issuer : '$issuer:$account';
+    final label = Uri.encodeComponent(labelSource.isEmpty ? 'TOTP' : labelSource);
+    final params = <String>[
+      'secret=$_cleanSecret',
+      if (issuer.isNotEmpty) 'issuer=${Uri.encodeComponent(issuer)}',
+      'algorithm=SHA1',
+      'digits=6',
+      'period=30',
+    ];
+    return 'otpauth://totp/$label?${params.join('&')}';
+  }
+
+  /// Shows the seed as a QR — sensitive, so it is gated behind auth and carries
+  /// a privacy warning. The seed is never logged.
+  Future<void> _showQr(BuildContext context) async {
+    final l10n = AppLocalizations.of(context);
+    final auth = await AuthHelper.requireAuth(
+      context,
+      reason: l10n.detailTotpExportQrAuthReason,
+    );
+    if (!auth || !context.mounted) return;
+
+    final p = context.palette;
+    final uri = _otpauthUri();
+    await showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: p.drawer,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 28),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.detailTotpExportQrTitle,
+                style: TextStyle(
+                  color: p.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 20),
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white, // QR needs a light background to scan.
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: QrImageView(
+                  data: uri,
+                  version: QrVersions.auto,
+                  size: 220,
+                  backgroundColor: Colors.white,
+                ),
+              ),
+              const SizedBox(height: 18),
+              Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded,
+                      color: p.warning, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      l10n.detailTotpExportQrWarning,
+                      style: TextStyle(
+                        color: p.textMuted,
+                        fontSize: 12.5,
+                        height: 1.4,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 
@@ -1160,6 +1266,19 @@ class _TotpTileState extends State<_TotpTile> {
                       ),
                     ),
                     const SizedBox(width: 6),
+                    Semantics(
+                      button: true,
+                      label: l10n.detailTotpExportQr,
+                      child: IconButton(
+                        icon: Icon(Icons.qr_code_2_rounded,
+                            color: accent, size: 20),
+                        tooltip: l10n.detailTotpExportQr,
+                        onPressed: () => _showQr(context),
+                        padding: EdgeInsets.zero,
+                        constraints:
+                            const BoxConstraints(minWidth: 34, minHeight: 34),
+                      ),
+                    ),
                     CopyFeedbackButton(
                       onCopy: () => _copy(context),
                       color: accent,
