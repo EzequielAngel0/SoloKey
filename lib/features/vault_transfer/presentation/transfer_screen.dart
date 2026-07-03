@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/services/vault_export_service.dart';
 import '../../../core/services/csv_import_service.dart';
+import '../../../core/services/otpauth_import_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../features/credentials/application/credentials_provider.dart';
 import '../../../features/credentials/domain/entities/credential.dart';
@@ -172,6 +173,50 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     if (mounted) await _runSelectiveImport(backup);
   }
 
+  /// Imports TOTP accounts from a file containing one or more `otpauth://` URIs
+  /// (e.g. exported from another authenticator). No export password needed.
+  Future<void> _doImportOtpauth() async {
+    final l10n = AppLocalizations.of(context);
+
+    setState(() {
+      _importing = true;
+      _lastImport = null;
+    });
+    DecryptedBackup? backup;
+    try {
+      final picked = await FilePicker.platform.pickFiles(
+        type: FileType.any,
+        withData: true,
+      );
+      if (picked == null || picked.files.isEmpty) return;
+      final bytes = picked.files.first.bytes;
+      if (bytes == null) {
+        _snack(l10n.transferErrorTitle, error: true);
+        return;
+      }
+      final content = utf8.decode(bytes, allowMalformed: true);
+      final service = OtpAuthImportService();
+      final creds = service.parse(content);
+      if (creds.isEmpty) {
+        _snack(
+          service.containsMigrationPayload(content)
+              ? l10n.transferOtpauthMigrationUnsupported
+              : l10n.transferOtpauthNone,
+          error: true,
+        );
+        return;
+      }
+      backup = DecryptedBackup(credentials: creds, folders: const []);
+    } catch (e) {
+      if (mounted) _snack(l10n.transferImportError('$e'), error: true);
+      return;
+    } finally {
+      if (mounted) setState(() => _importing = false);
+    }
+
+    if (mounted) await _runSelectiveImport(backup);
+  }
+
   /// Shows the selection sheet for [backup], then performs a selective import
   /// of the chosen credential types and folders.
   Future<void> _runSelectiveImport(DecryptedBackup backup) async {
@@ -309,6 +354,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
             passwordCtrl: _importPasswordCtrl,
             onImport: _importing ? null : _doImport,
             onImportCsv: _importing ? null : _doImportCsv,
+            onImportOtpauth: _importing ? null : _doImportOtpauth,
             isLoading: _importing,
             lastResult: _lastImport,
           ),
@@ -432,6 +478,7 @@ class _ImportTab extends StatelessWidget {
     required this.passwordCtrl,
     required this.onImport,
     required this.onImportCsv,
+    required this.onImportOtpauth,
     required this.isLoading,
     required this.lastResult,
   });
@@ -441,6 +488,7 @@ class _ImportTab extends StatelessWidget {
   final TextEditingController passwordCtrl;
   final VoidCallback? onImport;
   final VoidCallback? onImportCsv;
+  final VoidCallback? onImportOtpauth;
   final bool isLoading;
   final ImportResult? lastResult;
 
@@ -527,6 +575,17 @@ class _ImportTab extends StatelessWidget {
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(52),
               side: BorderSide(color: palette.secondary),
+            ),
+          ),
+          const SizedBox(height: 12),
+          OutlinedButton.icon(
+            onPressed: onImportOtpauth,
+            icon: Icon(Icons.qr_code_rounded, color: palette.typeTotp),
+            label: Text(l10n.transferImportOtpauth,
+                style: TextStyle(color: palette.typeTotp)),
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size.fromHeight(52),
+              side: BorderSide(color: palette.typeTotp),
             ),
           ),
         ],

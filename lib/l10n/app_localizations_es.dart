@@ -1450,6 +1450,17 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transferImportCsv => 'Importar desde CSV (Bitwarden/Chrome/1Pass)';
 
   @override
+  String get transferImportOtpauth => 'Importar autenticadores (otpauth)';
+
+  @override
+  String get transferOtpauthNone =>
+      'No se encontraron enlaces otpauth:// en ese archivo';
+
+  @override
+  String get transferOtpauthMigrationUnsupported =>
+      'Los QR de exportación de Google Authenticator no son compatibles. Exporta enlaces otpauth:// individuales.';
+
+  @override
   String get transferImportDone => 'Importación completada';
 
   @override
@@ -1906,5 +1917,155 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String notifApprovalBodyNamed(String name) {
     return '¿Desbloquear \"$name\"? Toca para aprobar.';
+  }
+
+  @override
+  String get syncSummaryTitle => 'Última sincronización';
+
+  @override
+  String get syncSummaryNoChanges => 'Sin cambios — ya estaba todo al día';
+
+  @override
+  String syncSummaryFrom(String device) {
+    return 'desde $device';
+  }
+
+  @override
+  String get syncOtherDevice => 'el otro dispositivo';
+
+  @override
+  String get syncCredentialsLabel => 'Credenciales';
+
+  @override
+  String get syncFoldersLabel => 'Carpetas';
+
+  @override
+  String syncCountAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count nuevas',
+      one: '1 nueva',
+      zero: '0 nuevas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncCountUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count actualizadas',
+      one: '1 actualizada',
+      zero: '0 actualizadas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncCountRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count eliminadas',
+      one: '1 eliminada',
+      zero: '0 eliminadas',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncItemsShow => 'Ver elementos';
+
+  @override
+  String get syncItemsHide => 'Ocultar elementos';
+
+  @override
+  String get syncActionAdded => 'Añadida';
+
+  @override
+  String get syncActionUpdated => 'Actualizada';
+
+  @override
+  String get syncActionRemoved => 'Eliminada';
+
+  @override
+  String get syncHistoryTitle => 'Sincronizaciones recientes';
+
+  @override
+  String get syncHistoryEmpty => 'Aún no hay sincronizaciones';
+
+  @override
+  String get syncRelativeNow => 'hace un momento';
+
+  @override
+  String syncRelativeMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count min',
+      one: 'hace 1 min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRelativeHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count h',
+      one: 'hace 1 h',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRelativeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count d',
+      one: 'hace 1 d',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncBadgeSyncing => 'Sincronizando…';
+
+  @override
+  String get syncBadgeSynced => 'Al día';
+
+  @override
+  String get syncBadgeError => 'Error de sync';
+
+  @override
+  String get syncPairedDevicesTitle => 'Dispositivos vinculados';
+
+  @override
+  String get syncNeverSynced => 'Nunca sincronizado';
+
+  @override
+  String syncLastSyncLabel(String when) {
+    return 'Última sync: $when';
+  }
+
+  @override
+  String get syncUnlinkDevice => 'Desvincular';
+
+  @override
+  String get notifSyncTitle => 'Bóveda sincronizada';
+
+  @override
+  String notifSyncBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count cambios sincronizados',
+      one: '1 cambio sincronizado',
+    );
+    return '$_temp0';
   }
 }

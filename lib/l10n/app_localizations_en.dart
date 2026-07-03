@@ -1437,6 +1437,16 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferImportCsv => 'Import from CSV (Bitwarden/Chrome/1Pass)';
 
   @override
+  String get transferImportOtpauth => 'Import authenticators (otpauth)';
+
+  @override
+  String get transferOtpauthNone => 'No otpauth:// links found in that file';
+
+  @override
+  String get transferOtpauthMigrationUnsupported =>
+      'Google Authenticator export QRs aren\'t supported. Export individual otpauth:// links instead.';
+
+  @override
   String get transferImportDone => 'Import completed';
 
   @override
@@ -1886,5 +1896,156 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String notifApprovalBodyNamed(String name) {
     return 'Unlock \"$name\"? Tap to approve.';
+  }
+
+  @override
+  String get syncSummaryTitle => 'Last sync';
+
+  @override
+  String get syncSummaryNoChanges =>
+      'No changes — everything was already up to date';
+
+  @override
+  String syncSummaryFrom(String device) {
+    return 'from $device';
+  }
+
+  @override
+  String get syncOtherDevice => 'the other device';
+
+  @override
+  String get syncCredentialsLabel => 'Credentials';
+
+  @override
+  String get syncFoldersLabel => 'Folders';
+
+  @override
+  String syncCountAdded(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count new',
+      one: '1 new',
+      zero: '0 new',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncCountUpdated(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count updated',
+      one: '1 updated',
+      zero: '0 updated',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncCountRemoved(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count removed',
+      one: '1 removed',
+      zero: '0 removed',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncItemsShow => 'Show items';
+
+  @override
+  String get syncItemsHide => 'Hide items';
+
+  @override
+  String get syncActionAdded => 'Added';
+
+  @override
+  String get syncActionUpdated => 'Updated';
+
+  @override
+  String get syncActionRemoved => 'Removed';
+
+  @override
+  String get syncHistoryTitle => 'Recent syncs';
+
+  @override
+  String get syncHistoryEmpty => 'No syncs recorded yet';
+
+  @override
+  String get syncRelativeNow => 'just now';
+
+  @override
+  String syncRelativeMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min ago',
+      one: '1 min ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRelativeHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count h ago',
+      one: '1 h ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String syncRelativeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count d ago',
+      one: '1 d ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncBadgeSyncing => 'Syncing…';
+
+  @override
+  String get syncBadgeSynced => 'In sync';
+
+  @override
+  String get syncBadgeError => 'Sync error';
+
+  @override
+  String get syncPairedDevicesTitle => 'Linked devices';
+
+  @override
+  String get syncNeverSynced => 'Never synced';
+
+  @override
+  String syncLastSyncLabel(String when) {
+    return 'Last sync: $when';
+  }
+
+  @override
+  String get syncUnlinkDevice => 'Unlink';
+
+  @override
+  String get notifSyncTitle => 'Vault synced';
+
+  @override
+  String notifSyncBody(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count changes synced',
+      one: '1 change synced',
+    );
+    return '$_temp0';
   }
 }

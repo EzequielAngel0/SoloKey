@@ -2714,6 +2714,24 @@ abstract class AppLocalizations {
   /// **'Import from CSV (Bitwarden/Chrome/1Pass)'**
   String get transferImportCsv;
 
+  /// No description provided for @transferImportOtpauth.
+  ///
+  /// In en, this message translates to:
+  /// **'Import authenticators (otpauth)'**
+  String get transferImportOtpauth;
+
+  /// No description provided for @transferOtpauthNone.
+  ///
+  /// In en, this message translates to:
+  /// **'No otpauth:// links found in that file'**
+  String get transferOtpauthNone;
+
+  /// No description provided for @transferOtpauthMigrationUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Google Authenticator export QRs aren\'t supported. Export individual otpauth:// links instead.'**
+  String get transferOtpauthMigrationUnsupported;
+
   /// No description provided for @transferImportDone.
   ///
   /// In en, this message translates to:
@@ -3529,6 +3547,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unlock \"{name}\"? Tap to approve.'**
   String notifApprovalBodyNamed(String name);
+
+  /// No description provided for @syncSummaryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync'**
+  String get syncSummaryTitle;
+
+  /// No description provided for @syncSummaryNoChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'No changes — everything was already up to date'**
+  String get syncSummaryNoChanges;
+
+  /// No description provided for @syncSummaryFrom.
+  ///
+  /// In en, this message translates to:
+  /// **'from {device}'**
+  String syncSummaryFrom(String device);
+
+  /// No description provided for @syncOtherDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'the other device'**
+  String get syncOtherDevice;
+
+  /// No description provided for @syncCredentialsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get syncCredentialsLabel;
+
+  /// No description provided for @syncFoldersLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Folders'**
+  String get syncFoldersLabel;
+
+  /// No description provided for @syncCountAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 new} =1{1 new} other{{count} new}}'**
+  String syncCountAdded(int count);
+
+  /// No description provided for @syncCountUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 updated} =1{1 updated} other{{count} updated}}'**
+  String syncCountUpdated(int count);
+
+  /// No description provided for @syncCountRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{0 removed} =1{1 removed} other{{count} removed}}'**
+  String syncCountRemoved(int count);
+
+  /// No description provided for @syncItemsShow.
+  ///
+  /// In en, this message translates to:
+  /// **'Show items'**
+  String get syncItemsShow;
+
+  /// No description provided for @syncItemsHide.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide items'**
+  String get syncItemsHide;
+
+  /// No description provided for @syncActionAdded.
+  ///
+  /// In en, this message translates to:
+  /// **'Added'**
+  String get syncActionAdded;
+
+  /// No description provided for @syncActionUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get syncActionUpdated;
+
+  /// No description provided for @syncActionRemoved.
+  ///
+  /// In en, this message translates to:
+  /// **'Removed'**
+  String get syncActionRemoved;
+
+  /// No description provided for @syncHistoryTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent syncs'**
+  String get syncHistoryTitle;
+
+  /// No description provided for @syncHistoryEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'No syncs recorded yet'**
+  String get syncHistoryEmpty;
+
+  /// No description provided for @syncRelativeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get syncRelativeNow;
+
+  /// No description provided for @syncRelativeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  String syncRelativeMinutes(int count);
+
+  /// No description provided for @syncRelativeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 h ago} other{{count} h ago}}'**
+  String syncRelativeHours(int count);
+
+  /// No description provided for @syncRelativeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 d ago} other{{count} d ago}}'**
+  String syncRelativeDays(int count);
+
+  /// No description provided for @syncBadgeSyncing.
+  ///
+  /// In en, this message translates to:
+  /// **'Syncing…'**
+  String get syncBadgeSyncing;
+
+  /// No description provided for @syncBadgeSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'In sync'**
+  String get syncBadgeSynced;
+
+  /// No description provided for @syncBadgeError.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync error'**
+  String get syncBadgeError;
+
+  /// No description provided for @syncPairedDevicesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Linked devices'**
+  String get syncPairedDevicesTitle;
+
+  /// No description provided for @syncNeverSynced.
+  ///
+  /// In en, this message translates to:
+  /// **'Never synced'**
+  String get syncNeverSynced;
+
+  /// No description provided for @syncLastSyncLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last sync: {when}'**
+  String syncLastSyncLabel(String when);
+
+  /// No description provided for @syncUnlinkDevice.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlink'**
+  String get syncUnlinkDevice;
+
+  /// No description provided for @notifSyncTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault synced'**
+  String get notifSyncTitle;
+
+  /// No description provided for @notifSyncBody.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 change synced} other{{count} changes synced}}'**
+  String notifSyncBody(int count);
 }
 
 class _AppLocalizationsDelegate
