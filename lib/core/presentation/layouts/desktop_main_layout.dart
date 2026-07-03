@@ -291,7 +291,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                             Padding(
                               padding: const EdgeInsets.fromLTRB(4, 4, 4, 10),
                               child: Text(
-                                '$headerName · ${folderCreds.length}',
+                                '$headerName · ${l10n.folderItemCount(folderCreds.length)}',
                                 style: TextStyle(
                                   color: palette.textMuted,
                                   fontSize: 11,

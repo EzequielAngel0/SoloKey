@@ -8,6 +8,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../../theme/app_palette.dart';
+import '../../../../shared/widgets/empty_state.dart';
 import '../../../folders/domain/entities/folder.dart';
 import '../../../folders/presentation/folder_actions.dart';
 import '../../domain/entities/credential.dart';
@@ -41,28 +42,22 @@ class FolderListView extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     final rootFolders = folders.where((f) => f.parentId == null).toList();
     final noFolderCreds = credentials.where((c) => c.categoryId == null).toList();
+    int itemsIn(String id) =>
+        credentials.where((c) => c.categoryId == id && !c.isHidden).length;
 
     if (rootFolders.isEmpty && noFolderCreds.isEmpty) {
       return ListView(
         physics: const AlwaysScrollableScrollPhysics(),
         children: [
-          SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-          Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.folder_open_rounded, size: 72, color: palette.textEmpty),
-                const SizedBox(height: 20),
-                Text(l10n.folderNoFolders, style: TextStyle(color: palette.textPrimary, fontSize: 20, fontWeight: FontWeight.w600)),
-                const SizedBox(height: 8),
-                Text(l10n.folderOrganize, style: TextStyle(color: palette.textMuted, fontSize: 14)),
-                const SizedBox(height: 20),
-                OutlinedButton.icon(
-                  onPressed: () => promptCreateFolder(context, ref),
-                  icon: const Icon(Icons.create_new_folder_rounded),
-                  label: Text(l10n.folderCreateRoot),
-                )
-              ],
+          SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+          EmptyState(
+            icon: Icons.folder_open_rounded,
+            title: l10n.folderNoFolders,
+            subtitle: l10n.folderOrganize,
+            action: OutlinedButton.icon(
+              onPressed: () => promptCreateFolder(context, ref),
+              icon: const Icon(Icons.create_new_folder_rounded),
+              label: Text(l10n.folderCreateRoot),
             ),
           ),
         ],
@@ -103,6 +98,10 @@ class FolderListView extends ConsumerWidget {
                   color: f.colorHex.toColor(),
                 ),
                 title: Text(f.name, style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500)),
+                subtitle: Text(
+                  l10n.folderItemCount(itemsIn(f.id)),
+                  style: TextStyle(color: palette.textMuted, fontSize: 12),
+                ),
                 trailing: Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
               ),
             )),

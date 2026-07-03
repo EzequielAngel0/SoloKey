@@ -6,6 +6,7 @@ import 'package:password_manager/features/credentials/domain/entities/credential
 import 'package:password_manager/features/folders/application/folders_provider.dart';
 import 'package:password_manager/features/folders/domain/entities/folder.dart';
 import 'package:password_manager/features/folders/presentation/folder_screen.dart';
+import 'package:password_manager/l10n/app_localizations.dart';
 
 import '../../support/fake_credential_repository.dart';
 import '../../support/widget_harness.dart';
@@ -49,5 +50,8 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
     expect(tester.takeException(), isNull);
     expect(find.text('GitHub'), findsWidgets);
+    // The empty "Sub" subfolder shows its localized item count.
+    final l10n = await AppLocalizations.delegate.load(const Locale('en'));
+    expect(find.text(l10n.folderItemCount(0)), findsOneWidget);
   });
 }

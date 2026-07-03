@@ -10,6 +10,8 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../credentials/application/credentials_provider.dart';
 import '../../credentials/presentation/widgets/credential_card.dart';
 import '../../credentials/presentation/widgets/folder_options_sheet.dart';
+import '../../../shared/extensions/color_extensions.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../theme/app_palette.dart';
 import '../application/folders_provider.dart';
 import '../domain/entities/folder.dart';
@@ -19,14 +21,6 @@ import 'widgets/folder_breadcrumbs.dart';
 class FolderScreen extends ConsumerWidget {
   const FolderScreen({super.key, required this.folderId});
   final String folderId;
-
-  Color _hexToColor(BuildContext context, String hex) {
-    try {
-      return Color(int.parse('FF${hex.replaceFirst('#', '')}', radix: 16));
-    } catch (_) {
-      return context.palette.accent;
-    }
-  }
 
   void _onCurrentFolderDeleted(BuildContext context, WidgetRef ref) {
     if (ResponsiveLayout.isDesktop(context)) {
@@ -64,8 +58,12 @@ class FolderScreen extends ConsumerWidget {
       );
     }
 
+    final allCredentials = credentialsAsync.valueOrNull ?? const [];
     final subFolders = folders.where((f) => f.parentId == folderId).toList();
-    final subCredentials = credentialsAsync.valueOrNull?.where((c) => c.categoryId == folderId).toList() ?? [];
+    final subCredentials =
+        allCredentials.where((c) => c.categoryId == folderId).toList();
+    int itemsIn(String id) =>
+        allCredentials.where((c) => c.categoryId == id && !c.isHidden).length;
 
     return Scaffold(
       appBar: VaultAppBar(
@@ -122,17 +120,11 @@ class FolderScreen extends ConsumerWidget {
             ? ListView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 children: [
-                  SizedBox(height: MediaQuery.of(context).size.height * 0.3),
-                  Center(
-                    child: Column(
-                      children: [
-                        Icon(Icons.folder_open_rounded, size: 72, color: palette.divider),
-                        const SizedBox(height: 20),
-                        Text(l10n.folderEmptyTitle, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 8),
-                        Text(l10n.folderEmptyDesc, style: TextStyle(color: palette.textMuted, fontSize: 14)),
-                      ],
-                    ),
+                  SizedBox(height: MediaQuery.of(context).size.height * 0.2),
+                  EmptyState(
+                    icon: Icons.folder_open_rounded,
+                    title: l10n.folderEmptyTitle,
+                    subtitle: l10n.folderEmptyDesc,
                   ),
                 ],
               )
@@ -156,9 +148,13 @@ class FolderScreen extends ConsumerWidget {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           leading: Icon(
                             f.isFavorite ? Icons.folder_special_rounded : Icons.folder_rounded,
-                            color: _hexToColor(context, f.colorHex)
+                            color: f.colorHex.toColor(),
                           ),
                           title: Text(f.name, style: TextStyle(color: palette.textPrimary, fontWeight: FontWeight.w500)),
+                          subtitle: Text(
+                            l10n.folderItemCount(itemsIn(f.id)),
+                            style: TextStyle(color: palette.textMuted, fontSize: 12),
+                          ),
                           trailing: Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
                         ),
                       )),
