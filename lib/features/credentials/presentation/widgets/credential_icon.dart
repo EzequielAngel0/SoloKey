@@ -1,43 +1,58 @@
 import 'package:flutter/material.dart';
 import '../../domain/entities/credential.dart';
 
+/// Type avatar for a credential: a rounded, accent-tinted square with the
+/// type icon.
+///
+/// Privacy/offline note: this widget NO LONGER fetches remote favicons by
+/// default. The previous implementation hit
+/// `google.com/s2/favicons` for every credential with a website, which leaked
+/// the user's vault domains to Google and broke the list offline. Remote
+/// favicons are now strictly opt-in via [showFavicon] (default `false`) and are
+/// still fetched lazily with a graceful fallback to the type avatar.
 class CredentialIcon extends StatelessWidget {
   const CredentialIcon({
     super.key,
     required this.credential,
     required this.defaultIcon,
     required this.color,
+    this.size = 44,
+    this.showFavicon = false,
   });
 
   final Credential credential;
   final IconData defaultIcon;
   final Color color;
+  final double size;
+
+  /// When true (opt-in), tries to load the site favicon over the network and
+  /// falls back to the type avatar on any error. Defaults to `false` so the
+  /// vault never phones home and always renders offline.
+  final bool showFavicon;
 
   @override
   Widget build(BuildContext context) {
-    final website = credential.website;
-    if (website != null && website.isNotEmpty) {
-      final domain = _getDomain(website);
+    if (showFavicon) {
+      final domain = _getDomain(credential.website);
       if (domain != null) {
-        final faviconUrl = 'https://www.google.com/s2/favicons?sz=64&domain=$domain';
+        final faviconUrl =
+            'https://www.google.com/s2/favicons?sz=64&domain=$domain';
         return Container(
-          width: 46,
-          height: 46,
+          width: size,
+          height: size,
           decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
+            color: color.withValues(alpha: 0.15),
+            borderRadius: BorderRadius.circular(size * 0.28),
           ),
           clipBehavior: Clip.antiAlias,
           child: Image.network(
             faviconUrl,
             fit: BoxFit.contain,
-            width: 46,
-            height: 46,
+            width: size,
+            height: size,
             errorBuilder: (_, _, _) => _buildDefault(),
-            loadingBuilder: (context, child, loadingProgress) {
-              if (loadingProgress == null) return child;
-              return _buildDefault();
-            },
+            loadingBuilder: (context, child, progress) =>
+                progress == null ? child : _buildDefault(),
           ),
         );
       }
@@ -47,17 +62,18 @@ class CredentialIcon extends StatelessWidget {
 
   Widget _buildDefault() {
     return Container(
-      width: 46,
-      height: 46,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(size * 0.28),
       ),
-      child: Icon(defaultIcon, color: color, size: 22),
+      child: Icon(defaultIcon, color: color, size: size * 0.48),
     );
   }
 
-  String? _getDomain(String url) {
+  String? _getDomain(String? url) {
+    if (url == null || url.isEmpty) return null;
     try {
       final uri = Uri.parse(url);
       final host = uri.host;
@@ -67,9 +83,6 @@ class CredentialIcon extends StatelessWidget {
     } catch (_) {}
 
     final match = RegExp(r'(?:https?://)?(?:www\.)?([^/]+)').firstMatch(url);
-    if (match != null) {
-      return match.group(1);
-    }
-    return null;
+    return match?.group(1);
   }
 }

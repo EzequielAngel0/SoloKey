@@ -29,9 +29,18 @@ Color credentialTypeColor(CredentialType type, AppPalette p) => switch (type) {
     };
 
 class CredentialCard extends ConsumerWidget {
-  const CredentialCard({super.key, required this.credential});
+  const CredentialCard({
+    super.key,
+    required this.credential,
+    this.dense = false,
+  });
 
   final Credential credential;
+
+  /// When true the card renders flat (no own border/radius/background): it is
+  /// meant to sit inside a grouped "filas densas" container that draws the
+  /// hairline dividers and border. When false it is a standalone rounded card.
+  final bool dense;
 
   static const _typeIcons = {
     CredentialType.password: Icons.lock_rounded,
@@ -226,16 +235,55 @@ class CredentialCard extends ConsumerWidget {
     }
   }
 
+  /// Subtitle under the title: prefer the username, else the site host, else
+  /// nothing (keeps the row compact for TOTP/notes without a username).
+  String? _subtitle() {
+    final u = credential.username;
+    if (u != null && u.trim().isNotEmpty) return u;
+    final w = credential.website;
+    if (w != null && w.trim().isNotEmpty) {
+      try {
+        final host = Uri.parse(w).host;
+        if (host.isNotEmpty) return host.replaceFirst(RegExp(r'^www\.'), '');
+      } catch (_) {}
+      return w;
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
     final icon = _typeIcons[credential.type] ?? Icons.lock_rounded;
     final color = credentialTypeColor(credential.type, palette);
-    final health = ref.watch(credentialHealthProvider)[credential.id];
+
+    void openDetail() {
+      if (ResponsiveLayout.isDesktop(context)) {
+        ref.read(desktopSelectedCredentialIdProvider.notifier).state =
+            credential.id;
+        ref.read(desktopRightPaneModeProvider.notifier).state =
+            RightPaneMode.details;
+      } else {
+        context.push(
+          AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
+        );
+      }
+    }
+
+    final inkwell = InkWell(
+      borderRadius: dense ? null : BorderRadius.circular(16),
+      onTap: openDetail,
+      onLongPress: () => _showOptionsSheet(context, ref),
+      onSecondaryTap: () => _showOptionsSheet(context, ref), // desktop right-click
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: dense ? 11 : 14),
+        child: _buildRow(context, ref, palette, icon, color),
+      ),
+    );
 
     // Swipe-to-delete intentionally removed: deletion is available via the
     // long-press options sheet and the credential detail screen.
+    if (dense) return inkwell; // group container draws bg/border/dividers
     return Material(
       color: palette.card,
       shape: RoundedRectangleBorder(
@@ -243,91 +291,98 @@ class CredentialCard extends ConsumerWidget {
         side: BorderSide(color: palette.divider),
       ),
       clipBehavior: Clip.antiAlias,
-      child: InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: () {
-            if (ResponsiveLayout.isDesktop(context)) {
-              ref.read(desktopSelectedCredentialIdProvider.notifier).state = credential.id;
-              ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.details;
-            } else {
-              context.push(
-                AppRoutes.credentialDetail.replaceFirst(':id', credential.id),
-              );
-            }
-          },
-          onLongPress: () => _showOptionsSheet(context, ref),
-          onSecondaryTap: () => _showOptionsSheet(context, ref), // desktop right-click
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-            child: Row(
-              children: [
-                CredentialIcon(
-                  credential: credential,
-                  defaultIcon: icon,
-                  color: color,
-                ),
-                const SizedBox(width: 14),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        credential.title,
-                        style: TextStyle(
-                          color: palette.textPrimary,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w600,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+      child: inkwell,
+    );
+  }
+
+  Widget _buildRow(
+    BuildContext context,
+    WidgetRef ref,
+    AppPalette palette,
+    IconData icon,
+    Color color,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    final health = ref.watch(credentialHealthProvider)[credential.id];
+    final subtitle = _subtitle();
+    final isTotp = credential.type == CredentialType.totp;
+
+    return Row(
+      children: [
+        CredentialIcon(
+          credential: credential,
+          defaultIcon: icon,
+          color: color,
+          size: dense ? 40 : 44,
+        ),
+        const SizedBox(width: 13),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      credential.title,
+                      style: TextStyle(
+                        color: palette.textPrimary,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.1,
                       ),
-                      if (credential.username != null) ...[
-                        const SizedBox(height: 3),
-                        Text(
-                          credential.username!,
-                          style: TextStyle(
-                            color: palette.textMuted,
-                            fontSize: 12,
-                          ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ],
-                    ],
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
+                  if (credential.isFavorite) ...[
+                    const SizedBox(width: 6),
+                    Icon(Icons.star_rounded, color: palette.warning, size: 15),
+                  ],
+                  if (credential.isDoubleEncrypted) ...[
+                    const SizedBox(width: 5),
+                    Icon(Icons.enhanced_encryption_rounded,
+                        color: palette.typeSshKey, size: 14),
+                  ],
+                ],
+              ),
+              if (subtitle != null) ...[
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: palette.textMuted, fontSize: 12.5),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-                if (health != null) ...[
-                  const SizedBox(width: 6),
-                  health.contains(CredentialHealth.reused)
-                      ? StatusChip(
-                          label: l10n.healthReused,
-                          color: palette.danger,
-                          icon: Icons.content_copy_rounded,
-                          dense: true,
-                        )
-                      : StatusChip(
-                          label: l10n.strengthWeak,
-                          color: palette.warning,
-                          icon: Icons.warning_amber_rounded,
-                          dense: true,
-                        ),
-                ],
-                if (credential.isDoubleEncrypted) ...[
-                  const SizedBox(width: 6),
-                  Icon(Icons.enhanced_encryption_rounded,
-                      color: palette.typeSshKey, size: 16),
-                ],
-                if (credential.isFavorite) ...[
-                  const SizedBox(width: 6),
-                  Icon(Icons.star_rounded, color: palette.warning, size: 18),
-                ],
-                if (credential.type == CredentialType.totp)
-                  _TotpVisualizer(credential: credential),
               ],
-            ),
+            ],
           ),
         ),
-      );
+        if (health != null) ...[
+          const SizedBox(width: 8),
+          health.contains(CredentialHealth.reused)
+              ? StatusChip(
+                  label: l10n.healthReused,
+                  color: palette.danger,
+                  icon: Icons.content_copy_rounded,
+                  dense: true,
+                )
+              : StatusChip(
+                  label: l10n.strengthWeak,
+                  color: palette.warning,
+                  icon: Icons.warning_amber_rounded,
+                  dense: true,
+                ),
+        ],
+        if (isTotp)
+          _TotpVisualizer(credential: credential)
+        else ...[
+          const SizedBox(width: 4),
+          Icon(Icons.chevron_right_rounded, color: palette.textDisabled, size: 20),
+        ],
+      ],
+    );
   }
 }
 

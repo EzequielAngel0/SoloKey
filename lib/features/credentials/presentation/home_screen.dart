@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,11 +11,15 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/shimmer_loader.dart';
 import '../../../shared/widgets/solo_filter_chip.dart';
+import '../../../shared/widgets/status_chip.dart';
 import '../../../theme/app_palette.dart';
+import '../../../theme/app_theme.dart';
 import '../../settings/presentation/settings_screen.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../../folders/application/folders_provider.dart';
 import '../application/credentials_provider.dart';
+import '../application/credential_health_provider.dart';
+import '../application/vault_view_provider.dart';
 import '../domain/entities/credential.dart';
 import 'widgets/folder_list_view.dart';
 import 'widgets/credential_list_widget.dart';
@@ -22,10 +28,6 @@ import 'widgets/security_hub_view.dart';
 
 import '../../../../core/presentation/layouts/desktop_main_layout.dart';
 import '../../../../core/presentation/layouts/responsive_layout.dart';
-
-/// Filters available as pill chips on the Vault destination. Favorites is now a
-/// filter chip instead of a whole navigation tab.
-enum VaultFilter { all, favorites, password, totp, passkey, ssh }
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -51,7 +53,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   int _currentIndex = 0;
   // When true the Vault destination shows the "Ocultas" set instead of active.
   bool _showHidden = false;
-  VaultFilter _filter = VaultFilter.all;
+  Timer? _searchDebounce;
 
   /// Persists the new manual order after a drag in the Credentials list.
   void _onReorder(List<Credential> visible, int oldIndex, int newIndex) {
@@ -62,17 +64,28 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     ref.read(credentialsNotifierProvider.notifier).reorder(ids);
   }
 
-  bool _matchesFilter(Credential c) => switch (_filter) {
-        VaultFilter.all => true,
-        VaultFilter.favorites => c.isFavorite,
-        VaultFilter.password => c.type == CredentialType.password,
-        VaultFilter.totp => c.type == CredentialType.totp,
-        VaultFilter.passkey => c.type == CredentialType.passkey,
-        VaultFilter.ssh => c.type == CredentialType.sshKey,
-      };
+  /// Debounced search: waits ~250ms after the last keystroke before hitting the
+  /// filtering provider, so typing in a large vault doesn't refilter per char.
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      if (mounted) {
+        ref.read(credentialSearchNotifierProvider.notifier).update(value);
+      }
+    });
+    setState(() {}); // refresh clear-button / empty-state affordances immediately
+  }
+
+  void _clearSearch() {
+    _searchDebounce?.cancel();
+    _searchCtrl.clear();
+    ref.read(credentialSearchNotifierProvider.notifier).update('');
+    setState(() {});
+  }
 
   @override
   void dispose() {
+    _searchDebounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
   }
@@ -93,17 +106,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       appBar: VaultAppBar(
         title: _titleFor(l10n),
         actions: [
-          if (_currentIndex == 0)
-            IconButton(
-              icon: Icon(
-                _showHidden
-                    ? Icons.visibility_off_rounded
-                    : Icons.visibility_rounded,
-                color: _showHidden ? palette.primary : palette.textMuted,
-              ),
-              tooltip: _showHidden ? l10n.homeShowActive : l10n.homeShowHidden,
-              onPressed: () => setState(() => _showHidden = !_showHidden),
-            ),
+          if (_currentIndex == 0) ..._buildVaultActions(l10n, palette),
           IconButton(
             icon: Icon(Icons.lock_rounded, color: palette.danger),
             tooltip: l10n.homeLockTooltip,
@@ -163,6 +166,81 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     );
   }
 
+  /// Sort menu + reorder toggle + hidden toggle, shown only on the Vault tab.
+  List<Widget> _buildVaultActions(AppLocalizations l10n, AppPalette palette) {
+    final sort = ref.watch(vaultSortProvider);
+    final filter = ref.watch(vaultFilterProvider);
+    final reorderMode = ref.watch(vaultReorderModeProvider);
+    final canReorder = sort == VaultSort.manual &&
+        filter == VaultFilter.all &&
+        _searchCtrl.text.isEmpty &&
+        !_showHidden;
+
+    return [
+      if (canReorder)
+        IconButton(
+          icon: Icon(
+            reorderMode ? Icons.check_rounded : Icons.swap_vert_rounded,
+            color: reorderMode ? palette.primary : palette.textMuted,
+          ),
+          tooltip: reorderMode ? l10n.homeReorderDone : l10n.homeReorderStart,
+          onPressed: () => ref.read(vaultReorderModeProvider.notifier).toggle(),
+        ),
+      if (!reorderMode) ...[
+        PopupMenuButton<VaultSort>(
+          icon: Icon(Icons.sort_rounded, color: palette.textMuted),
+          tooltip: l10n.homeSortTooltip,
+          onSelected: (s) => ref.read(vaultSortProvider.notifier).set(s),
+          itemBuilder: (_) => [
+            _sortMenuItem(VaultSort.manual, l10n.sortManual, sort),
+            _sortMenuItem(VaultSort.titleAsc, l10n.sortTitleAsc, sort),
+            _sortMenuItem(VaultSort.updatedDesc, l10n.sortUpdatedDesc, sort),
+          ],
+        ),
+        IconButton(
+          icon: Icon(
+            _showHidden
+                ? Icons.visibility_off_rounded
+                : Icons.visibility_rounded,
+            color: _showHidden ? palette.primary : palette.textMuted,
+          ),
+          tooltip: _showHidden ? l10n.homeShowActive : l10n.homeShowHidden,
+          onPressed: () {
+            ref.read(vaultReorderModeProvider.notifier).set(false);
+            setState(() => _showHidden = !_showHidden);
+          },
+        ),
+      ],
+    ];
+  }
+
+  PopupMenuItem<VaultSort> _sortMenuItem(
+      VaultSort value, String label, VaultSort current) {
+    final palette = context.palette;
+    final selected = value == current;
+    return PopupMenuItem<VaultSort>(
+      value: value,
+      child: Row(
+        children: [
+          Icon(vaultSortIcon(value),
+              size: 18, color: selected ? palette.primary : palette.textMuted),
+          const SizedBox(width: 12),
+          Text(
+            label,
+            style: TextStyle(
+              color: selected ? palette.textPrimary : palette.textBody,
+              fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
+            ),
+          ),
+          if (selected) ...[
+            const SizedBox(width: 16),
+            Icon(Icons.check_rounded, size: 16, color: palette.primary),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildFolders(AppPalette palette) {
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
     final foldersAsync = ref.watch(foldersNotifierProvider);
@@ -184,70 +262,86 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
 
   Widget _buildVault(AppLocalizations l10n, AppPalette palette) {
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
+    final filter = ref.watch(vaultFilterProvider);
+    final sort = ref.watch(vaultSortProvider);
+    final reorderModePref = ref.watch(vaultReorderModeProvider);
     final credentials = credentialsAsync.valueOrNull ?? [];
-    final filtered = credentials
-        .where((c) => _showHidden ? c.isHidden : !c.isHidden)
-        .where(_matchesFilter)
-        .toList();
-    final canReorder = _filter == VaultFilter.all &&
+
+    final filtered = sortCredentials(
+      credentials
+          .where((c) => _showHidden ? c.isHidden : !c.isHidden)
+          .where((c) => matchesVaultFilter(c, filter))
+          .toList(),
+      sort,
+    );
+
+    final canReorder = sort == VaultSort.manual &&
+        filter == VaultFilter.all &&
         _searchCtrl.text.isEmpty &&
         !_showHidden;
+    final reorderActive = reorderModePref && canReorder;
+
+    void selectFilter(VaultFilter f) {
+      ref.read(vaultReorderModeProvider.notifier).set(false);
+      ref.read(vaultFilterProvider.notifier).set(f);
+    }
 
     return Column(
       children: [
+        _VaultHeader(
+          count: filtered.length,
+          onOpenSecurity: () => setState(() => _currentIndex = 2),
+        ),
         Padding(
           padding: const EdgeInsets.fromLTRB(16, 4, 16, 12),
           child: _SearchField(
             controller: _searchCtrl,
             hint: l10n.homeSearchHint,
-            onChanged: (v) =>
-                ref.read(credentialSearchNotifierProvider.notifier).update(v),
-            onClear: () {
-              _searchCtrl.clear();
-              ref.read(credentialSearchNotifierProvider.notifier).update('');
-            },
+            onChanged: _onSearchChanged,
+            onClear: _clearSearch,
           ),
         ),
         SoloFilterChipBar(
           children: [
             SoloFilterChip(
               label: l10n.filterAll,
-              selected: _filter == VaultFilter.all,
-              onTap: () => setState(() => _filter = VaultFilter.all),
+              selected: filter == VaultFilter.all,
+              onTap: () => selectFilter(VaultFilter.all),
             ),
             SoloFilterChip(
               label: l10n.navFavorites,
               icon: Icons.star_rounded,
               accent: palette.warning,
-              selected: _filter == VaultFilter.favorites,
-              onTap: () => setState(() => _filter = VaultFilter.favorites),
+              selected: filter == VaultFilter.favorites,
+              onTap: () => selectFilter(VaultFilter.favorites),
             ),
             SoloFilterChip(
               label: l10n.filterPasswords,
               accent: palette.typePassword,
-              selected: _filter == VaultFilter.password,
-              onTap: () => setState(() => _filter = VaultFilter.password),
+              selected: filter == VaultFilter.password,
+              onTap: () => selectFilter(VaultFilter.password),
             ),
             SoloFilterChip(
               label: l10n.typeSelTotp,
               accent: palette.typeTotp,
-              selected: _filter == VaultFilter.totp,
-              onTap: () => setState(() => _filter = VaultFilter.totp),
+              selected: filter == VaultFilter.totp,
+              onTap: () => selectFilter(VaultFilter.totp),
             ),
             SoloFilterChip(
               label: l10n.typeSelPasskey,
               accent: palette.typePasskey,
-              selected: _filter == VaultFilter.passkey,
-              onTap: () => setState(() => _filter = VaultFilter.passkey),
+              selected: filter == VaultFilter.passkey,
+              onTap: () => selectFilter(VaultFilter.passkey),
             ),
             SoloFilterChip(
               label: l10n.typeSshKey,
               accent: palette.typeSshKey,
-              selected: _filter == VaultFilter.ssh,
-              onTap: () => setState(() => _filter = VaultFilter.ssh),
+              selected: filter == VaultFilter.ssh,
+              onTap: () => selectFilter(VaultFilter.ssh),
             ),
           ],
         ),
+        if (reorderActive) _ReorderHintBar(label: l10n.homeReorderHint),
         const SizedBox(height: 8),
         Expanded(
           child: RefreshIndicator(
@@ -270,6 +364,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
                         ? _buildEmpty(context, l10n)
                         : CredentialListWidget(
                             credentials: filtered,
+                            reorderMode: reorderActive,
                             onReorder: canReorder
                                 ? (o, n) => _onReorder(filtered, o, n)
                                 : null,
@@ -289,7 +384,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         title: l10n.homeNoHidden,
       );
     }
-    final filtering = _searchCtrl.text.isNotEmpty || _filter != VaultFilter.all;
+    final filtering = _searchCtrl.text.isNotEmpty ||
+        ref.read(vaultFilterProvider) != VaultFilter.all;
     if (filtering) {
       return EmptyState(
         icon: Icons.search_off_rounded,
@@ -334,6 +430,88 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     if (name != null && name.isNotEmpty) {
       await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: null);
     }
+  }
+}
+
+/// Compact Vault header: a muted credential count plus a tappable "issues" chip
+/// that jumps to the Security tab when the vault has weak/reused passwords.
+class _VaultHeader extends ConsumerWidget {
+  const _VaultHeader({required this.count, required this.onOpenSecurity});
+
+  final int count;
+  final VoidCallback onOpenSecurity;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final p = context.palette;
+    final l10n = AppLocalizations.of(context);
+    final issues = ref.watch(credentialHealthProvider).length;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 6, 16, 0),
+      child: Row(
+        children: [
+          Expanded(
+            child: Text(
+              l10n.homeCredentialCount(count),
+              style: TextStyle(
+                color: p.textMuted,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.3,
+              ),
+            ),
+          ),
+          if (issues > 0)
+            InkWell(
+              borderRadius: BorderRadius.circular(7),
+              onTap: onOpenSecurity,
+              child: StatusChip(
+                label: l10n.homeIssuesChip(issues),
+                color: p.warning,
+                icon: Icons.shield_rounded,
+                dense: true,
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Thin banner shown while the list is in drag-to-reorder mode.
+class _ReorderHintBar extends StatelessWidget {
+  const _ReorderHintBar({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Container(
+      margin: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: p.primary.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(AppTheme.rInput),
+        border: Border.all(color: p.primary.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.drag_indicator_rounded, size: 16, color: p.primary),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              label,
+              style: TextStyle(
+                color: p.primary,
+                fontSize: 12.5,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
 

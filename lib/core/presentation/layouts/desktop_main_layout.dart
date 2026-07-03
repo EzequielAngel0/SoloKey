@@ -8,6 +8,7 @@ import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/credentials/application/credentials_provider.dart';
+import '../../../../features/credentials/application/vault_view_provider.dart';
 import '../../../../features/credentials/domain/entities/credential.dart';
 import '../../../../features/credentials/presentation/credential_detail_screen.dart';
 import '../../../../features/credentials/presentation/credential_form_screen.dart';
@@ -290,9 +291,14 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
           // Credentials or Favorites list. La lista principal excluye las
           // ocultas (igual que en movil); las favoritas se mantienen tal cual.
-          final list = tabIndex == 0
-              ? creds.where((c) => !c.isHidden).toList()
-              : creds.where((c) => c.isFavorite).toList();
+          // El orden sigue el mismo selector que en movil (vaultSortProvider).
+          final sort = ref.watch(vaultSortProvider);
+          final list = sortCredentials(
+            tabIndex == 0
+                ? creds.where((c) => !c.isHidden).toList()
+                : creds.where((c) => c.isFavorite).toList(),
+            sort,
+          );
 
           if (list.isEmpty) {
             return EmptyStateWidget(
@@ -304,13 +310,16 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
             );
           }
 
+          // Reorden por drag solo en la lista principal, sin busqueda y con el
+          // orden manual (reordenar un orden calculado no aplica).
+          final canReorder = tabIndex == 0 &&
+              _searchCtrl.text.isEmpty &&
+              sort == VaultSort.manual;
           return CredentialListWidget(
             credentials: list,
-            // Reorden por drag solo en la lista principal sin busqueda activa
-            // (el orden es global; reordenar resultados filtrados no aplica).
-            onReorder: (tabIndex == 0 && _searchCtrl.text.isEmpty)
-                ? (oldIndex, newIndex) => _onReorder(list, oldIndex, newIndex)
-                : null,
+            reorderMode: canReorder,
+            onReorder:
+                canReorder ? (o, n) => _onReorder(list, o, n) : null,
           );
         },
       ),

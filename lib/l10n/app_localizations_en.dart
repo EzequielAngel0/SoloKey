@@ -285,6 +285,50 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homeEmptyVault => 'Your vault is empty';
 
   @override
+  String homeCredentialCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count credentials',
+      one: '1 credential',
+      zero: 'No credentials',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String homeIssuesChip(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count issues',
+      one: '1 issue',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get homeSortTooltip => 'Sort';
+
+  @override
+  String get sortManual => 'Manual order';
+
+  @override
+  String get sortTitleAsc => 'Name (A–Z)';
+
+  @override
+  String get sortUpdatedDesc => 'Recently updated';
+
+  @override
+  String get homeReorderStart => 'Reorder';
+
+  @override
+  String get homeReorderDone => 'Done';
+
+  @override
+  String get homeReorderHint => 'Drag the handle to reorder';
+
+  @override
   String get emptyAddFirst => 'Add your first credential';
 
   @override

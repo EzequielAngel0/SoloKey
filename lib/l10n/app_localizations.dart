@@ -614,6 +614,60 @@ abstract class AppLocalizations {
   /// **'Your vault is empty'**
   String get homeEmptyVault;
 
+  /// No description provided for @homeCredentialCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No credentials} =1{1 credential} other{{count} credentials}}'**
+  String homeCredentialCount(int count);
+
+  /// No description provided for @homeIssuesChip.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 issue} other{{count} issues}}'**
+  String homeIssuesChip(int count);
+
+  /// No description provided for @homeSortTooltip.
+  ///
+  /// In en, this message translates to:
+  /// **'Sort'**
+  String get homeSortTooltip;
+
+  /// No description provided for @sortManual.
+  ///
+  /// In en, this message translates to:
+  /// **'Manual order'**
+  String get sortManual;
+
+  /// No description provided for @sortTitleAsc.
+  ///
+  /// In en, this message translates to:
+  /// **'Name (A–Z)'**
+  String get sortTitleAsc;
+
+  /// No description provided for @sortUpdatedDesc.
+  ///
+  /// In en, this message translates to:
+  /// **'Recently updated'**
+  String get sortUpdatedDesc;
+
+  /// No description provided for @homeReorderStart.
+  ///
+  /// In en, this message translates to:
+  /// **'Reorder'**
+  String get homeReorderStart;
+
+  /// No description provided for @homeReorderDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get homeReorderDone;
+
+  /// No description provided for @homeReorderHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Drag the handle to reorder'**
+  String get homeReorderHint;
+
   /// No description provided for @emptyAddFirst.
   ///
   /// In en, this message translates to:
