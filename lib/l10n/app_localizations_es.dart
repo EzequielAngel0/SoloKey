@@ -1108,6 +1108,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formDiscardLeave => 'Descartar';
 
   @override
+  String get formErrInvalidUrl => 'Ingresa una URL valida';
+
+  @override
+  String get formErrInvalidTotp => 'Secreto Base32 invalido (solo A-Z y 2-7)';
+
+  @override
   String get commonLoading => 'Cargando…';
 
   @override
@@ -1168,6 +1174,28 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get folderAddSubfolder => 'Añadir subcarpeta';
+
+  @override
+  String folderItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementos',
+      one: '1 elemento',
+      zero: 'Sin elementos',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get folderChangeColor => 'Cambiar color';
+
+  @override
+  String get folderColorTitle => 'Color de la carpeta';
+
+  @override
+  String get folderTreeHint =>
+      'Usa las flechas para navegar por las carpetas; pulsa el botón de menú para acciones.';
 
   @override
   String get folderSelectTitle => 'Seleccionar Carpeta';

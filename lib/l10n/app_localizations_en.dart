@@ -1099,6 +1099,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formDiscardLeave => 'Discard';
 
   @override
+  String get formErrInvalidUrl => 'Enter a valid URL';
+
+  @override
+  String get formErrInvalidTotp => 'Invalid Base32 secret (only A–Z and 2–7)';
+
+  @override
   String get commonLoading => 'Loading…';
 
   @override
@@ -1159,6 +1165,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get folderAddSubfolder => 'Add subfolder';
+
+  @override
+  String folderItemCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items',
+      one: '1 item',
+      zero: 'No items',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get folderChangeColor => 'Change color';
+
+  @override
+  String get folderColorTitle => 'Folder color';
+
+  @override
+  String get folderTreeHint =>
+      'Use the arrow keys to browse folders; press the menu button for actions.';
 
   @override
   String get folderSelectTitle => 'Select folder';

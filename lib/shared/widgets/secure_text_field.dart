@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../../l10n/app_localizations.dart';
 import '../../theme/app_palette.dart';
 
 class SecureTextField extends StatefulWidget {
@@ -62,6 +63,9 @@ class _SecureTextFieldState extends State<SecureTextField> {
             color: context.palette.textMuted,
             size: 20,
           ),
+          tooltip: _obscure
+              ? AppLocalizations.of(context).detailRevealSecret
+              : AppLocalizations.of(context).detailHideSecret,
           onPressed: () => setState(() => _obscure = !_obscure),
         ),
       ),

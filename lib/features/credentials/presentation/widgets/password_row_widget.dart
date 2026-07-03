@@ -4,6 +4,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../shared/widgets/secure_text_field.dart';
 import 'password_generator_widget.dart';
+import 'password_strength_meter.dart';
 
 class PasswordRowWidget extends StatelessWidget {
   const PasswordRowWidget({
@@ -13,6 +14,7 @@ class PasswordRowWidget extends StatelessWidget {
     required this.showGenerator,
     required this.onToggleGenerator,
     this.validator,
+    this.showStrength = false,
   });
 
   final TextEditingController ctrl;
@@ -20,6 +22,9 @@ class PasswordRowWidget extends StatelessWidget {
   final bool showGenerator;
   final ValueChanged<bool> onToggleGenerator;
   final String? Function(String?)? validator;
+
+  /// When true, a live strength meter is shown under the field (guidance only).
+  final bool showStrength;
 
   @override
   Widget build(BuildContext context) {
@@ -51,23 +56,29 @@ class PasswordRowWidget extends StatelessWidget {
                       : Colors.transparent,
                 ),
               ),
-              child: IconButton(
-                icon: Icon(
-                  Icons.auto_fix_high_rounded,
-                  color: showGenerator
-                      ? palette.accent
-                      : palette.textMuted,
+              child: Semantics(
+                button: true,
+                toggled: showGenerator,
+                label: AppLocalizations.of(context).passwordRowGeneratorTooltip,
+                child: IconButton(
+                  icon: Icon(
+                    Icons.auto_fix_high_rounded,
+                    color: showGenerator ? palette.accent : palette.textMuted,
+                  ),
+                  onPressed: () {
+                    HapticFeedback.selectionClick();
+                    FocusScope.of(context).unfocus();
+                    onToggleGenerator(!showGenerator);
+                  },
+                  tooltip: AppLocalizations.of(
+                    context,
+                  ).passwordRowGeneratorTooltip,
                 ),
-                onPressed: () {
-                  HapticFeedback.selectionClick();
-                  FocusScope.of(context).unfocus();
-                  onToggleGenerator(!showGenerator);
-                },
-                tooltip: AppLocalizations.of(context).passwordRowGeneratorTooltip,
               ),
             ),
           ],
         ),
+        if (showStrength) PasswordStrengthMeter(controller: ctrl),
         AnimatedSize(
           duration: const Duration(milliseconds: 300),
           curve: Curves.fastOutSlowIn,

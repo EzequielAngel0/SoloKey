@@ -2114,6 +2114,18 @@ abstract class AppLocalizations {
   /// **'Discard'**
   String get formDiscardLeave;
 
+  /// No description provided for @formErrInvalidUrl.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid URL'**
+  String get formErrInvalidUrl;
+
+  /// No description provided for @formErrInvalidTotp.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid Base32 secret (only A–Z and 2–7)'**
+  String get formErrInvalidTotp;
+
   /// No description provided for @commonLoading.
   ///
   /// In en, this message translates to:
@@ -2233,6 +2245,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Add subfolder'**
   String get folderAddSubfolder;
+
+  /// No description provided for @folderItemCount.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No items} =1{1 item} other{{count} items}}'**
+  String folderItemCount(int count);
+
+  /// No description provided for @folderChangeColor.
+  ///
+  /// In en, this message translates to:
+  /// **'Change color'**
+  String get folderChangeColor;
+
+  /// No description provided for @folderColorTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Folder color'**
+  String get folderColorTitle;
+
+  /// No description provided for @folderTreeHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Use the arrow keys to browse folders; press the menu button for actions.'**
+  String get folderTreeHint;
 
   /// No description provided for @folderSelectTitle.
   ///

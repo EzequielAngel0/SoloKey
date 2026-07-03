@@ -1101,6 +1101,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         ),
         body: Form(
           key: _formKey,
+          autovalidateMode: AutovalidateMode.onUserInteraction,
           child: ListView(
             padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
             children: [
@@ -1292,6 +1293,39 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     );
   }
 
+  /// Optional URL: empty passes; otherwise it must parse to a host with a dot.
+  /// Accepts bare hosts ("github.com") by assuming an https:// scheme.
+  String? _validateUrlOptional(String? v) {
+    final s = v?.trim() ?? '';
+    if (s.isEmpty) return null;
+    if (s.contains(' ')) return AppLocalizations.of(context).formErrInvalidUrl;
+    final candidate = s.contains('://') ? s : 'https://$s';
+    final uri = Uri.tryParse(candidate);
+    final host = uri?.host ?? '';
+    if (uri == null ||
+        host.isEmpty ||
+        !host.contains('.') ||
+        host.startsWith('.') ||
+        host.endsWith('.')) {
+      return AppLocalizations.of(context).formErrInvalidUrl;
+    }
+    return null;
+  }
+
+  /// Required Base32 (RFC 4648) TOTP secret. Spaces and dashes are ignored, case
+  /// is normalised; only A–Z and 2–7 (with optional `=` padding) are allowed.
+  String? _validateTotpSecret(String? v) {
+    final l10n = AppLocalizations.of(context);
+    final raw = (v ?? '').trim();
+    if (raw.isEmpty) return l10n.formFieldRequired;
+    final s = raw.replaceAll(RegExp(r'[\s-]'), '').toUpperCase();
+    final unpadded = s.replaceAll('=', '');
+    if (unpadded.length < 8 || !RegExp(r'^[A-Z2-7]+=*$').hasMatch(s)) {
+      return l10n.formErrInvalidTotp;
+    }
+    return null;
+  }
+
   String _titleHintFor(AppLocalizations l10n) => switch (_type) {
     CredentialType.password => l10n.formHintPassword,
     CredentialType.apiKey => l10n.formHintApiKey,
@@ -1374,6 +1408,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           ctrl: _passwordCtrl,
           label: l10n.fieldPassword,
           showGenerator: _showGenerator,
+          showStrength: true,
           onToggleGenerator: (v) => setState(() => _showGenerator = v),
         ),
         const SizedBox(height: 14),
@@ -1381,6 +1416,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           controller: _websiteCtrl,
           style: TextStyle(color: context.palette.textPrimary),
           keyboardType: TextInputType.url,
+          validator: _validateUrlOptional,
           decoration: InputDecoration(
             labelText: l10n.formWebsiteLabel,
             hintText: l10n.formWebsiteHint,
@@ -1431,6 +1467,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           controller: _endpointCtrl,
           style: TextStyle(color: context.palette.textPrimary),
           keyboardType: TextInputType.url,
+          validator: _validateUrlOptional,
           decoration: InputDecoration(
             labelText: l10n.formEndpointLabel,
             hintText: 'https://api.example.com/v1',
@@ -1580,8 +1617,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         SecureTextField(
           controller: _totpSecretCtrl,
           label: l10n.formTotpSecretLabel,
-          validator: (v) =>
-              v == null || v.trim().isEmpty ? l10n.formFieldRequired : null,
+          validator: _validateTotpSecret,
         ),
       ],
     );

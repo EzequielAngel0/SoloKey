@@ -9,6 +9,8 @@ import 'package:password_manager/features/credentials/presentation/widgets/passw
 import 'package:password_manager/features/folders/application/folders_provider.dart';
 import 'package:password_manager/features/folders/domain/entities/folder.dart';
 import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:password_manager/shared/widgets/password_strength_indicator.dart';
+import 'package:password_manager/shared/widgets/secure_text_field.dart';
 import 'package:password_manager/theme/app_theme.dart';
 
 import '../../support/widget_harness.dart';
@@ -153,9 +155,9 @@ void main() {
       ],
     );
 
-    // Header + CTA reflect edit mode, and the title field shows the value.
+    // Header reflects edit mode, and the top fields show the preloaded values.
+    // (The bottom "Save changes" CTA lives past the lazy ListView viewport.)
     expect(find.text('Edit credential'), findsOneWidget);
-    expect(find.text('Save changes'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, 'GitHub'), findsOneWidget);
     expect(find.widgetWithText(TextFormField, 'octocat'), findsOneWidget);
   });
@@ -188,5 +190,54 @@ void main() {
 
     expect(find.text('Discard changes?'), findsNothing);
     expect(find.text('open'), findsOneWidget); // back on the launcher route
+  });
+
+  testWidgets('typing a password reveals the live strength meter',
+      (tester) async {
+    await pumpForm(tester);
+    await tester.pump();
+
+    // No indicator while the password field is empty.
+    expect(find.byType(PasswordStrengthIndicator), findsNothing);
+
+    await tester.enterText(find.byType(SecureTextField), 'Xy9#kLmn2Pqr');
+    await tester.pump();
+
+    expect(find.byType(PasswordStrengthIndicator), findsOneWidget);
+    expect(find.text('Strong'), findsOneWidget);
+  });
+
+  testWidgets('an invalid website URL fails inline validation',
+      (tester) async {
+    await pumpForm(tester);
+    await tester.pump();
+
+    final website = find.ancestor(
+      of: find.text('Website / URL'),
+      matching: find.byType(TextFormField),
+    );
+    await tester.enterText(website, 'not a valid url');
+    await tester.pump();
+
+    expect(find.text('Enter a valid URL'), findsOneWidget);
+  });
+
+  testWidgets('an invalid Base32 TOTP secret fails inline validation',
+      (tester) async {
+    await pumpForm(tester);
+    await tester.pump();
+
+    // Switch to TOTP and let the AnimatedSwitcher settle.
+    await tester.tap(find.text('TOTP'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 350));
+    await tester.pump(const Duration(milliseconds: 350));
+
+    // '1' and '8' are not part of the Base32 alphabet (A–Z, 2–7).
+    await tester.enterText(find.byType(SecureTextField), '11111111');
+    await tester.pump();
+
+    expect(find.text('Invalid Base32 secret (only A–Z and 2–7)'),
+        findsOneWidget);
   });
 }

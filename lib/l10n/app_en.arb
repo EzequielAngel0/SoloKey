@@ -426,6 +426,8 @@
   "formDiscardMessage": "You have unsaved changes. If you leave now they will be lost.",
   "formDiscardKeep": "Keep editing",
   "formDiscardLeave": "Discard",
+  "formErrInvalidUrl": "Enter a valid URL",
+  "formErrInvalidTotp": "Invalid Base32 secret (only A–Z and 2–7)",
 
   "commonLoading": "Loading…",
   "folderNewSubfolder": "New subfolder",
@@ -450,6 +452,13 @@
   "folderUnassigned": "No folder assigned",
   "folderNew": "New folder",
   "folderAddSubfolder": "Add subfolder",
+  "folderItemCount": "{count, plural, =0{No items} =1{1 item} other{{count} items}}",
+  "@folderItemCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "folderChangeColor": "Change color",
+  "folderColorTitle": "Folder color",
+  "folderTreeHint": "Use the arrow keys to browse folders; press the menu button for actions.",
   "folderSelectTitle": "Select folder",
   "folderNewRootShort": "New root",
   "folderNoneMainVault": "None (Main vault)",
