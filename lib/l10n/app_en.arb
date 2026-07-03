@@ -422,18 +422,20 @@
   "formCustomDaysLabel": "Days to remind",
   "formCustomDaysRequired": "You must enter the number of days",
   "formCustomDaysInvalid": "Enter a valid number of days",
+  "formDiscardTitle": "Discard changes?",
+  "formDiscardMessage": "You have unsaved changes. If you leave now they will be lost.",
+  "formDiscardKeep": "Keep editing",
+  "formDiscardLeave": "Discard",
 
   "commonLoading": "Loading…",
   "folderNewSubfolder": "New subfolder",
   "folderDeleteTitle": "Delete folder",
-  "folderDeleteBodyOrphan": "Delete \"{name}\"? Its credentials will be orphaned or moved to the root.",
-  "@folderDeleteBodyOrphan": {
+  "folderDeleteKeepBody": "Remove \"{name}\"? Its subfolders and credentials are kept — choose where to move them. Nothing is deleted.",
+  "@folderDeleteKeepBody": {
     "placeholders": { "name": { "type": "String" } }
   },
-  "folderDeleteBodyReleased": "Delete \"{name}\"? Its subfolders or credentials will be released.",
-  "@folderDeleteBodyReleased": {
-    "placeholders": { "name": { "type": "String" } }
-  },
+  "folderDeleteMoveToParent": "Move contents to parent folder",
+  "folderDeleteMoveToVault": "Move contents to vault root",
   "folderDeleted": "Folder deleted",
   "folderRename": "Rename",
   "folderRenameTitle": "Rename folder",

@@ -31,6 +31,10 @@ class FolderRepositoryImpl implements IFolderRepository {
   @override
   Future<void> delete(String id) => _dao.deleteById(id);
 
+  @override
+  Future<void> reparentChildren(String fromParentId, String? toParentId) =>
+      _dao.reparentChildren(fromParentId, toParentId);
+
   Folder _fromEntry(FolderEntry e) => Folder(
         id: e.id,
         parentId: e.parentId,

@@ -2090,6 +2090,30 @@ abstract class AppLocalizations {
   /// **'Enter a valid number of days'**
   String get formCustomDaysInvalid;
 
+  /// No description provided for @formDiscardTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard changes?'**
+  String get formDiscardTitle;
+
+  /// No description provided for @formDiscardMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'You have unsaved changes. If you leave now they will be lost.'**
+  String get formDiscardMessage;
+
+  /// No description provided for @formDiscardKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep editing'**
+  String get formDiscardKeep;
+
+  /// No description provided for @formDiscardLeave.
+  ///
+  /// In en, this message translates to:
+  /// **'Discard'**
+  String get formDiscardLeave;
+
   /// No description provided for @commonLoading.
   ///
   /// In en, this message translates to:
@@ -2108,17 +2132,23 @@ abstract class AppLocalizations {
   /// **'Delete folder'**
   String get folderDeleteTitle;
 
-  /// No description provided for @folderDeleteBodyOrphan.
+  /// No description provided for @folderDeleteKeepBody.
   ///
   /// In en, this message translates to:
-  /// **'Delete \"{name}\"? Its credentials will be orphaned or moved to the root.'**
-  String folderDeleteBodyOrphan(String name);
+  /// **'Remove \"{name}\"? Its subfolders and credentials are kept — choose where to move them. Nothing is deleted.'**
+  String folderDeleteKeepBody(String name);
 
-  /// No description provided for @folderDeleteBodyReleased.
+  /// No description provided for @folderDeleteMoveToParent.
   ///
   /// In en, this message translates to:
-  /// **'Delete \"{name}\"? Its subfolders or credentials will be released.'**
-  String folderDeleteBodyReleased(String name);
+  /// **'Move contents to parent folder'**
+  String get folderDeleteMoveToParent;
+
+  /// No description provided for @folderDeleteMoveToVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Move contents to vault root'**
+  String get folderDeleteMoveToVault;
 
   /// No description provided for @folderDeleted.
   ///

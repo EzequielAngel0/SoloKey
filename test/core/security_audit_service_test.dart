@@ -40,6 +40,12 @@ class FakeCredentialRepository implements ICredentialRepository {
 
   @override
   Future<void> reorder(List<String> orderedIds) async {}
+
+  @override
+  Future<void> moveToFolder(String id, String? folderId) async {}
+
+  @override
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) async {}
 }
 
 class TestSecurityAuditService extends SecurityAuditService {

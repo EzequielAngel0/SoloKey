@@ -1095,6 +1095,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formCustomDaysInvalid => 'Ingrese un número válido de días';
 
   @override
+  String get formDiscardTitle => '¿Descartar cambios?';
+
+  @override
+  String get formDiscardMessage =>
+      'Tienes cambios sin guardar. Si sales ahora se perderan.';
+
+  @override
+  String get formDiscardKeep => 'Seguir editando';
+
+  @override
+  String get formDiscardLeave => 'Descartar';
+
+  @override
   String get commonLoading => 'Cargando…';
 
   @override
@@ -1104,14 +1117,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get folderDeleteTitle => 'Eliminar carpeta';
 
   @override
-  String folderDeleteBodyOrphan(String name) {
-    return '¿Eliminar \"$name\"? Sus credenciales quedarán huérfanas o movidas a la raíz.';
+  String folderDeleteKeepBody(String name) {
+    return '¿Quitar \"$name\"? Sus subcarpetas y credenciales se conservan: elige a dónde moverlas. No se elimina nada.';
   }
 
   @override
-  String folderDeleteBodyReleased(String name) {
-    return '¿Eliminar \"$name\"? Sus subcarpetas o credenciales quedarán liberadas.';
-  }
+  String get folderDeleteMoveToParent => 'Mover contenido a la carpeta padre';
+
+  @override
+  String get folderDeleteMoveToVault => 'Mover contenido a la raíz';
 
   @override
   String get folderDeleted => 'Carpeta eliminada';

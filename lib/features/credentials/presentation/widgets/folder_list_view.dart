@@ -8,8 +8,8 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/extensions/color_extensions.dart';
 import '../../../../theme/app_palette.dart';
-import '../../../folders/application/folders_provider.dart';
 import '../../../folders/domain/entities/folder.dart';
+import '../../../folders/presentation/folder_actions.dart';
 import '../../domain/entities/credential.dart';
 import 'credential_card.dart';
 import 'folder_options_sheet.dart';
@@ -30,8 +30,8 @@ class FolderListView extends ConsumerWidget {
       ref: ref,
       folder: folder,
       showManagementOptions: true,
-      onRename: () => _renameFolder(context, ref, folder),
-      onDelete: () => _deleteFolder(context, ref, folder),
+      onRename: () => promptRenameFolder(context, ref, folder),
+      onDelete: () => confirmDeleteFolder(context, ref, folder),
     );
   }
 
@@ -58,7 +58,7 @@ class FolderListView extends ConsumerWidget {
                 Text(l10n.folderOrganize, style: TextStyle(color: palette.textMuted, fontSize: 14)),
                 const SizedBox(height: 20),
                 OutlinedButton.icon(
-                  onPressed: () => _createFolder(context, ref, null),
+                  onPressed: () => promptCreateFolder(context, ref),
                   icon: const Icon(Icons.create_new_folder_rounded),
                   label: Text(l10n.folderCreateRoot),
                 )
@@ -78,7 +78,7 @@ class FolderListView extends ConsumerWidget {
           child: Align(
             alignment: Alignment.centerRight,
             child: TextButton.icon(
-              onPressed: () => _createFolder(context, ref, null),
+              onPressed: () => promptCreateFolder(context, ref),
               icon: Icon(Icons.create_new_folder_rounded, color: palette.accent),
               label: Text(l10n.folderNewRoot, style: TextStyle(color: palette.accent)),
             ),
@@ -117,89 +117,5 @@ class FolderListView extends ConsumerWidget {
             )),
       ],
     );
-  }
-
-  Future<void> _createFolder(BuildContext context, WidgetRef ref, String? parentId) async {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    final ctrl = TextEditingController();
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: palette.drawer,
-        title: Text(l10n.folderDialogTitle, style: TextStyle(color: palette.textPrimary)),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          style: TextStyle(color: palette.textPrimary),
-          decoration: InputDecoration(
-            labelText: l10n.folderNameLabel,
-            hintText: l10n.folderNameHint,
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonCreate)),
-        ],
-      ),
-    );
-    if (name != null && name.isNotEmpty) {
-      await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: parentId);
-    }
-  }
-
-  Future<void> _deleteFolder(BuildContext context, WidgetRef ref, Folder folder) async {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: palette.drawer,
-        title: Text(l10n.folderDeleteTitle, style: TextStyle(color: palette.textPrimary)),
-        content: Text(
-          l10n.folderDeleteBodyReleased(folder.name),
-          style: TextStyle(color: palette.textMuted),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: Text(l10n.commonDelete, style: TextStyle(color: palette.danger))),
-        ],
-      ),
-    );
-    if (confirmed == true) {
-      await ref.read(foldersNotifierProvider.notifier).deleteFolder(folder.id);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(l10n.folderDeleted),
-          backgroundColor: palette.success,
-        ));
-      }
-    }
-  }
-
-  Future<void> _renameFolder(BuildContext context, WidgetRef ref, Folder folder) async {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    final ctrl = TextEditingController(text: folder.name);
-    final name = await showDialog<String>(
-      context: context,
-      builder: (_) => AlertDialog(
-        backgroundColor: palette.drawer,
-        title: Text(l10n.folderRenameTitle, style: TextStyle(color: palette.textPrimary)),
-        content: TextField(
-          controller: ctrl,
-          autofocus: true,
-          style: TextStyle(color: palette.textPrimary),
-          decoration: InputDecoration(labelText: l10n.folderNewNameLabel),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonSave)),
-        ],
-      ),
-    );
-    if (name != null && name.isNotEmpty) {
-      ref.read(foldersNotifierProvider.notifier).renameFolder(folder.id, name);
-    }
   }
 }

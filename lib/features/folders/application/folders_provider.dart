@@ -40,8 +40,15 @@ class FoldersNotifier extends _$FoldersNotifier {
     return folder;
   }
 
-  Future<void> deleteFolder(String id) async {
-    await ref.read(folderRepositoryProvider).delete(id);
+  /// Deletes a folder, re-parenting its direct subfolders to
+  /// [reparentSubfoldersTo] (`null` = vault root) first so the subtree is never
+  /// orphaned. Credentials living in the folder are reassigned separately by the
+  /// caller (see `CredentialsNotifier.reassignFolder`) so this notifier stays
+  /// decoupled from the credentials layer.
+  Future<void> deleteFolder(String id, {String? reparentSubfoldersTo}) async {
+    final repo = ref.read(folderRepositoryProvider);
+    await repo.reparentChildren(id, reparentSubfoldersTo);
+    await repo.delete(id);
     await refresh();
   }
 

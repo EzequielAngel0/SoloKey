@@ -62,4 +62,19 @@ class FakeCredentialRepository implements ICredentialRepository {
 
   @override
   Future<void> reorder(List<String> orderedIds) async {}
+
+  @override
+  Future<void> moveToFolder(String id, String? folderId) async {
+    final i = credentials.indexWhere((c) => c.id == id);
+    if (i != -1) credentials[i] = credentials[i].copyWith(categoryId: folderId);
+  }
+
+  @override
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) async {
+    for (var i = 0; i < credentials.length; i++) {
+      if (credentials[i].categoryId == fromFolderId) {
+        credentials[i] = credentials[i].copyWith(categoryId: toFolderId);
+      }
+    }
+  }
 }

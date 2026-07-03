@@ -25,6 +25,29 @@ Set<String> folderAncestorIds(List<Folder> folders, String? selectedId) {
   return acc;
 }
 
+/// Ids of [rootId] plus every folder nested under it (its whole subtree),
+/// walking `parentId` downward. Guards against cycles. Empty when [rootId] is
+/// `null` or unknown. Used to reason about what a folder deletion affects.
+Set<String> folderDescendantIds(List<Folder> folders, String? rootId) {
+  if (rootId == null) return const {};
+  final childrenByParent = <String?, List<Folder>>{};
+  for (final f in folders) {
+    childrenByParent.putIfAbsent(f.parentId, () => []).add(f);
+  }
+  final acc = <String>{};
+  void walk(String id) {
+    for (final child in childrenByParent[id] ?? const <Folder>[]) {
+      if (acc.add(child.id)) walk(child.id);
+    }
+  }
+
+  if (folders.any((f) => f.id == rootId)) {
+    acc.add(rootId);
+    walk(rootId);
+  }
+  return acc;
+}
+
 /// One visible row of the tree: the [folder], its [depth] (roots = 1) and
 /// whether it [hasChildren] (to show the expander).
 class FolderRow {

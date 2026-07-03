@@ -60,6 +60,34 @@ class CredentialDao extends DatabaseAccessor<AppDatabase>
         CredentialEntriesCompanion(sortOrder: Value(order)),
       );
 
+  /// Moves a credential to [categoryId] (`null` = vault root / unfiled) without
+  /// touching the encrypted payload. Bumps `updatedAt` so the change is picked
+  /// up by delta sync (LWW compares `updatedAt`).
+  Future<void> setCategory(String id, String? categoryId, int updatedAtMs) =>
+      (update(credentialEntries)..where((t) => t.id.equals(id))).write(
+        CredentialEntriesCompanion(
+          categoryId: Value(categoryId),
+          updatedAt: Value(updatedAtMs),
+        ),
+      );
+
+  /// Bulk-reassigns every credential currently in [fromCategoryId] to
+  /// [toCategoryId] (`null` = vault root). Bumps `updatedAt` so the moves sync.
+  /// Used when a folder is deleted so its credentials are never orphaned.
+  Future<void> reassignCategory(
+    String fromCategoryId,
+    String? toCategoryId,
+    int updatedAtMs,
+  ) =>
+      (update(credentialEntries)
+            ..where((t) => t.categoryId.equals(fromCategoryId)))
+          .write(
+        CredentialEntriesCompanion(
+          categoryId: Value(toCategoryId),
+          updatedAt: Value(updatedAtMs),
+        ),
+      );
+
   Future<int> deleteById(String id) =>
       (delete(credentialEntries)..where((t) => t.id.equals(id))).go();
 }

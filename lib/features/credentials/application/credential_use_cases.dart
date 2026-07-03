@@ -33,6 +33,12 @@ class SaveCredentialUseCase {
       _repo.setHidden(id, hidden);
 
   Future<void> reorder(List<String> orderedIds) => _repo.reorder(orderedIds);
+
+  Future<void> moveToFolder(String id, String? folderId) =>
+      _repo.moveToFolder(id, folderId);
+
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) =>
+      _repo.reassignFolder(fromFolderId, toFolderId);
 }
 
 @lazySingleton

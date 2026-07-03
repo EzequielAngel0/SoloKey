@@ -134,6 +134,22 @@ class CredentialRepositoryImpl implements ICredentialRepository {
   }
 
   @override
+  Future<void> moveToFolder(String id, String? folderId) =>
+      _credentialDao.setCategory(
+        id,
+        folderId,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+
+  @override
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) =>
+      _credentialDao.reassignCategory(
+        fromFolderId,
+        toFolderId,
+        DateTime.now().millisecondsSinceEpoch,
+      );
+
+  @override
   Future<List<PasswordHistory>> getPasswordHistory(String credentialId) async {
     final entries = await _historyDao.getByCredential(credentialId);
     final key = _keyBytes;

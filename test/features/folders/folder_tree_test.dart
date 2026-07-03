@@ -62,6 +62,37 @@ void main() {
     });
   });
 
+  group('folderDescendantIds', () {
+    test('null root yields no descendants', () {
+      expect(folderDescendantIds(all, null), isEmpty);
+    });
+
+    test('unknown root yields no descendants', () {
+      expect(folderDescendantIds(all, 'ghost'), isEmpty);
+    });
+
+    test('includes the root and its whole subtree', () {
+      expect(folderDescendantIds(all, 'work'), {'work', 'alpha', 'beta'});
+    });
+
+    test('a leaf is just itself', () {
+      expect(folderDescendantIds(all, 'alpha'), {'alpha'});
+    });
+
+    test('is cycle-safe (mutual parent references do not loop)', () {
+      final a = _f('a', parent: 'b');
+      final b = _f('b', parent: 'a');
+      expect(folderDescendantIds([a, b], 'a'), {'a', 'b'});
+    });
+
+    test('nested subtree walks multiple levels', () {
+      final root = _f('r');
+      final mid = _f('m', parent: 'r');
+      final leaf = _f('l', parent: 'm');
+      expect(folderDescendantIds([root, mid, leaf], 'r'), {'r', 'm', 'l'});
+    });
+  });
+
   group('flattenVisibleFolders', () {
     test('collapsed: only roots, depth 1, hasChildren flagged', () {
       final rows = flattenVisibleFolders(all, {});

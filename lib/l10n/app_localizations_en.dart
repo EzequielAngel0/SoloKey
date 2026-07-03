@@ -1086,6 +1086,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formCustomDaysInvalid => 'Enter a valid number of days';
 
   @override
+  String get formDiscardTitle => 'Discard changes?';
+
+  @override
+  String get formDiscardMessage =>
+      'You have unsaved changes. If you leave now they will be lost.';
+
+  @override
+  String get formDiscardKeep => 'Keep editing';
+
+  @override
+  String get formDiscardLeave => 'Discard';
+
+  @override
   String get commonLoading => 'Loading…';
 
   @override
@@ -1095,14 +1108,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get folderDeleteTitle => 'Delete folder';
 
   @override
-  String folderDeleteBodyOrphan(String name) {
-    return 'Delete \"$name\"? Its credentials will be orphaned or moved to the root.';
+  String folderDeleteKeepBody(String name) {
+    return 'Remove \"$name\"? Its subfolders and credentials are kept — choose where to move them. Nothing is deleted.';
   }
 
   @override
-  String folderDeleteBodyReleased(String name) {
-    return 'Delete \"$name\"? Its subfolders or credentials will be released.';
-  }
+  String get folderDeleteMoveToParent => 'Move contents to parent folder';
+
+  @override
+  String get folderDeleteMoveToVault => 'Move contents to vault root';
 
   @override
   String get folderDeleted => 'Folder deleted';

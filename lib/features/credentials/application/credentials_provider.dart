@@ -46,6 +46,21 @@ class CredentialsNotifier extends _$CredentialsNotifier {
     await ref.read(saveCredentialUseCaseProvider).reorder(orderedIds);
     await refresh();
   }
+
+  /// Moves one credential to [folderId] (`null` = vault root) and refreshes.
+  Future<void> moveToFolder(String id, String? folderId) async {
+    await ref.read(saveCredentialUseCaseProvider).moveToFolder(id, folderId);
+    await refresh();
+  }
+
+  /// Bulk-reassigns every credential in [fromFolderId] to [toFolderId] and
+  /// refreshes. Used when a folder is deleted so credentials aren't orphaned.
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) async {
+    await ref
+        .read(saveCredentialUseCaseProvider)
+        .reassignFolder(fromFolderId, toFolderId);
+    await refresh();
+  }
 }
 
 @riverpod
