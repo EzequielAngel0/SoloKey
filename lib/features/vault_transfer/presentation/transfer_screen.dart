@@ -409,6 +409,14 @@ class _ExportTab extends StatelessWidget {
             subtitle: l10n.transferSummary(
                 lastSummary!.totalCredentials, lastSummary!.totalFolders),
           ),
+          if (lastSummary!.savedPath != null) ...[
+            const SizedBox(height: 12),
+            _InfoBanner(
+              icon: Icons.folder_open_rounded,
+              color: palette.accent,
+              text: l10n.transferSavedTo(lastSummary!.savedPath!),
+            ),
+          ],
         ],
       ],
     );
@@ -454,7 +462,7 @@ class _ImportTab extends StatelessWidget {
         const SizedBox(height: 12),
         _PasswordField(
           controller: passwordCtrl,
-          label: l10n.transferExportPasswordLabel,
+          label: l10n.transferBackupPasswordLabel,
           hint: l10n.transferImportPasswordHint,
         ),
 

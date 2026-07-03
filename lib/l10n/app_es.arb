@@ -469,6 +469,8 @@
   "transferEncryptionInfo": "El archivo se cifra con AES-256-GCM + Argon2id. Solo quién conozca la contraseña de exportación puede abrirlo.",
   "transferExportButton": "Exportar bóveda",
   "transferExportDone": "Exportación completada",
+  "transferSavedTo": "Guardado en: {path}",
+  "@transferSavedTo": { "placeholders": { "path": { "type": "String" } } },
   "transferSummary": "{creds} credenciales · {folders} carpetas",
   "transferBackupPasswordLabel": "Contraseña del backup",
   "transferImportPasswordInfo": "Ingresa la contraseña que usaste al exportar el backup. Si importas un backup tuyo del mismo dispositivo puedes dejar este campo vacío.",

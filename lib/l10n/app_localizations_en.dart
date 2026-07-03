@@ -1393,6 +1393,11 @@ class AppLocalizationsEn extends AppLocalizations {
   String get transferExportDone => 'Export completed';
 
   @override
+  String transferSavedTo(String path) {
+    return 'Saved to: $path';
+  }
+
+  @override
   String transferSummary(int creds, int folders) {
     return '$creds credentials · $folders folders';
   }

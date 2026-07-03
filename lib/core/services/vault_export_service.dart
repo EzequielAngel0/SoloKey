@@ -109,7 +109,7 @@ class VaultExportService {
       if (path == null) return null; // cancelled
       // On desktop saveFile only returns the path — write the bytes ourselves.
       await File(path).writeAsBytes(built.bytes, flush: true);
-      return built.summary;
+      return built.summary.withSavedPath(path);
     }
 
     // Mobile: share sheet from a temp file, deleted afterwards.
@@ -418,10 +418,22 @@ class ExportSummary {
     required this.totalCredentials,
     required this.totalFolders,
     required this.countsByType,
+    this.savedPath,
   });
   final int totalCredentials;
   final int totalFolders;
   final Map<CredentialType, int> countsByType;
+
+  /// Absolute path the `.skvault` was written to. Only set on desktop (where
+  /// the user picks the destination); `null` on mobile (shared via the OS sheet).
+  final String? savedPath;
+
+  ExportSummary withSavedPath(String path) => ExportSummary(
+        totalCredentials: totalCredentials,
+        totalFolders: totalFolders,
+        countsByType: countsByType,
+        savedPath: path,
+      );
 }
 
 class ImportResult {

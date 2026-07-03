@@ -2642,6 +2642,12 @@ abstract class AppLocalizations {
   /// **'Export completed'**
   String get transferExportDone;
 
+  /// No description provided for @transferSavedTo.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved to: {path}'**
+  String transferSavedTo(String path);
+
   /// No description provided for @transferSummary.
   ///
   /// In en, this message translates to:
