@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
 import 'package:password_manager/features/credentials/domain/repositories/i_credential_repository.dart';
@@ -5,12 +7,25 @@ import 'package:password_manager/features/credentials/domain/repositories/i_cred
 /// Minimal in-memory [ICredentialRepository] for logic/widget tests. Holds a
 /// fixed list; mutating methods are no-ops unless a test needs otherwise.
 /// Shared so suites don't each re-declare the same fake.
+///
+/// Two optional knobs drive async UI states: [failWith] makes `getAll` throw
+/// (error branch) and [loadForever] makes it never complete (loading branch).
 class FakeCredentialRepository implements ICredentialRepository {
-  FakeCredentialRepository(this.credentials);
+  FakeCredentialRepository(
+    this.credentials, {
+    this.failWith,
+    this.loadForever = false,
+  });
   final List<Credential> credentials;
+  final Object? failWith;
+  final bool loadForever;
 
   @override
-  Future<List<Credential>> getAll() async => credentials;
+  Future<List<Credential>> getAll() {
+    if (failWith != null) return Future.error(failWith!);
+    if (loadForever) return Completer<List<Credential>>().future;
+    return Future.value(credentials);
+  }
 
   @override
   Future<Credential?> getById(String id) async =>
