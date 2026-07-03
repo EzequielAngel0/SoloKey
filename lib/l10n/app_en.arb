@@ -204,6 +204,9 @@
   "totpClipboardLabel": "TOTP code",
   "totpInvalid": "Invalid",
 
+  "a11yFavorite": "Favourite",
+  "a11yDoubleEncrypted": "Double-encrypted",
+
   "historyTitle": "History",
   "historyEmpty": "No old passwords.",
   "historyCopyTooltip": "Copy password",

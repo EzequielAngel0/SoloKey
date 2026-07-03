@@ -476,6 +476,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get totpInvalid => 'Invalid';
 
   @override
+  String get a11yFavorite => 'Favourite';
+
+  @override
+  String get a11yDoubleEncrypted => 'Double-encrypted';
+
+  @override
   String get historyTitle => 'History';
 
   @override

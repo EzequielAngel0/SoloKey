@@ -4,6 +4,7 @@ import 'package:password_manager/features/credentials/application/credential_hea
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/presentation/widgets/credential_card.dart';
 import 'package:password_manager/shared/widgets/status_chip.dart';
+import 'package:password_manager/shared/widgets/type_badge.dart';
 
 import '../../../support/widget_harness.dart';
 
@@ -48,6 +49,34 @@ void main() {
       await pumpCard(tester, _c(username: 'octocat'));
       expect(find.text('GitHub'), findsOneWidget);
       expect(find.text('octocat'), findsOneWidget);
+    });
+
+    testWidgets('username present hides the type badge', (tester) async {
+      await pumpCard(tester, _c(username: 'octocat'));
+      expect(find.byType(TypeBadge), findsNothing);
+    });
+
+    testWidgets('no username/host falls back to a type badge', (tester) async {
+      await pumpCard(tester, _c()); // password, no username or website
+      expect(find.byType(TypeBadge), findsOneWidget);
+      expect(find.text('Password'), findsOneWidget);
+    });
+
+    testWidgets('website host is used as the subtitle when no username',
+        (tester) async {
+      await pumpCard(
+        tester,
+        Credential(
+          id: '9',
+          type: CredentialType.password,
+          title: 'GitHub',
+          website: 'https://www.github.com/login',
+          createdAt: DateTime(2020),
+          updatedAt: DateTime(2020),
+        ),
+      );
+      expect(find.text('github.com'), findsOneWidget);
+      expect(find.byType(TypeBadge), findsNothing);
     });
 
     testWidgets('shows a chevron for non-TOTP types', (tester) async {
@@ -104,6 +133,9 @@ void main() {
       expect(_monoCode(), findsOneWidget);
       // No chevron for TOTP rows.
       expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
+      // TOTP rows have no username → the subtitle falls back to a type badge.
+      expect(find.byType(TypeBadge), findsOneWidget);
+      expect(find.text('TOTP'), findsOneWidget);
     });
 
     testWidgets('invalid secret shows the "Invalid" label, not a code',

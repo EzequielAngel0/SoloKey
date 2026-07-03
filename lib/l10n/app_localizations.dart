@@ -938,6 +938,18 @@ abstract class AppLocalizations {
   /// **'Invalid'**
   String get totpInvalid;
 
+  /// No description provided for @a11yFavorite.
+  ///
+  /// In en, this message translates to:
+  /// **'Favourite'**
+  String get a11yFavorite;
+
+  /// No description provided for @a11yDoubleEncrypted.
+  ///
+  /// In en, this message translates to:
+  /// **'Double-encrypted'**
+  String get a11yDoubleEncrypted;
+
   /// No description provided for @historyTitle.
   ///
   /// In en, this message translates to:

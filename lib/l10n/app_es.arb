@@ -163,6 +163,9 @@
   "totpClipboardLabel": "Código TOTP",
   "totpInvalid": "Inválido",
 
+  "a11yFavorite": "Favorito",
+  "a11yDoubleEncrypted": "Con doble cifrado",
+
   "historyTitle": "Historial",
   "historyEmpty": "No hay contraseñas antiguas.",
   "historyCopyTooltip": "Copiar contraseña",

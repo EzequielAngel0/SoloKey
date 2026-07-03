@@ -10,6 +10,7 @@ import '../../../../l10n/app_localizations.dart';
 import '../../../../shared/widgets/clipboard_countdown.dart';
 import '../../../../router/app_router.dart';
 import '../../../../shared/widgets/status_chip.dart';
+import '../../../../shared/widgets/type_badge.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
 import '../../domain/entities/credential.dart';
@@ -26,6 +27,19 @@ Color credentialTypeColor(CredentialType type, AppPalette p) => switch (type) {
       CredentialType.totp => p.typeTotp,
       CredentialType.passkey => p.typePasskey,
       CredentialType.sshKey => p.typeSshKey,
+    };
+
+/// Short, localized label for a credential [type] — reused by the card subtitle
+/// fallback, the type badge and (a11y) semantics. Kept in one place so the
+/// wording stays consistent everywhere a type is named.
+String credentialTypeLabel(CredentialType type, AppLocalizations l10n) =>
+    switch (type) {
+      CredentialType.password => l10n.typePassword,
+      CredentialType.apiKey => l10n.typeApiKey,
+      CredentialType.secureNote => l10n.typeSelNote,
+      CredentialType.totp => l10n.typeSelTotp,
+      CredentialType.passkey => l10n.typeSelPasskey,
+      CredentialType.sshKey => l10n.typeSshKey,
     };
 
 class CredentialCard extends ConsumerWidget {
@@ -303,17 +317,26 @@ class CredentialCard extends ConsumerWidget {
     Color color,
   ) {
     final l10n = AppLocalizations.of(context);
-    final health = ref.watch(credentialHealthProvider)[credential.id];
+    // Only this card's own health entry — a `.select` so a change to another
+    // credential's flags never rebuilds this row (perf on large vaults).
+    final health = ref
+        .watch(credentialHealthProvider.select((m) => m[credential.id]));
     final subtitle = _subtitle();
+    final typeLabel = credentialTypeLabel(credential.type, l10n);
     final isTotp = credential.type == CredentialType.totp;
 
     return Row(
       children: [
-        CredentialIcon(
-          credential: credential,
-          defaultIcon: icon,
-          color: color,
-          size: dense ? 40 : 44,
+        // The avatar already encodes the type via colour+icon; label it for
+        // screen readers so the row announces its type + title.
+        Semantics(
+          label: '$typeLabel: ${credential.title}',
+          child: CredentialIcon(
+            credential: credential,
+            defaultIcon: icon,
+            color: color,
+            size: dense ? 40 : 44,
+          ),
         ),
         const SizedBox(width: 13),
         Expanded(
@@ -338,24 +361,35 @@ class CredentialCard extends ConsumerWidget {
                   ),
                   if (credential.isFavorite) ...[
                     const SizedBox(width: 6),
-                    Icon(Icons.star_rounded, color: palette.warning, size: 15),
+                    Tooltip(
+                      message: l10n.a11yFavorite,
+                      child: Icon(Icons.star_rounded,
+                          color: palette.warning, size: 15),
+                    ),
                   ],
                   if (credential.isDoubleEncrypted) ...[
                     const SizedBox(width: 5),
-                    Icon(Icons.enhanced_encryption_rounded,
-                        color: palette.typeSshKey, size: 14),
+                    Tooltip(
+                      message: l10n.a11yDoubleEncrypted,
+                      child: Icon(Icons.enhanced_encryption_rounded,
+                          color: palette.typeSshKey, size: 14),
+                    ),
                   ],
                 ],
               ),
-              if (subtitle != null) ...[
-                const SizedBox(height: 2),
-                Text(
-                  subtitle,
-                  style: TextStyle(color: palette.textMuted, fontSize: 12.5),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+              const SizedBox(height: 3),
+              // Second line: username/host when present, otherwise a subtle
+              // type badge so every row keeps a consistent two-line rhythm and
+              // TOTP/notes/SSH (which rarely have a username) still name a type.
+              subtitle != null
+                  ? Text(
+                      subtitle,
+                      style:
+                          TextStyle(color: palette.textMuted, fontSize: 12.5),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    )
+                  : TypeBadge(label: typeLabel, color: color),
             ],
           ),
         ),
@@ -379,7 +413,10 @@ class CredentialCard extends ConsumerWidget {
           _TotpVisualizer(credential: credential)
         else ...[
           const SizedBox(width: 4),
-          Icon(Icons.chevron_right_rounded, color: palette.textDisabled, size: 20),
+          ExcludeSemantics(
+            child: Icon(Icons.chevron_right_rounded,
+                color: palette.textDisabled, size: 20),
+          ),
         ],
       ],
     );
@@ -492,6 +529,7 @@ class _TotpVisualizerState extends State<_TotpVisualizer> {
           const SizedBox(width: 4),
           IconButton(
             icon: Icon(Icons.copy_rounded, color: palette.typeTotp, size: 16),
+            tooltip: AppLocalizations.of(context).detailCopyCode,
             onPressed: () => _quickCopy(context),
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 32, minHeight: 28),
