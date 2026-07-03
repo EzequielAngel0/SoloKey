@@ -24,8 +24,6 @@ import 'support/e2e_helpers.dart';
 ///
 /// Finders are locale-agnostic (by widget type/icon, not by English text) so it
 /// works whatever UI language the device is set to. Zero-Print: no secret logged.
-const _allowWipe = bool.fromEnvironment('E2E_ALLOW_WIPE');
-
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -58,5 +56,5 @@ void main() {
     expect(find.byType(SetupScreen), findsNothing);
   },
       // Never runs by accident: only on a disposable device with the opt-in.
-      skip: !_allowWipe);
+      skip: !e2eWipeAllowed);
 }

@@ -89,9 +89,14 @@ Finder fieldByLabel(String label) => find.byWidgetPredicate(
 /// identity is not the shipped one. Even when allowed, it first copies every
 /// file it will delete to a timestamped `.e2e-backup` sibling. Run E2E only on a
 /// throwaway device/emulator, never on a machine that holds a real vault.
+/// Opt-in flag for the destructive path. `bool.fromEnvironment` only accepts the
+/// literal "true", so we accept both `E2E_ALLOW_WIPE=1` and `=true`.
+const bool e2eWipeAllowed =
+    String.fromEnvironment('E2E_ALLOW_WIPE') == '1' ||
+        String.fromEnvironment('E2E_ALLOW_WIPE') == 'true';
+
 Future<void> resetVault() async {
-  const allowWipe = bool.fromEnvironment('E2E_ALLOW_WIPE');
-  if (!allowWipe) {
+  if (!e2eWipeAllowed) {
     // Safe default: do NOT touch persistent storage. Tests that truly need a
     // clean vault should be run with the define on a disposable device.
     return;

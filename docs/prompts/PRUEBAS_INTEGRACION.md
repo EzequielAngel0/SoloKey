@@ -252,6 +252,13 @@ que la hace estable:
   hardcodeadas por índice.
 - Tiempo determinista donde importe (TOTP/rotación): inyecta el instante, no dependas del
   reloj de pared.
+- **Windows: corre UN archivo por invocación.** `main()` usa
+  `WindowsSingleInstance.ensureSingleInstance`, así que lanzar toda la carpeta
+  (`flutter test integration_test -d windows`) falla al abrir la 2.ª app
+  ("Unable to start the app on the device"): la primera instancia bloquea la
+  segunda. Ejecuta cada archivo por separado
+  (`flutter test integration_test/vault_e2e_test.dart -d windows ...`) y mata
+  cualquier `SoloKey.exe` colgado entre corridas.
 
 ## Si algún día se quiere en CI
 
