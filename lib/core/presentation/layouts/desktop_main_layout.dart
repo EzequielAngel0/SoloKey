@@ -302,7 +302,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                             ),
                             ...folderCreds.map((c) => Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
-                                  child: CredentialCard(credential: c),
+                                  child: CredentialCard(
+                                      credential: c, enableFolderDrag: true),
                                 )),
                           ],
                         ),

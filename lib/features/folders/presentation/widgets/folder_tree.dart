@@ -199,6 +199,21 @@ class _FolderTreeState extends ConsumerState<FolderTree> {
         ],
       );
 
+  /// Drop handler: a credential dragged onto a node is moved into that folder
+  /// (`null` = vault root). Plain-column move, so it syncs without re-encrypting.
+  Future<void> _moveCredentialHere(String credentialId, String? folderId) async {
+    await ref
+        .read(credentialsNotifierProvider.notifier)
+        .moveToFolder(credentialId, folderId);
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(l10n.cardMovedSuccess),
+      backgroundColor: context.palette.success,
+      duration: const Duration(seconds: 2),
+    ));
+  }
+
   Future<void> _showContextMenu(Folder folder, Offset globalPosition) async {
     final l10n = AppLocalizations.of(context);
     final overlay =
@@ -235,6 +250,7 @@ class _FolderTreeState extends ConsumerState<FolderTree> {
           _focusNode.requestFocus();
           widget.onSelect(null);
         },
+        onAcceptCredential: (id) => _moveCredentialHere(id, null),
       ),
     ];
     for (final f in _childrenOf(null)) {
@@ -286,6 +302,7 @@ class _FolderTreeState extends ConsumerState<FolderTree> {
         onSelected: (a) => _runAction(a, f),
       ),
       onSecondaryTap: (pos) => _showContextMenu(f, pos),
+      onAcceptCredential: (id) => _moveCredentialHere(id, f.id),
     ));
     if (expanded) {
       for (final c in children) {
@@ -310,6 +327,7 @@ class _TreeRow extends StatefulWidget {
     this.onToggle,
     this.menu,
     this.onSecondaryTap,
+    this.onAcceptCredential,
   });
 
   final String label;
@@ -325,6 +343,9 @@ class _TreeRow extends StatefulWidget {
   final Widget? menu;
   final ValueChanged<Offset>? onSecondaryTap;
 
+  /// Called with a dropped credential id when one is dragged onto this node.
+  final ValueChanged<String>? onAcceptCredential;
+
   @override
   State<_TreeRow> createState() => _TreeRowState();
 }
@@ -334,6 +355,16 @@ class _TreeRowState extends State<_TreeRow> {
 
   @override
   Widget build(BuildContext context) {
+    if (widget.onAcceptCredential == null) return _row(context, false);
+    return DragTarget<String>(
+      onWillAcceptWithDetails: (_) => true,
+      onAcceptWithDetails: (d) => widget.onAcceptCredential!(d.data),
+      builder: (context, candidate, rejected) =>
+          _row(context, candidate.isNotEmpty),
+    );
+  }
+
+  Widget _row(BuildContext context, bool dragOver) {
     final p = context.palette;
     final showMenuBtn = widget.menu != null;
     return Padding(
@@ -342,8 +373,11 @@ class _TreeRowState extends State<_TreeRow> {
         onEnter: (_) => setState(() => _hovered = true),
         onExit: (_) => setState(() => _hovered = false),
         child: Material(
-          color:
-              widget.selected ? p.primary.withValues(alpha: 0.14) : Colors.transparent,
+          color: dragOver
+              ? p.primary.withValues(alpha: 0.28)
+              : widget.selected
+                  ? p.primary.withValues(alpha: 0.14)
+                  : Colors.transparent,
           borderRadius: BorderRadius.circular(8),
           child: GestureDetector(
             onSecondaryTapDown: widget.onSecondaryTap == null

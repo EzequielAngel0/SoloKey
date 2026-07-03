@@ -17,7 +17,7 @@ import '../../domain/entities/credential.dart';
 import '../../application/credentials_provider.dart';
 import '../../application/credential_health_provider.dart';
 import 'credential_icon.dart';
-import '../../../folders/application/folders_provider.dart';
+import 'folder_picker_sheet.dart';
 
 /// Resolves the themed accent color for a credential [type].
 Color credentialTypeColor(CredentialType type, AppPalette p) => switch (type) {
@@ -47,6 +47,7 @@ class CredentialCard extends ConsumerWidget {
     super.key,
     required this.credential,
     this.dense = false,
+    this.enableFolderDrag = false,
   });
 
   final Credential credential;
@@ -55,6 +56,11 @@ class CredentialCard extends ConsumerWidget {
   /// meant to sit inside a grouped "filas densas" container that draws the
   /// hairline dividers and border. When false it is a standalone rounded card.
   final bool dense;
+
+  /// When true (desktop only) the card is a drag source: long-press to drag it
+  /// onto a folder node in the tree to move it. Off by default so it never
+  /// clashes with the reorderable vault list.
+  final bool enableFolderDrag;
 
   static const _typeIcons = {
     CredentialType.password: Icons.lock_rounded,
@@ -199,53 +205,34 @@ class CredentialCard extends ConsumerWidget {
   Future<void> _moveFolder(BuildContext context, WidgetRef ref) async {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
 
-    final newCategoryId = await showModalBottomSheet<String?>(
+    // Reuse the hierarchical picker (tree + create-subfolder) instead of a flat
+    // list, so nested folders are reachable. It returns `[folderId]` (or
+    // `[null]` for the vault root); `null` means the sheet was dismissed.
+    final picked = await showModalBottomSheet<List<String?>>(
       context: context,
       backgroundColor: palette.drawer,
-      builder: (_) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Text(l10n.cardMoveToFolder, style: TextStyle(color: palette.textPrimary, fontSize: 18, fontWeight: FontWeight.bold)),
-          ),
-          ListTile(
-            leading: Icon(Icons.all_inbox_rounded, color: palette.textPrimary),
-            title: Text(l10n.cardNoFolder, style: TextStyle(color: palette.textPrimary)),
-            onTap: () => Navigator.pop(context, ''), // empty means null
-          ),
-          Divider(color: palette.divider),
-          Expanded(
-            child: ListView.builder(
-              itemCount: folders.length,
-              itemBuilder: (context, i) {
-                final f = folders[i];
-                final color = Color(int.tryParse('FF${f.colorHex.replaceFirst('#', '')}', radix: 16) ?? 0xFF3B82F6);
-                return ListTile(
-                  leading: Icon(Icons.folder_rounded, color: color),
-                  title: Text(f.name, style: TextStyle(color: palette.textPrimary)),
-                  trailing: credential.categoryId == f.id ? Icon(Icons.check_rounded, color: palette.accent) : null,
-                  onTap: () => Navigator.pop(context, f.id),
-                );
-              },
-            ),
-          )
-        ],
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
+      builder: (_) => FolderPickerSheet(selectedFolderId: credential.categoryId),
     );
+    if (picked == null) return; // dismissed
+    final target = picked.first;
+    if (target == credential.categoryId) return; // unchanged
 
-    if (newCategoryId != null) {
-      final updated = credential.copyWith(categoryId: newCategoryId.isEmpty ? null : newCategoryId);
-      await ref.read(credentialsNotifierProvider.notifier).save(updated);
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(l10n.cardMovedSuccess),
-          backgroundColor: palette.success,
-          duration: const Duration(seconds: 2),
-        ));
-      }
+    // Plain-column move (no re-encryption, no password-history entry); bumps
+    // updatedAt so the change syncs.
+    await ref
+        .read(credentialsNotifierProvider.notifier)
+        .moveToFolder(credential.id, target);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(l10n.cardMovedSuccess),
+        backgroundColor: palette.success,
+        duration: const Duration(seconds: 2),
+      ));
     }
   }
 
@@ -284,10 +271,15 @@ class CredentialCard extends ConsumerWidget {
       }
     }
 
+    // On desktop the card can be dragged onto a folder node to move it; there,
+    // long-press starts the drag (options stay available via right-click), so it
+    // must not also open the options sheet.
+    final useDrag = enableFolderDrag && ResponsiveLayout.isDesktop(context);
+
     final inkwell = InkWell(
       borderRadius: dense ? null : BorderRadius.circular(16),
       onTap: openDetail,
-      onLongPress: () => _showOptionsSheet(context, ref),
+      onLongPress: useDrag ? null : () => _showOptionsSheet(context, ref),
       onSecondaryTap: () => _showOptionsSheet(context, ref), // desktop right-click
       child: Padding(
         padding: EdgeInsets.symmetric(horizontal: 14, vertical: dense ? 11 : 14),
@@ -297,17 +289,59 @@ class CredentialCard extends ConsumerWidget {
 
     // Swipe-to-delete intentionally removed: deletion is available via the
     // long-press options sheet and the credential detail screen.
-    if (dense) return inkwell; // group container draws bg/border/dividers
-    return Material(
-      color: palette.card,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: palette.divider),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: inkwell,
+    final Widget card = dense
+        ? inkwell // group container draws bg/border/dividers
+        : Material(
+            color: palette.card,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: palette.divider),
+            ),
+            clipBehavior: Clip.antiAlias,
+            child: inkwell,
+          );
+
+    if (!useDrag) return card;
+    return LongPressDraggable<String>(
+      data: credential.id,
+      dragAnchorStrategy: pointerDragAnchorStrategy,
+      feedback: _dragFeedback(context, palette),
+      childWhenDragging: Opacity(opacity: 0.4, child: card),
+      child: card,
     );
   }
+
+  Widget _dragFeedback(BuildContext context, AppPalette palette) => Material(
+        color: Colors.transparent,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: palette.card,
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: palette.divider),
+            boxShadow: [
+              BoxShadow(
+                color: palette.scrim.withValues(alpha: 0.4),
+                blurRadius: 12,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.drive_file_move_rounded,
+                  size: 16, color: palette.accent),
+              const SizedBox(width: 8),
+              Text(
+                credential.title,
+                style: TextStyle(
+                    color: palette.textPrimary, fontWeight: FontWeight.w600),
+              ),
+            ],
+          ),
+        ),
+      );
 
   Widget _buildRow(
     BuildContext context,
