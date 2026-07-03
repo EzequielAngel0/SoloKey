@@ -2294,17 +2294,17 @@ abstract class AppLocalizations {
   /// **'{count, plural, =0{No items} =1{1 item} other{{count} items}}'**
   String folderItemCount(int count);
 
-  /// No description provided for @folderChangeColor.
-  ///
-  /// In en, this message translates to:
-  /// **'Change color'**
-  String get folderChangeColor;
-
   /// No description provided for @folderColorTitle.
   ///
   /// In en, this message translates to:
-  /// **'Folder color'**
+  /// **'Color'**
   String get folderColorTitle;
+
+  /// No description provided for @folderEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit folder'**
+  String get folderEditTitle;
 
   /// No description provided for @folderTreeHint.
   ///

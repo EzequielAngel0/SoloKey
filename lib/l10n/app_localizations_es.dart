@@ -1212,10 +1212,10 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get folderChangeColor => 'Cambiar color';
+  String get folderColorTitle => 'Color';
 
   @override
-  String get folderColorTitle => 'Color de la carpeta';
+  String get folderEditTitle => 'Editar carpeta';
 
   @override
   String get folderTreeHint =>

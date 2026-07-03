@@ -76,7 +76,7 @@ void main() {
 
     final l10n = await AppLocalizations.delegate.load(const Locale('en'));
     expect(find.text(l10n.folderNewSubfolder), findsOneWidget);
-    expect(find.text(l10n.folderRename), findsOneWidget);
+    expect(find.text(l10n.commonEdit), findsOneWidget);
     expect(find.text(l10n.commonDelete), findsOneWidget);
   });
 }

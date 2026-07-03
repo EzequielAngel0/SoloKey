@@ -168,8 +168,7 @@ class _FolderTreeState extends ConsumerState<FolderTree> {
       ),
       PopupMenuItem(
         value: _FolderMenuAction.rename,
-        child: _menuRow(Icons.drive_file_rename_outline_rounded,
-            l10n.folderRename, p.textPrimary),
+        child: _menuRow(Icons.edit_rounded, l10n.commonEdit, p.textPrimary),
       ),
       PopupMenuItem(
         value: _FolderMenuAction.toggleFavorite,

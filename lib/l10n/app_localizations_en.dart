@@ -1202,10 +1202,10 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get folderChangeColor => 'Change color';
+  String get folderColorTitle => 'Color';
 
   @override
-  String get folderColorTitle => 'Folder color';
+  String get folderEditTitle => 'Edit folder';
 
   @override
   String get folderTreeHint =>

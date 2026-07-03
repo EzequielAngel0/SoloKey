@@ -466,8 +466,8 @@
   "@folderItemCount": {
     "placeholders": { "count": { "type": "int" } }
   },
-  "folderChangeColor": "Change color",
-  "folderColorTitle": "Folder color",
+  "folderColorTitle": "Color",
+  "folderEditTitle": "Edit folder",
   "folderTreeHint": "Use the arrow keys to browse folders; press the menu button for actions.",
   "folderSelectTitle": "Select folder",
   "folderNewRootShort": "New root",

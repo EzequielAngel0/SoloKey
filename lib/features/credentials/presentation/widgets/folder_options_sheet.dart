@@ -51,8 +51,8 @@ void showFolderOptionsSheet({
         ),
         if (showManagementOptions) ...[
           ListTile(
-            leading: Icon(Icons.drive_file_rename_outline_rounded, color: palette.textPrimary),
-            title: Text(l10n.folderRename, style: TextStyle(color: palette.textPrimary)),
+            leading: Icon(Icons.edit_rounded, color: palette.textPrimary),
+            title: Text(l10n.commonEdit, style: TextStyle(color: palette.textPrimary)),
             onTap: () {
               Navigator.pop(context);
               if (onRename != null) onRename();
