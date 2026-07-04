@@ -676,6 +676,17 @@
   "desktopNewFolderTooltip": "New folder",
   "desktopNewCredentialTooltip": "New credential",
   "desktopLockVault": "Lock vault",
+  "desktopSectionVault": "Vault",
+  "desktopSectionSecurity": "Security",
+  "desktopSectionDevices": "Devices",
+  "desktopCollapseSidebar": "Collapse sidebar",
+  "desktopExpandSidebar": "Expand sidebar",
+  "desktopWatchtowerBadge": "{count, plural, one{{count} item needs attention} other{{count} items need attention}}",
+  "@desktopWatchtowerBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
 
   "navSecureFiles": "Secure files",
   "secureFilesTitle": "Secure files",

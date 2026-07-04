@@ -53,6 +53,32 @@ void main() {
     expect(find.text('GitHub'), findsWidgets);
   });
 
+  testWidgets('sidebar groups nav items under section headers',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      const DesktopMainLayout(),
+      overrides: [
+        getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
+            FakeCredentialRepository([_c('1', 'GitHub'), _c('2', 'GitLab')]))),
+        foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+        syncStatusProvider.overrideWith(_IdleSyncStatus.new),
+      ],
+      surfaceSize: const Size(1300, 900),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // The three section headers are the uppercased localized titles.
+    expect(find.text('VAULT'), findsOneWidget);
+    expect(find.text('SECURITY'), findsOneWidget);
+    expect(find.text('DEVICES'), findsOneWidget);
+    // Settings + Lock live in the footer, still reachable.
+    expect(find.text('Settings'), findsWidgets);
+    expect(find.text('Lock'), findsWidgets);
+  });
+
   testWidgets('desktop search is debounced (>250ms) before it filters',
       (tester) async {
     tolerateInkHiddenPaintWarnings();

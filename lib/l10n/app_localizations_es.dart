@@ -1773,6 +1773,32 @@ class AppLocalizationsEs extends AppLocalizations {
   String get desktopLockVault => 'Bloquear Bóveda';
 
   @override
+  String get desktopSectionVault => 'Bóveda';
+
+  @override
+  String get desktopSectionSecurity => 'Seguridad';
+
+  @override
+  String get desktopSectionDevices => 'Dispositivos';
+
+  @override
+  String get desktopCollapseSidebar => 'Colapsar barra lateral';
+
+  @override
+  String get desktopExpandSidebar => 'Expandir barra lateral';
+
+  @override
+  String desktopWatchtowerBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count elementos requieren atención',
+      one: '$count elemento requiere atención',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get navSecureFiles => 'Archivos seguros';
 
   @override

@@ -593,6 +593,12 @@
   "desktopNewFolderTooltip": "Nueva carpeta",
   "desktopNewCredentialTooltip": "Nueva credencial",
   "desktopLockVault": "Bloquear Bóveda",
+  "desktopSectionVault": "Bóveda",
+  "desktopSectionSecurity": "Seguridad",
+  "desktopSectionDevices": "Dispositivos",
+  "desktopCollapseSidebar": "Colapsar barra lateral",
+  "desktopExpandSidebar": "Expandir barra lateral",
+  "desktopWatchtowerBadge": "{count, plural, one{{count} elemento requiere atención} other{{count} elementos requieren atención}}",
 
   "navSecureFiles": "Archivos seguros",
   "secureFilesTitle": "Archivos seguros",

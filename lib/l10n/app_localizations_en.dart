@@ -1756,6 +1756,32 @@ class AppLocalizationsEn extends AppLocalizations {
   String get desktopLockVault => 'Lock vault';
 
   @override
+  String get desktopSectionVault => 'Vault';
+
+  @override
+  String get desktopSectionSecurity => 'Security';
+
+  @override
+  String get desktopSectionDevices => 'Devices';
+
+  @override
+  String get desktopCollapseSidebar => 'Collapse sidebar';
+
+  @override
+  String get desktopExpandSidebar => 'Expand sidebar';
+
+  @override
+  String desktopWatchtowerBadge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count items need attention',
+      one: '$count item needs attention',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get navSecureFiles => 'Secure files';
 
   @override

@@ -10,6 +10,7 @@ import '../shortcuts/app_shortcuts.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
+import '../../../../features/credentials/application/credential_health_provider.dart';
 import '../../../../features/credentials/application/credentials_provider.dart';
 import '../../../../features/credentials/application/vault_view_provider.dart';
 import '../../../../features/credentials/domain/entities/credential.dart';
@@ -445,20 +446,86 @@ class _DesktopSidebar extends ConsumerWidget {
     final collapsed = ref.watch(desktopSidebarCollapsedProvider);
     final syncStatus = ref.watch(syncStatusProvider);
     final syncBadge = _syncBadge(context, syncStatus);
+    // Watchtower: count of credentials with inline health flags (weak/reused);
+    // surfaced as a numeric badge on the Audit item so problems are visible
+    // without opening the audit screen.
+    final auditIssues = ref.watch(credentialHealthProvider).length;
 
-    final menuItems = [
-      _SidebarItemData(icon: Icons.inventory_2_rounded, label: l10n.navVault, index: 0),
-      _SidebarItemData(icon: Icons.folder_rounded, label: l10n.navFolders, index: 1),
-      _SidebarItemData(icon: Icons.star_rounded, label: l10n.navFavorites, index: 2),
-      _SidebarItemData(icon: Icons.shield_rounded, label: l10n.navAudit, index: 3),
-      _SidebarItemData(icon: Icons.folder_shared_rounded, label: l10n.navSecureFiles, index: 6),
-      _SidebarItemData(icon: Icons.settings_rounded, label: l10n.navSettings, index: 4),
-      _SidebarItemData(
-          icon: Icons.sync_rounded,
-          label: l10n.navSync,
-          index: 5,
-          badge: syncBadge),
+    // Nav grouped by purpose. Section headers hide when collapsed (replaced by a
+    // hairline between groups). Settings + Lock live in the footer, not here.
+    final sections = <_SidebarSection>[
+      _SidebarSection(
+        title: l10n.desktopSectionVault,
+        items: [
+          _SidebarItemData(
+              icon: Icons.inventory_2_rounded, label: l10n.navVault, index: 0),
+          _SidebarItemData(
+              icon: Icons.folder_rounded, label: l10n.navFolders, index: 1),
+          _SidebarItemData(
+              icon: Icons.star_rounded, label: l10n.navFavorites, index: 2),
+        ],
+      ),
+      _SidebarSection(
+        title: l10n.desktopSectionSecurity,
+        items: [
+          _SidebarItemData(
+            icon: Icons.shield_rounded,
+            label: l10n.navAudit,
+            index: 3,
+            badge: auditIssues > 0 ? _CountBadge(count: auditIssues) : null,
+            badgeSemantics:
+                auditIssues > 0 ? l10n.desktopWatchtowerBadge(auditIssues) : null,
+          ),
+          _SidebarItemData(
+              icon: Icons.folder_shared_rounded,
+              label: l10n.navSecureFiles,
+              index: 6),
+        ],
+      ),
+      _SidebarSection(
+        title: l10n.desktopSectionDevices,
+        items: [
+          _SidebarItemData(
+              icon: Icons.sync_rounded,
+              label: l10n.navSync,
+              index: 5,
+              badge: syncBadge),
+        ],
+      ),
     ];
+
+    void select(int index) {
+      ref.read(desktopSelectedNavigationProvider.notifier).state = index;
+      // Reset details state on tab switch
+      ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+      ref.read(desktopSelectedFolderIdProvider.notifier).state = null;
+      ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+    }
+
+    _SidebarItem buildItem(_SidebarItemData item) => _SidebarItem(
+          icon: item.icon,
+          label: item.label,
+          isSelected: selectedIndex == item.index,
+          collapsed: collapsed,
+          badge: item.badge,
+          badgeSemantics: item.badgeSemantics,
+          onTap: () => select(item.index),
+        );
+
+    // Flatten sections into the scrollable nav column: a header (or a hairline
+    // when collapsed) before each group, then its items.
+    final navChildren = <Widget>[];
+    for (final section in sections) {
+      if (!collapsed) {
+        navChildren.add(_SidebarSectionHeader(title: section.title));
+      } else if (navChildren.isNotEmpty) {
+        navChildren.add(Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+          child: Divider(height: 1, color: palette.divider),
+        ));
+      }
+      navChildren.addAll(section.items.map(buildItem));
+    }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 180),
@@ -503,7 +570,7 @@ class _DesktopSidebar extends ConsumerWidget {
                   ),
                   IconButton(
                     icon: Icon(Icons.menu_open_rounded, color: palette.textMuted, size: 20),
-                    tooltip: 'Colapsar',
+                    tooltip: l10n.desktopCollapseSidebar,
                     onPressed: () => ref
                         .read(desktopSidebarCollapsedProvider.notifier)
                         .state = true,
@@ -515,7 +582,7 @@ class _DesktopSidebar extends ConsumerWidget {
           if (collapsed)
             IconButton(
               icon: Icon(Icons.menu_rounded, color: palette.textMuted, size: 20),
-              tooltip: 'Expandir',
+              tooltip: l10n.desktopExpandSidebar,
               onPressed: () => ref
                   .read(desktopSidebarCollapsedProvider.notifier)
                   .state = false,
@@ -526,63 +593,71 @@ class _DesktopSidebar extends ConsumerWidget {
             child: _SidebarSearchButton(collapsed: collapsed),
           ),
           const SizedBox(height: 8),
-          // Menu Items
+          // Grouped nav items
           Expanded(
-            child: ListView.builder(
-              itemCount: menuItems.length,
-              itemBuilder: (context, i) {
-                final item = menuItems[i];
-                final isSelected = selectedIndex == item.index;
-
-                return _SidebarItem(
-                  icon: item.icon,
-                  label: item.label,
-                  isSelected: isSelected,
-                  collapsed: collapsed,
-                  badge: item.badge,
-                  onTap: () {
-                    ref.read(desktopSelectedNavigationProvider.notifier).state = item.index;
-                    // Reset details state on tab switch
-                    ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
-                    ref.read(desktopSelectedFolderIdProvider.notifier).state = null;
-                    ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
-                  },
-                );
-              },
+            child: ListView(
+              padding: EdgeInsets.zero,
+              children: navChildren,
             ),
           ),
-          // Sidebar Footer with Lock Button
+          // Sidebar Footer: Settings sits next to the Lock action, separated from
+          // the nav groups by a hairline.
+          Divider(height: 1, color: palette.divider),
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: buildItem(_SidebarItemData(
+                icon: Icons.settings_rounded,
+                label: l10n.navSettings,
+                index: 4)),
+          ),
           Padding(
             padding: const EdgeInsets.all(12.0),
-            child: InkWell(
-              onTap: () {
-                HapticFeedback.heavyImpact();
-                ref.read(vaultNotifierProvider.notifier).lock();
-                context.go(AppRoutes.unlock);
-              },
-              borderRadius: BorderRadius.circular(12),
-              child: Container(
-                padding: EdgeInsets.symmetric(
-                    vertical: 12, horizontal: collapsed ? 0 : 16),
-                decoration: BoxDecoration(
-                  border: Border.all(color: palette.error.withValues(alpha: 0.25)),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.lock_outline_rounded, color: palette.error, size: 18),
-                    if (!collapsed) ...[
-                      const SizedBox(width: 10),
-                      Text(
-                        l10n.homeLockTooltip,
-                        style: TextStyle(
-                            color: palette.error,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 13),
+            child: Tooltip(
+              message: collapsed ? l10n.homeLockTooltip : '',
+              excludeFromSemantics: true,
+              child: Semantics(
+                button: true,
+                label: l10n.homeLockTooltip,
+                onTap: () {
+                  HapticFeedback.heavyImpact();
+                  ref.read(vaultNotifierProvider.notifier).lock();
+                  context.go(AppRoutes.unlock);
+                },
+                child: ExcludeSemantics(
+                  child: InkWell(
+                    onTap: () {
+                      HapticFeedback.heavyImpact();
+                      ref.read(vaultNotifierProvider.notifier).lock();
+                      context.go(AppRoutes.unlock);
+                    },
+                    borderRadius: BorderRadius.circular(12),
+                    child: Container(
+                      padding: EdgeInsets.symmetric(
+                          vertical: 12, horizontal: collapsed ? 0 : 16),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                            color: palette.error.withValues(alpha: 0.25)),
+                        borderRadius: BorderRadius.circular(12),
                       ),
-                    ],
-                  ],
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.lock_outline_rounded,
+                              color: palette.error, size: 18),
+                          if (!collapsed) ...[
+                            const SizedBox(width: 10),
+                            Text(
+                              l10n.homeLockTooltip,
+                              style: TextStyle(
+                                  color: palette.error,
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 13),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -680,18 +755,85 @@ Widget? _syncBadge(BuildContext context, SyncStatusState s) {
   }
 }
 
+/// A titled group of sidebar entries (its header hides when collapsed).
+class _SidebarSection {
+  const _SidebarSection({required this.title, required this.items});
+
+  final String title;
+  final List<_SidebarItemData> items;
+}
+
+/// Uppercase group label shown above each sidebar section (expanded only).
+class _SidebarSectionHeader extends StatelessWidget {
+  const _SidebarSectionHeader({required this.title});
+
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(24, 14, 16, 6),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          color: p.textMuted,
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+        ),
+      ),
+    );
+  }
+}
+
 class _SidebarItemData {
   const _SidebarItemData({
     required this.icon,
     required this.label,
     required this.index,
     this.badge,
+    this.badgeSemantics,
   });
 
   final IconData icon;
   final String label;
   final int index;
   final Widget? badge;
+
+  /// Screen-reader description of [badge] (e.g. "3 items need attention"),
+  /// appended to the item's label since the badge itself is decorative.
+  final String? badgeSemantics;
+}
+
+/// Small numeric pill used as the Audit "Watchtower" badge.
+class _CountBadge extends StatelessWidget {
+  const _CountBadge({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Container(
+      constraints: const BoxConstraints(minWidth: 15),
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 1),
+      decoration: BoxDecoration(
+        color: p.danger,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        count > 99 ? '99+' : '$count',
+        style: TextStyle(
+          color: p.onPrimary,
+          fontSize: 9,
+          height: 1.1,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
 }
 
 class _SidebarItem extends StatefulWidget {
@@ -702,6 +844,7 @@ class _SidebarItem extends StatefulWidget {
     required this.onTap,
     this.collapsed = false,
     this.badge,
+    this.badgeSemantics,
   });
 
   final IconData icon;
@@ -709,6 +852,7 @@ class _SidebarItem extends StatefulWidget {
   final bool isSelected;
   final bool collapsed;
   final Widget? badge;
+  final String? badgeSemantics;
   final VoidCallback onTap;
 
   @override
@@ -802,8 +946,26 @@ class _SidebarItemState extends State<_SidebarItem> {
       ),
     );
 
-    if (!collapsed) return item;
-    return Tooltip(message: widget.label, child: item);
+    // One clean semantics node: role=button, selected state, label (+ badge
+    // phrase), and an activation action. The inner InkWell/Text are excluded so
+    // the label is not read twice.
+    final semanticsLabel = widget.badgeSemantics == null
+        ? widget.label
+        : '${widget.label}. ${widget.badgeSemantics}';
+    final semantic = Semantics(
+      button: true,
+      selected: isSelected,
+      label: semanticsLabel,
+      onTap: widget.onTap,
+      child: ExcludeSemantics(child: item),
+    );
+
+    if (!collapsed) return semantic;
+    return Tooltip(
+      message: widget.label,
+      excludeFromSemantics: true,
+      child: semantic,
+    );
   }
 }
 

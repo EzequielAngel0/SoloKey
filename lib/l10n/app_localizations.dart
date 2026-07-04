@@ -3272,6 +3272,42 @@ abstract class AppLocalizations {
   /// **'Lock vault'**
   String get desktopLockVault;
 
+  /// No description provided for @desktopSectionVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault'**
+  String get desktopSectionVault;
+
+  /// No description provided for @desktopSectionSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get desktopSectionSecurity;
+
+  /// No description provided for @desktopSectionDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'Devices'**
+  String get desktopSectionDevices;
+
+  /// No description provided for @desktopCollapseSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse sidebar'**
+  String get desktopCollapseSidebar;
+
+  /// No description provided for @desktopExpandSidebar.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand sidebar'**
+  String get desktopExpandSidebar;
+
+  /// No description provided for @desktopWatchtowerBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{{count} item needs attention} other{{count} items need attention}}'**
+  String desktopWatchtowerBadge(int count);
+
   /// No description provided for @navSecureFiles.
   ///
   /// In en, this message translates to:
