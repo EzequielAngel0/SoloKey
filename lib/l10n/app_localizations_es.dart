@@ -1830,6 +1830,12 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String get trayShowVault => 'Mostrar bóveda';
+
+  @override
+  String get trayExit => 'Salir';
+
+  @override
   String get navSecureFiles => 'Archivos seguros';
 
   @override

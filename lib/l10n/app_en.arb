@@ -697,6 +697,8 @@
       "count": { "type": "int" }
     }
   },
+  "trayShowVault": "Show vault",
+  "trayExit": "Exit",
 
   "navSecureFiles": "Secure files",
   "secureFilesTitle": "Secure files",

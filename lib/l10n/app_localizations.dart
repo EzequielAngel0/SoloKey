@@ -3368,6 +3368,18 @@ abstract class AppLocalizations {
   /// **'{count, plural, one{{count} item needs attention} other{{count} items need attention}}'**
   String desktopWatchtowerBadge(int count);
 
+  /// No description provided for @trayShowVault.
+  ///
+  /// In en, this message translates to:
+  /// **'Show vault'**
+  String get trayShowVault;
+
+  /// No description provided for @trayExit.
+  ///
+  /// In en, this message translates to:
+  /// **'Exit'**
+  String get trayExit;
+
   /// No description provided for @navSecureFiles.
   ///
   /// In en, this message translates to:

@@ -7,6 +7,7 @@ import 'package:window_manager/window_manager.dart';
 import 'package:tray_manager/tray_manager.dart';
 
 import '../core/infrastructure/security/app_lifecycle_observer.dart';
+import '../core/presentation/layouts/desktop_layout_state.dart';
 import '../core/services/notification_service.dart';
 import '../core/services/scheduled_backup_service.dart';
 import '../features/sync/application/sync_status_provider.dart';
@@ -91,6 +92,10 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
     super.dispose();
   }
 
+  /// Language the tray context menu was last built for, so we only rebuild it
+  /// when the app language actually changes.
+  String? _trayMenuLang;
+
   Future<void> _initSystemTray() async {
     try {
       // Windows tray needs a small multi-res .ico; the large PNG fails to
@@ -100,21 +105,36 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
             ? 'assets/logo/SoloKey.ico'
             : 'assets/logo/SoloKey.png',
       );
+      // The menu labels are localized, so they're set from [build] (which has
+      // the resolved locale) via [_maybeRefreshTrayMenu], not here.
+    } catch (_) {
+      // Best-effort
+    }
+  }
+
+  /// Rebuilds the tray context menu with quick actions in [l10n]'s language.
+  /// Only runs on desktop and only when the language changed since last build.
+  void _maybeRefreshTrayMenu(String lang, AppLocalizations l10n) {
+    if (kIsWeb ||
+        !(Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
+      return;
+    }
+    if (_trayMenuLang == lang) return;
+    _trayMenuLang = lang;
+    _setTrayMenu(l10n);
+  }
+
+  Future<void> _setTrayMenu(AppLocalizations l10n) async {
+    try {
       final menu = Menu(
         items: [
-          MenuItem(
-            key: 'show_window',
-            label: 'Mostrar Bóveda',
-          ),
-          MenuItem(
-            key: 'lock_vault',
-            label: 'Bloquear',
-          ),
+          MenuItem(key: 'show_window', label: l10n.trayShowVault),
+          MenuItem(key: 'new_credential', label: l10n.desktopNewCredentialTooltip),
+          MenuItem(key: 'sync', label: l10n.navSync),
           MenuItem.separator(),
-          MenuItem(
-            key: 'exit_app',
-            label: 'Salir',
-          ),
+          MenuItem(key: 'lock_vault', label: l10n.homeLockTooltip),
+          MenuItem.separator(),
+          MenuItem(key: 'exit_app', label: l10n.trayExit),
         ],
       );
       await trayManager.setContextMenu(menu);
@@ -224,14 +244,31 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
 
   @override
   void onTrayMenuItemClick(MenuItem menuItem) {
-    if (menuItem.key == 'show_window') {
-      windowManager.show();
-      windowManager.focus();
-      _cancelTrayLockTimer();
-    } else if (menuItem.key == 'lock_vault') {
-      ref.read(vaultNotifierProvider.notifier).lock();
-    } else if (menuItem.key == 'exit_app') {
-      windowManager.destroy();
+    switch (menuItem.key) {
+      case 'show_window':
+        windowManager.show();
+        windowManager.focus();
+        _cancelTrayLockTimer();
+      case 'new_credential':
+        // Trae la ventana al frente y abre el formulario de nueva credencial en
+        // la pestana Boveda. Si esta bloqueada, el guard del router redirige a
+        // /unlock y el modo create queda listo tras desbloquear.
+        windowManager.show();
+        windowManager.focus();
+        _cancelTrayLockTimer();
+        ref.read(desktopSelectedNavigationProvider.notifier).state = 0;
+        ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+        ref.read(desktopRightPaneModeProvider.notifier).state =
+            RightPaneMode.create;
+      case 'sync':
+        windowManager.show();
+        windowManager.focus();
+        _cancelTrayLockTimer();
+        ref.read(desktopSelectedNavigationProvider.notifier).state = 5;
+      case 'lock_vault':
+        ref.read(vaultNotifierProvider.notifier).lock();
+      case 'exit_app':
+        windowManager.destroy();
     }
   }
 
@@ -267,6 +304,17 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
     final locale = settings == null
         ? null
         : LanguageMode.fromKey(settings.locale).locale;
+
+    // Keep the (localized) tray menu in the app's language. This widget sits
+    // ABOVE MaterialApp, so there's no Localizations in context — resolve the
+    // strings directly from the effective locale (es is the only non-en one).
+    final effLang = (locale ??
+                WidgetsBinding.instance.platformDispatcher.locale)
+            .languageCode ==
+            'es'
+        ? 'es'
+        : 'en';
+    _maybeRefreshTrayMenu(effLang, lookupAppLocalizations(Locale(effLang)));
 
     // Visual density picked in Settings ('comfortable' | 'compact'). Applied to
     // every built theme below so the whole UI tightens/relaxes consistently.

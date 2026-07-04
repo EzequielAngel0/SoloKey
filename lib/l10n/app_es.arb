@@ -609,6 +609,8 @@
   "desktopCollapseSidebar": "Colapsar barra lateral",
   "desktopExpandSidebar": "Expandir barra lateral",
   "desktopWatchtowerBadge": "{count, plural, one{{count} elemento requiere atención} other{{count} elementos requieren atención}}",
+  "trayShowVault": "Mostrar bóveda",
+  "trayExit": "Salir",
 
   "navSecureFiles": "Archivos seguros",
   "secureFilesTitle": "Archivos seguros",

@@ -1813,6 +1813,12 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get trayShowVault => 'Show vault';
+
+  @override
+  String get trayExit => 'Exit';
+
+  @override
   String get navSecureFiles => 'Secure files';
 
   @override
