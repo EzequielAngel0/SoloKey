@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/utils/relative_time.dart';
+import '../../../shared/widgets/copy_feedback_button.dart';
+import '../../../shared/widgets/detail_group.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../credentials/application/credentials_provider.dart';
@@ -139,71 +144,25 @@ class _EmptyPasskeysView extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(40),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+    return EmptyState(
+      icon: Icons.fingerprint_rounded,
+      title: l10n.passkeysEmptyTitle,
+      subtitle: l10n.passkeysEmptyDesc,
+      action: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        decoration: BoxDecoration(
+          color: palette.card,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: palette.divider),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              padding: const EdgeInsets.all(28),
-              decoration: BoxDecoration(
-                color: palette.typePasskey.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: palette.typePasskey.withValues(alpha: 0.3),
-                  width: 1.5,
-                ),
-              ),
-              child: Icon(
-                Icons.fingerprint_rounded,
-                size: 56,
-                color: palette.typePasskey,
-              ),
-            ),
-            const SizedBox(height: 28),
+            Icon(Icons.verified_rounded, color: palette.typePasskey, size: 16),
+            const SizedBox(width: 8),
             Text(
-              l10n.passkeysEmptyTitle,
-              style: TextStyle(
-                color: palette.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              l10n.passkeysEmptyDesc,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: palette.textMuted,
-                fontSize: 13,
-                height: 1.6,
-              ),
-            ),
-            const SizedBox(height: 32),
-            // Backup storage badge
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-              decoration: BoxDecoration(
-                color: palette.card,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: palette.divider),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.verified_rounded,
-                      color: palette.typePasskey, size: 16),
-                  const SizedBox(width: 8),
-                  Text(
-                    l10n.passkeysEncryptedBadge,
-                    style: TextStyle(
-                      color: palette.textMuted,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
+              l10n.passkeysEncryptedBadge,
+              style: TextStyle(color: palette.textMuted, fontSize: 12),
             ),
           ],
         ),
@@ -232,18 +191,21 @@ class _PasskeyCard extends ConsumerWidget {
       child: ListTile(
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(
-            color: palette.typePasskey.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: palette.typePasskey.withValues(alpha: 0.3),
+        leading: Semantics(
+          label: l10n.passkeyIconLabel,
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: palette.typePasskey.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(
+                color: palette.typePasskey.withValues(alpha: 0.3),
+              ),
             ),
+            child: Icon(Icons.fingerprint_rounded,
+                color: palette.typePasskey, size: 24),
           ),
-          child: Icon(Icons.fingerprint_rounded,
-              color: palette.typePasskey, size: 24),
         ),
         title: Text(
           credential.title,
@@ -269,7 +231,8 @@ class _PasskeyCard extends ConsumerWidget {
             ],
             const SizedBox(height: 4),
             Text(
-              l10n.passkeysUpdated(_formatDate(credential.updatedAt)),
+              l10n.passkeysUpdated(relativeTime(l10n, credential.updatedAt,
+                  locale: Localizations.localeOf(context).languageCode)),
               style: TextStyle(
                   color: palette.textDisabled, fontSize: 10),
             ),
@@ -317,6 +280,18 @@ class _PasskeyCard extends ConsumerWidget {
     }
   }
 
+  Future<void> _copyCredentialId(BuildContext context, String id) async {
+    final l10n = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    await Clipboard.setData(ClipboardData(text: id));
+    messenger?.showSnackBar(
+      SnackBar(
+        content: Text(l10n.passkeyCredentialIdCopied),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
   void _showDetails(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
@@ -353,41 +328,49 @@ class _PasskeyCard extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: 16),
-            if (meta != null) ...[
-              _DetailRow(
-                  icon: Icons.language_rounded,
-                  label: l10n.passkeyDomain,
-                  value: meta.rpId),
-              if (meta.rpName != null)
-                _DetailRow(
-                    icon: Icons.business_rounded,
-                    label: l10n.passkeyService,
-                    value: meta.rpName!),
-              if (meta.userDisplayName != null)
-                _DetailRow(
-                    icon: Icons.person_rounded,
-                    label: l10n.fieldUsername,
-                    value: meta.userDisplayName!),
-              _DetailRow(
-                icon: Icons.verified_user_rounded,
-                label: l10n.passkeyVerification,
-                value: meta.userVerificationRequired
-                    ? l10n.passkeyVerificationRequired
-                    : l10n.passkeyVerificationOptional,
-              ),
-              _DetailRow(
-                icon: Icons.tag_rounded,
-                label: l10n.passkeyCredentialId,
-                value:
-                    '${meta.credentialId.substring(0, meta.credentialId.length.clamp(0, 20))}…',
-              ),
-            ],
-            _DetailRow(
-              icon: Icons.calendar_today_rounded,
-              label: l10n.passkeyRegistered,
-              value: _formatDate(credential.createdAt),
+            DetailGroup(
+              children: [
+                if (meta != null) ...[
+                  KvRow(
+                      icon: Icons.language_rounded,
+                      label: l10n.passkeyDomain,
+                      value: meta.rpId),
+                  if (meta.rpName != null)
+                    KvRow(
+                        icon: Icons.business_rounded,
+                        label: l10n.passkeyService,
+                        value: meta.rpName!),
+                  if (meta.userDisplayName != null)
+                    KvRow(
+                        icon: Icons.person_rounded,
+                        label: l10n.fieldUsername,
+                        value: meta.userDisplayName!),
+                  KvRow(
+                    icon: Icons.verified_user_rounded,
+                    label: l10n.passkeyVerification,
+                    value: meta.userVerificationRequired
+                        ? l10n.passkeyVerificationRequired
+                        : l10n.passkeyVerificationOptional,
+                  ),
+                  KvRow(
+                    icon: Icons.tag_rounded,
+                    label: l10n.passkeyCredentialId,
+                    value: meta.credentialId,
+                    mono: true,
+                    trailing: CopyFeedbackButton(
+                      onCopy: () =>
+                          _copyCredentialId(context, meta.credentialId),
+                    ),
+                  ),
+                ],
+                KvRow(
+                  icon: Icons.calendar_today_rounded,
+                  label: l10n.passkeyRegistered,
+                  value: _formatDate(credential.createdAt),
+                ),
+              ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
@@ -464,43 +447,5 @@ class _PasskeyCard extends ConsumerWidget {
     return '${dt.day.toString().padLeft(2, '0')}/'
         '${dt.month.toString().padLeft(2, '0')}/'
         '${dt.year}';
-  }
-}
-
-// ── Detail Row ────────────────────────────────────────────────────────────────
-
-class _DetailRow extends StatelessWidget {
-  const _DetailRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-  final IconData icon;
-  final String label;
-  final String value;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        children: [
-          Icon(icon, size: 16, color: palette.textMuted),
-          const SizedBox(width: 10),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: TextStyle(
-                      color: palette.textDisabled, fontSize: 10)),
-              Text(value,
-                  style: TextStyle(
-                      color: palette.textPrimary, fontSize: 13)),
-            ],
-          ),
-        ],
-      ),
-    );
   }
 }

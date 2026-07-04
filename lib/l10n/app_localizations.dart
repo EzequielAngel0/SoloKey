@@ -1796,6 +1796,18 @@ abstract class AppLocalizations {
   /// **'Credential ID'**
   String get passkeyCredentialId;
 
+  /// No description provided for @passkeyCredentialIdCopied.
+  ///
+  /// In en, this message translates to:
+  /// **'Credential ID copied'**
+  String get passkeyCredentialIdCopied;
+
+  /// No description provided for @passkeyIconLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey'**
+  String get passkeyIconLabel;
+
   /// No description provided for @passkeyRegistered.
   ///
   /// In en, this message translates to:

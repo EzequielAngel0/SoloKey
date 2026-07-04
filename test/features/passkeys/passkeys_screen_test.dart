@@ -46,4 +46,14 @@ void main() {
     expect(find.text('Acme'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('opens details with a copyable credential id', (tester) async {
+    await pumpPasskeys(tester, [_passkey('1', 'Example')]);
+    await tester.tap(find.text('Example').first);
+    await tester.pumpAndSettle();
+    expect(find.text('Example.com'), findsWidgets);
+    expect(find.text('c-1'), findsOneWidget);
+    expect(find.byIcon(Icons.copy_rounded), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

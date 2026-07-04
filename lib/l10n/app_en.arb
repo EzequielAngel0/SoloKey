@@ -370,6 +370,8 @@
   "passkeyVerificationRequired": "Required (Biometric / PIN)",
   "passkeyVerificationOptional": "Optional",
   "passkeyCredentialId": "Credential ID",
+  "passkeyCredentialIdCopied": "Credential ID copied",
+  "passkeyIconLabel": "Passkey",
   "passkeyRegistered": "Registered",
   "passkeyPrivateKeyNote": "The private key never leaves the device. Only the identifying information is stored.",
   "passkeysDeleteTitle": "Delete passkey",

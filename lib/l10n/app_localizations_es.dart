@@ -943,6 +943,12 @@ class AppLocalizationsEs extends AppLocalizations {
   String get passkeyCredentialId => 'Credential ID';
 
   @override
+  String get passkeyCredentialIdCopied => 'Credential ID copiado';
+
+  @override
+  String get passkeyIconLabel => 'Passkey';
+
+  @override
   String get passkeyRegistered => 'Registrada';
 
   @override

@@ -320,6 +320,8 @@
   "passkeyVerificationRequired": "Requerida (Biométrico / PIN)",
   "passkeyVerificationOptional": "Opcional",
   "passkeyCredentialId": "Credential ID",
+  "passkeyCredentialIdCopied": "Credential ID copiado",
+  "passkeyIconLabel": "Passkey",
   "passkeyRegistered": "Registrada",
   "passkeyPrivateKeyNote": "La clave privada nunca sale del dispositivo. Solo la información de identificación está almacenada.",
   "passkeysDeleteTitle": "Eliminar Passkey",
