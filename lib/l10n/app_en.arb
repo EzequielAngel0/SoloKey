@@ -6,6 +6,12 @@
   "commonClose": "Close",
   "commonDelete": "Delete",
   "commonRetry": "Retry",
+  "commonClear": "Clear",
+  "commonExpand": "Expand",
+  "commonCollapse": "Collapse",
+  "commonShowPassword": "Show password",
+  "commonHidePassword": "Hide password",
+  "formDeleteField": "Delete field",
 
   "unlockSubtitle": "Enter your master password",
   "unlockMasterPasswordHint": "Master password",

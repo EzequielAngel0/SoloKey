@@ -319,6 +319,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                       suffixIcon: _searchCtrl.text.isNotEmpty
                           ? IconButton(
                               icon: Icon(Icons.close_rounded, color: palette.textMuted, size: 18),
+                              tooltip: l10n.commonClear,
                               onPressed: _clearSearch,
                             )
                           : null,

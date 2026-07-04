@@ -1006,6 +1006,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     size: 20,
                     color: context.palette.textMuted,
                   ),
+                  tooltip: l10n.formEditField,
                   onPressed: () => _showCustomFieldDialog(index: index),
                 ),
                 IconButton(
@@ -1014,6 +1015,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                     size: 20,
                     color: context.palette.danger,
                   ),
+                  tooltip: l10n.formDeleteField,
                   onPressed: () {
                     HapticFeedback.selectionClick();
                     setState(() {
@@ -1223,6 +1225,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           leading: ResponsiveLayout.isDesktop(context)
               ? IconButton(
                   icon: const Icon(Icons.close_rounded),
+                  tooltip: l10n.commonClose,
                   onPressed: _handleDesktopClose,
                 )
               : null,

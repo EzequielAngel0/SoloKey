@@ -295,6 +295,7 @@ class _NodeRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return InkWell(
       // Tocar la fila SELECCIONA (tri-estado en carpetas, marca en credenciales).
       // La expansion para ver/seleccionar credenciales individuales queda en el
@@ -312,6 +313,7 @@ class _NodeRow extends StatelessWidget {
                       visualDensity: VisualDensity.compact,
                       padding: EdgeInsets.zero,
                       constraints: const BoxConstraints(),
+                      tooltip: expanded ? l10n.commonCollapse : l10n.commonExpand,
                       icon: Icon(
                         expanded
                             ? Icons.expand_more_rounded

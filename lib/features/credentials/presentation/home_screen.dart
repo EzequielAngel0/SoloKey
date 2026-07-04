@@ -580,6 +580,7 @@ class _SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = context.palette;
+    final l10n = AppLocalizations.of(context);
     return TextField(
       controller: controller,
       onChanged: onChanged,
@@ -594,6 +595,7 @@ class _SearchField extends StatelessWidget {
               ? const SizedBox.shrink()
               : IconButton(
                   icon: Icon(Icons.close_rounded, color: p.textMuted),
+                  tooltip: l10n.commonClear,
                   onPressed: onClear,
                 ),
         ),

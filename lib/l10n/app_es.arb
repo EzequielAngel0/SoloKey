@@ -6,6 +6,12 @@
   "commonClose": "Cerrar",
   "commonDelete": "Eliminar",
   "commonRetry": "Reintentar",
+  "commonClear": "Limpiar",
+  "commonExpand": "Expandir",
+  "commonCollapse": "Contraer",
+  "commonShowPassword": "Mostrar contraseña",
+  "commonHidePassword": "Ocultar contraseña",
+  "formDeleteField": "Eliminar campo",
 
   "unlockSubtitle": "Introduce tu contraseña maestra",
   "unlockMasterPasswordHint": "Contraseña maestra",

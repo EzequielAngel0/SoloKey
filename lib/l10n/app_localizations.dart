@@ -128,6 +128,42 @@ abstract class AppLocalizations {
   /// **'Retry'**
   String get commonRetry;
 
+  /// No description provided for @commonClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get commonClear;
+
+  /// No description provided for @commonExpand.
+  ///
+  /// In en, this message translates to:
+  /// **'Expand'**
+  String get commonExpand;
+
+  /// No description provided for @commonCollapse.
+  ///
+  /// In en, this message translates to:
+  /// **'Collapse'**
+  String get commonCollapse;
+
+  /// No description provided for @commonShowPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Show password'**
+  String get commonShowPassword;
+
+  /// No description provided for @commonHidePassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide password'**
+  String get commonHidePassword;
+
+  /// No description provided for @formDeleteField.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete field'**
+  String get formDeleteField;
+
   /// No description provided for @unlockSubtitle.
   ///
   /// In en, this message translates to:

@@ -670,6 +670,7 @@ class _PasswordFieldState extends State<_PasswordField> {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return TextField(
       controller: widget.controller,
       obscureText: _obscure,
@@ -684,6 +685,7 @@ class _PasswordFieldState extends State<_PasswordField> {
             color: palette.textMuted,
             size: 20,
           ),
+          tooltip: _obscure ? l10n.commonShowPassword : l10n.commonHidePassword,
           onPressed: () => setState(() => _obscure = !_obscure),
         ),
       ),

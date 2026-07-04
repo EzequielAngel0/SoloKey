@@ -169,6 +169,7 @@ class _DetailView extends ConsumerWidget {
           ),
           IconButton(
             icon: const Icon(Icons.edit_rounded),
+            tooltip: l10n.commonEdit,
             onPressed: () {
               if (ResponsiveLayout.isDesktop(context)) {
                 ref.read(desktopRightPaneModeProvider.notifier).state =
@@ -182,6 +183,7 @@ class _DetailView extends ConsumerWidget {
           ),
           IconButton(
             icon: Icon(Icons.delete_outline_rounded, color: palette.danger),
+            tooltip: l10n.commonDelete,
             onPressed: () => _confirmDelete(context, ref),
           ),
         ],
@@ -938,6 +940,7 @@ class _DetailRowState extends State<_DetailRow> with WidgetsBindingObserver {
               color: p.textMuted,
               size: 18,
             ),
+            tooltip: _revealed ? l10n.detailHideSecret : l10n.detailRevealSecret,
             onPressed: _toggleReveal,
             padding: EdgeInsets.zero,
             constraints: const BoxConstraints(minWidth: 34, minHeight: 34),

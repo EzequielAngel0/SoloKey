@@ -4,6 +4,7 @@ import 'package:password_manager/features/credentials/application/credential_use
 import 'package:password_manager/features/credentials/application/credentials_provider.dart';
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/presentation/credential_detail_screen.dart';
+import 'package:password_manager/l10n/app_localizations.dart';
 
 import '../../support/fake_credential_repository.dart';
 import '../../support/widget_harness.dart';
@@ -115,6 +116,28 @@ void main() {
     );
     expect(find.text('My note'), findsWidgets);
     expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('AppBar icon actions expose accessibility tooltips',
+      (tester) async {
+    await pumpDetail(
+      tester,
+      _c(
+        id: 'a11y',
+        type: CredentialType.password,
+        title: 'GitHub',
+        username: 'octocat',
+        password: 's3cr3t',
+      ),
+    );
+    final l10n = AppLocalizations.of(
+      tester.element(find.byType(CredentialDetailScreen)),
+    );
+    // Icon-only actions must carry a tooltip so screen readers (and desktop
+    // hover) can name them.
+    expect(find.byTooltip(l10n.commonEdit), findsOneWidget);
+    expect(find.byTooltip(l10n.commonDelete), findsOneWidget);
+    expect(find.byTooltip(l10n.detailRevealSecret), findsWidgets);
   });
 
   testWidgets('shows a not-found state for a missing id', (tester) async {

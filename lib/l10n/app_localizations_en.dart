@@ -24,6 +24,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commonRetry => 'Retry';
 
   @override
+  String get commonClear => 'Clear';
+
+  @override
+  String get commonExpand => 'Expand';
+
+  @override
+  String get commonCollapse => 'Collapse';
+
+  @override
+  String get commonShowPassword => 'Show password';
+
+  @override
+  String get commonHidePassword => 'Hide password';
+
+  @override
+  String get formDeleteField => 'Delete field';
+
+  @override
   String get unlockSubtitle => 'Enter your master password';
 
   @override

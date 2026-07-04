@@ -24,6 +24,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get commonRetry => 'Reintentar';
 
   @override
+  String get commonClear => 'Limpiar';
+
+  @override
+  String get commonExpand => 'Expandir';
+
+  @override
+  String get commonCollapse => 'Contraer';
+
+  @override
+  String get commonShowPassword => 'Mostrar contraseña';
+
+  @override
+  String get commonHidePassword => 'Ocultar contraseña';
+
+  @override
+  String get formDeleteField => 'Eliminar campo';
+
+  @override
   String get unlockSubtitle => 'Introduce tu contraseña maestra';
 
   @override
