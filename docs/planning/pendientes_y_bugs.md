@@ -188,7 +188,7 @@ Lo solicitado es **PUSH** (la PC pregunta "¿apruebas el inicio?" al celular):
 | Tests del módulo sync | No hay tests de `SyncService` / `DeltaSyncManager` (re-cifrado, deltas, multi-peer). | 🟡 | ⬜ |
 | Empaquetado multiplataforma | Solo hay instalador Windows (`installer/SoloKey.iss`). Falta macOS/Linux (ver `../features/desktop_companion_planning.md`) e iOS (`../release/ios_compilation_guide.md`). | 🔴 | ⬜ |
 | i18n del módulo sync/transfer | Pendiente según `roadmap_desarrollo.md §6` (misma carpeta). | 🟡 | ⬜ |
-| Passkeys WebAuthn real | Hoy es "respaldo de passkey", sin firma FIDO2 (Credential Manager / AuthenticationServices). | 🔴 | ⬜ |
+| Passkeys WebAuthn real | Hoy es "respaldo de passkey", sin firma FIDO2 (Credential Manager / AuthenticationServices). Evaluacion + plan por fases en [`webauthn_fido2_plan.md`](webauthn_fido2_plan.md). | 🔴 | ⬜ |
 | Actualizar `CLAUDE.md` | Roadmap desfasado (corregido junto a este doc el 2026-06-28). | 🟢 | ✅ |
 
 ---
