@@ -17,14 +17,15 @@ import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../domain/connected_device.dart';
+import '../domain/i_sync_service.dart';
 import '../domain/pairing_payload.dart';
-import '../domain/sync_events_source.dart';
 import '../domain/sync_network_utils.dart';
 import '../domain/sync_summary.dart';
 import 'delta_sync_manager.dart';
 
 @lazySingleton
-class SyncService implements SyncEventsSource {
+class SyncService implements ISyncService {
   SyncService(
       this._storage, this._db, this._securityService, this._sessionManager);
 
@@ -67,6 +68,7 @@ class SyncService implements SyncEventsSource {
   final Set<_ServerPeer> _peers = {};
 
   /// Snapshot of connected (paired) devices, de-duplicated by id.
+  @override
   List<ConnectedDevice> get connectedDevices {
     final byId = <String, ConnectedDevice>{};
     for (final p in _peers) {
@@ -122,6 +124,7 @@ class SyncService implements SyncEventsSource {
   // DESKTOP: Server Operations
   // ───────────────────────────────────────────────────────────────────────────
 
+  @override
   Future<PairingPayload> startServer() async {
     if (_server != null) {
       await stopServer();
@@ -176,6 +179,7 @@ class SyncService implements SyncEventsSource {
     );
   }
 
+  @override
   Future<void> stopServer() async {
     _serverEventController.add('server_stopped');
     final reg = _registration;
@@ -390,6 +394,7 @@ class SyncService implements SyncEventsSource {
   /// shows a LOCAL notification (no FCM); approving sends back its DUK over the
   /// existing E2EE channel, which decrypts the locally-wrapped master key.
   /// Returns how many phones the request reached.
+  @override
   Future<int> requestApproval() async {
     var sent = 0;
     for (final peer in _peers) {
@@ -667,6 +672,7 @@ class SyncService implements SyncEventsSource {
     }
   }
 
+  @override
   Future<bool> pairWithDesktop(PairingPayload payload) async {
     try {
       _clientEventController.add('connecting');
@@ -793,6 +799,7 @@ class SyncService implements SyncEventsSource {
 
   /// Initiates a delta sync from the mobile device.
   /// Sends the local manifest to the desktop server and waits for the response.
+  @override
   Future<bool> requestSync() async {
     if (_clientChannel == null || _syncKey == null) {
       _clientEventController.add('error: Not connected or unpaired');
@@ -954,12 +961,14 @@ class SyncService implements SyncEventsSource {
   // ─────────────────────────────────────────────────────────────────────────
 
   /// True if this phone holds a WiFi-unlock token (DUK) for the paired desktop.
+  @override
   Future<bool> hasRemoteUnlockToken() async =>
       (await _storage.read(key: _kRemoteUnlockToken)) != null;
 
   /// Sends a remote unlock request: transmits the stored DUK over the E2EE
   /// channel so the desktop can decrypt its own master key. The master password
   /// is never sent nor stored on the phone.
+  @override
   Future<bool> sendRemoteUnlockRequest() async {
     final duk = await _storage.read(key: _kRemoteUnlockToken);
     if (duk == null) {
@@ -1048,6 +1057,7 @@ class SyncService implements SyncEventsSource {
   int _reconnectAttempts = 0;
 
   /// True once this phone has resume data (endpoint + K_sync) to reconnect.
+  @override
   Future<bool> canResume() async =>
       (await _storage.read(key: _kDesktopEndpointName)) != null &&
       (await _storage.read(key: _kSyncKeyName)) != null;
@@ -1055,6 +1065,7 @@ class SyncService implements SyncEventsSource {
   /// Reconnects to the paired desktop using the persisted endpoint + K_sync,
   /// authenticating via the resume challenge (no QR). On success it starts the
   /// keep-alive + periodic auto-sync loop. Returns true when the link is up.
+  @override
   Future<bool> resumeWithDesktop({String? ip, int? port}) async {
     try {
       var endpoint = (ip != null && port != null) ? '$ip:$port' : null;
@@ -1175,6 +1186,7 @@ class SyncService implements SyncEventsSource {
 
   /// Checks if this device has paired before — either as a mobile client
   /// (single stored K_sync) or as a desktop server (one or more known devices).
+  @override
   Future<bool> hasPairingKey() async {
     final saved = await _storage.read(key: _kSyncKeyName);
     if (saved != null) return true;
@@ -1183,6 +1195,7 @@ class SyncService implements SyncEventsSource {
   }
 
   /// Removes all pairing state, effectively "un-pairing" the devices.
+  @override
   Future<void> removePairingKey() async {
     await _storage.delete(key: _kSyncKeyName);
     await _storage.delete(key: _kSyncDevicesName);
@@ -1402,23 +1415,6 @@ class SyncService implements SyncEventsSource {
     await _clientEventController.close();
     await _vaultChangesController.close();
   }
-}
-
-/// Sync status of a connected device, surfaced in the desktop UI.
-enum DeviceSyncStatus { connected, syncing, synced }
-
-/// Immutable snapshot of a mobile device currently connected to the desktop
-/// sync server. Exposed via [SyncService.connectedDevices].
-class ConnectedDevice {
-  const ConnectedDevice({
-    required this.id,
-    required this.name,
-    required this.status,
-  });
-
-  final String id;
-  final String name;
-  final DeviceSyncStatus status;
 }
 
 /// Per-connection server state. Each WebSocket gets its own [_ServerPeer] so the

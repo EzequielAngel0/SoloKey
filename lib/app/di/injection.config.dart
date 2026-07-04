@@ -60,6 +60,7 @@ import '../../features/settings/domain/repositories/i_settings_repository.dart'
     as _i657;
 import '../../features/settings/infrastructure/settings_repository_impl.dart'
     as _i569;
+import '../../features/sync/domain/i_sync_service.dart' as _i1055;
 import '../../features/sync/infrastructure/sync_service.dart' as _i706;
 import '../../features/vault_access/application/setup_vault_use_case.dart'
     as _i229;
@@ -191,6 +192,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i795.SessionManager>(),
         gh<_i657.ISettingsRepository>(),
       ),
+    );
+    gh.lazySingleton<_i1055.ISyncService>(
+      () => registerModule.syncService(gh<_i706.SyncService>()),
     );
     gh.lazySingleton<_i332.VaultExportService>(
       () => _i332.VaultExportService(

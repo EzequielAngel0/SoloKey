@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../app/di/injection.dart';
+import '../domain/i_sync_service.dart';
 import '../domain/pairing_payload.dart';
-import '../infrastructure/sync_service.dart';
 
 enum PairingStatus {
   idle,
@@ -36,7 +36,7 @@ class PairingState {
 
 class PairingNotifier extends StateNotifier<PairingState> {
   PairingNotifier() : super(PairingState.idle()) {
-    final syncService = getIt<SyncService>();
+    final syncService = getIt<ISyncService>();
     // Listen to server events
     syncService.serverEvents.listen((event) {
       if (event == 'paired') {
@@ -60,7 +60,7 @@ class PairingNotifier extends StateNotifier<PairingState> {
   Future<void> startDesktopServer() async {
     state = PairingState.loading();
     try {
-      final payload = await getIt<SyncService>().startServer();
+      final payload = await getIt<ISyncService>().startServer();
       state = PairingState.serverReady(payload);
     } catch (e) {
       state = PairingState.failed('No se pudo iniciar el servidor local: $e');
@@ -68,7 +68,7 @@ class PairingNotifier extends StateNotifier<PairingState> {
   }
 
   Future<void> stopDesktopServer() async {
-    await getIt<SyncService>().stopServer();
+    await getIt<ISyncService>().stopServer();
     state = PairingState.idle();
   }
 
@@ -77,7 +77,7 @@ class PairingNotifier extends StateNotifier<PairingState> {
     state = PairingState.connecting();
     try {
       final payload = PairingPayload.fromQrString(qrData);
-      final success = await getIt<SyncService>().pairWithDesktop(payload);
+      final success = await getIt<ISyncService>().pairWithDesktop(payload);
       if (success) {
         state = PairingState.paired();
       } else {

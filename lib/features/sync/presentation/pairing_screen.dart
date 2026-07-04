@@ -12,7 +12,8 @@ import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../credentials/presentation/qr_scanner_screen.dart';
 import '../application/pairing_notifier.dart';
-import '../infrastructure/sync_service.dart';
+import '../domain/connected_device.dart';
+import '../domain/i_sync_service.dart';
 import 'widgets/sync_summary_card.dart';
 
 class PairingScreen extends ConsumerWidget {
@@ -54,7 +55,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
     _checkPairingKey();
     _subscribeToServerEvents();
     Future.microtask(() {
-      final syncService = getIt<SyncService>();
+      final syncService = getIt<ISyncService>();
       if (!syncService.isServerRunning) {
         ref.read(pairingNotifierProvider.notifier).startDesktopServer();
       } else {
@@ -66,12 +67,12 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   }
 
   Future<void> _checkPairingKey() async {
-    final hasPairing = await getIt<SyncService>().hasPairingKey();
+    final hasPairing = await getIt<ISyncService>().hasPairingKey();
     if (mounted) setState(() => _hasPairingKey = hasPairing);
   }
 
   void _subscribeToServerEvents() {
-    _serverEventsSubscription = getIt<SyncService>().serverEvents.listen((event) {
+    _serverEventsSubscription = getIt<ISyncService>().serverEvents.listen((event) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
       setState(() {
@@ -333,8 +334,8 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           children: [
             OutlinedButton.icon(
               onPressed: () async {
-                await getIt<SyncService>().removePairingKey();
-                await getIt<SyncService>().stopServer();
+                await getIt<ISyncService>().removePairingKey();
+                await getIt<ISyncService>().stopServer();
                 setState(() {
                   _hasPairingKey = false;
                   _serverStatusMessage = null;
@@ -369,7 +370,7 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
   /// Live list of the mobile devices currently connected to the sync server,
   /// each with its own status (connected / syncing / synced).
   Widget _buildDevicesList(AppPalette palette) {
-    final devices = getIt<SyncService>().connectedDevices;
+    final devices = getIt<ISyncService>().connectedDevices;
     if (devices.isEmpty) {
       return _statusChip(
         palette,
@@ -504,7 +505,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   /// so sync and login-approval work without re-scanning. Keep-alive starts on
   /// success (M1).
   Future<void> _autoResume() async {
-    final sync = getIt<SyncService>();
+    final sync = getIt<ISyncService>();
     if (sync.isClientConnected) return;
     if (await sync.canResume()) {
       await sync.resumeWithDesktop();
@@ -512,7 +513,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   }
 
   void _subscribeToClientEvents() {
-    _clientEventsSubscription = getIt<SyncService>().clientEvents.listen((event) {
+    _clientEventsSubscription = getIt<ISyncService>().clientEvents.listen((event) {
       if (!mounted) return;
       final l10n = AppLocalizations.of(context);
       setState(() {
@@ -548,7 +549,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
   }
 
   Future<void> _checkPairingKey() async {
-    final hasPairing = await getIt<SyncService>().hasPairingKey();
+    final hasPairing = await getIt<ISyncService>().hasPairingKey();
     if (mounted) setState(() => _hasPairingKey = hasPairing);
   }
 
@@ -579,7 +580,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
     });
 
     try {
-      final syncService = getIt<SyncService>();
+      final syncService = getIt<ISyncService>();
 
       // 1. Need a registered token (issued when pairing with vault unlocked).
       if (!await syncService.hasRemoteUnlockToken()) {
@@ -999,7 +1000,7 @@ class _MobilePairingViewState extends ConsumerState<_MobilePairingView> {
                   )
                 : ElevatedButton.icon(
                     onPressed: () async {
-                      final syncService = getIt<SyncService>();
+                      final syncService = getIt<ISyncService>();
                       // Ya conectado: dispara una sincronizacion.
                       if (syncService.isClientConnected) {
                         await syncService.requestSync();
