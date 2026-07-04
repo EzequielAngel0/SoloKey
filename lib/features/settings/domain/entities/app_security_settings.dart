@@ -27,6 +27,16 @@ class AppSecuritySettings with _$AppSecuritySettings {
     // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
     // clave se usa el atajo por defecto de AppShortcut.
     @Default(<String, String>{}) Map<String, String> shortcutOverrides,
+    // Escritorio: barra lateral colapsada (solo iconos) al reabrir.
+    @Default(false) bool desktopSidebarCollapsed,
+    // Escritorio: ultima pestana de navegacion seleccionada (indice del sidebar).
+    @Default(0) int desktopLastTab,
+    // Escritorio: ultimo tamano/posicion de la ventana (window_manager). null =
+    // sin valor persistido todavia -> se centra con el tamano por defecto.
+    double? windowWidth,
+    double? windowHeight,
+    double? windowX,
+    double? windowY,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>

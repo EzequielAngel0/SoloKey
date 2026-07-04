@@ -20,6 +20,8 @@ import 'app/di/provider_overrides.dart';
 import 'core/services/notification_navigation.dart';
 import 'core/services/notification_service.dart';
 import 'features/autofill/infrastructure/autofill_fetch_service.dart';
+import 'features/settings/domain/entities/app_security_settings.dart';
+import 'features/settings/domain/repositories/i_settings_repository.dart';
 import 'features/sync/infrastructure/sync_service.dart';
 import 'router/app_router.dart';
 
@@ -118,14 +120,38 @@ Future<void> main(List<String> args) async {
 
         await windowManager.ensureInitialized();
         await windowManager.setPreventClose(true);
-        const windowOptions = WindowOptions(
-          size: Size(1080, 780),
-          minimumSize: Size(850, 650),
-          center: true,
+
+        // Restaura el tamano/posicion de la ultima sesion (persistidos en
+        // AppSecuritySettings). Sin valor previo -> tamano por defecto centrado.
+        AppSecuritySettings? savedWin;
+        try {
+          savedWin = await getIt<ISettingsRepository>().getSettings();
+        } catch (_) {
+          savedWin = null;
+        }
+        final hasSavedSize =
+            savedWin?.windowWidth != null && savedWin?.windowHeight != null;
+        final hasSavedPos =
+            savedWin?.windowX != null && savedWin?.windowY != null;
+        final windowOptions = WindowOptions(
+          size: hasSavedSize
+              ? Size(savedWin!.windowWidth!, savedWin.windowHeight!)
+              : const Size(1080, 780),
+          minimumSize: const Size(850, 650),
+          center: !hasSavedPos,
           title: "SoloKey Secure Vault",
           titleBarStyle: TitleBarStyle.normal,
         );
         windowManager.waitUntilReadyToShow(windowOptions, () async {
+          // Reaplica la posicion guardada (WindowOptions solo fija tamano/centro).
+          if (hasSavedPos) {
+            try {
+              await windowManager
+                  .setPosition(Offset(savedWin!.windowX!, savedWin.windowY!));
+            } catch (_) {
+              // best-effort; no debe impedir el arranque.
+            }
+          }
           // Plan B del icono: ademas del WM_SETICON nativo del runner, fijamos el
           // icono de la ventana/taskbar desde Dart con el .ico bundleado junto al
           // .exe, por si window_manager recrea la ventana tras el set nativo.

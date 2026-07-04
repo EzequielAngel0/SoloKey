@@ -27,6 +27,12 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
         (k, e) => MapEntry(k, e as String),
       ) ??
       const <String, String>{},
+  desktopSidebarCollapsed: json['desktopSidebarCollapsed'] as bool? ?? false,
+  desktopLastTab: (json['desktopLastTab'] as num?)?.toInt() ?? 0,
+  windowWidth: (json['windowWidth'] as num?)?.toDouble(),
+  windowHeight: (json['windowHeight'] as num?)?.toDouble(),
+  windowX: (json['windowX'] as num?)?.toDouble(),
+  windowY: (json['windowY'] as num?)?.toDouble(),
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -44,4 +50,10 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'backupDirectory': instance.backupDirectory,
   'uiDensity': instance.uiDensity,
   'shortcutOverrides': instance.shortcutOverrides,
+  'desktopSidebarCollapsed': instance.desktopSidebarCollapsed,
+  'desktopLastTab': instance.desktopLastTab,
+  'windowWidth': instance.windowWidth,
+  'windowHeight': instance.windowHeight,
+  'windowX': instance.windowX,
+  'windowY': instance.windowY,
 };

@@ -37,5 +37,42 @@ void main() {
       final restored = AppSecuritySettings.fromJson(custom.toJson());
       expect(restored.shortcutOverrides, {'lock': 'ctrl+alt+q'});
     });
+
+    test('desktop layout prefs default to collapsed=false, tab=0, no bounds',
+        () {
+      const s = AppSecuritySettings();
+      expect(s.desktopSidebarCollapsed, isFalse);
+      expect(s.desktopLastTab, 0);
+      expect(s.windowWidth, isNull);
+      expect(s.windowHeight, isNull);
+      expect(s.windowX, isNull);
+      expect(s.windowY, isNull);
+    });
+
+    test('desktop layout prefs persist through a JSON round-trip', () {
+      const s = AppSecuritySettings(
+        desktopSidebarCollapsed: true,
+        desktopLastTab: 3,
+        windowWidth: 1200,
+        windowHeight: 800,
+        windowX: 40,
+        windowY: 60,
+      );
+      final restored = AppSecuritySettings.fromJson(s.toJson());
+      expect(restored.desktopSidebarCollapsed, isTrue);
+      expect(restored.desktopLastTab, 3);
+      expect(restored.windowWidth, 1200);
+      expect(restored.windowHeight, 800);
+      expect(restored.windowX, 40);
+      expect(restored.windowY, 60);
+      expect(restored, s);
+    });
+
+    test('fromJson tolerates missing desktop prefs (older settings)', () {
+      final restored = AppSecuritySettings.fromJson(const {'themeMode': 'dark'});
+      expect(restored.desktopSidebarCollapsed, isFalse);
+      expect(restored.desktopLastTab, 0);
+      expect(restored.windowWidth, isNull);
+    });
   });
 }

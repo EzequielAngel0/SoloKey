@@ -23,6 +23,7 @@ import '../../../../features/credentials/presentation/widgets/credential_list_wi
 import '../../../../features/credentials/presentation/widgets/empty_state_widget.dart';
 import '../../../../features/folders/application/folders_provider.dart';
 import '../../../../features/folders/presentation/widgets/folder_tree.dart';
+import '../../../../features/settings/domain/entities/app_security_settings.dart';
 import '../../../../features/sync/application/sync_status_provider.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../features/secure_files/presentation/secure_files_screen.dart';
@@ -44,11 +45,46 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
   final _searchCtrl = TextEditingController();
   Timer? _searchDebounce;
 
+  /// Whether the persisted sidebar/tab prefs have been applied to the ephemeral
+  /// state providers yet. Seeded once, after the settings first load.
+  bool _seededDesktopPrefs = false;
+
   @override
   void dispose() {
     _searchDebounce?.cancel();
     _searchCtrl.dispose();
     super.dispose();
+  }
+
+  /// Applies the persisted sidebar-collapsed + last-tab prefs to the ephemeral
+  /// providers once the settings have loaded (they reset every launch). Done in
+  /// a post-frame callback so it never mutates providers during build.
+  void _seedDesktopPrefs(AppSecuritySettings settings) {
+    if (_seededDesktopPrefs) return;
+    _seededDesktopPrefs = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      ref.read(desktopSidebarCollapsedProvider.notifier).state =
+          settings.desktopSidebarCollapsed;
+      // Guard against a stale/out-of-range persisted index.
+      final tab = settings.desktopLastTab;
+      if (tab >= 0 && tab <= 6) {
+        ref.read(desktopSelectedNavigationProvider.notifier).state = tab;
+      }
+    });
+  }
+
+  /// Write-through: persists [next] into [AppSecuritySettings] via [mutate] when
+  /// it actually differs, and only after the initial seed (so restoring the
+  /// saved value never triggers a redundant save).
+  void _persistDesktopPref(
+    bool changed,
+    AppSecuritySettings Function(AppSecuritySettings s) mutate,
+  ) {
+    if (!_seededDesktopPrefs || !changed) return;
+    final s = ref.read(settingsNotifierProvider).valueOrNull;
+    if (s == null) return;
+    ref.read(settingsNotifierProvider.notifier).save(mutate(s));
   }
 
   /// Debounced search, mirroring mobile: waits ~250ms after the last keystroke
@@ -101,13 +137,28 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     final palette = context.palette;
     final activeTab = ref.watch(desktopSelectedNavigationProvider);
 
+    // Seed the ephemeral sidebar/tab providers from the persisted settings once
+    // they've loaded (they reset on every launch).
+    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    if (settings != null) _seedDesktopPrefs(settings);
+
+    // Write-through: persist collapse/tab changes so they survive a restart.
+    ref.listen<bool>(desktopSidebarCollapsedProvider, (prev, next) {
+      _persistDesktopPref(
+        settings?.desktopSidebarCollapsed != next,
+        (s) => s.copyWith(desktopSidebarCollapsed: next),
+      );
+    });
+    ref.listen<int>(desktopSelectedNavigationProvider, (prev, next) {
+      _persistDesktopPref(
+        settings?.desktopLastTab != next,
+        (s) => s.copyWith(desktopLastTab: next),
+      );
+    });
+
     // Keyboard shortcuts are user-remappable: resolve each action's current
     // combination from the persisted overrides (falling back to its default).
-    final overrides = ref
-            .watch(settingsNotifierProvider)
-            .valueOrNull
-            ?.shortcutOverrides ??
-        const <String, String>{};
+    final overrides = settings?.shortcutOverrides ?? const <String, String>{};
 
     return AutoLockManager(
       child: CallbackShortcuts(

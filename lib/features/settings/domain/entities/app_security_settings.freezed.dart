@@ -42,7 +42,16 @@ mixin _$AppSecuritySettings {
   // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
   // clave se usa el atajo por defecto de AppShortcut.
   Map<String, String> get shortcutOverrides =>
-      throw _privateConstructorUsedError;
+      throw _privateConstructorUsedError; // Escritorio: barra lateral colapsada (solo iconos) al reabrir.
+  bool get desktopSidebarCollapsed =>
+      throw _privateConstructorUsedError; // Escritorio: ultima pestana de navegacion seleccionada (indice del sidebar).
+  int get desktopLastTab =>
+      throw _privateConstructorUsedError; // Escritorio: ultimo tamano/posicion de la ventana (window_manager). null =
+  // sin valor persistido todavia -> se centra con el tamano por defecto.
+  double? get windowWidth => throw _privateConstructorUsedError;
+  double? get windowHeight => throw _privateConstructorUsedError;
+  double? get windowX => throw _privateConstructorUsedError;
+  double? get windowY => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -74,6 +83,12 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     String? backupDirectory,
     String uiDensity,
     Map<String, String> shortcutOverrides,
+    bool desktopSidebarCollapsed,
+    int desktopLastTab,
+    double? windowWidth,
+    double? windowHeight,
+    double? windowX,
+    double? windowY,
   });
 }
 
@@ -104,6 +119,12 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? backupDirectory = freezed,
     Object? uiDensity = null,
     Object? shortcutOverrides = null,
+    Object? desktopSidebarCollapsed = null,
+    Object? desktopLastTab = null,
+    Object? windowWidth = freezed,
+    Object? windowHeight = freezed,
+    Object? windowX = freezed,
+    Object? windowY = freezed,
   }) {
     return _then(
       _value.copyWith(
@@ -155,6 +176,30 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.shortcutOverrides
                 : shortcutOverrides // ignore: cast_nullable_to_non_nullable
                       as Map<String, String>,
+            desktopSidebarCollapsed: null == desktopSidebarCollapsed
+                ? _value.desktopSidebarCollapsed
+                : desktopSidebarCollapsed // ignore: cast_nullable_to_non_nullable
+                      as bool,
+            desktopLastTab: null == desktopLastTab
+                ? _value.desktopLastTab
+                : desktopLastTab // ignore: cast_nullable_to_non_nullable
+                      as int,
+            windowWidth: freezed == windowWidth
+                ? _value.windowWidth
+                : windowWidth // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            windowHeight: freezed == windowHeight
+                ? _value.windowHeight
+                : windowHeight // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            windowX: freezed == windowX
+                ? _value.windowX
+                : windowX // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            windowY: freezed == windowY
+                ? _value.windowY
+                : windowY // ignore: cast_nullable_to_non_nullable
+                      as double?,
           )
           as $Val,
     );
@@ -183,6 +228,12 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     String? backupDirectory,
     String uiDensity,
     Map<String, String> shortcutOverrides,
+    bool desktopSidebarCollapsed,
+    int desktopLastTab,
+    double? windowWidth,
+    double? windowHeight,
+    double? windowX,
+    double? windowY,
   });
 }
 
@@ -212,6 +263,12 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? backupDirectory = freezed,
     Object? uiDensity = null,
     Object? shortcutOverrides = null,
+    Object? desktopSidebarCollapsed = null,
+    Object? desktopLastTab = null,
+    Object? windowWidth = freezed,
+    Object? windowHeight = freezed,
+    Object? windowX = freezed,
+    Object? windowY = freezed,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -263,6 +320,30 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value._shortcutOverrides
             : shortcutOverrides // ignore: cast_nullable_to_non_nullable
                   as Map<String, String>,
+        desktopSidebarCollapsed: null == desktopSidebarCollapsed
+            ? _value.desktopSidebarCollapsed
+            : desktopSidebarCollapsed // ignore: cast_nullable_to_non_nullable
+                  as bool,
+        desktopLastTab: null == desktopLastTab
+            ? _value.desktopLastTab
+            : desktopLastTab // ignore: cast_nullable_to_non_nullable
+                  as int,
+        windowWidth: freezed == windowWidth
+            ? _value.windowWidth
+            : windowWidth // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        windowHeight: freezed == windowHeight
+            ? _value.windowHeight
+            : windowHeight // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        windowX: freezed == windowX
+            ? _value.windowX
+            : windowX // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        windowY: freezed == windowY
+            ? _value.windowY
+            : windowY // ignore: cast_nullable_to_non_nullable
+                  as double?,
       ),
     );
   }
@@ -284,6 +365,12 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.backupDirectory,
     this.uiDensity = 'comfortable',
     final Map<String, String> shortcutOverrides = const <String, String>{},
+    this.desktopSidebarCollapsed = false,
+    this.desktopLastTab = 0,
+    this.windowWidth,
+    this.windowHeight,
+    this.windowX,
+    this.windowY,
   }) : _shortcutOverrides = shortcutOverrides;
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -343,9 +430,28 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     return EqualUnmodifiableMapView(_shortcutOverrides);
   }
 
+  // Escritorio: barra lateral colapsada (solo iconos) al reabrir.
+  @override
+  @JsonKey()
+  final bool desktopSidebarCollapsed;
+  // Escritorio: ultima pestana de navegacion seleccionada (indice del sidebar).
+  @override
+  @JsonKey()
+  final int desktopLastTab;
+  // Escritorio: ultimo tamano/posicion de la ventana (window_manager). null =
+  // sin valor persistido todavia -> se centra con el tamano por defecto.
+  @override
+  final double? windowWidth;
+  @override
+  final double? windowHeight;
+  @override
+  final double? windowX;
+  @override
+  final double? windowY;
+
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity, shortcutOverrides: $shortcutOverrides)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity, shortcutOverrides: $shortcutOverrides, desktopSidebarCollapsed: $desktopSidebarCollapsed, desktopLastTab: $desktopLastTab, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
   }
 
   @override
@@ -384,7 +490,20 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
             const DeepCollectionEquality().equals(
               other._shortcutOverrides,
               _shortcutOverrides,
-            ));
+            ) &&
+            (identical(
+                  other.desktopSidebarCollapsed,
+                  desktopSidebarCollapsed,
+                ) ||
+                other.desktopSidebarCollapsed == desktopSidebarCollapsed) &&
+            (identical(other.desktopLastTab, desktopLastTab) ||
+                other.desktopLastTab == desktopLastTab) &&
+            (identical(other.windowWidth, windowWidth) ||
+                other.windowWidth == windowWidth) &&
+            (identical(other.windowHeight, windowHeight) ||
+                other.windowHeight == windowHeight) &&
+            (identical(other.windowX, windowX) || other.windowX == windowX) &&
+            (identical(other.windowY, windowY) || other.windowY == windowY));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -403,6 +522,12 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     backupDirectory,
     uiDensity,
     const DeepCollectionEquality().hash(_shortcutOverrides),
+    desktopSidebarCollapsed,
+    desktopLastTab,
+    windowWidth,
+    windowHeight,
+    windowX,
+    windowY,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -436,6 +561,12 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final String? backupDirectory,
     final String uiDensity,
     final Map<String, String> shortcutOverrides,
+    final bool desktopSidebarCollapsed,
+    final int desktopLastTab,
+    final double? windowWidth,
+    final double? windowHeight,
+    final double? windowX,
+    final double? windowY,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -467,7 +598,20 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
   // clave se usa el atajo por defecto de AppShortcut.
   @override
-  Map<String, String> get shortcutOverrides;
+  Map<String, String> get shortcutOverrides; // Escritorio: barra lateral colapsada (solo iconos) al reabrir.
+  @override
+  bool get desktopSidebarCollapsed; // Escritorio: ultima pestana de navegacion seleccionada (indice del sidebar).
+  @override
+  int get desktopLastTab; // Escritorio: ultimo tamano/posicion de la ventana (window_manager). null =
+  // sin valor persistido todavia -> se centra con el tamano por defecto.
+  @override
+  double? get windowWidth;
+  @override
+  double? get windowHeight;
+  @override
+  double? get windowX;
+  @override
+  double? get windowY;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

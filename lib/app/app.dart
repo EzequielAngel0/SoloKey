@@ -32,6 +32,7 @@ class App extends ConsumerStatefulWidget {
 class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   late final AppLifecycleObserver _observer;
   Timer? _trayLockTimer;
+  Timer? _saveBoundsTimer;
   StreamSubscription<String>? _approvalSub;
 
   @override
@@ -80,6 +81,7 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   @override
   void dispose() {
     _cancelTrayLockTimer();
+    _saveBoundsTimer?.cancel();
     _approvalSub?.cancel();
     if (!kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux)) {
       windowManager.removeListener(this);
@@ -166,6 +168,46 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
   @override
   void onWindowFocus() {
     _cancelTrayLockTimer();
+  }
+
+  @override
+  void onWindowResized() => _scheduleSaveBounds();
+
+  @override
+  void onWindowMoved() => _scheduleSaveBounds();
+
+  /// Debounces bounds persistence so a drag/resize gesture writes once when it
+  /// settles, not per frame.
+  void _scheduleSaveBounds() {
+    _saveBoundsTimer?.cancel();
+    _saveBoundsTimer =
+        Timer(const Duration(milliseconds: 600), _persistWindowBounds);
+  }
+
+  /// Persists the current window geometry so the next launch restores it. Goes
+  /// through the settings provider (single writer) so it never clobbers other
+  /// persisted fields. Skips hidden/minimized/maximized states so we only ever
+  /// store the "normal" bounds. Best-effort: failures never disrupt the app.
+  Future<void> _persistWindowBounds() async {
+    try {
+      if (!await windowManager.isVisible()) return;
+      if (await windowManager.isMinimized() ||
+          await windowManager.isMaximized()) {
+        return;
+      }
+      final bounds = await windowManager.getBounds();
+      final notifier = ref.read(settingsNotifierProvider.notifier);
+      final current = ref.read(settingsNotifierProvider).valueOrNull;
+      if (current == null) return;
+      await notifier.save(current.copyWith(
+        windowWidth: bounds.width,
+        windowHeight: bounds.height,
+        windowX: bounds.left,
+        windowY: bounds.top,
+      ));
+    } catch (_) {
+      // Best-effort; never disrupt the app.
+    }
   }
 
   @override
