@@ -1,8 +1,10 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:password_manager/core/infrastructure/security/double_envelope_service.dart';
 import 'package:password_manager/core/infrastructure/security/i_security_service.dart';
 import 'package:password_manager/core/services/ssh_key_generator_service.dart';
@@ -15,7 +17,9 @@ import 'package:password_manager/features/credentials/presentation/credential_fo
 import 'package:password_manager/features/credentials/presentation/widgets/favorite_toggle.dart';
 import 'package:password_manager/features/folders/application/folders_provider.dart';
 import 'package:password_manager/features/folders/domain/entities/folder.dart';
+import 'package:password_manager/l10n/app_localizations.dart';
 import 'package:password_manager/shared/widgets/secure_text_field.dart';
+import 'package:password_manager/theme/app_theme.dart';
 
 import '../../support/widget_harness.dart';
 
@@ -559,6 +563,67 @@ void main() {
       final c = repo.saved.single;
       expect(c.sshKeyMetadata!.privateKey, 'FAKE_PRIV');
       expect(c.sshKeyMetadata!.publicKey, 'FAKE_PUB');
+    });
+  });
+
+  group('mobile layout (phone width)', () {
+    testWidgets('saving at phone width persists then pops to the prior route',
+        (tester) async {
+      final repo = SaveSpyRepo();
+      final router = GoRouter(
+        initialLocation: '/home',
+        routes: [
+          GoRoute(
+            path: '/home',
+            builder: (_, _) =>
+                const Scaffold(body: Center(child: Text('HOME'))),
+          ),
+          GoRoute(
+            path: '/new',
+            builder: (_, _) => const CredentialFormScreen(),
+          ),
+        ],
+      );
+      // Force a real phone viewport (logical 430 wide → isDesktop == false).
+      tester.view.physicalSize = const Size(430, 1200);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+      tolerateInkHiddenPaintWarnings();
+
+      await tester.pumpWidget(
+        ProviderScope(
+          overrides: [
+            foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+            getCredentialsUseCaseProvider
+                .overrideWithValue(GetCredentialsUseCase(repo)),
+            saveCredentialUseCaseProvider
+                .overrideWithValue(SaveCredentialUseCase(repo)),
+          ],
+          child: MaterialApp.router(
+            theme: AppTheme.dark(),
+            localizationsDelegates: AppLocalizations.localizationsDelegates,
+            supportedLocales: AppLocalizations.supportedLocales,
+            routerConfig: router,
+          ),
+        ),
+      );
+      await tester.pump();
+      router.push('/new');
+      await tester.pumpAndSettle();
+
+      // No overflow at ~phone width, and the title field is reachable.
+      expect(tester.takeException(), isNull);
+      await tester.enterText(find.byType(TextFormField).first, 'Mobile Cred');
+      await tester.pump();
+
+      await _tapSave(tester);
+      await tester.pumpAndSettle();
+
+      // Mobile branch: it saves and pops back to /home (no desktop right pane).
+      expect(repo.saved.single.title, 'Mobile Cred');
+      expect(find.byType(CredentialFormScreen), findsNothing);
+      expect(find.text('HOME'), findsOneWidget);
     });
   });
 }
