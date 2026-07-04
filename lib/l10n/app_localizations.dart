@@ -3326,6 +3326,24 @@ abstract class AppLocalizations {
   /// **'Options'**
   String get secureFilesOptions;
 
+  /// No description provided for @secureFilesPreview.
+  ///
+  /// In en, this message translates to:
+  /// **'Preview'**
+  String get secureFilesPreview;
+
+  /// No description provided for @secureFilesPreviewError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not preview file: {msg}'**
+  String secureFilesPreviewError(String msg);
+
+  /// No description provided for @secureFilesPreviewUnsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This file can\'t be shown as an image.'**
+  String get secureFilesPreviewUnsupported;
+
   /// No description provided for @secureFilesFileTypeLabel.
   ///
   /// In en, this message translates to:

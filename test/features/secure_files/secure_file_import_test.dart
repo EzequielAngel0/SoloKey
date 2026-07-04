@@ -41,6 +41,20 @@ void main() {
     });
   });
 
+  group('isPreviewableImage', () {
+    test('accepts common image extensions, case-insensitively', () {
+      expect(isPreviewableImage('png'), isTrue);
+      expect(isPreviewableImage('JPG'), isTrue);
+      expect(isPreviewableImage('webp'), isTrue);
+    });
+
+    test('rejects non-images and null', () {
+      expect(isPreviewableImage('pdf'), isFalse);
+      expect(isPreviewableImage('json'), isFalse);
+      expect(isPreviewableImage(null), isFalse);
+    });
+  });
+
   group('formatFileSize', () {
     test('formats bytes, KB and MB', () {
       expect(formatFileSize(512), '512 B');

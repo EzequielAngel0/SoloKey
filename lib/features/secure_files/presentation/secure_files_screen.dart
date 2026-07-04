@@ -135,6 +135,43 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     if (mounted) await _addAll(files);
   }
 
+  /// Primary tap: preview images inline, otherwise open the options sheet.
+  void _onTapFile(SecureFile file) {
+    if (isPreviewableImage(file.mimeHint)) {
+      _previewImage(file);
+    } else {
+      _showOptions(file);
+    }
+  }
+
+  /// Decrypts an image into RAM (behind auth) and shows it in a viewer. The
+  /// plaintext bytes are zeroed when the viewer closes — never written to disk.
+  Future<void> _previewImage(SecureFile file) async {
+    final l10n = AppLocalizations.of(context);
+    final ok =
+        await AuthHelper.requireAuth(context, reason: l10n.secureFilesAuthReason);
+    if (!ok || !mounted) return;
+    setState(() => _busy = true);
+    Uint8List? bytes;
+    try {
+      bytes =
+          await ref.read(secureFileRepositoryProvider).readDecrypted(file.id);
+    } catch (e) {
+      if (mounted) _snack(l10n.secureFilesPreviewError('$e'), error: true);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+    if (bytes == null) return;
+    if (!mounted) {
+      bytes.fillRange(0, bytes.length, 0);
+      return;
+    }
+    await showDialog<void>(
+      context: context,
+      builder: (_) => _ImagePreviewDialog(name: file.name, bytes: bytes!),
+    );
+  }
+
   Future<void> _exportFile(SecureFile file) async {
     final l10n = AppLocalizations.of(context);
     final ok =
@@ -303,6 +340,16 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            if (isPreviewableImage(file.mimeHint))
+              ListTile(
+                leading: Icon(Icons.visibility_rounded, color: palette.accent),
+                title: Text(l10n.secureFilesPreview,
+                    style: TextStyle(color: palette.textPrimary)),
+                onTap: () {
+                  Navigator.pop(context);
+                  _previewImage(file);
+                },
+              ),
             ListTile(
               leading: Icon(
                 file.isFavorite ? Icons.star_rounded : Icons.star_border_rounded,
@@ -410,7 +457,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
                     folderName: sorted[i].folderId == null
                         ? null
                         : folderNames[sorted[i].folderId],
-                    onTap: () => _showOptions(sorted[i]),
+                    onTap: () => _onTapFile(sorted[i]),
                     onMore: () => _showOptions(sorted[i]),
                     onToggleFavorite: () => ref
                         .read(secureFilesNotifierProvider.notifier)
@@ -593,5 +640,83 @@ class _SecureFileTile extends StatelessWidget {
       default:
         return Icons.insert_drive_file_rounded;
     }
+  }
+}
+
+/// Full-screen viewer for a decrypted image held only in RAM. Zeroes the
+/// plaintext bytes and evicts the decoded frame from the image cache on close.
+class _ImagePreviewDialog extends StatefulWidget {
+  const _ImagePreviewDialog({required this.name, required this.bytes});
+
+  final String name;
+  final Uint8List bytes;
+
+  @override
+  State<_ImagePreviewDialog> createState() => _ImagePreviewDialogState();
+}
+
+class _ImagePreviewDialogState extends State<_ImagePreviewDialog> {
+  late final MemoryImage _image = MemoryImage(widget.bytes);
+
+  @override
+  void dispose() {
+    _image.evict();
+    widget.bytes.fillRange(0, widget.bytes.length, 0);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Dialog.fullscreen(
+      backgroundColor: Colors.black,
+      child: SafeArea(
+        child: Column(
+          children: [
+            Row(
+              children: [
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    widget.name,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w600),
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.close_rounded, color: Colors.white),
+                  tooltip: l10n.commonCancel,
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ],
+            ),
+            Expanded(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 5,
+                child: Center(
+                  child: Image(
+                    image: _image,
+                    fit: BoxFit.contain,
+                    gaplessPlayback: true,
+                    errorBuilder: (_, _, _) => Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Text(
+                        l10n.secureFilesPreviewUnsupported,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(color: palette.textMuted),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

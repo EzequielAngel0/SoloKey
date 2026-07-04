@@ -17,8 +17,10 @@ class _EmptyFolders extends FoldersNotifier {
 }
 
 class _FakeSecureFileRepo implements ISecureFileRepository {
+  _FakeSecureFileRepo([this._files = const []]);
+  final List<SecureFile> _files;
   @override
-  Future<List<SecureFile>> getAll() async => const [];
+  Future<List<SecureFile>> getAll() async => _files;
   @override
   Future<SecureFile?> getById(String id) async => null;
   @override
@@ -38,20 +40,47 @@ class _FakeSecureFileRepo implements ISecureFileRepository {
   Future<void> deleteAll() async {}
 }
 
+SecureFile _file(String id, String name, {String? mime}) {
+  final now = DateTime(2020, 6, 1);
+  return SecureFile(
+    id: id,
+    name: name,
+    sizeBytes: 2048,
+    storedFileName: '$id.enc',
+    mimeHint: mime,
+    createdAt: now,
+    updatedAt: now,
+  );
+}
+
+Future<void> _pump(WidgetTester tester, List<SecureFile> files) async {
+  tolerateInkHiddenPaintWarnings();
+  await pumpApp(
+    tester,
+    const SecureFilesScreen(),
+    overrides: [
+      secureFileRepositoryProvider.overrideWithValue(_FakeSecureFileRepo(files)),
+      foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+    ],
+    surfaceSize: const Size(820, 1200),
+  );
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 50));
+}
+
 void main() {
   testWidgets('SecureFilesScreen builds with an empty store', (tester) async {
-    tolerateInkHiddenPaintWarnings();
-    await pumpApp(
-      tester,
-      const SecureFilesScreen(),
-      overrides: [
-        secureFileRepositoryProvider.overrideWithValue(_FakeSecureFileRepo()),
-        foldersNotifierProvider.overrideWith(_EmptyFolders.new),
-      ],
-      surfaceSize: const Size(820, 1200),
-    );
-    await tester.pump();
-    await tester.pump(const Duration(milliseconds: 50));
+    await _pump(tester, const []);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('lists stored files with their names', (tester) async {
+    await _pump(tester, [
+      _file('1', 'photo.png', mime: 'png'),
+      _file('2', 'creds.json', mime: 'json'),
+    ]);
+    expect(find.text('photo.png'), findsOneWidget);
+    expect(find.text('creds.json'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 }

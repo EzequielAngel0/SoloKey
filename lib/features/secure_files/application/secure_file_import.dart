@@ -28,6 +28,20 @@ String uniqueSecureFileName(String candidate, Iterable<String> existing) {
   }
 }
 
+/// Extensions we can decode and preview in-memory with `Image.memory`.
+const Set<String> kPreviewableImageExtensions = {
+  'png',
+  'jpg',
+  'jpeg',
+  'gif',
+  'bmp',
+  'webp',
+};
+
+/// Whether a file with this [mimeHint] (extension) can be previewed as an image.
+bool isPreviewableImage(String? mimeHint) =>
+    mimeHint != null && kPreviewableImageExtensions.contains(mimeHint.toLowerCase());
+
 /// Human-readable size, matching the tile formatter (B / KB / MB).
 String formatFileSize(int bytes) {
   if (bytes < 1024) return '$bytes B';

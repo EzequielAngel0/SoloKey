@@ -1802,6 +1802,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get secureFilesOptions => 'Opciones';
 
   @override
+  String get secureFilesPreview => 'Previsualizar';
+
+  @override
+  String secureFilesPreviewError(String msg) {
+    return 'No se pudo previsualizar el archivo: $msg';
+  }
+
+  @override
+  String get secureFilesPreviewUnsupported =>
+      'Este archivo no se puede mostrar como imagen.';
+
+  @override
   String secureFilesFileTypeLabel(String type) {
     return 'Archivo $type';
   }
