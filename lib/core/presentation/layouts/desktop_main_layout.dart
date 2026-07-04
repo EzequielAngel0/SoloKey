@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../router/app_router.dart';
+import '../shortcuts/app_shortcuts.dart';
 import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
@@ -70,28 +71,43 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     setState(() {});
   }
 
+  /// Runs a remappable desktop [AppShortcut]. The key combinations themselves
+  /// come from settings (see [build]); this maps each action to its effect.
+  void _runShortcut(AppShortcut shortcut) {
+    switch (shortcut) {
+      case AppShortcut.commandPalette:
+        CommandPalette.show(context);
+      case AppShortcut.newCredential:
+        // Nueva credencial (en la pestaña Boveda).
+        ref.read(desktopSelectedNavigationProvider.notifier).state = 0;
+        ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+        ref.read(desktopRightPaneModeProvider.notifier).state =
+            RightPaneMode.create;
+      case AppShortcut.lock:
+        ref.read(vaultNotifierProvider.notifier).lock();
+        context.go(AppRoutes.unlock);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
     final activeTab = ref.watch(desktopSelectedNavigationProvider);
 
+    // Keyboard shortcuts are user-remappable: resolve each action's current
+    // combination from the persisted overrides (falling back to its default).
+    final overrides = ref
+            .watch(settingsNotifierProvider)
+            .valueOrNull
+            ?.shortcutOverrides ??
+        const <String, String>{};
+
     return AutoLockManager(
       child: CallbackShortcuts(
         bindings: {
-          const SingleActivator(LogicalKeyboardKey.keyK, control: true): () =>
-              CommandPalette.show(context),
-          // Ctrl+N: nueva credencial (en la pestaña Boveda).
-          const SingleActivator(LogicalKeyboardKey.keyN, control: true): () {
-            ref.read(desktopSelectedNavigationProvider.notifier).state = 0;
-            ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
-            ref.read(desktopRightPaneModeProvider.notifier).state =
-                RightPaneMode.create;
-          },
-          // Ctrl+L: bloquear la boveda.
-          const SingleActivator(LogicalKeyboardKey.keyL, control: true): () {
-            ref.read(vaultNotifierProvider.notifier).lock();
-            context.go(AppRoutes.unlock);
-          },
+          for (final shortcut in AppShortcut.values)
+            shortcut.resolve(overrides).toActivator(): () =>
+                _runShortcut(shortcut),
         },
         child: Focus(
           autofocus: true,

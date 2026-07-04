@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:go_router/go_router.dart';
@@ -12,6 +13,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/constants/app_constants.dart';
+import '../../../core/presentation/shortcuts/app_shortcuts.dart';
 import '../../../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
 import '../../../core/services/scheduled_backup_service.dart';
@@ -225,6 +227,13 @@ class _SettingsBody extends StatelessWidget {
             ),
           ],
         ),
+        // ── Atajos de teclado (solo escritorio) ─────────────────────────────
+        if (isDesktop)
+          _ShortcutsSection(
+            overrides: settings.shortcutOverrides,
+            onChanged: (m) =>
+                onUpdate(settings.copyWith(shortcutOverrides: m)),
+          ),
         // ── Quick-Fill (solo escritorio) ────────────────────────────────────
         if (isDesktop) ...[
           SectionHeader(text: l10n.settingsSectionQuickFill),
@@ -299,6 +308,258 @@ class _QuickFillInfoTile extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// Desktop-only section listing the remappable keyboard shortcuts. Each row
+/// shows the action and its current combination; tapping opens a capture
+/// dialog. A header action resets every shortcut to its default.
+class _ShortcutsSection extends StatelessWidget {
+  const _ShortcutsSection({required this.overrides, required this.onChanged});
+
+  final Map<String, String> overrides;
+  final ValueChanged<Map<String, String>> onChanged;
+
+  static String _label(AppLocalizations l10n, AppShortcut s) => switch (s) {
+        AppShortcut.commandPalette => l10n.shortcutCommandPalette,
+        AppShortcut.newCredential => l10n.shortcutNewCredential,
+        AppShortcut.lock => l10n.shortcutLock,
+      };
+
+  Future<void> _edit(BuildContext context, AppShortcut shortcut) async {
+    final l10n = AppLocalizations.of(context);
+    final captured = await showDialog<ShortcutBinding>(
+      context: context,
+      builder: (_) => _ShortcutCaptureDialog(
+        title: _label(l10n, shortcut),
+        current: shortcut.resolve(overrides),
+      ),
+    );
+    if (captured == null || !context.mounted) return;
+
+    // Reject a combination already bound to a different action.
+    final conflict = AppShortcut.values.any(
+      (other) => other != shortcut && other.resolve(overrides) == captured,
+    );
+    if (conflict) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.shortcutConflict)),
+      );
+      return;
+    }
+    onChanged({...overrides, shortcut.id: captured.serialize()});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final isDefault = overrides.isEmpty;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(
+          text: l10n.settingsSectionShortcuts,
+          trailing: TextButton(
+            onPressed: isDefault ? null : () => onChanged(const {}),
+            style: TextButton.styleFrom(
+              foregroundColor: palette.accent,
+              disabledForegroundColor: palette.textDisabled,
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              minimumSize: const Size(0, 0),
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+            ),
+            child: Text(l10n.shortcutReset, style: const TextStyle(fontSize: 12)),
+          ),
+        ),
+        DetailGroup(
+          children: [
+            for (final s in AppShortcut.values)
+              _ShortcutRow(
+                label: _label(l10n, s),
+                binding: s.resolve(overrides),
+                onTap: () => _edit(context, s),
+              ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
+/// A single shortcut row: action label on the left, a kbd-style chip with the
+/// current combination and an edit icon on the right.
+class _ShortcutRow extends StatelessWidget {
+  const _ShortcutRow({
+    required this.label,
+    required this.binding,
+    required this.onTap,
+  });
+
+  final String label;
+  final ShortcutBinding binding;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        child: Row(
+          children: [
+            Icon(Icons.keyboard_rounded, color: palette.accent, size: 20),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(color: palette.textPrimary, fontSize: 14),
+              ),
+            ),
+            _KbdChip(text: binding.label),
+            const SizedBox(width: 8),
+            Icon(Icons.edit_rounded, color: palette.textMuted, size: 16),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Monospace "keycap" chip used to render a shortcut combination.
+class _KbdChip extends StatelessWidget {
+  const _KbdChip({required this.text});
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      decoration: BoxDecoration(
+        color: palette.cardDark,
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: palette.divider),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: palette.textPrimary,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          fontFamily: AppTheme.monoFamily,
+          letterSpacing: 0.3,
+        ),
+      ),
+    );
+  }
+}
+
+/// Modal that records a new key combination. Autofocuses a [Focus] and captures
+/// the first non-modifier key pressed while a modifier is held. Escape cancels.
+class _ShortcutCaptureDialog extends StatefulWidget {
+  const _ShortcutCaptureDialog({required this.title, required this.current});
+
+  final String title;
+  final ShortcutBinding current;
+
+  @override
+  State<_ShortcutCaptureDialog> createState() => _ShortcutCaptureDialogState();
+}
+
+class _ShortcutCaptureDialogState extends State<_ShortcutCaptureDialog> {
+  static final Set<LogicalKeyboardKey> _modifiers = {
+    LogicalKeyboardKey.controlLeft,
+    LogicalKeyboardKey.controlRight,
+    LogicalKeyboardKey.shiftLeft,
+    LogicalKeyboardKey.shiftRight,
+    LogicalKeyboardKey.altLeft,
+    LogicalKeyboardKey.altRight,
+    LogicalKeyboardKey.metaLeft,
+    LogicalKeyboardKey.metaRight,
+  };
+
+  ShortcutBinding? _captured;
+  bool _needsModifier = false;
+
+  KeyEventResult _onKey(FocusNode node, KeyEvent event) {
+    if (event is! KeyDownEvent) return KeyEventResult.handled;
+    final key = event.logicalKey;
+    // Escape cancels without saving.
+    if (key == LogicalKeyboardKey.escape) {
+      Navigator.of(context).pop();
+      return KeyEventResult.handled;
+    }
+    // Wait for a real (non-modifier) key while modifiers are held.
+    if (_modifiers.contains(key)) return KeyEventResult.handled;
+
+    final keyboard = HardwareKeyboard.instance;
+    final binding = ShortcutBinding(
+      trigger: key,
+      control: keyboard.isControlPressed,
+      shift: keyboard.isShiftPressed,
+      alt: keyboard.isAltPressed,
+      meta: keyboard.isMetaPressed,
+    );
+    setState(() {
+      if (binding.hasModifier) {
+        _captured = binding;
+        _needsModifier = false;
+      } else {
+        _captured = null;
+        _needsModifier = true;
+      }
+    });
+    return KeyEventResult.handled;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final preview = _captured ?? widget.current;
+    return AlertDialog(
+      title: Text(l10n.shortcutEditTitle),
+      content: Focus(
+        autofocus: true,
+        onKeyEvent: _onKey,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              widget.title,
+              style: TextStyle(color: palette.textMuted, fontSize: 13),
+            ),
+            const SizedBox(height: 16),
+            _KbdChip(text: preview.label),
+            const SizedBox(height: 16),
+            Text(
+              _needsModifier
+                  ? l10n.shortcutNeedsModifier
+                  : l10n.shortcutCapturePrompt,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: _needsModifier ? palette.danger : palette.textDisabled,
+                fontSize: 12,
+              ),
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(),
+          child: Text(l10n.commonCancel),
+        ),
+        TextButton(
+          onPressed: _captured == null
+              ? null
+              : () => Navigator.of(context).pop(_captured),
+          child: Text(l10n.commonSave),
+        ),
+      ],
     );
   }
 }

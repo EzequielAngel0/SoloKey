@@ -249,6 +249,34 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsAboutTagline => 'Local-first password manager';
 
   @override
+  String get settingsSectionShortcuts => 'Keyboard shortcuts';
+
+  @override
+  String get shortcutCommandPalette => 'Command palette';
+
+  @override
+  String get shortcutNewCredential => 'New credential';
+
+  @override
+  String get shortcutLock => 'Lock vault';
+
+  @override
+  String get shortcutReset => 'Reset to defaults';
+
+  @override
+  String get shortcutEditTitle => 'Set shortcut';
+
+  @override
+  String get shortcutCapturePrompt => 'Press the key combination…';
+
+  @override
+  String get shortcutNeedsModifier => 'Add a modifier (Ctrl, Alt or Shift)';
+
+  @override
+  String get shortcutConflict =>
+      'That combination is already used by another shortcut';
+
+  @override
   String get languageSystem => 'Follow system';
 
   @override

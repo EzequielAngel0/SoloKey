@@ -23,6 +23,10 @@ class AppSecuritySettings with _$AppSecuritySettings {
     // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
     // VisualDensity en el tema (ver UiDensity).
     @Default('comfortable') String uiDensity,
+    // Escritorio: reasignaciones de atajos de teclado. Clave = AppShortcut.id,
+    // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
+    // clave se usa el atajo por defecto de AppShortcut.
+    @Default(<String, String>{}) Map<String, String> shortcutOverrides,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>

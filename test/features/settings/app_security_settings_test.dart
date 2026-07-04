@@ -27,5 +27,15 @@ void main() {
       expect(restored.autoLockMinutes, 10);
       expect(restored.themeMode, 'dark');
     });
+
+    test('shortcutOverrides default to empty and persist through JSON', () {
+      const s = AppSecuritySettings();
+      expect(s.shortcutOverrides, isEmpty);
+
+      final custom =
+          s.copyWith(shortcutOverrides: const {'lock': 'ctrl+alt+q'});
+      final restored = AppSecuritySettings.fromJson(custom.toJson());
+      expect(restored.shortcutOverrides, {'lock': 'ctrl+alt+q'});
+    });
   });
 }

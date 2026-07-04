@@ -37,7 +37,12 @@ mixin _$AppSecuritySettings {
   String? get backupDirectory =>
       throw _privateConstructorUsedError; // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
   // VisualDensity en el tema (ver UiDensity).
-  String get uiDensity => throw _privateConstructorUsedError;
+  String get uiDensity =>
+      throw _privateConstructorUsedError; // Escritorio: reasignaciones de atajos de teclado. Clave = AppShortcut.id,
+  // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
+  // clave se usa el atajo por defecto de AppShortcut.
+  Map<String, String> get shortcutOverrides =>
+      throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -68,6 +73,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     int scheduledBackupIntervalDays,
     String? backupDirectory,
     String uiDensity,
+    Map<String, String> shortcutOverrides,
   });
 }
 
@@ -97,6 +103,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
     Object? uiDensity = null,
+    Object? shortcutOverrides = null,
   }) {
     return _then(
       _value.copyWith(
@@ -144,6 +151,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.uiDensity
                 : uiDensity // ignore: cast_nullable_to_non_nullable
                       as String,
+            shortcutOverrides: null == shortcutOverrides
+                ? _value.shortcutOverrides
+                : shortcutOverrides // ignore: cast_nullable_to_non_nullable
+                      as Map<String, String>,
           )
           as $Val,
     );
@@ -171,6 +182,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     int scheduledBackupIntervalDays,
     String? backupDirectory,
     String uiDensity,
+    Map<String, String> shortcutOverrides,
   });
 }
 
@@ -199,6 +211,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
     Object? uiDensity = null,
+    Object? shortcutOverrides = null,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -246,6 +259,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.uiDensity
             : uiDensity // ignore: cast_nullable_to_non_nullable
                   as String,
+        shortcutOverrides: null == shortcutOverrides
+            ? _value._shortcutOverrides
+            : shortcutOverrides // ignore: cast_nullable_to_non_nullable
+                  as Map<String, String>,
       ),
     );
   }
@@ -266,7 +283,8 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.scheduledBackupIntervalDays = 0,
     this.backupDirectory,
     this.uiDensity = 'comfortable',
-  });
+    final Map<String, String> shortcutOverrides = const <String, String>{},
+  }) : _shortcutOverrides = shortcutOverrides;
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
       _$$AppSecuritySettingsImplFromJson(json);
@@ -309,10 +327,25 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final String uiDensity;
+  // Escritorio: reasignaciones de atajos de teclado. Clave = AppShortcut.id,
+  // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
+  // clave se usa el atajo por defecto de AppShortcut.
+  final Map<String, String> _shortcutOverrides;
+  // Escritorio: reasignaciones de atajos de teclado. Clave = AppShortcut.id,
+  // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
+  // clave se usa el atajo por defecto de AppShortcut.
+  @override
+  @JsonKey()
+  Map<String, String> get shortcutOverrides {
+    if (_shortcutOverrides is EqualUnmodifiableMapView)
+      return _shortcutOverrides;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableMapView(_shortcutOverrides);
+  }
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity, shortcutOverrides: $shortcutOverrides)';
   }
 
   @override
@@ -347,7 +380,11 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
             (identical(other.backupDirectory, backupDirectory) ||
                 other.backupDirectory == backupDirectory) &&
             (identical(other.uiDensity, uiDensity) ||
-                other.uiDensity == uiDensity));
+                other.uiDensity == uiDensity) &&
+            const DeepCollectionEquality().equals(
+              other._shortcutOverrides,
+              _shortcutOverrides,
+            ));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -365,6 +402,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     scheduledBackupIntervalDays,
     backupDirectory,
     uiDensity,
+    const DeepCollectionEquality().hash(_shortcutOverrides),
   );
 
   /// Create a copy of AppSecuritySettings
@@ -397,6 +435,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final int scheduledBackupIntervalDays,
     final String? backupDirectory,
     final String uiDensity,
+    final Map<String, String> shortcutOverrides,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -424,7 +463,11 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   String? get backupDirectory; // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
   // VisualDensity en el tema (ver UiDensity).
   @override
-  String get uiDensity;
+  String get uiDensity; // Escritorio: reasignaciones de atajos de teclado. Clave = AppShortcut.id,
+  // valor = combinacion serializada (p.ej. 'ctrl+shift+k'). Si falta una
+  // clave se usa el atajo por defecto de AppShortcut.
+  @override
+  Map<String, String> get shortcutOverrides;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

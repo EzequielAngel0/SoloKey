@@ -250,6 +250,34 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsAboutTagline => 'Gestor de contraseñas local-first';
 
   @override
+  String get settingsSectionShortcuts => 'Atajos de teclado';
+
+  @override
+  String get shortcutCommandPalette => 'Paleta de comandos';
+
+  @override
+  String get shortcutNewCredential => 'Nueva credencial';
+
+  @override
+  String get shortcutLock => 'Bloquear bóveda';
+
+  @override
+  String get shortcutReset => 'Restablecer atajos';
+
+  @override
+  String get shortcutEditTitle => 'Asignar atajo';
+
+  @override
+  String get shortcutCapturePrompt => 'Pulsa la combinación de teclas…';
+
+  @override
+  String get shortcutNeedsModifier =>
+      'Añade un modificador (Ctrl, Alt o Shift)';
+
+  @override
+  String get shortcutConflict => 'Esa combinación ya la usa otro atajo';
+
+  @override
   String get languageSystem => 'Seguir el sistema';
 
   @override

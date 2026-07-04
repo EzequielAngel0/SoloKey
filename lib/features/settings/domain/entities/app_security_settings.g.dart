@@ -22,6 +22,11 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
       (json['scheduledBackupIntervalDays'] as num?)?.toInt() ?? 0,
   backupDirectory: json['backupDirectory'] as String?,
   uiDensity: json['uiDensity'] as String? ?? 'comfortable',
+  shortcutOverrides:
+      (json['shortcutOverrides'] as Map<String, dynamic>?)?.map(
+        (k, e) => MapEntry(k, e as String),
+      ) ??
+      const <String, String>{},
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -38,4 +43,5 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'scheduledBackupIntervalDays': instance.scheduledBackupIntervalDays,
   'backupDirectory': instance.backupDirectory,
   'uiDensity': instance.uiDensity,
+  'shortcutOverrides': instance.shortcutOverrides,
 };

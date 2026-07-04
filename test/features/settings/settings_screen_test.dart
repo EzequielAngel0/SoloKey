@@ -59,4 +59,26 @@ void main() {
 
     expect(repo.settings.uiDensity, 'compact');
   });
+
+  testWidgets('desktop shortcuts section shows the default key combinations',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      scaffolded(const SettingsView()),
+      overrides: [
+        settingsRepositoryProvider
+            .overrideWithValue(_FakeSettingsRepo(AppSecuritySettings.defaults())),
+      ],
+      surfaceSize: const Size(820, 2600),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // `flutter test` runs on a desktop host, so the desktop-only shortcuts
+    // section is present with its default Ctrl+K/N/L combinations.
+    expect(find.text('Ctrl + K'), findsOneWidget);
+    expect(find.text('Ctrl + N'), findsOneWidget);
+    expect(find.text('Ctrl + L'), findsOneWidget);
+  });
 }

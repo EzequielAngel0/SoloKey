@@ -542,6 +542,60 @@ abstract class AppLocalizations {
   /// **'Local-first password manager'**
   String get settingsAboutTagline;
 
+  /// No description provided for @settingsSectionShortcuts.
+  ///
+  /// In en, this message translates to:
+  /// **'Keyboard shortcuts'**
+  String get settingsSectionShortcuts;
+
+  /// No description provided for @shortcutCommandPalette.
+  ///
+  /// In en, this message translates to:
+  /// **'Command palette'**
+  String get shortcutCommandPalette;
+
+  /// No description provided for @shortcutNewCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'New credential'**
+  String get shortcutNewCredential;
+
+  /// No description provided for @shortcutLock.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock vault'**
+  String get shortcutLock;
+
+  /// No description provided for @shortcutReset.
+  ///
+  /// In en, this message translates to:
+  /// **'Reset to defaults'**
+  String get shortcutReset;
+
+  /// No description provided for @shortcutEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set shortcut'**
+  String get shortcutEditTitle;
+
+  /// No description provided for @shortcutCapturePrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'Press the key combination…'**
+  String get shortcutCapturePrompt;
+
+  /// No description provided for @shortcutNeedsModifier.
+  ///
+  /// In en, this message translates to:
+  /// **'Add a modifier (Ctrl, Alt or Shift)'**
+  String get shortcutNeedsModifier;
+
+  /// No description provided for @shortcutConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'That combination is already used by another shortcut'**
+  String get shortcutConflict;
+
   /// No description provided for @languageSystem.
   ///
   /// In en, this message translates to:
