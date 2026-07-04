@@ -19,6 +19,7 @@ import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
 import '../domain/pairing_payload.dart';
 import '../domain/sync_events_source.dart';
+import '../domain/sync_network_utils.dart';
 import '../domain/sync_summary.dart';
 import 'delta_sync_manager.dart';
 
@@ -1058,13 +1059,13 @@ class SyncService implements SyncEventsSource {
     try {
       var endpoint = (ip != null && port != null) ? '$ip:$port' : null;
       endpoint ??= await _storage.read(key: _kDesktopEndpointName);
-      if (endpoint == null || !endpoint.contains(':')) {
+      final parsed = endpoint == null ? null : parseEndpoint(endpoint);
+      if (parsed == null) {
         _clientEventController.add('error: no_endpoint');
         return false;
       }
-      final sep = endpoint.lastIndexOf(':');
-      final host = endpoint.substring(0, sep);
-      final p = int.tryParse(endpoint.substring(sep + 1)) ?? 0;
+      final host = parsed.host;
+      final p = parsed.port;
 
       if (_syncKey == null) {
         final saved = await _storage.read(key: _kSyncKeyName);
@@ -1342,45 +1343,24 @@ class SyncService implements SyncEventsSource {
     return result;
   }
 
-  /// Fragmentos de nombre tipicos de adaptadores virtuales (WSL, VMs, Docker,
-  /// Hyper-V, VPNs). Sus IPs suelen ser inalcanzables desde el celular, asi que
-  /// los dejamos como ultima opcion al elegir la IP del QR.
-  static const List<String> _virtualAdapterHints = [
-    'vethernet', 'wsl', 'virtualbox', 'vmware', 'hyper-v', 'docker',
-    'loopback', 'bluetooth', 'tailscale', 'zerotier', 'tunnel', 'vpn', 'radmin',
-  ];
-
   Future<String> _getLocalIp() async {
     final interfaces = await NetworkInterface.list(
       type: InternetAddressType.IPv4,
       includeLoopback: false,
     );
-
-    bool isPrivate(String ip) =>
-        ip.startsWith('192.168.') ||
-        ip.startsWith('10.') ||
-        ip.startsWith('172.');
-    bool isVirtual(String name) {
-      final n = name.toLowerCase();
-      return _virtualAdapterHints.any(n.contains);
-    }
-
-    // 1) IPv4 privada en un adaptador NO virtual (Wi-Fi/Ethernet real).
-    for (final interface in interfaces) {
-      if (isVirtual(interface.name)) continue;
-      for (final addr in interface.addresses) {
-        if (!addr.isLoopback && isPrivate(addr.address)) return addr.address;
-      }
-    }
-    // 2) Fallback: cualquier IPv4 privada, aunque sea de un adaptador virtual.
-    for (final interface in interfaces) {
-      for (final addr in interface.addresses) {
-        if (!addr.isLoopback && isPrivate(addr.address)) return addr.address;
-      }
-    }
-    return interfaces.isNotEmpty && interfaces.first.addresses.isNotEmpty
-        ? interfaces.first.addresses.first.address
-        : '127.0.0.1';
+    // Reduce to the pure model and delegate the (behavior-preserving) choice to
+    // `selectPairingIp` (unit-tested in sync_network_utils_test.dart).
+    final adapters = [
+      for (final interface in interfaces)
+        NetworkAdapter(
+          name: interface.name,
+          ipv4Addresses: [
+            for (final addr in interface.addresses)
+              if (!addr.isLoopback) addr.address,
+          ],
+        ),
+    ];
+    return selectPairingIp(adapters);
   }
 
   Future<int> _findAvailablePort(int startPort) async {
