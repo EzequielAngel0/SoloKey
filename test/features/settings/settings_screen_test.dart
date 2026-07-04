@@ -60,6 +60,32 @@ void main() {
     expect(repo.settings.uiDensity, 'compact');
   });
 
+  testWidgets('dragging the auto-lock slider persists a lower value',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    final repo = _FakeSettingsRepo(AppSecuritySettings.defaults());
+    await pumpApp(
+      tester,
+      scaffolded(const SettingsView()),
+      overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      surfaceSize: const Size(820, 2400),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    expect(repo.settings.autoLockMinutes, 5); // AppSecuritySettings default.
+
+    // The auto-lock slider is the first Slider (Security section). Dragging it
+    // toward the minimum must flow through onUpdate → save → the fake repo.
+    final slider = find.byType(Slider).first;
+    await tester.ensureVisible(slider);
+    await tester.drag(slider, const Offset(-400, 0));
+    await tester.pump();
+
+    expect(repo.settings.autoLockMinutes, lessThan(5));
+    expect(repo.settings.autoLockMinutes, greaterThanOrEqualTo(1));
+  });
+
   testWidgets('desktop shortcuts section shows the default key combinations',
       (tester) async {
     tolerateInkHiddenPaintWarnings();

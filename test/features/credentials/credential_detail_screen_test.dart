@@ -64,7 +64,10 @@ void main() {
       ),
     );
     expect(find.text('GitHub'), findsWidgets);
-    expect(tester.takeException(), isNull);
+    // Username shows; the secret stays masked until an authed reveal.
+    expect(find.text('octocat'), findsOneWidget);
+    expect(find.text('s3cr3t'), findsNothing);
+    expect(find.byIcon(Icons.visibility_rounded), findsWidgets);
   });
 
   testWidgets('renders a TOTP credential detail (timer alive)', (tester) async {
@@ -73,7 +76,8 @@ void main() {
       _c(id: '2', type: CredentialType.totp, title: 'Authy', password: 'JBSWY3DPEHPK3PXP'),
     );
     expect(find.text('Authy'), findsWidgets);
-    expect(tester.takeException(), isNull);
+    // TOTP details offer the QR-export action (behind an auth gate on tap).
+    expect(find.byIcon(Icons.qr_code_2_rounded), findsOneWidget);
   });
 
   testWidgets('renders an SSH key credential detail', (tester) async {
@@ -91,10 +95,11 @@ void main() {
       ),
     );
     expect(find.text('Prod server'), findsWidgets);
-    expect(tester.takeException(), isNull);
+    expect(find.text('Ed25519'), findsOneWidget);
   });
 
-  testWidgets('renders a passkey credential detail', (tester) async {
+  testWidgets('passkey detail shows metadata but never the raw handle',
+      (tester) async {
     await pumpDetail(
       tester,
       _c(
@@ -106,16 +111,18 @@ void main() {
       ),
     );
     expect(find.text('Example Passkey'), findsWidgets);
-    expect(tester.takeException(), isNull);
+    expect(find.text('example.com'), findsWidgets);
+    // Zero-Print: the encrypted private-key handle is never rendered.
+    expect(find.text('handle'), findsNothing);
   });
 
-  testWidgets('renders a secure note detail', (tester) async {
+  testWidgets('renders a secure note detail with its body', (tester) async {
     await pumpDetail(
       tester,
       _c(id: '5', type: CredentialType.secureNote, title: 'My note', notes: 'secret body'),
     );
     expect(find.text('My note'), findsWidgets);
-    expect(tester.takeException(), isNull);
+    expect(find.text('secret body'), findsOneWidget);
   });
 
   testWidgets('AppBar icon actions expose accessibility tooltips',
@@ -152,6 +159,6 @@ void main() {
     );
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 50));
-    expect(tester.takeException(), isNull);
+    expect(find.text('Credential not found'), findsOneWidget);
   });
 }
