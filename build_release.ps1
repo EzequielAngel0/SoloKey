@@ -215,6 +215,12 @@ if ($Target -eq 'inno' -or $Target -eq 'all') {
     $script:Iscc = Find-Iscc
     Write-Host "Inno Setup OK: $script:Iscc" -ForegroundColor DarkGray
 }
+if ($Target -eq 'inno' -or $Target -eq 'windows' -or $Target -eq 'all') {
+    # El plugin screen_capturer_windows (captura de QR de pantalla para TOTP)
+    # compila con ATL. Si el build de Windows falla en ese plugin, instala en el
+    # Visual Studio Installer: 'C++ ATL for latest v142 build tools (x86 & x64)'.
+    Write-Host "Nota: el build de Windows requiere 'C++ ATL for latest v142 build tools' en Visual Studio (lo usa screen_capturer_windows)." -ForegroundColor DarkGray
+}
 
 # ── Ejecucion ───────────────────────────────────────────────────────────────────
 # dist/ fresco para no mezclar artefactos viejos, y transcript para depurar.
