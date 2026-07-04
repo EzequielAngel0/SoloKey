@@ -55,6 +55,20 @@ ejecútalo por lotes.
 - **Notificaciones** de sync ("N cambios") y de rotación (ya existe base).
 - **Tema por credencial/carpeta** (color) y **densidad** configurable.
 
+**Tests (obligatorio):** como es transversal, extiende la suite del área que toques,
+no crees una nueva desde cero:
+
+- **a11y / temas** → amplía `test/theme/theme_smoke_test.dart` (contraste en los 4
+  temas) y `test/theme/ui_density_test.dart` (densidad).
+- **Búsqueda / filtros / orden** → `test/features/credentials/credentials_notifier_test.dart`
+  (filtro por título/usuario/website) y `test/features/credentials/vault_view_test.dart`
+  (filtro/orden). Debounce >250 ms en `test/features/credentials/mobile_home_screen_test.dart`.
+- **Kit compartido** → `test/shared/kit_widgets_test.dart` (extiéndelo al widget que
+  reutilices/podes). Usa el harness `test/support/widget_harness.dart`.
+- **Seguridad operacional** → los *use cases* de bóveda viven en
+  `test/features/vault_access/vault_use_cases_test.dart`; si tocas revelar/copiar,
+  cubre la ruta con auth mockeada.
+
 **Verificación:** por cada lote, `flutter analyze` 0 + `flutter test` verde; smoke en
 los 4 temas; prueba en móvil y en la ventana de escritorio.
 

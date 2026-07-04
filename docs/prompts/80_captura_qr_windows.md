@@ -51,9 +51,22 @@ luego ejecútalo por fases.
   documenta permisos. Corre `flutter pub get`.
 - i18n es/en para todos los textos nuevos.
 - Zero-Print: nunca loguees el secreto capturado.
-- Tests: parser `otpauth://` (casos válidos e inválidos, algoritmos/digits/period);
-  test de integración del mapeo al form (con una imagen de QR de prueba si el decoder
-  lo permite en test).
+
+**Tests (obligatorio):**
+
+- **Parser `otpauth://`** → extiende
+  `test/features/credentials/otpauth_parser_test.dart` y
+  `test/core/otpauth_import_service_test.dart` (casos válidos e inválidos,
+  algoritmos/digits/period, `otpauth-migration://` si lo abordas).
+- **Decodificación de QR desde imagen** → extiende
+  `test/features/credentials/qr_image_decoder_test.dart` (bytes de una imagen de
+  QR de prueba → `otpauth://`) y `test/features/credentials/screen_qr_scanner_test.dart`
+  (mapeo al formulario TOTP). Zero-Print: asserta contra el secreto esperado, no lo
+  imprimas.
+- **Campos TOTP del form** → extiende
+  `test/features/credentials/widgets/totp_fields_section_test.dart` (prefill de
+  secreto/emisor/cuenta y aviso de parámetros no estándar). Usa el harness
+  `test/support/widget_harness.dart`.
 
 ## Features relacionadas (elige 1–2 extra)
 

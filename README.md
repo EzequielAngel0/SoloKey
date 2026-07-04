@@ -80,6 +80,34 @@ flutter build apk --release --obfuscate --split-debug-info=./debug_info
 
 ---
 
+## 🧪 Pruebas (Testing)
+
+SoloKey tiene una **red de pruebas real** organizada como pirámide **unit → widget → integración**:
+
+- **Unit + widget** en `test/**` (espeja `lib/**`), con harness compartido
+  `test/support/widget_harness.dart` y fakes reutilizables en `test/support/`
+  (repositorios en memoria, `fake_secure_storage.dart`). Cubren cripto/servicios,
+  los *use cases* de bóveda (unlock/setup/wipe), providers (bóveda, carpetas, sync)
+  y los widgets del kit y de cada pantalla.
+- **Integración e2e** en `integration_test/**` (motor `integration_test`):
+  `app_boot_test.dart` (arranque seguro en cualquier equipo) y `vault_e2e_test.dart`
+  (recorrido real crear→bloquear→desbloquear→revelar), este **gateado** tras
+  `--dart-define=E2E_ALLOW_WIPE=1` por ser destructivo (borra la bóveda local).
+
+```bash
+flutter analyze                                              # 0 issues (gate)
+flutter test                                                 # unit + widget (verde)
+flutter test integration_test/app_boot_test.dart -d windows  # e2e seguro
+```
+
+**Regla viva del proyecto:** *toca código → toca sus tests* (unit para lógica,
+widget para UI); `flutter test` queda verde en cada cambio. El proceso completo y la
+guía del motor e2e (patrones anti-flaky) están en
+[`docs/prompts/95_pruebas.md`](docs/prompts/95_pruebas.md) y
+[`docs/prompts/PRUEBAS_INTEGRACION.md`](docs/prompts/PRUEBAS_INTEGRACION.md).
+
+---
+
 ## 💡 Próximos pasos y Roadmap
 
 Toda la documentación está organizada en [docs/](docs/README.md). Puedes visualizar las mejoras planificadas en [docs/planning/feature_ideas.md](docs/planning/feature_ideas.md) y el backlog de estabilización vigente en [docs/planning/pendientes_y_bugs.md](docs/planning/pendientes_y_bugs.md).

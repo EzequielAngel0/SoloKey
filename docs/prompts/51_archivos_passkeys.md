@@ -43,6 +43,20 @@ Primero **audita** y propón un plan priorizado; luego ejecútalo:
 
 **Comunes:** i18n es/en, `Semantics` en íconos, tests de CRUD y estados.
 
+**Tests (obligatorio):**
+
+- **Archivos seguros — lógica de import** → extiende
+  `test/features/secure_files/secure_file_import_test.dart` (límite de tamaño,
+  dedupe de nombre, cifrado/descifrado round-trip; nunca vuelques bytes en claro).
+- **Archivos seguros — pantalla/estados** → extiende
+  `test/features/secure_files/secure_files_screen_test.dart` (vacío/carga/error,
+  `EmptyState`, auth antes de exportar/previsualizar). Usa el harness
+  `test/support/widget_harness.dart`.
+- **Passkeys — pantalla** → extiende
+  `test/features/passkeys/passkeys_screen_test.dart` (lista densa, `EmptyState`
+  explicativo, copiar Credential ID). Si añades WebAuthn real, crea un unit test
+  del flujo de registro/firma con un authenticator fake (no toques la red).
+
 **Verificación:** `flutter analyze` 0 + `flutter test` verde; sube/descarga un
 archivo y crea/borra un passkey de respaldo.
 
