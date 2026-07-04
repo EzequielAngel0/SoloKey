@@ -78,6 +78,11 @@ dependencies:
   hotkey_manager: ^0.2.3
   windows_single_instance: ^1.1.0
 
+  # ── Captura de QR de pantalla en escritorio (TOTP) ────────────
+  screen_capturer: ^0.2.3   # captura de region de pantalla (Windows/macOS/Linux)
+  zxing2: ^0.2.4            # decodificador de QR puro Dart sobre la imagen
+  image: ^4.8.0            # decodifica el PNG capturado a pixeles para zxing2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
