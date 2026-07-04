@@ -1,10 +1,16 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
+// plugin_platform_interface ships transitively with every Flutter plugin; it is
+// used here only to mock the FilePicker platform channel in tests.
+// ignore: depend_on_referenced_packages
+import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:password_manager/core/infrastructure/security/i_security_service.dart';
 import 'package:password_manager/core/infrastructure/security/security_service_impl.dart';
 import 'package:password_manager/core/infrastructure/security/session_manager.dart';
+import 'package:password_manager/core/services/csv_import_service.dart';
 import 'package:password_manager/core/services/vault_export_service.dart';
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
@@ -138,8 +144,8 @@ Credential _cred(
       updatedAt: DateTime(2021, 6, 1),
     );
 
-Folder _folder(String id, String name) =>
-    Folder(id: id, name: name, createdAt: DateTime(2021));
+Folder _folder(String id, String name, {String? parentId}) =>
+    Folder(id: id, name: name, parentId: parentId, createdAt: DateTime(2021));
 
 void main() {
   const password = 'backup-pass-123';
@@ -313,4 +319,151 @@ void main() {
           reason: 'the export key must be zeroed in RAM after use');
     }
   });
+
+  test('an empty export password is rejected before any crypto runs', () async {
+    final svc = VaultExportService(
+        _MutableCredRepo([_cred('1', CredentialType.password)]),
+        FakeFolderRepository([]),
+        security,
+        session);
+    expect(
+      () => svc.exportVaultToDirectory(
+          exportPassword: '', directoryPath: tmp.path),
+      throwsA(isA<ArgumentError>()),
+    );
+  });
+
+  test('folderFilter exports only the listed folders (plus unfiled when asked)',
+      () async {
+    final srcCred = _MutableCredRepo([
+      _cred('1', CredentialType.password, folder: 'f-a'),
+      _cred('2', CredentialType.password, folder: 'f-b'),
+      _cred('3', CredentialType.password), // unfiled
+    ]);
+    final srcFolder = FakeFolderRepository([
+      _folder('f-a', 'A'),
+      _folder('f-b', 'B'),
+    ]);
+    final exportSvc = VaultExportService(srcCred, srcFolder, security, session);
+
+    // Only f-a and the unfiled bucket → creds 1 and 3, folder f-a only.
+    final path = await exportSvc.exportVaultToDirectory(
+      exportPassword: password,
+      directoryPath: tmp.path,
+      folderFilter: {'f-a', kNoFolderFilterId},
+    );
+    final bytes = await File(path).readAsBytes();
+
+    final importSvc =
+        VaultExportService(_MutableCredRepo(), FakeFolderRepository([]), security, session);
+    final backup =
+        await importSvc.decryptBackup(fileBytes: bytes, exportPassword: password);
+
+    expect(backup.credentials.map((c) => c.id).toSet(), {'1', '3'});
+    expect(backup.folders.map((f) => f.id).toSet(), {'f-a'});
+  });
+
+  test('credentialIds export carries only those creds and their folder ancestors',
+      () async {
+    final srcCred = _MutableCredRepo([
+      _cred('1', CredentialType.password, folder: 'f-child'),
+      _cred('2', CredentialType.password, folder: 'f-root'), // unrelated
+      _cred('3', CredentialType.password), // unfiled, must be excluded
+    ]);
+    final srcFolder = FakeFolderRepository([
+      _folder('f-root', 'Root'),
+      _folder('f-child', 'Child', parentId: 'f-root'),
+    ]);
+    final exportSvc = VaultExportService(srcCred, srcFolder, security, session);
+
+    // exportVault() (not exportVaultToDirectory) is the only entry point that
+    // accepts credentialIds; on desktop it routes through FilePicker.saveFile.
+    // Set (don't read first — the getter throws with no plugin registered) a
+    // headless picker. This test file runs in its own isolate, so it won't leak.
+    final savePath = '${tmp.path}/selective.skvault';
+    FilePicker.platform = _FakeFilePicker(savePath);
+
+    // Selecting only cred '1' must pull in f-child AND its ancestor f-root so it
+    // re-imports into place, while excluding creds '2'/'3' and folders elsewhere.
+    final summary = await exportSvc.exportVault(
+      exportPassword: password,
+      credentialIds: {'1'},
+    );
+    expect(summary, isNotNull);
+    expect(summary!.totalCredentials, 1);
+    expect(summary.totalFolders, 2); // f-child + ancestor f-root
+
+    final bytes = await File(savePath).readAsBytes();
+    final importSvc = VaultExportService(
+        _MutableCredRepo(), FakeFolderRepository([]), security, session);
+    final backup =
+        await importSvc.decryptBackup(fileBytes: bytes, exportPassword: password);
+    expect(backup.credentials.map((c) => c.id).toSet(), {'1'});
+    expect(backup.folders.map((f) => f.id).toSet(), {'f-child', 'f-root'});
+  });
+
+  test('parseCsvBackup returns credentials with no folders, empty CSV throws',
+      () {
+    final svc = VaultExportService(
+        _MutableCredRepo(), FakeFolderRepository([]), security, session);
+    final csvService = CsvImportService(_MutableCredRepo());
+
+    const csv =
+        'folder,favorite,type,name,notes,fields,login_uri,login_username,login_password,login_totp\n'
+        'Work,1,login,GitHub,,,https://github.com,octocat,git-pass,\n';
+    final backup = svc.parseCsvBackup(csv, csvService);
+    expect(backup.credentials, hasLength(1));
+    expect(backup.credentials.single.title, 'GitHub');
+    expect(backup.folders, isEmpty);
+
+    // Header only (no rows) → no valid credentials → clear error.
+    const headerOnly =
+        'folder,favorite,type,name,notes,fields,login_uri,login_username,login_password,login_totp\n';
+    expect(
+      () => svc.parseCsvBackup(headerOnly, csvService),
+      throwsA(isA<ArgumentError>()),
+    );
+  });
+
+  test('performSelectiveImport replace mode wipes the existing vault first',
+      () async {
+    final dstCred = _MutableCredRepo([_cred('old', CredentialType.password)]);
+    final dstFolder = FakeFolderRepository([_folder('oldF', 'Old folder')]);
+    final svc = VaultExportService(dstCred, dstFolder, security, session);
+
+    final backup = DecryptedBackup(
+      credentials: [_cred('new', CredentialType.password)], // unfiled
+      folders: [_folder('newF', 'New folder')],
+    );
+
+    final result = await svc.performSelectiveImport(
+      backup: backup,
+      mode: ImportMode.replace,
+      typeFilter: CredentialType.values.toSet(),
+      folderFilter: {'newF', kNoFolderFilterId},
+    );
+
+    expect(result.success, isTrue);
+    expect(dstCred.store.map((c) => c.id), ['new']); // 'old' gone
+    expect(dstFolder.folders.map((f) => f.id), ['newF']); // 'oldF' gone
+  });
+}
+
+/// Headless [FilePicker] whose `saveFile` returns a fixed path (and never opens
+/// a native dialog), so the desktop export path is exercisable in tests.
+class _FakeFilePicker extends FilePicker with MockPlatformInterfaceMixin {
+  _FakeFilePicker(this.savePath);
+  final String? savePath;
+
+  @override
+  Future<String?> saveFile({
+    String? dialogTitle,
+    String? fileName,
+    String? initialDirectory,
+    FileType type = FileType.any,
+    List<String>? allowedExtensions,
+    Uint8List? bytes,
+    bool lockParentWindow = false,
+  }) async =>
+      savePath;
 }
