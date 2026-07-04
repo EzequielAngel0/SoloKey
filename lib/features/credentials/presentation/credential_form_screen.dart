@@ -13,6 +13,7 @@ import '../application/credentials_provider.dart';
 import '../application/duplicate_detector.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/entities/credential.dart';
+import '../domain/otpauth.dart';
 import 'qr_scanner_screen.dart';
 import 'widgets/form_section.dart';
 import 'widgets/save_button.dart';
@@ -610,42 +611,26 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     }
   }
 
-  /// Parses an `otpauth://` URI and fills the TOTP fields (secret, and issuer /
-  /// title when empty). Returns true on success. Shared by QR scan and paste.
-  bool _applyOtpauth(String code) {
-    final Uri uri;
-    try {
-      uri = Uri.parse(code);
-    } catch (_) {
-      return false;
-    }
-    if (uri.scheme.toLowerCase() != 'otpauth') return false;
-    final secret = uri.queryParameters['secret'];
-    if (secret == null || secret.isEmpty) return false;
+  /// Parses an `otpauth://` payload and fills the TOTP fields (secret, and
+  /// issuer / title when empty). Returns the parsed data on success, `null` on
+  /// failure. Shared by camera scan, desktop screen scan and clipboard paste.
+  OtpAuth? _applyOtpauth(String code) {
+    final otp = OtpauthParser.parse(code);
+    if (otp == null) return null;
 
-    String? titleFromPath;
-    if (uri.pathSegments.isNotEmpty) {
-      titleFromPath = uri.pathSegments.first;
-      if (titleFromPath.contains(':')) {
-        titleFromPath = titleFromPath.split(':').last;
-      }
-    }
-    final issuer =
-        uri.queryParameters['issuer'] ??
-        (uri.pathSegments.isNotEmpty && uri.pathSegments.first.contains(':')
-            ? Uri.decodeComponent(uri.pathSegments.first.split(':').first)
-            : null);
+    // Title defaults to the account label, falling back to the issuer.
+    final suggestedTitle = otp.accountName ?? otp.issuer;
 
     setState(() {
-      _totpSecretCtrl.text = secret;
-      if (issuer != null && _totpIssuerCtrl.text.isEmpty) {
-        _totpIssuerCtrl.text = issuer;
+      _totpSecretCtrl.text = otp.secret;
+      if (otp.issuer != null && _totpIssuerCtrl.text.isEmpty) {
+        _totpIssuerCtrl.text = otp.issuer!;
       }
-      if (titleFromPath != null && _titleCtrl.text.isEmpty) {
-        _titleCtrl.text = Uri.decodeComponent(titleFromPath);
+      if (suggestedTitle != null && _titleCtrl.text.isEmpty) {
+        _titleCtrl.text = suggestedTitle;
       }
     });
-    return true;
+    return otp;
   }
 
   void _showTotpAppliedSnackBar(String message) {
@@ -676,7 +661,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
       context,
     ).push<String>(MaterialPageRoute(builder: (_) => const QrScannerScreen()));
     if (code == null || !mounted) return;
-    if (_applyOtpauth(code)) {
+    if (_applyOtpauth(code) != null) {
       _showTotpAppliedSnackBar(l10n.formQrScanned);
     } else {
       _showError(l10n.formQrNotTotp);
@@ -688,7 +673,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     if (!mounted) return;
     final text = data?.text?.trim() ?? '';
-    if (text.isNotEmpty && _applyOtpauth(text)) {
+    if (text.isNotEmpty && _applyOtpauth(text) != null) {
       _showTotpAppliedSnackBar(l10n.formPasteApplied);
     } else {
       _showError(l10n.formPasteNoOtpauth);
