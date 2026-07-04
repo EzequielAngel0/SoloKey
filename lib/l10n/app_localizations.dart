@@ -884,6 +884,36 @@ abstract class AppLocalizations {
   /// **'No results'**
   String get commandNoResults;
 
+  /// No description provided for @commandActionsGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get commandActionsGroup;
+
+  /// No description provided for @commandCredentialsGroup.
+  ///
+  /// In en, this message translates to:
+  /// **'Credentials'**
+  String get commandCredentialsGroup;
+
+  /// No description provided for @commandHintNavigate.
+  ///
+  /// In en, this message translates to:
+  /// **'Navigate'**
+  String get commandHintNavigate;
+
+  /// No description provided for @commandHintSelect.
+  ///
+  /// In en, this message translates to:
+  /// **'Open'**
+  String get commandHintSelect;
+
+  /// No description provided for @commandHintClose.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get commandHintClose;
+
   /// No description provided for @detailAdvanced.
   ///
   /// In en, this message translates to:

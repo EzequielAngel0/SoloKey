@@ -441,6 +441,21 @@ class AppLocalizationsEn extends AppLocalizations {
   String get commandNoResults => 'No results';
 
   @override
+  String get commandActionsGroup => 'Actions';
+
+  @override
+  String get commandCredentialsGroup => 'Credentials';
+
+  @override
+  String get commandHintNavigate => 'Navigate';
+
+  @override
+  String get commandHintSelect => 'Open';
+
+  @override
+  String get commandHintClose => 'Close';
+
+  @override
   String get detailAdvanced => 'Advanced';
 
   @override
