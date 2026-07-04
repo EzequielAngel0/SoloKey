@@ -378,8 +378,9 @@ class _IssueCard extends StatelessWidget {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final color = _severityColor(issue.severity, palette);
-    return GestureDetector(
+    return InkWell(
       onTap: () => context.push(AppRoutes.credentialEdit.replaceFirst(':id', issue.credential.id)),
+      borderRadius: BorderRadius.circular(14),
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(

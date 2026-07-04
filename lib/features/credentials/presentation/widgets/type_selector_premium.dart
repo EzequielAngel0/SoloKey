@@ -60,55 +60,62 @@ class TypeSelectorPremium extends StatelessWidget {
           final isSelected = item.type == selected;
           final isDisabled = isEditing && item.type != selected;
 
-          return GestureDetector(
-            onTap: isDisabled
-                ? null
-                : () {
-                    HapticFeedback.selectionClick();
-                    onChanged(item.type);
-                  },
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 250),
-              curve: Curves.easeOutCubic,
-              width: isSelected ? 100 : 72,
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? color.withValues(alpha: 0.15)
-                    : isDisabled
-                        ? palette.card.withValues(alpha: 0.5)
-                        : palette.card,
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isSelected ? color : palette.divider,
-                  width: isSelected ? 1.5 : 1,
+          return Semantics(
+            button: true,
+            selected: isSelected,
+            enabled: !isDisabled,
+            label: _label(l10n, item.type),
+            excludeSemantics: true,
+            child: GestureDetector(
+              onTap: isDisabled
+                  ? null
+                  : () {
+                      HapticFeedback.selectionClick();
+                      onChanged(item.type);
+                    },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 250),
+                curve: Curves.easeOutCubic,
+                width: isSelected ? 100 : 72,
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: BoxDecoration(
+                  color: isSelected
+                      ? color.withValues(alpha: 0.15)
+                      : isDisabled
+                          ? palette.card.withValues(alpha: 0.5)
+                          : palette.card,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: isSelected ? color : palette.divider,
+                    width: isSelected ? 1.5 : 1,
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AnimatedScale(
-                    scale: isSelected ? 1.08 : 1.0,
-                    duration: const Duration(milliseconds: 200),
-                    child: Icon(
-                      item.icon,
-                      color: isSelected ? color : isDisabled ? palette.textDisabled : palette.textMuted,
-                      size: 22,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    AnimatedScale(
+                      scale: isSelected ? 1.08 : 1.0,
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        item.icon,
+                        color: isSelected ? color : isDisabled ? palette.textDisabled : palette.textMuted,
+                        size: 22,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    _label(l10n, item.type),
-                    style: TextStyle(
-                      color: isSelected ? color : isDisabled ? palette.textDisabled : palette.textMuted,
-                      fontSize: 10,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    const SizedBox(height: 6),
+                    Text(
+                      _label(l10n, item.type),
+                      style: TextStyle(
+                        color: isSelected ? color : isDisabled ? palette.textDisabled : palette.textMuted,
+                        fontSize: 10,
+                        fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                      ),
+                      textAlign: TextAlign.center,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                     ),
-                    textAlign: TextAlign.center,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           );
