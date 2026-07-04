@@ -79,6 +79,50 @@ void main() {
     expect(find.text('Lock'), findsWidgets);
   });
 
+  testWidgets('wide window shows list + detail (two panes)', (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      const DesktopMainLayout(),
+      overrides: [
+        getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
+            FakeCredentialRepository([_c('1', 'GitHub')]))),
+        foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+        syncStatusProvider.overrideWith(_IdleSyncStatus.new),
+      ],
+      surfaceSize: const Size(1300, 900),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // Detail empty-state pane is present alongside the list.
+    expect(find.text('Secure Vault'), findsOneWidget);
+    expect(find.text('Vault'), findsWidgets);
+  });
+
+  testWidgets('narrow window collapses to a single pane (list only)',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      const DesktopMainLayout(),
+      overrides: [
+        getCredentialsUseCaseProvider.overrideWithValue(GetCredentialsUseCase(
+            FakeCredentialRepository([_c('1', 'GitHub')]))),
+        foldersNotifierProvider.overrideWith(_EmptyFolders.new),
+        syncStatusProvider.overrideWith(_IdleSyncStatus.new),
+      ],
+      // 800 - 240 (sidebar) - 1 (divider) = 559 < 640 → single pane.
+      surfaceSize: const Size(800, 900),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // Nothing selected → the list is shown and the detail pane is not built.
+    expect(find.text('Vault'), findsWidgets);
+    expect(find.text('Secure Vault'), findsNothing);
+  });
+
   testWidgets('desktop search is debounced (>250ms) before it filters',
       (tester) async {
     tolerateInkHiddenPaintWarnings();

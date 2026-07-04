@@ -34,6 +34,14 @@ import 'package:password_manager/l10n/app_localizations.dart';
 import 'desktop_layout_state.dart';
 import 'auto_lock_manager.dart';
 
+/// Content-area width (window minus sidebar) at/above which the list + detail
+/// panes sit side by side; below it the content collapses to a single pane.
+const double _kTwoPaneMinWidth = 640;
+
+/// Content-area width at/above which the master list widens for extra breathing
+/// room on large windows.
+const double _kWideWindowWidth = 1180;
+
 class DesktopMainLayout extends ConsumerStatefulWidget {
   const DesktopMainLayout({super.key});
 
@@ -213,24 +221,48 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
       return const SecureFilesScreen();
     }
 
-    // Tabs with lists (Credentials, Folders, Favorites)
-    return Row(
-      children: [
-        // Column 2: Middle List Pane
-        SizedBox(
-          width: 360,
-          child: _buildMiddleListPane(tabIndex),
-        ),
-        // Vertical divider
-        Container(
-          width: 1,
-          color: palette.divider,
-        ),
-        // Column 3: Right Details/Form Pane
-        Expanded(
-          child: _buildRightPane(tabIndex),
-        ),
-      ],
+    // Tabs with lists (Credentials, Folders, Favorites): master-detail that
+    // adapts to the content-area width (which shrinks as the sidebar expands or
+    // the window narrows).
+    //  - Wide  → 3 columns (sidebar · list · detail); the list widens a bit on
+    //    very wide windows so the master column breathes.
+    //  - Narrow → 2 columns (sidebar · one pane): the list, or the detail once a
+    //    credential/form is open. The detail's own close button returns to the
+    //    list, and the sidebar stays for tab switching.
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final w = constraints.maxWidth;
+        if (w < _kTwoPaneMinWidth) {
+          final mode = ref.watch(desktopRightPaneModeProvider);
+          final selectedId = ref.watch(desktopSelectedCredentialIdProvider);
+          final showDetail = mode == RightPaneMode.create ||
+              mode == RightPaneMode.edit ||
+              selectedId != null;
+          return showDetail
+              ? _buildRightPane(tabIndex)
+              : _buildMiddleListPane(tabIndex);
+        }
+
+        final listWidth = w >= _kWideWindowWidth ? 400.0 : 360.0;
+        return Row(
+          children: [
+            // Column 2: Middle List Pane
+            SizedBox(
+              width: listWidth,
+              child: _buildMiddleListPane(tabIndex),
+            ),
+            // Vertical divider
+            Container(
+              width: 1,
+              color: palette.divider,
+            ),
+            // Column 3: Right Details/Form Pane
+            Expanded(
+              child: _buildRightPane(tabIndex),
+            ),
+          ],
+        );
+      },
     );
   }
 
