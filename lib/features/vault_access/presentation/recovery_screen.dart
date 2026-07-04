@@ -343,6 +343,12 @@ class RecoveryCodeDisplay extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            StepIndicator(
+              currentStep: 2,
+              totalSteps: 2,
+              label: '${l10n.accessStepOf(2, 2)} · ${l10n.setupStepSaveCode}',
+            ),
+            const SizedBox(height: 24),
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(

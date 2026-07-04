@@ -5,11 +5,14 @@ import '../../../app/di/injection.dart';
 import '../../../core/services/recovery_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
+import '../../../shared/widgets/password_requirements_checklist.dart';
 import '../../../shared/widgets/password_strength_indicator.dart';
 import '../../../shared/widgets/secure_text_field.dart';
+import '../../../shared/widgets/step_indicator.dart';
 import '../../password_generator/domain/password_generator.dart';
 import '../../../theme/app_palette.dart';
 import '../application/vault_state_provider.dart';
+import '../domain/master_password_policy.dart';
 import 'recovery_screen.dart';
 
 class SetupScreen extends ConsumerStatefulWidget {
@@ -109,6 +112,12 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 32),
+                StepIndicator(
+                  currentStep: 1,
+                  totalSteps: 2,
+                  label: '${l10n.accessStepOf(1, 2)} · ${l10n.setupStepCreate}',
+                ),
+                const SizedBox(height: 24),
                 Text(
                   l10n.setupTitle,
                   style: TextStyle(
@@ -128,19 +137,15 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   ),
                 ),
                 const SizedBox(height: 36),
-                TextFormField(
+                SecureTextField(
                   controller: _passCtrl,
-                  obscureText: true,
+                  label: l10n.unlockMasterPasswordHint,
+                  hint: l10n.setupMinChars,
                   autofocus: true,
                   onChanged: _onPasswordChanged,
                   validator: _validatePassword,
                   textInputAction: TextInputAction.next,
-                  onFieldSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                  style: TextStyle(color: palette.textPrimary, fontSize: 16, letterSpacing: 1.5),
-                  decoration: InputDecoration(
-                    labelText: l10n.unlockMasterPasswordHint,
-                    hintText: l10n.setupMinChars,
-                  ),
+                  onSubmitted: (_) => FocusScope.of(context).nextFocus(),
                 ),
                 const SizedBox(height: 8),
                 PasswordStrengthIndicator(strength: _strength),
@@ -155,7 +160,7 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
                   onSubmitted: (_) => _submit(),
                 ),
                 const SizedBox(height: 12),
-                _RequirementsList(password: _passCtrl.text),
+                PasswordRequirementsChecklist(password: _passCtrl.text),
                 const SizedBox(height: 36),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 200),
@@ -180,64 +185,14 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
 
   String? _validatePassword(String? v) {
     final l10n = AppLocalizations.of(context);
-    if (v == null || v.length < 12) return l10n.setupMinChars;
-    if (!v.contains(RegExp(r'[A-Z]'))) return l10n.setupNeedUppercase;
-    if (!v.contains(RegExp(r'[0-9]'))) return l10n.setupNeedNumber;
-    if (!v.contains(RegExp(r'[!@#$%^&*()\-_=+]'))) {
-      return l10n.setupNeedSymbol;
-    }
+    final value = v ?? '';
+    if (!MasterPasswordPolicy.hasMinLength(value)) return l10n.setupMinChars;
+    if (!MasterPasswordPolicy.hasUppercase(value)) return l10n.setupNeedUppercase;
+    if (!MasterPasswordPolicy.hasNumber(value)) return l10n.setupNeedNumber;
+    if (!MasterPasswordPolicy.hasSymbol(value)) return l10n.setupNeedSymbol;
     return null;
   }
 }
 
 // ignore: unused_element
 class _Loading {}
-
-class _RequirementsList extends StatelessWidget {
-  const _RequirementsList({required this.password});
-  final String password;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    final l10n = AppLocalizations.of(context);
-    final reqs = [
-      (label: l10n.setupReqChars, met: password.length >= 12),
-      (label: l10n.setupReqUppercase, met: password.contains(RegExp(r'[A-Z]'))),
-      (label: l10n.setupReqNumber, met: password.contains(RegExp(r'[0-9]'))),
-      (
-        label: l10n.setupReqSymbol,
-        met: password.contains(RegExp(r'[!@#$%^&*()\-_=+]'))
-      ),
-    ];
-
-    return Wrap(
-      spacing: 8,
-      runSpacing: 6,
-      children: reqs
-          .map(
-            (r) => Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  r.met
-                      ? Icons.check_circle_rounded
-                      : Icons.radio_button_unchecked_rounded,
-                  size: 14,
-                  color: r.met ? palette.success : palette.textDisabled,
-                ),
-                const SizedBox(width: 4),
-                Text(
-                  r.label,
-                  style: TextStyle(
-                    fontSize: 12,
-                    color: r.met ? palette.success : palette.textDisabled,
-                  ),
-                ),
-              ],
-            ),
-          )
-          .toList(),
-    );
-  }
-}
