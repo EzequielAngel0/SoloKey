@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:uuid/uuid.dart';
+import 'package:window_manager/window_manager.dart';
 import '../../../core/presentation/layouts/desktop_layout_state.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../l10n/app_localizations.dart';
@@ -14,6 +15,7 @@ import '../application/duplicate_detector.dart';
 import '../../folders/application/folders_provider.dart';
 import '../domain/entities/credential.dart';
 import '../domain/otpauth.dart';
+import '../infrastructure/screen_qr_scanner.dart';
 import 'qr_scanner_screen.dart';
 import 'widgets/form_section.dart';
 import 'widgets/save_button.dart';
@@ -655,16 +657,68 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     );
   }
 
+  /// Applies an `otpauth://` payload and shows the right feedback: a success
+  /// snackbar for standard TOTP, or a warning when the params (algorithm /
+  /// digits / period) differ from what SoloKey generates. Returns false when
+  /// [code] was not a valid otpauth payload (so callers show their own error).
+  bool _applyAndReport(String code, String successMsg) {
+    final otp = _applyOtpauth(code);
+    if (otp == null) return false;
+    if (otp.isStandard) {
+      _showTotpAppliedSnackBar(successMsg);
+    } else {
+      _showWarn(AppLocalizations.of(context).formTotpNonStandard);
+    }
+    return true;
+  }
+
+  /// Mobile: open the camera scanner and apply the scanned otpauth URI.
   Future<void> _scanQr() async {
     final l10n = AppLocalizations.of(context);
     final code = await Navigator.of(
       context,
     ).push<String>(MaterialPageRoute(builder: (_) => const QrScannerScreen()));
     if (code == null || !mounted) return;
-    if (_applyOtpauth(code) != null) {
-      _showTotpAppliedSnackBar(l10n.formQrScanned);
-    } else {
+    if (!_applyAndReport(code, l10n.formQrScanned)) {
       _showError(l10n.formQrNotTotp);
+    }
+  }
+
+  /// Desktop (Windows/macOS/Linux): hide SoloKey, let the user select a screen
+  /// region, decode any QR inside it and prefill the TOTP fields.
+  Future<void> _scanQrFromScreen() async {
+    final l10n = AppLocalizations.of(context);
+    // Hide our window so it doesn't cover the QR while the region is selected.
+    try {
+      await windowManager.minimize();
+    } catch (_) {}
+    await Future<void>.delayed(const Duration(milliseconds: 350));
+
+    ScreenQrResult result;
+    try {
+      result = await ScreenQrScanner().captureAndDecode();
+    } catch (_) {
+      result = const ScreenQrResult(ScreenQrStatus.error);
+    } finally {
+      try {
+        await windowManager.restore();
+        await windowManager.focus();
+      } catch (_) {}
+    }
+
+    if (!mounted) return;
+    switch (result.status) {
+      case ScreenQrStatus.ok:
+        if (!_applyAndReport(result.payload!, l10n.formQrScanned)) {
+          _showError(l10n.formQrNotTotp);
+        }
+      case ScreenQrStatus.noQr:
+        _showError(l10n.formQrScreenNoQr);
+      case ScreenQrStatus.error:
+      case ScreenQrStatus.unsupported:
+        _showError(l10n.formQrScreenError);
+      case ScreenQrStatus.cancelled:
+        break; // user backed out — stay silent
     }
   }
 
@@ -673,9 +727,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
     final data = await Clipboard.getData(Clipboard.kTextPlain);
     if (!mounted) return;
     final text = data?.text?.trim() ?? '';
-    if (text.isNotEmpty && _applyOtpauth(text) != null) {
-      _showTotpAppliedSnackBar(l10n.formPasteApplied);
-    } else {
+    if (text.isEmpty || !_applyAndReport(text, l10n.formPasteApplied)) {
       _showError(l10n.formPasteNoOtpauth);
     }
   }
@@ -688,6 +740,30 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         content: Text(msg),
         backgroundColor: context.palette.danger,
         behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
+
+  void _showWarn(String msg) {
+    if (!mounted) return;
+    HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(
+              Icons.warning_amber_rounded,
+              color: Colors.white,
+              size: 18,
+            ),
+            const SizedBox(width: 8),
+            Expanded(child: Text(msg)),
+          ],
+        ),
+        backgroundColor: context.palette.warning,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 4),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
     );
   }
@@ -1563,12 +1639,14 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   Widget _buildTotpFields() {
+    final isDesktopScan = ScreenQrScanner.isSupported;
     return TotpFieldsSection(
       issuerCtrl: _totpIssuerCtrl,
       secretCtrl: _totpSecretCtrl,
-      onScan: _scanQr,
+      onScan: isDesktopScan ? _scanQrFromScreen : _scanQr,
       onPaste: _pasteTotpFromClipboard,
       secretValidator: _validateTotpSecret,
+      isDesktopScan: isDesktopScan,
     );
   }
 

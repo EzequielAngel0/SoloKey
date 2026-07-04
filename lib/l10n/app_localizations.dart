@@ -2342,6 +2342,30 @@ abstract class AppLocalizations {
   /// **'Scan QR code'**
   String get formScanQr;
 
+  /// No description provided for @formScanQrScreen.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan QR from screen'**
+  String get formScanQrScreen;
+
+  /// No description provided for @formQrScreenNoQr.
+  ///
+  /// In en, this message translates to:
+  /// **'No QR code was found in the capture.'**
+  String get formQrScreenNoQr;
+
+  /// No description provided for @formQrScreenError.
+  ///
+  /// In en, this message translates to:
+  /// **'Couldn\'t capture the screen.'**
+  String get formQrScreenError;
+
+  /// No description provided for @formTotpNonStandard.
+  ///
+  /// In en, this message translates to:
+  /// **'TOTP detected, but with non-standard parameters (SoloKey generates SHA1, 6 digits, 30s); the code may not match.'**
+  String get formTotpNonStandard;
+
   /// No description provided for @formOrManually.
   ///
   /// In en, this message translates to:

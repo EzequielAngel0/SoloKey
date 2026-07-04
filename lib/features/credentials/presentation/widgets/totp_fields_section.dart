@@ -16,6 +16,7 @@ class TotpFieldsSection extends StatelessWidget {
     required this.onScan,
     required this.onPaste,
     required this.secretValidator,
+    this.isDesktopScan = false,
   });
 
   final TextEditingController issuerCtrl;
@@ -23,6 +24,10 @@ class TotpFieldsSection extends StatelessWidget {
   final VoidCallback onScan;
   final VoidCallback onPaste;
   final FormFieldValidator<String> secretValidator;
+
+  /// When true (desktop), the scan button captures a screen region instead of
+  /// opening the camera scanner.
+  final bool isDesktopScan;
 
   @override
   Widget build(BuildContext context) {
@@ -81,10 +86,16 @@ class TotpFieldsSection extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.qr_code_scanner_rounded, color: totp, size: 22),
+                  Icon(
+                    isDesktopScan
+                        ? Icons.crop_free_rounded
+                        : Icons.qr_code_scanner_rounded,
+                    color: totp,
+                    size: 22,
+                  ),
                   const SizedBox(width: 10),
                   Text(
-                    l10n.formScanQr,
+                    isDesktopScan ? l10n.formScanQrScreen : l10n.formScanQr,
                     style: TextStyle(
                       color: totp,
                       fontSize: 15,

@@ -1234,6 +1234,19 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formScanQr => 'Scan QR code';
 
   @override
+  String get formScanQrScreen => 'Scan QR from screen';
+
+  @override
+  String get formQrScreenNoQr => 'No QR code was found in the capture.';
+
+  @override
+  String get formQrScreenError => 'Couldn\'t capture the screen.';
+
+  @override
+  String get formTotpNonStandard =>
+      'TOTP detected, but with non-standard parameters (SoloKey generates SHA1, 6 digits, 30s); the code may not match.';
+
+  @override
   String get formOrManually => 'or enter manually';
 
   @override
