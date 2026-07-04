@@ -328,6 +328,17 @@
   "recoveryCodeWarning": "Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.",
   "recoveryCopyCode": "Copy code",
   "recoveryCodeSavedContinue": "I saved it, continue",
+  "accessStepOf": "Step {current} of {total}",
+  "@accessStepOf": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "recoveryStepEnterCode": "Enter your recovery code",
+  "recoveryStepNewPassword": "Set a new master password",
+  "setupStepCreate": "Create your master password",
+  "setupStepSaveCode": "Save your recovery code",
 
   "autofillOnboardingTitle": "Autofill",
   "autofillActiveTitle": "SoloKey is active!",

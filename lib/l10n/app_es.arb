@@ -281,6 +281,17 @@
   "recoveryCodeWarning": "¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.",
   "recoveryCopyCode": "Copiar código",
   "recoveryCodeSavedContinue": "Ya lo guardé, continuar",
+  "accessStepOf": "Paso {current} de {total}",
+  "@accessStepOf": {
+    "placeholders": {
+      "current": { "type": "int" },
+      "total": { "type": "int" }
+    }
+  },
+  "recoveryStepEnterCode": "Ingresa tu código de recuperación",
+  "recoveryStepNewPassword": "Define una nueva contraseña maestra",
+  "setupStepCreate": "Crea tu contraseña maestra",
+  "setupStepSaveCode": "Guarda tu código de recuperación",
 
   "autofillOnboardingTitle": "Autocompletado",
   "autofillActiveTitle": "¡SoloKey está activo!",

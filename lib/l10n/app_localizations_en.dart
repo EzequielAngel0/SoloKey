@@ -813,6 +813,23 @@ class AppLocalizationsEn extends AppLocalizations {
   String get recoveryCodeSavedContinue => 'I saved it, continue';
 
   @override
+  String accessStepOf(int current, int total) {
+    return 'Step $current of $total';
+  }
+
+  @override
+  String get recoveryStepEnterCode => 'Enter your recovery code';
+
+  @override
+  String get recoveryStepNewPassword => 'Set a new master password';
+
+  @override
+  String get setupStepCreate => 'Create your master password';
+
+  @override
+  String get setupStepSaveCode => 'Save your recovery code';
+
+  @override
   String get autofillOnboardingTitle => 'Autofill';
 
   @override

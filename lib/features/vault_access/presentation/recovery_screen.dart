@@ -5,11 +5,16 @@ import 'package:go_router/go_router.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/services/recovery_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/widgets/password_requirements_checklist.dart';
+import '../../../shared/widgets/password_strength_indicator.dart';
 import '../../../shared/widgets/secure_text_field.dart';
+import '../../../shared/widgets/step_indicator.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/clipboard_countdown.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
+import '../../password_generator/domain/password_generator.dart';
+import '../domain/master_password_policy.dart';
 
 /// Recovery Step 1: Enter recovery code → unlock.
 /// Recovery Step 2: Set new master password.
@@ -28,6 +33,7 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
   int _step = 1; // 1 = enter code, 2 = set new password
   bool _isLoading = false;
   String? _error;
+  PasswordStrength _strength = PasswordStrength.none;
 
   @override
   void dispose() {
@@ -75,8 +81,11 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
       setState(() => _error = l10n.recoveryEnterNewPassword);
       return;
     }
-    if (pwd.length < 8) {
-      setState(() => _error = l10n.recoveryMin8);
+    // A reset must enforce the SAME complexity as the initial setup — never let
+    // the user downgrade to a weaker master password (MasterPasswordPolicy).
+    final policyError = _policyError(l10n, pwd);
+    if (policyError != null) {
+      setState(() => _error = policyError);
       return;
     }
     if (pwd != confirm) {
@@ -106,6 +115,17 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
     }
   }
 
+  /// First unmet requirement of [MasterPasswordPolicy], as a localized message,
+  /// or null when [value] satisfies the policy. Mirrors the Setup validator so
+  /// both flows speak the same language.
+  String? _policyError(AppLocalizations l10n, String value) {
+    if (!MasterPasswordPolicy.hasMinLength(value)) return l10n.setupMinChars;
+    if (!MasterPasswordPolicy.hasUppercase(value)) return l10n.setupNeedUppercase;
+    if (!MasterPasswordPolicy.hasNumber(value)) return l10n.setupNeedNumber;
+    if (!MasterPasswordPolicy.hasSymbol(value)) return l10n.setupNeedSymbol;
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -126,6 +146,13 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          StepIndicator(
+            currentStep: 1,
+            totalSteps: 2,
+            label:
+                '${l10n.accessStepOf(1, 2)} · ${l10n.recoveryStepEnterCode}',
+          ),
+          const SizedBox(height: 24),
           // Header
           Container(
             padding: const EdgeInsets.all(20),
@@ -215,6 +242,13 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+          StepIndicator(
+            currentStep: 2,
+            totalSteps: 2,
+            label:
+                '${l10n.accessStepOf(2, 2)} · ${l10n.recoveryStepNewPassword}',
+          ),
+          const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -241,8 +275,14 @@ class _RecoveryScreenState extends ConsumerState<RecoveryScreen> {
           SecureTextField(
             controller: _newPasswordCtrl,
             label: l10n.recoveryNewPasswordLabel,
+            onChanged: (v) =>
+                setState(() => _strength = PasswordGenerator.evaluate(v)),
             validator: (_) => null,
           ),
+          const SizedBox(height: 8),
+          PasswordStrengthIndicator(strength: _strength),
+          const SizedBox(height: 12),
+          PasswordRequirementsChecklist(password: _newPasswordCtrl.text),
           const SizedBox(height: 16),
           SecureTextField(
             controller: _confirmCtrl,

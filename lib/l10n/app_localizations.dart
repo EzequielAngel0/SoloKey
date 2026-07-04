@@ -1538,6 +1538,36 @@ abstract class AppLocalizations {
   /// **'I saved it, continue'**
   String get recoveryCodeSavedContinue;
 
+  /// No description provided for @accessStepOf.
+  ///
+  /// In en, this message translates to:
+  /// **'Step {current} of {total}'**
+  String accessStepOf(int current, int total);
+
+  /// No description provided for @recoveryStepEnterCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your recovery code'**
+  String get recoveryStepEnterCode;
+
+  /// No description provided for @recoveryStepNewPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Set a new master password'**
+  String get recoveryStepNewPassword;
+
+  /// No description provided for @setupStepCreate.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your master password'**
+  String get setupStepCreate;
+
+  /// No description provided for @setupStepSaveCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Save your recovery code'**
+  String get setupStepSaveCode;
+
   /// No description provided for @autofillOnboardingTitle.
   ///
   /// In en, this message translates to:

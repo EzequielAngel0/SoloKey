@@ -13,6 +13,7 @@ class SecureTextField extends StatefulWidget {
     this.validator,
     this.textInputAction = TextInputAction.next,
     this.onSubmitted,
+    this.onChanged,
     this.autofocus = false,
     this.enabled = true,
     this.keyboardType,
@@ -25,6 +26,7 @@ class SecureTextField extends StatefulWidget {
   final String? Function(String?)? validator;
   final TextInputAction textInputAction;
   final void Function(String)? onSubmitted;
+  final void Function(String)? onChanged;
   final bool autofocus;
   final bool enabled;
   final TextInputType? keyboardType;
@@ -46,6 +48,7 @@ class _SecureTextFieldState extends State<SecureTextField> {
       enabled: widget.enabled,
       textInputAction: widget.textInputAction,
       onFieldSubmitted: widget.onSubmitted,
+      onChanged: widget.onChanged,
       validator: widget.validator,
       keyboardType: widget.keyboardType,
       inputFormatters: widget.inputFormatters,
