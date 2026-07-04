@@ -88,6 +88,37 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unlockGenericError => 'No se pudo desbloquear la bóveda.';
 
   @override
+  String get unlockWithWindowsHello => 'Desbloquear con Windows Hello';
+
+  @override
+  String get unlockWithBiometrics => 'Desbloquear con biometría';
+
+  @override
+  String get unlockOrUseMasterPassword => 'o usa tu contraseña maestra';
+
+  @override
+  String unlockAttemptsBeforeLockout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Quedan $count intentos antes del bloqueo temporal',
+      one: 'Queda 1 intento antes del bloqueo temporal',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unlockAttemptsBeforeWipe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Quedan $count intentos antes de borrar la bóveda',
+      one: 'Queda 1 intento antes de borrar la bóveda',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsSectionAppearance => 'Apariencia';
 
   @override

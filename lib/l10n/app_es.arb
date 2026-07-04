@@ -28,6 +28,17 @@
   "unlockVaultWiped": "Bóveda borrada por demasiados intentos fallidos.",
   "unlockBiometricFailed": "Autenticación biométrica fallida o no configurada.",
   "unlockGenericError": "No se pudo desbloquear la bóveda.",
+  "unlockWithWindowsHello": "Desbloquear con Windows Hello",
+  "unlockWithBiometrics": "Desbloquear con biometría",
+  "unlockOrUseMasterPassword": "o usa tu contraseña maestra",
+  "unlockAttemptsBeforeLockout": "{count, plural, one{Queda 1 intento antes del bloqueo temporal} other{Quedan {count} intentos antes del bloqueo temporal}}",
+  "@unlockAttemptsBeforeLockout": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unlockAttemptsBeforeWipe": "{count, plural, one{Queda 1 intento antes de borrar la bóveda} other{Quedan {count} intentos antes de borrar la bóveda}}",
+  "@unlockAttemptsBeforeWipe": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "settingsSectionAppearance": "Apariencia",
   "settingsSectionLanguage": "Idioma",

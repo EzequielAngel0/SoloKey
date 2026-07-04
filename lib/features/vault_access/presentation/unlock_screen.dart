@@ -39,6 +39,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   // Anti brute-force lockout
   Duration _lockout = Duration.zero;
   Timer? _lockoutTimer;
+  int _failedAttempts = 0;
+  int _wipeThreshold = 0; // 0 = wipe-on-failure disabled
 
   @override
   void initState() {
@@ -56,11 +58,24 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   }
 
   /// Reads the persisted brute-force lockout and starts a 1s countdown ticker.
+  /// Also captures the failed-attempt counter and the configured wipe threshold
+  /// so the UI can warn how many tries remain before a lock/wipe.
   Future<void> _refreshLockout() async {
     try {
       final state = await getIt<BruteForceGuard>().currentState();
+      var wipe = 0;
+      try {
+        wipe = (await getIt<ISettingsRepository>().getSettings())
+            .wipeAfterFailedAttempts;
+      } catch (_) {
+        // Settings repo may be unavailable in tests — keep wipe disabled.
+      }
       if (!mounted) return;
-      setState(() => _lockout = state.lockoutRemaining);
+      setState(() {
+        _lockout = state.lockoutRemaining;
+        _failedAttempts = state.failedAttempts;
+        _wipeThreshold = wipe;
+      });
       _lockoutTimer?.cancel();
       if (_lockout > Duration.zero) {
         _lockoutTimer = Timer.periodic(const Duration(seconds: 1), (t) {
@@ -164,8 +179,13 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     const biometricSeam = String.fromEnvironment('TEST_DISABLE_BIOMETRIC');
     if (biometricSeam == '1' || biometricSeam == 'true') return;
 
-    final settings = await getIt<ISettingsRepository>().getSettings();
-    if (settings.biometricEnabled) _tryBiometric();
+    try {
+      final settings = await getIt<ISettingsRepository>().getSettings();
+      if (settings.biometricEnabled) _tryBiometric();
+    } catch (_) {
+      // Settings unavailable (e.g. in tests) — skip the biometric auto-prompt
+      // but keep the biometric button available.
+    }
   }
 
   Future<void> _tryBiometric() async {
@@ -267,6 +287,38 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
   }
 
+  /// Primary-action label for the biometric unlock: "Windows Hello" on desktop
+  /// (where `local_auth` also accepts the Hello PIN), "biometrics" on mobile.
+  String _biometricLabel(AppLocalizations l10n) => _isDesktopPlatform
+      ? l10n.unlockWithWindowsHello
+      : l10n.unlockWithBiometrics;
+
+  IconData get _biometricIcon =>
+      _isDesktopPlatform ? Icons.verified_user_rounded : Icons.fingerprint_rounded;
+
+  /// A subtle warning of how many attempts remain before a temporary lock (or,
+  /// if wipe-on-failure is enabled, before the vault is wiped). Returns null
+  /// while there are no failures yet or a lockout is already active.
+  Widget? _attemptsHint(BuildContext context) {
+    if (_failedAttempts <= 0 || _lockout > Duration.zero) return null;
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    if (_wipeThreshold > 0) {
+      final left = _wipeThreshold - _failedAttempts;
+      if (left > 0) {
+        return _AttemptsHint(
+            text: l10n.unlockAttemptsBeforeWipe(left), color: palette.danger);
+      }
+    }
+    final freeLeft = BruteForceGuard.freeAttempts - _failedAttempts;
+    if (freeLeft > 0) {
+      return _AttemptsHint(
+          text: l10n.unlockAttemptsBeforeLockout(freeLeft),
+          color: palette.warning);
+    }
+    return null;
+  }
+
   void _navigateHome() => context.go(AppRoutes.home);
 
   void _showError(String msg) {
@@ -350,47 +402,71 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
                       const SizedBox(height: 16),
                     ],
 
-                    // Tappable masked password display
-                    _SecurePasswordTap(
-                      charCount: _charCount,
-                      onTap: _openSecureKeyboard,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 200),
-                      child: isLoading || _isRemoteUnlocking
-                          ? Center(
-                              child: CircularProgressIndicator(
-                                color: palette.accent,
-                              ),
-                            )
-                          : ElevatedButton(
-                              onPressed: _lockout > Duration.zero
-                                  ? null
-                                  : _openSecureKeyboard,
-                              child: Text(_lockout > Duration.zero
-                                  ? l10n.unlockLockedFor(
-                                      _formatLockout(_lockout))
-                                  : l10n.unlockButton),
-                            ),
-                    ),
+                    // Remaining-attempts hint (before any lockout kicks in).
+                    if (_attemptsHint(context) case final hint?) ...[
+                      hint,
+                      const SizedBox(height: 16),
+                    ],
 
                     if (_biometricAvailable) ...[
-                      const SizedBox(height: 16),
+                      // PRIMARY: biometric / Windows Hello (big button).
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: isLoading || _isRemoteUnlocking
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                    color: palette.accent))
+                            : Semantics(
+                                button: true,
+                                label: _biometricLabel(l10n),
+                                child: ElevatedButton.icon(
+                                  onPressed: _lockout > Duration.zero
+                                      ? null
+                                      : _tryBiometric,
+                                  icon: Icon(_biometricIcon),
+                                  label: Text(_lockout > Duration.zero
+                                      ? l10n.unlockLockedFor(
+                                          _formatLockout(_lockout))
+                                      : _biometricLabel(l10n)),
+                                ),
+                              ),
+                      ),
+                      const SizedBox(height: 20),
+                      // SECONDARY: master-password fallback.
                       Center(
-                        child: TextButton.icon(
-                          onPressed: _tryBiometric,
-                          icon: Icon(
-                            Icons.fingerprint_rounded,
-                            color: palette.accent,
-                          ),
-                          label: Text(
-                            l10n.unlockUseBiometrics,
-                            style: TextStyle(color: palette.accent),
-                          ),
+                        child: Text(
+                          l10n.unlockOrUseMasterPassword,
+                          style:
+                              TextStyle(color: palette.textMuted, fontSize: 12),
                         ),
+                      ),
+                      const SizedBox(height: 10),
+                      _SecurePasswordTap(
+                        charCount: _charCount,
+                        onTap: _openSecureKeyboard,
+                      ),
+                    ] else ...[
+                      // PRIMARY: master password (no biometric / Hello available).
+                      _SecurePasswordTap(
+                        charCount: _charCount,
+                        onTap: _openSecureKeyboard,
+                      ),
+                      const SizedBox(height: 20),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 200),
+                        child: isLoading || _isRemoteUnlocking
+                            ? Center(
+                                child: CircularProgressIndicator(
+                                    color: palette.accent))
+                            : ElevatedButton(
+                                onPressed: _lockout > Duration.zero
+                                    ? null
+                                    : _openSecureKeyboard,
+                                child: Text(_lockout > Duration.zero
+                                    ? l10n.unlockLockedFor(
+                                        _formatLockout(_lockout))
+                                    : l10n.unlockButton),
+                              ),
                       ),
                     ],
 
@@ -513,6 +589,40 @@ class _LockoutBanner extends StatelessWidget {
               AppLocalizations.of(context).unlockTooManyAttempts(remainingText),
               style: TextStyle(
                 color: palette.danger,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttemptsHint extends StatelessWidget {
+  const _AttemptsHint({required this.text, required this.color});
+  final String text;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.info_outline_rounded, color: color, size: 18),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: color,
                 fontSize: 13,
                 fontWeight: FontWeight.w500,
               ),

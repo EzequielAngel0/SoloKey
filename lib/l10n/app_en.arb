@@ -37,6 +37,17 @@
   "unlockVaultWiped": "Vault wiped after too many failed attempts.",
   "unlockBiometricFailed": "Biometric authentication failed or not configured.",
   "unlockGenericError": "Could not unlock the vault.",
+  "unlockWithWindowsHello": "Unlock with Windows Hello",
+  "unlockWithBiometrics": "Unlock with biometrics",
+  "unlockOrUseMasterPassword": "or use your master password",
+  "unlockAttemptsBeforeLockout": "{count, plural, one{1 attempt left before a temporary lock} other{{count} attempts left before a temporary lock}}",
+  "@unlockAttemptsBeforeLockout": {
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "unlockAttemptsBeforeWipe": "{count, plural, one{1 attempt left before the vault is wiped} other{{count} attempts left before the vault is wiped}}",
+  "@unlockAttemptsBeforeWipe": {
+    "placeholders": { "count": { "type": "int" } }
+  },
 
   "settingsSectionAppearance": "Appearance",
   "settingsSectionLanguage": "Language",

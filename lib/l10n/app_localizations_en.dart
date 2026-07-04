@@ -87,6 +87,37 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockGenericError => 'Could not unlock the vault.';
 
   @override
+  String get unlockWithWindowsHello => 'Unlock with Windows Hello';
+
+  @override
+  String get unlockWithBiometrics => 'Unlock with biometrics';
+
+  @override
+  String get unlockOrUseMasterPassword => 'or use your master password';
+
+  @override
+  String unlockAttemptsBeforeLockout(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count attempts left before a temporary lock',
+      one: '1 attempt left before a temporary lock',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String unlockAttemptsBeforeWipe(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count attempts left before the vault is wiped',
+      one: '1 attempt left before the vault is wiped',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get settingsSectionAppearance => 'Appearance';
 
   @override

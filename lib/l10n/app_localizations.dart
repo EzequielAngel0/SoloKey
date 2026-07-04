@@ -236,6 +236,36 @@ abstract class AppLocalizations {
   /// **'Could not unlock the vault.'**
   String get unlockGenericError;
 
+  /// No description provided for @unlockWithWindowsHello.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with Windows Hello'**
+  String get unlockWithWindowsHello;
+
+  /// No description provided for @unlockWithBiometrics.
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock with biometrics'**
+  String get unlockWithBiometrics;
+
+  /// No description provided for @unlockOrUseMasterPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'or use your master password'**
+  String get unlockOrUseMasterPassword;
+
+  /// No description provided for @unlockAttemptsBeforeLockout.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 attempt left before a temporary lock} other{{count} attempts left before a temporary lock}}'**
+  String unlockAttemptsBeforeLockout(int count);
+
+  /// No description provided for @unlockAttemptsBeforeWipe.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, one{1 attempt left before the vault is wiped} other{{count} attempts left before the vault is wiped}}'**
+  String unlockAttemptsBeforeWipe(int count);
+
   /// No description provided for @settingsSectionAppearance.
   ///
   /// In en, this message translates to:
