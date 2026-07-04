@@ -158,10 +158,11 @@ class AppPalette extends ThemeExtension<AppPalette> {
   );
 
   /// Dim palette — un oscuro suave (gris-azulado), menos contraste que dark.
-  /// Graphite Pro con un azul algo más claro (`#5B96F8`) para bajar el contraste.
+  /// Graphite Pro con un azul algo más claro (`#4C8DF5`): suave pero con
+  /// contraste WCAG AA suficiente para etiquetas blancas sobre el acento.
   static const AppPalette dim = AppPalette(
-    primary: Color(0xFF5B96F8),
-    accent: Color(0xFF5B96F8),
+    primary: Color(0xFF4C8DF5),
+    accent: Color(0xFF4C8DF5),
     secondary: Color(0xFF10B981),
     onPrimary: Color(0xFFFFFFFF),
     background: Color(0xFF14151A),
@@ -172,7 +173,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     divider: Color(0xFF2C2D36),
     textPrimary: Color(0xFFE7E8EE),
     textBody: Color(0xFFBFC1CB),
-    textMuted: Color(0xFF85868F),
+    textMuted: Color(0xFF909199),
     textDisabled: Color(0xFF56575F),
     textEmpty: Color(0xFF2C2D36),
     danger: Color(0xFFF26D6D),
@@ -180,7 +181,7 @@ class AppPalette extends ThemeExtension<AppPalette> {
     warning: Color(0xFFF5A524),
     success: Color(0xFF10B981),
     info: Color(0xFF38BDF8),
-    typePassword: Color(0xFF5B96F8),
+    typePassword: Color(0xFF4C8DF5),
     typeApiKey: Color(0xFF10B981),
     typeNote: Color(0xFFF5A524),
     typeTotp: Color(0xFF8B5CF6),
