@@ -69,6 +69,24 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockBiometricReason => 'Unlock your vault';
 
   @override
+  String get unlockWrongPassword => 'Incorrect master password';
+
+  @override
+  String unlockWrongPasswordLocked(String time) {
+    return 'Incorrect password. Locked for $time.';
+  }
+
+  @override
+  String get unlockVaultWiped => 'Vault wiped after too many failed attempts.';
+
+  @override
+  String get unlockBiometricFailed =>
+      'Biometric authentication failed or not configured.';
+
+  @override
+  String get unlockGenericError => 'Could not unlock the vault.';
+
+  @override
   String get settingsSectionAppearance => 'Appearance';
 
   @override

@@ -23,7 +23,12 @@ mixin _$VaultState {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult? whenOrNull<TResult extends Object?>({
@@ -31,7 +36,8 @@ mixin _$VaultState {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
   TResult maybeWhen<TResult extends Object?>({
@@ -39,7 +45,8 @@ mixin _$VaultState {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) => throw _privateConstructorUsedError;
   @optionalTypeArgs
@@ -138,7 +145,12 @@ class _$InitialImpl implements _Initial {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) {
     return initial();
   }
@@ -150,7 +162,8 @@ class _$InitialImpl implements _Initial {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) {
     return initial?.call();
   }
@@ -162,7 +175,8 @@ class _$InitialImpl implements _Initial {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) {
     if (initial != null) {
@@ -263,7 +277,12 @@ class _$LoadingImpl implements _Loading {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) {
     return loading();
   }
@@ -275,7 +294,8 @@ class _$LoadingImpl implements _Loading {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) {
     return loading?.call();
   }
@@ -287,7 +307,8 @@ class _$LoadingImpl implements _Loading {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) {
     if (loading != null) {
@@ -427,7 +448,12 @@ class _$UnlockedImpl implements _Unlocked {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) {
     return unlocked(session);
   }
@@ -439,7 +465,8 @@ class _$UnlockedImpl implements _Unlocked {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) {
     return unlocked?.call(session);
   }
@@ -451,7 +478,8 @@ class _$UnlockedImpl implements _Unlocked {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) {
     if (unlocked != null) {
@@ -560,7 +588,12 @@ class _$LockedImpl implements _Locked {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) {
     return locked();
   }
@@ -572,7 +605,8 @@ class _$LockedImpl implements _Locked {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) {
     return locked?.call();
   }
@@ -584,7 +618,8 @@ class _$LockedImpl implements _Locked {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) {
     if (locked != null) {
@@ -645,7 +680,7 @@ abstract class _$$ErrorImplCopyWith<$Res> {
     $Res Function(_$ErrorImpl) then,
   ) = __$$ErrorImplCopyWithImpl<$Res>;
   @useResult
-  $Res call({String message});
+  $Res call({VaultErrorKind kind, Duration? lockout, String? message});
 }
 
 /// @nodoc
@@ -661,13 +696,25 @@ class __$$ErrorImplCopyWithImpl<$Res>
   /// with the given fields replaced by the non-null parameter values.
   @pragma('vm:prefer-inline')
   @override
-  $Res call({Object? message = null}) {
+  $Res call({
+    Object? kind = null,
+    Object? lockout = freezed,
+    Object? message = freezed,
+  }) {
     return _then(
       _$ErrorImpl(
-        null == message
+        kind: null == kind
+            ? _value.kind
+            : kind // ignore: cast_nullable_to_non_nullable
+                  as VaultErrorKind,
+        lockout: freezed == lockout
+            ? _value.lockout
+            : lockout // ignore: cast_nullable_to_non_nullable
+                  as Duration?,
+        message: freezed == message
             ? _value.message
             : message // ignore: cast_nullable_to_non_nullable
-                  as String,
+                  as String?,
       ),
     );
   }
@@ -676,14 +723,23 @@ class __$$ErrorImplCopyWithImpl<$Res>
 /// @nodoc
 
 class _$ErrorImpl implements _Error {
-  const _$ErrorImpl(this.message);
+  const _$ErrorImpl({
+    this.kind = VaultErrorKind.generic,
+    this.lockout,
+    this.message,
+  });
 
   @override
-  final String message;
+  @JsonKey()
+  final VaultErrorKind kind;
+  @override
+  final Duration? lockout;
+  @override
+  final String? message;
 
   @override
   String toString() {
-    return 'VaultState.error(message: $message)';
+    return 'VaultState.error(kind: $kind, lockout: $lockout, message: $message)';
   }
 
   @override
@@ -691,11 +747,13 @@ class _$ErrorImpl implements _Error {
     return identical(this, other) ||
         (other.runtimeType == runtimeType &&
             other is _$ErrorImpl &&
+            (identical(other.kind, kind) || other.kind == kind) &&
+            (identical(other.lockout, lockout) || other.lockout == lockout) &&
             (identical(other.message, message) || other.message == message));
   }
 
   @override
-  int get hashCode => Object.hash(runtimeType, message);
+  int get hashCode => Object.hash(runtimeType, kind, lockout, message);
 
   /// Create a copy of VaultState
   /// with the given fields replaced by the non-null parameter values.
@@ -712,9 +770,14 @@ class _$ErrorImpl implements _Error {
     required TResult Function() loading,
     required TResult Function(VaultSession session) unlocked,
     required TResult Function() locked,
-    required TResult Function(String message) error,
+    required TResult Function(
+      VaultErrorKind kind,
+      Duration? lockout,
+      String? message,
+    )
+    error,
   }) {
-    return error(message);
+    return error(kind, lockout, message);
   }
 
   @override
@@ -724,9 +787,10 @@ class _$ErrorImpl implements _Error {
     TResult? Function()? loading,
     TResult? Function(VaultSession session)? unlocked,
     TResult? Function()? locked,
-    TResult? Function(String message)? error,
+    TResult? Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
   }) {
-    return error?.call(message);
+    return error?.call(kind, lockout, message);
   }
 
   @override
@@ -736,11 +800,12 @@ class _$ErrorImpl implements _Error {
     TResult Function()? loading,
     TResult Function(VaultSession session)? unlocked,
     TResult Function()? locked,
-    TResult Function(String message)? error,
+    TResult Function(VaultErrorKind kind, Duration? lockout, String? message)?
+    error,
     required TResult orElse(),
   }) {
     if (error != null) {
-      return error(message);
+      return error(kind, lockout, message);
     }
     return orElse();
   }
@@ -787,9 +852,15 @@ class _$ErrorImpl implements _Error {
 }
 
 abstract class _Error implements VaultState {
-  const factory _Error(final String message) = _$ErrorImpl;
+  const factory _Error({
+    final VaultErrorKind kind,
+    final Duration? lockout,
+    final String? message,
+  }) = _$ErrorImpl;
 
-  String get message;
+  VaultErrorKind get kind;
+  Duration? get lockout;
+  String? get message;
 
   /// Create a copy of VaultState
   /// with the given fields replaced by the non-null parameter values.

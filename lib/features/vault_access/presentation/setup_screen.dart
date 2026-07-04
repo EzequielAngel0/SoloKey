@@ -63,7 +63,8 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
           ),
         );
       },
-      error: _showError,
+      error: (kind, lockout, message) =>
+          _showError(message ?? AppLocalizations.of(context).unlockGenericError),
       orElse: () {},
     );
   }

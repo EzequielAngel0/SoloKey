@@ -206,6 +206,36 @@ abstract class AppLocalizations {
   /// **'Unlock your vault'**
   String get unlockBiometricReason;
 
+  /// No description provided for @unlockWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect master password'**
+  String get unlockWrongPassword;
+
+  /// No description provided for @unlockWrongPasswordLocked.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password. Locked for {time}.'**
+  String unlockWrongPasswordLocked(String time);
+
+  /// No description provided for @unlockVaultWiped.
+  ///
+  /// In en, this message translates to:
+  /// **'Vault wiped after too many failed attempts.'**
+  String get unlockVaultWiped;
+
+  /// No description provided for @unlockBiometricFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric authentication failed or not configured.'**
+  String get unlockBiometricFailed;
+
+  /// No description provided for @unlockGenericError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not unlock the vault.'**
+  String get unlockGenericError;
+
   /// No description provided for @settingsSectionAppearance.
   ///
   /// In en, this message translates to:

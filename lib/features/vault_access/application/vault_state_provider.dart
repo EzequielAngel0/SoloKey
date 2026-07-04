@@ -14,13 +14,41 @@ import 'vault_exceptions.dart';
 part 'vault_state_provider.freezed.dart';
 part 'vault_state_provider.g.dart';
 
+/// Semantic reason of an unlock/setup failure. The notifier lives in the
+/// application layer (no `BuildContext`), so it MUST NOT build user-facing
+/// strings — it reports the reason and the presentation layer localizes it via
+/// `AppLocalizations`. Keeps the Zero-hardcoded-i18n rule intact.
+enum VaultErrorKind {
+  /// The master password did not match (optionally with a fresh lockout).
+  wrongPassword,
+
+  /// An attempt was rejected because a brute-force lockout is active.
+  lockedOut,
+
+  /// The vault was wiped after reaching the failed-attempt threshold.
+  wiped,
+
+  /// Biometric / Windows Hello unlock failed or is not configured.
+  biometricFailed,
+
+  /// WiFi/remote unlock failed.
+  remoteFailed,
+
+  /// Any other/unexpected failure ([message] carries the raw detail, if any).
+  generic,
+}
+
 @freezed
 class VaultState with _$VaultState {
   const factory VaultState.initial() = _Initial;
   const factory VaultState.loading() = _Loading;
   const factory VaultState.unlocked(VaultSession session) = _Unlocked;
   const factory VaultState.locked() = _Locked;
-  const factory VaultState.error(String message) = _Error;
+  const factory VaultState.error({
+    @Default(VaultErrorKind.generic) VaultErrorKind kind,
+    Duration? lockout,
+    String? message,
+  }) = _Error;
 }
 
 @riverpod
@@ -35,7 +63,7 @@ class VaultNotifier extends _$VaultNotifier {
       final session = await useCase.execute(masterPassword);
       state = VaultState.unlocked(session);
     } catch (e) {
-      state = VaultState.error(e.toString());
+      state = VaultState.error(message: e.toString());
     }
   }
 
@@ -47,28 +75,19 @@ class VaultNotifier extends _$VaultNotifier {
       state = VaultState.unlocked(session);
     } on VaultLockedOutException catch (e) {
       state = VaultState.error(
-          'Demasiados intentos. Espera ${_formatLockout(e.remaining)}.');
+          kind: VaultErrorKind.lockedOut, lockout: e.remaining);
     } on WrongMasterPasswordException catch (e) {
-      state = e.lockoutAfter > Duration.zero
-          ? VaultState.error(
-              'Contraseña incorrecta. Bloqueado ${_formatLockout(e.lockoutAfter)}.')
-          : const VaultState.error('Contraseña maestra incorrecta');
+      state = VaultState.error(
+        kind: VaultErrorKind.wrongPassword,
+        lockout: e.lockoutAfter > Duration.zero ? e.lockoutAfter : null,
+      );
     } on VaultWipedException {
-      state = const VaultState.error(
-          'Bóveda borrada por demasiados intentos fallidos.');
+      state = const VaultState.error(kind: VaultErrorKind.wiped);
     } on ArgumentError {
-      state = const VaultState.error('Contraseña maestra incorrecta');
+      state = const VaultState.error(kind: VaultErrorKind.wrongPassword);
     } catch (e) {
-      state = VaultState.error(e.toString());
+      state = VaultState.error(message: e.toString());
     }
-  }
-
-  static String _formatLockout(Duration d) {
-    if (d.inMinutes >= 1) {
-      final s = d.inSeconds % 60;
-      return s > 0 ? '${d.inMinutes}m ${s}s' : '${d.inMinutes}m';
-    }
-    return '${d.inSeconds}s';
   }
 
   Future<void> unlockWithBiometrics() async {
@@ -78,7 +97,7 @@ class VaultNotifier extends _$VaultNotifier {
       final session = await useCase.executeBiometrics();
       state = VaultState.unlocked(session);
     } catch (e) {
-      state = const VaultState.error('Autenticación biométrica fallida o no configurada.');
+      state = const VaultState.error(kind: VaultErrorKind.biometricFailed);
     }
   }
 
@@ -90,7 +109,7 @@ class VaultNotifier extends _$VaultNotifier {
       final session = await useCase.executeWithRawKey(key);
       state = VaultState.unlocked(session);
     } catch (e) {
-      state = const VaultState.error('Desbloqueo remoto fallido.');
+      state = const VaultState.error(kind: VaultErrorKind.remoteFailed);
     }
   }
 

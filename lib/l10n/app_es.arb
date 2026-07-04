@@ -20,6 +20,14 @@
   "unlockRemoteFailed": "Desbloqueo remoto fallido: {msg}",
   "unlockRemoteError": "Error en desbloqueo remoto",
   "unlockBiometricReason": "Desbloquea tu bóveda",
+  "unlockWrongPassword": "Contraseña maestra incorrecta",
+  "unlockWrongPasswordLocked": "Contraseña incorrecta. Bloqueado {time}.",
+  "@unlockWrongPasswordLocked": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "unlockVaultWiped": "Bóveda borrada por demasiados intentos fallidos.",
+  "unlockBiometricFailed": "Autenticación biométrica fallida o no configurada.",
+  "unlockGenericError": "No se pudo desbloquear la bóveda.",
 
   "settingsSectionAppearance": "Apariencia",
   "settingsSectionLanguage": "Idioma",

@@ -29,6 +29,14 @@
   },
   "unlockRemoteError": "Remote unlock error",
   "unlockBiometricReason": "Unlock your vault",
+  "unlockWrongPassword": "Incorrect master password",
+  "unlockWrongPasswordLocked": "Incorrect password. Locked for {time}.",
+  "@unlockWrongPasswordLocked": {
+    "placeholders": { "time": { "type": "String" } }
+  },
+  "unlockVaultWiped": "Vault wiped after too many failed attempts.",
+  "unlockBiometricFailed": "Biometric authentication failed or not configured.",
+  "unlockGenericError": "Could not unlock the vault.",
 
   "settingsSectionAppearance": "Appearance",
   "settingsSectionLanguage": "Language",

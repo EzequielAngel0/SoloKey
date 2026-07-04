@@ -69,6 +69,25 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unlockBiometricReason => 'Desbloquea tu bóveda';
 
   @override
+  String get unlockWrongPassword => 'Contraseña maestra incorrecta';
+
+  @override
+  String unlockWrongPasswordLocked(String time) {
+    return 'Contraseña incorrecta. Bloqueado $time.';
+  }
+
+  @override
+  String get unlockVaultWiped =>
+      'Bóveda borrada por demasiados intentos fallidos.';
+
+  @override
+  String get unlockBiometricFailed =>
+      'Autenticación biométrica fallida o no configurada.';
+
+  @override
+  String get unlockGenericError => 'No se pudo desbloquear la bóveda.';
+
+  @override
   String get settingsSectionAppearance => 'Apariencia';
 
   @override

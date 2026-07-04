@@ -125,9 +125,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
       ref.read(vaultNotifierProvider).maybeWhen(
             unlocked: (_) => _navigateHome(),
-            error: (msg) {
+            error: (kind, lockout, message) {
               setState(() => _isRemoteUnlocking = false);
-              _showError(AppLocalizations.of(context).unlockRemoteFailed(msg));
+              _showError(_localizeVaultError(kind, lockout, message));
             },
             orElse: () {
               setState(() => _isRemoteUnlocking = false);
@@ -183,7 +183,8 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
       ref.read(vaultNotifierProvider).maybeWhen(
             unlocked: (_) => _navigateHome(),
-            error: _showError,
+            error: (kind, lockout, message) =>
+                _showError(_localizeVaultError(kind, lockout, message)),
             orElse: () {},
           );
     } catch (_) {
@@ -209,14 +210,41 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     if (!mounted) return;
     ref.read(vaultNotifierProvider).maybeWhen(
           unlocked: (_) => _navigateHome(),
-          error: (msg) {
+          error: (kind, lockout, message) {
             setState(() => _charCount = 0);
-            _showError(msg);
+            _showError(_localizeVaultError(kind, lockout, message));
             // Actualiza el contador/lockout tras un intento fallido.
             _refreshLockout();
           },
           orElse: () {},
         );
+  }
+
+  /// Maps a semantic [VaultErrorKind] to a localized, user-facing message. The
+  /// notifier reports the reason (no `BuildContext`); the screen localizes it.
+  String _localizeVaultError(
+    VaultErrorKind kind,
+    Duration? lockout,
+    String? message,
+  ) {
+    final l10n = AppLocalizations.of(context);
+    switch (kind) {
+      case VaultErrorKind.wrongPassword:
+        return lockout != null
+            ? l10n.unlockWrongPasswordLocked(_formatLockout(lockout))
+            : l10n.unlockWrongPassword;
+      case VaultErrorKind.lockedOut:
+        return l10n.unlockTooManyAttempts(
+            _formatLockout(lockout ?? Duration.zero));
+      case VaultErrorKind.wiped:
+        return l10n.unlockVaultWiped;
+      case VaultErrorKind.biometricFailed:
+        return l10n.unlockBiometricFailed;
+      case VaultErrorKind.remoteFailed:
+        return l10n.unlockRemoteError;
+      case VaultErrorKind.generic:
+        return l10n.unlockGenericError;
+    }
   }
 
   /// Desktop (M3): asks the connected phone(s) to approve unlocking this PC.
