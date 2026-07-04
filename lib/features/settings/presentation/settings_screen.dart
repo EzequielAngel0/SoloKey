@@ -26,6 +26,7 @@ import '../domain/repositories/i_settings_repository.dart';
 import '../../../core/presentation/layouts/responsive_layout.dart';
 import '../../../theme/app_palette.dart';
 import '../../../theme/app_theme.dart';
+import '../../../theme/ui_density.dart';
 
 part 'settings_screen.g.dart';
 
@@ -153,6 +154,10 @@ class _SettingsBody extends StatelessWidget {
             _LanguageModeTile(
               current: settings.locale,
               onChanged: (key) => onUpdate(settings.copyWith(locale: key)),
+            ),
+            _DensityTile(
+              current: settings.uiDensity,
+              onChanged: (key) => onUpdate(settings.copyWith(uiDensity: key)),
             ),
           ],
         ),
@@ -365,6 +370,94 @@ class _LanguageModeTile extends StatelessWidget {
                       fontWeight:
                           selected ? FontWeight.w700 : FontWeight.w500,
                     ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// UI density selector: two pills (comfortable / compact) persisted in
+/// `AppSecuritySettings.uiDensity` and applied as `VisualDensity` in `app.dart`.
+class _DensityTile extends StatelessWidget {
+  const _DensityTile({required this.current, required this.onChanged});
+
+  final String current;
+  final ValueChanged<String> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    String labelFor(UiDensity d) => switch (d) {
+          UiDensity.comfortable => l10n.densityComfortable,
+          UiDensity.compact => l10n.densityCompact,
+        };
+
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.density_medium_rounded,
+                  color: palette.accent, size: 20),
+              const SizedBox(width: 12),
+              Text(
+                l10n.settingsDensityTitle,
+                style: TextStyle(
+                  color: palette.textPrimary,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: UiDensity.values.map((d) {
+              final selected = d.key == current;
+              return GestureDetector(
+                onTap: () => onChanged(d.key),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16, vertical: 10),
+                  decoration: BoxDecoration(
+                    color: selected
+                        ? palette.accent.withValues(alpha: 0.15)
+                        : palette.cardDark,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: selected ? palette.accent : palette.divider,
+                      width: selected ? 2 : 1,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(d.icon,
+                          size: 16,
+                          color:
+                              selected ? palette.accent : palette.textMuted),
+                      const SizedBox(width: 8),
+                      Text(
+                        labelFor(d),
+                        style: TextStyle(
+                          color: selected ? palette.accent : palette.textMuted,
+                          fontSize: 13,
+                          fontWeight:
+                              selected ? FontWeight.w700 : FontWeight.w500,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               );

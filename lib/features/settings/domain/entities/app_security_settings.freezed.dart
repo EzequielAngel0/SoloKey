@@ -34,7 +34,10 @@ mixin _$AppSecuritySettings {
   bool get autostartEnabled =>
       throw _privateConstructorUsedError; // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
   int get scheduledBackupIntervalDays => throw _privateConstructorUsedError;
-  String? get backupDirectory => throw _privateConstructorUsedError;
+  String? get backupDirectory =>
+      throw _privateConstructorUsedError; // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
+  // VisualDensity en el tema (ver UiDensity).
+  String get uiDensity => throw _privateConstructorUsedError;
 
   /// Serializes this AppSecuritySettings to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -64,6 +67,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
     String? backupDirectory,
+    String uiDensity,
   });
 }
 
@@ -92,6 +96,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
+    Object? uiDensity = null,
   }) {
     return _then(
       _value.copyWith(
@@ -135,6 +140,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.backupDirectory
                 : backupDirectory // ignore: cast_nullable_to_non_nullable
                       as String?,
+            uiDensity: null == uiDensity
+                ? _value.uiDensity
+                : uiDensity // ignore: cast_nullable_to_non_nullable
+                      as String,
           )
           as $Val,
     );
@@ -161,6 +170,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
     String? backupDirectory,
+    String uiDensity,
   });
 }
 
@@ -188,6 +198,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
+    Object? uiDensity = null,
   }) {
     return _then(
       _$AppSecuritySettingsImpl(
@@ -231,6 +242,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.backupDirectory
             : backupDirectory // ignore: cast_nullable_to_non_nullable
                   as String?,
+        uiDensity: null == uiDensity
+            ? _value.uiDensity
+            : uiDensity // ignore: cast_nullable_to_non_nullable
+                  as String,
       ),
     );
   }
@@ -250,6 +265,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.autostartEnabled = false,
     this.scheduledBackupIntervalDays = 0,
     this.backupDirectory,
+    this.uiDensity = 'comfortable',
   });
 
   factory _$AppSecuritySettingsImpl.fromJson(Map<String, dynamic> json) =>
@@ -288,10 +304,15 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   final int scheduledBackupIntervalDays;
   @override
   final String? backupDirectory;
+  // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
+  // VisualDensity en el tema (ver UiDensity).
+  @override
+  @JsonKey()
+  final String uiDensity;
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity)';
   }
 
   @override
@@ -324,7 +345,9 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
                 other.scheduledBackupIntervalDays ==
                     scheduledBackupIntervalDays) &&
             (identical(other.backupDirectory, backupDirectory) ||
-                other.backupDirectory == backupDirectory));
+                other.backupDirectory == backupDirectory) &&
+            (identical(other.uiDensity, uiDensity) ||
+                other.uiDensity == uiDensity));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -341,6 +364,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     autostartEnabled,
     scheduledBackupIntervalDays,
     backupDirectory,
+    uiDensity,
   );
 
   /// Create a copy of AppSecuritySettings
@@ -372,6 +396,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final bool autostartEnabled,
     final int scheduledBackupIntervalDays,
     final String? backupDirectory,
+    final String uiDensity,
   }) = _$AppSecuritySettingsImpl;
 
   factory _AppSecuritySettings.fromJson(Map<String, dynamic> json) =
@@ -396,7 +421,10 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   int get scheduledBackupIntervalDays;
   @override
-  String? get backupDirectory;
+  String? get backupDirectory; // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
+  // VisualDensity en el tema (ver UiDensity).
+  @override
+  String get uiDensity;
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.

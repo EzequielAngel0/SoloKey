@@ -148,6 +148,15 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsThemeTitle => 'Tema de la aplicación';
 
   @override
+  String get settingsDensityTitle => 'Densidad';
+
+  @override
+  String get densityComfortable => 'Cómoda';
+
+  @override
+  String get densityCompact => 'Compacta';
+
+  @override
   String get themeSystem => 'Sistema';
 
   @override

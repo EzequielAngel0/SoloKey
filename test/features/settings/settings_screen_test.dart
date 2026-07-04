@@ -37,4 +37,26 @@ void main() {
     // The settings body renders switches/sliders once loaded.
     expect(find.byType(Switch), findsWidgets);
   });
+
+  testWidgets('tapping the Compact density pill persists uiDensity',
+      (tester) async {
+    tolerateInkHiddenPaintWarnings();
+    final repo = _FakeSettingsRepo(AppSecuritySettings.defaults());
+    await pumpApp(
+      tester,
+      scaffolded(const SettingsView()),
+      overrides: [settingsRepositoryProvider.overrideWithValue(repo)],
+      surfaceSize: const Size(820, 2400),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // The compact pill is uniquely identified by its density_small icon
+    // (locale-independent). Default is 'comfortable'.
+    expect(repo.settings.uiDensity, 'comfortable');
+    await tester.tap(find.byIcon(Icons.density_small_rounded));
+    await tester.pump();
+
+    expect(repo.settings.uiDensity, 'compact');
+  });
 }

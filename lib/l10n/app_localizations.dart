@@ -350,6 +350,24 @@ abstract class AppLocalizations {
   /// **'App theme'**
   String get settingsThemeTitle;
 
+  /// No description provided for @settingsDensityTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Density'**
+  String get settingsDensityTitle;
+
+  /// No description provided for @densityComfortable.
+  ///
+  /// In en, this message translates to:
+  /// **'Comfortable'**
+  String get densityComfortable;
+
+  /// No description provided for @densityCompact.
+  ///
+  /// In en, this message translates to:
+  /// **'Compact'**
+  String get densityCompact;
+
   /// No description provided for @themeSystem.
   ///
   /// In en, this message translates to:

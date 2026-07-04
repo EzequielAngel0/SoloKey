@@ -19,6 +19,7 @@ import '../l10n/language_mode.dart';
 import '../router/app_router.dart';
 import '../theme/app_theme.dart';
 import '../theme/app_transitions.dart';
+import '../theme/ui_density.dart';
 import 'di/injection.dart';
 
 class App extends ConsumerStatefulWidget {
@@ -225,26 +226,34 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
         ? null
         : LanguageMode.fromKey(settings.locale).locale;
 
+    // Visual density picked in Settings ('comfortable' | 'compact'). Applied to
+    // every built theme below so the whole UI tightens/relaxes consistently.
+    final density = UiDensity.fromKey(settings?.uiDensity).visualDensity;
+    ThemeData withExtras(ThemeData t) => t.copyWith(
+          pageTransitionsTheme: _pageTransitions,
+          visualDensity: density,
+        );
+
     final ThemeData theme;
     ThemeData? darkTheme;
     final ThemeMode themeMode;
     switch (mode) {
       case AppThemeMode.system:
         // Let Flutter pick light/dark based on the OS brightness.
-        theme = AppTheme.light().copyWith(pageTransitionsTheme: _pageTransitions);
-        darkTheme = AppTheme.dark().copyWith(pageTransitionsTheme: _pageTransitions);
+        theme = withExtras(AppTheme.light());
+        darkTheme = withExtras(AppTheme.dark());
         themeMode = ThemeMode.system;
       case AppThemeMode.light:
-        theme = AppTheme.light().copyWith(pageTransitionsTheme: _pageTransitions);
+        theme = withExtras(AppTheme.light());
         themeMode = ThemeMode.light;
       case AppThemeMode.dark:
-        theme = AppTheme.dark().copyWith(pageTransitionsTheme: _pageTransitions);
+        theme = withExtras(AppTheme.dark());
         themeMode = ThemeMode.light;
       case AppThemeMode.dim:
-        theme = AppTheme.dim().copyWith(pageTransitionsTheme: _pageTransitions);
+        theme = withExtras(AppTheme.dim());
         themeMode = ThemeMode.light;
       case AppThemeMode.oled:
-        theme = AppTheme.oled().copyWith(pageTransitionsTheme: _pageTransitions);
+        theme = withExtras(AppTheme.oled());
         themeMode = ThemeMode.light;
     }
 

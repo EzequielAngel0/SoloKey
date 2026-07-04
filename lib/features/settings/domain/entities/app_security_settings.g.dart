@@ -21,6 +21,7 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   scheduledBackupIntervalDays:
       (json['scheduledBackupIntervalDays'] as num?)?.toInt() ?? 0,
   backupDirectory: json['backupDirectory'] as String?,
+  uiDensity: json['uiDensity'] as String? ?? 'comfortable',
 );
 
 Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
@@ -36,4 +37,5 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'autostartEnabled': instance.autostartEnabled,
   'scheduledBackupIntervalDays': instance.scheduledBackupIntervalDays,
   'backupDirectory': instance.backupDirectory,
+  'uiDensity': instance.uiDensity,
 };

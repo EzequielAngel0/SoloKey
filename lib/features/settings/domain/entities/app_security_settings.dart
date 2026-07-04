@@ -20,6 +20,9 @@ class AppSecuritySettings with _$AppSecuritySettings {
     // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
     @Default(0) int scheduledBackupIntervalDays,
     String? backupDirectory,
+    // Densidad visual de la UI: 'comfortable' | 'compact'. Se aplica como
+    // VisualDensity en el tema (ver UiDensity).
+    @Default('comfortable') String uiDensity,
   }) = _AppSecuritySettings;
 
   factory AppSecuritySettings.fromJson(Map<String, dynamic> json) =>
