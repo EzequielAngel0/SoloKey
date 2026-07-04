@@ -41,6 +41,8 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 | 95 | [Pruebas (lógica + UI + integración)](95_pruebas.md) | `test/**`, `integration_test/**` | pirámide unit→widget→e2e; **un solo chat**; deja el proceso auto-sostenible |
 | 96 | [Pruebas del módulo Sync](96_pruebas_sync.md) | `sync_service`, `pairing_screen`, `test/support` | fake reutilizable de `SyncService`, lógica pura, widget tests de pairing |
 | 97 | [Subir cobertura + smoke→behavioral](97_pruebas_cobertura.md) | `credential_form`, detalle, ajustes, servicios | guardado por tipo, revelar con auth mockeada, eleva smoke a behavioral |
+| 98 | [Behavioral: escritorio y transferencia](98_pruebas_escritorio_transferencia.md) | `transfer_screen`, `desktop_main_layout`, `secure_files_screen` | export/import selectivo real, navegación master-detail, archivos con auth |
+| 99 | [Acceso, auto-bloqueo y fondo](99_pruebas_acceso_fondo.md) | `unlock_screen`, `app_lifecycle_observer`, `notification_service` | unlock por contraseña/remoto, decisión pura de auto-bloqueo, rotación |
 
 > **Testing:** la red de pruebas **ya existe** — pirámide unit → widget → e2e en
 > `test/**` (espeja `lib/**`, con harness compartido `test/support/widget_harness.dart`)
