@@ -9,9 +9,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/services/vault_export_service.dart' show kNoFolderFilterId;
 import '../../../core/utils/auth_helper.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../../shared/utils/relative_time.dart';
+import '../../../shared/widgets/empty_state.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../folders/application/folders_provider.dart';
+import '../application/secure_file_import.dart';
 import '../application/secure_files_provider.dart';
 import '../domain/entities/secure_file.dart';
 
@@ -28,6 +31,9 @@ class SecureFilesScreen extends ConsumerStatefulWidget {
 class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
   bool _busy = false;
   bool _dragging = false;
+
+  /// (done, total) while a batch is being encrypted, or null when idle.
+  ({int done, int total})? _progress;
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
@@ -54,21 +60,66 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
   Future<void> _addAll(List<({String name, Uint8List bytes})> files) async {
     if (files.isEmpty) return;
     final l10n = AppLocalizations.of(context);
-    setState(() => _busy = true);
+
+    // Enforce the per-file size cap up-front so a huge drop can't OOM us.
+    final tooLarge = <String>[];
+    final accepted = <({String name, Uint8List bytes})>[];
+    for (final f in files) {
+      if (isWithinSecureFileLimit(f.bytes.length)) {
+        accepted.add(f);
+      } else {
+        tooLarge.add(f.name);
+      }
+    }
+
+    if (accepted.isEmpty) {
+      _snack(
+        tooLarge.length == 1
+            ? l10n.secureFilesTooLarge(
+                tooLarge.first, formatFileSize(kMaxSecureFileBytes))
+            : l10n.secureFilesSkippedLarge(tooLarge.length),
+        error: true,
+      );
+      return;
+    }
+
+    // Names already in the store — used to avoid silent duplicates on import.
+    final existing = <String>{
+      for (final f in ref.read(secureFilesNotifierProvider).valueOrNull ?? [])
+        f.name,
+    };
+
+    setState(() {
+      _busy = true;
+      _progress = (done: 0, total: accepted.length);
+    });
     var ok = 0;
+    String? lastName;
     try {
       final notifier = ref.read(secureFilesNotifierProvider.notifier);
-      for (final f in files) {
-        await notifier.addFile(name: f.name, bytes: f.bytes);
+      for (final f in accepted) {
+        final name = uniqueSecureFileName(f.name, existing);
+        existing.add(name);
+        await notifier.addFile(name: name, bytes: f.bytes);
+        lastName = name;
         ok++;
+        if (mounted) setState(() => _progress = (done: ok, total: accepted.length));
       }
       _snack(ok == 1
-          ? l10n.secureFilesAddedSummary(files.first.name)
+          ? l10n.secureFilesAddedSummary(lastName ?? accepted.first.name)
           : l10n.secureFilesAddedCount(ok));
+      if (tooLarge.isNotEmpty && mounted) {
+        _snack(l10n.secureFilesSkippedLarge(tooLarge.length), error: true);
+      }
     } catch (e) {
       if (mounted) _snack(l10n.secureFilesAddError('$e'), error: true);
     } finally {
-      if (mounted) setState(() => _busy = false);
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _progress = null;
+        });
+      }
     }
   }
 
@@ -338,9 +389,10 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
                   Center(child: Text('$e', style: TextStyle(color: palette.danger))),
               data: (files) {
                 if (files.isEmpty) {
-                  return _EmptyState(
+                  return EmptyState(
+                    icon: Icons.folder_shared_rounded,
                     title: l10n.secureFilesEmptyTitle,
-                    desc: l10n.secureFilesEmptyDesc,
+                    subtitle: l10n.secureFilesEmptyDesc,
                   );
                 }
                 final sorted = [...files]..sort((a, b) {
@@ -358,7 +410,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
                     folderName: sorted[i].folderId == null
                         ? null
                         : folderNames[sorted[i].folderId],
-                    onTap: () => _exportFile(sorted[i]),
+                    onTap: () => _showOptions(sorted[i]),
                     onMore: () => _showOptions(sorted[i]),
                     onToggleFavorite: () => ref
                         .read(secureFilesNotifierProvider.notifier)
@@ -371,8 +423,22 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
               Positioned.fill(
                 child: ColoredBox(
                   color: Colors.black54,
-                  child:
-                      Center(child: CircularProgressIndicator(color: palette.accent)),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircularProgressIndicator(color: palette.accent),
+                        if (_progress != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            l10n.secureFilesProcessing(
+                                _progress!.done, _progress!.total),
+                            style: TextStyle(color: palette.textPrimary),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
               ),
             if (_dragging)
@@ -424,8 +490,14 @@ class _SecureFileTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final meta = StringBuffer(_formatSize(file.sizeBytes));
+    final locale = Localizations.localeOf(context).languageCode;
+    final meta = StringBuffer(formatFileSize(file.sizeBytes))
+      ..write('  ·  ')
+      ..write(relativeTime(l10n, file.createdAt, locale: locale));
     if (folderName != null) meta.write('  ·  $folderName');
+    final typeLabel = file.mimeHint == null
+        ? l10n.secureFilesFileGeneric
+        : l10n.secureFilesFileTypeLabel(file.mimeHint!.toUpperCase());
     return Material(
       color: palette.card,
       borderRadius: BorderRadius.circular(14),
@@ -437,13 +509,16 @@ class _SecureFileTile extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
           child: Row(
             children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: palette.accent.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(10),
+              Semantics(
+                label: typeLabel,
+                child: Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: palette.accent.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(_iconFor(file.mimeHint), color: palette.accent),
                 ),
-                child: Icon(_iconFor(file.mimeHint), color: palette.accent),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -482,6 +557,7 @@ class _SecureFileTile extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.more_vert_rounded, color: palette.textMuted),
+                tooltip: l10n.secureFilesOptions,
                 onPressed: onMore,
               ),
             ],
@@ -489,12 +565,6 @@ class _SecureFileTile extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  static String _formatSize(int bytes) {
-    if (bytes < 1024) return '$bytes B';
-    if (bytes < 1024 * 1024) return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
   }
 
   static IconData _iconFor(String? ext) {
@@ -523,51 +593,5 @@ class _SecureFileTile extends StatelessWidget {
       default:
         return Icons.insert_drive_file_rounded;
     }
-  }
-}
-
-class _EmptyState extends StatelessWidget {
-  const _EmptyState({required this.title, required this.desc});
-  final String title;
-  final String desc;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(32),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                color: palette.card,
-                shape: BoxShape.circle,
-              ),
-              child: Icon(Icons.folder_shared_rounded,
-                  size: 48, color: palette.accent.withValues(alpha: 0.8)),
-            ),
-            const SizedBox(height: 24),
-            Text(
-              title,
-              style: TextStyle(
-                color: palette.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              desc,
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                  color: palette.textDisabled, fontSize: 13, height: 1.4),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

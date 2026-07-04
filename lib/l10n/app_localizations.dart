@@ -3302,6 +3302,66 @@ abstract class AppLocalizations {
   /// **'Added {count} file(s)'**
   String secureFilesAddedCount(int count);
 
+  /// No description provided for @secureFilesTooLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'\"{name}\" exceeds the {limit} limit and was skipped'**
+  String secureFilesTooLarge(String name, String limit);
+
+  /// No description provided for @secureFilesSkippedLarge.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 file skipped (too large)} other{{count} files skipped (too large)}}'**
+  String secureFilesSkippedLarge(int count);
+
+  /// No description provided for @secureFilesProcessing.
+  ///
+  /// In en, this message translates to:
+  /// **'Encrypting {done} of {total}…'**
+  String secureFilesProcessing(int done, int total);
+
+  /// No description provided for @secureFilesOptions.
+  ///
+  /// In en, this message translates to:
+  /// **'Options'**
+  String get secureFilesOptions;
+
+  /// No description provided for @secureFilesFileTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'{type} file'**
+  String secureFilesFileTypeLabel(String type);
+
+  /// No description provided for @secureFilesFileGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'File'**
+  String get secureFilesFileGeneric;
+
+  /// No description provided for @relativeNow.
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get relativeNow;
+
+  /// No description provided for @relativeMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  String relativeMinutes(int count);
+
+  /// No description provided for @relativeHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 h ago} other{{count} h ago}}'**
+  String relativeHours(int count);
+
+  /// No description provided for @relativeDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 d ago} other{{count} d ago}}'**
+  String relativeDays(int count);
+
   /// No description provided for @homeShowHidden.
   ///
   /// In en, this message translates to:

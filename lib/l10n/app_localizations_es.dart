@@ -1778,6 +1778,74 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String secureFilesTooLarge(String name, String limit) {
+    return '\"$name\" supera el limite de $limit y se omitio';
+  }
+
+  @override
+  String secureFilesSkippedLarge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count archivos omitidos (muy grandes)',
+      one: '1 archivo omitido (muy grande)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String secureFilesProcessing(int done, int total) {
+    return 'Cifrando $done de $total…';
+  }
+
+  @override
+  String get secureFilesOptions => 'Opciones';
+
+  @override
+  String secureFilesFileTypeLabel(String type) {
+    return 'Archivo $type';
+  }
+
+  @override
+  String get secureFilesFileGeneric => 'Archivo';
+
+  @override
+  String get relativeNow => 'hace un momento';
+
+  @override
+  String relativeMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count min',
+      one: 'hace 1 min',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relativeHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count h',
+      one: 'hace 1 h',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relativeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'hace $count d',
+      one: 'hace 1 d',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get homeShowHidden => 'Ver ocultas';
 
   @override

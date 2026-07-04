@@ -1761,6 +1761,74 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String secureFilesTooLarge(String name, String limit) {
+    return '\"$name\" exceeds the $limit limit and was skipped';
+  }
+
+  @override
+  String secureFilesSkippedLarge(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count files skipped (too large)',
+      one: '1 file skipped (too large)',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String secureFilesProcessing(int done, int total) {
+    return 'Encrypting $done of $total…';
+  }
+
+  @override
+  String get secureFilesOptions => 'Options';
+
+  @override
+  String secureFilesFileTypeLabel(String type) {
+    return '$type file';
+  }
+
+  @override
+  String get secureFilesFileGeneric => 'File';
+
+  @override
+  String get relativeNow => 'just now';
+
+  @override
+  String relativeMinutes(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count min ago',
+      one: '1 min ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relativeHours(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count h ago',
+      one: '1 h ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String relativeDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count d ago',
+      one: '1 d ago',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get homeShowHidden => 'Show hidden';
 
   @override
