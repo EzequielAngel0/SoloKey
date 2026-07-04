@@ -64,24 +64,30 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Image.asset(
-                  'assets/logo/solokey_mark.png',
-                  height: 104,
-                  width: 104,
-                  errorBuilder: (_, _, _) => Image.asset(
-                    'assets/logo/SoloKey.png',
+                // Decorative logo — the brand name below carries the semantics.
+                ExcludeSemantics(
+                  child: Image.asset(
+                    'assets/logo/solokey_mark.png',
                     height: 104,
                     width: 104,
+                    errorBuilder: (_, _, _) => Image.asset(
+                      'assets/logo/SoloKey.png',
+                      height: 104,
+                      width: 104,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 24),
-                Text(
-                  'SoloKey',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
-                    letterSpacing: 1.2,
+                Semantics(
+                  header: true,
+                  child: Text(
+                    'SoloKey',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.w800,
+                      color: palette.textPrimary,
+                      letterSpacing: 1.2,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 8),
