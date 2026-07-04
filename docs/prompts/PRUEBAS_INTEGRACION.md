@@ -82,6 +82,31 @@ flutter devices                         # copia el id del dispositivo
 flutter test integration_test -d emulator-5554
 ```
 
+> ⚠️ En **Windows corre UN archivo por invocación** (la instancia única del `main()`
+> bloquea la 2.ª app). Lanzar la carpeta entera (`flutter test integration_test -d
+> windows`) falla al abrir el segundo test. Usa la ruta del archivo, p. ej.
+> `flutter test integration_test/vault_e2e_test.dart -d windows …` (ver *Anti-flaky*).
+
+### Con backup automático (equipo con vault real)
+
+Como el e2e destructivo borra el vault REAL de Windows (DB en `Documents` + secure
+storage DPAPI), en una máquina con datos reales corre el runner que **siempre hace
+backup antes y restaura después** (snapshot con hash → tests → restore en `finally`):
+
+```powershell
+.\run_integration_tests.ps1                 # app_boot + vault_e2e ×2 (anti-flaky), con backup/restore
+.\run_integration_tests.ps1 -SkipDestructive # solo app_boot (no toca el vault)
+```
+
+El script cierra cualquier `SoloKey.exe` abierto, snapshotea `vault_guard_db.sqlite`
+y los `flutter_secure_storage.dat` conocidos en `%USERPROFILE%\SoloKey-e2e-backup-<ts>`,
+corre los tests y **restaura verificando hash** (deja el vault byte-idéntico). Aun
+así, ejecútalo solo cuando tengas ese backup a mano.
+
+**Última corrida validada (2026-07-04, Windows):** `app_boot` verde; `vault_e2e`
+(setup→recovery→unlock) **2/2 verdes**; vault real restaurado y verificado por SHA-256
+(DB y secure storage idénticos al estado previo).
+
 Los `--dart-define` son la **configuración** de la corrida. SoloKey no tiene URL de API;
 los defines aquí son **seams de prueba** que la propia suite puede introducir para lo que
 no se puede automatizar:
