@@ -314,6 +314,216 @@ abstract class AppLocalizations {
   /// **'Try now'**
   String get settingsQuickFillTryNow;
 
+  /// No description provided for @commonDisabled.
+  ///
+  /// In en, this message translates to:
+  /// **'Disabled'**
+  String get commonDisabled;
+
+  /// No description provided for @settingsSectionSecurity.
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get settingsSectionSecurity;
+
+  /// No description provided for @settingsSectionData.
+  ///
+  /// In en, this message translates to:
+  /// **'Data'**
+  String get settingsSectionData;
+
+  /// No description provided for @settingsSectionAbout.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsSectionAbout;
+
+  /// No description provided for @settingsSectionDanger.
+  ///
+  /// In en, this message translates to:
+  /// **'Danger zone'**
+  String get settingsSectionDanger;
+
+  /// No description provided for @settingsThemeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App theme'**
+  String get settingsThemeTitle;
+
+  /// No description provided for @themeSystem.
+  ///
+  /// In en, this message translates to:
+  /// **'System'**
+  String get themeSystem;
+
+  /// No description provided for @themeLight.
+  ///
+  /// In en, this message translates to:
+  /// **'Light'**
+  String get themeLight;
+
+  /// No description provided for @themeDark.
+  ///
+  /// In en, this message translates to:
+  /// **'Dark'**
+  String get themeDark;
+
+  /// No description provided for @themeDim.
+  ///
+  /// In en, this message translates to:
+  /// **'Dim'**
+  String get themeDim;
+
+  /// No description provided for @themeOled.
+  ///
+  /// In en, this message translates to:
+  /// **'OLED'**
+  String get themeOled;
+
+  /// No description provided for @settingsWipeTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Wipe vault after failed attempts'**
+  String get settingsWipeTitle;
+
+  /// No description provided for @settingsWipeSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Anti brute-force protection (irreversible)'**
+  String get settingsWipeSubtitle;
+
+  /// No description provided for @settingsSyncComputerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync computer'**
+  String get settingsSyncComputerTitle;
+
+  /// No description provided for @settingsSyncComputerSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with desktop SoloKey'**
+  String get settingsSyncComputerSubtitle;
+
+  /// No description provided for @settingsExportImportTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Export / Import'**
+  String get settingsExportImportTitle;
+
+  /// No description provided for @settingsExportImportSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make encrypted backups of your vault'**
+  String get settingsExportImportSubtitle;
+
+  /// No description provided for @settingsAutofillTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'System autofill'**
+  String get settingsAutofillTitle;
+
+  /// No description provided for @settingsAutofillSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill passwords in other apps'**
+  String get settingsAutofillSubtitle;
+
+  /// No description provided for @settingsPasskeysTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Passkey backup'**
+  String get settingsPasskeysTitle;
+
+  /// No description provided for @settingsPasskeysSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Store your passkey backups'**
+  String get settingsPasskeysSubtitle;
+
+  /// No description provided for @settingsBackupTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Automatic backup'**
+  String get settingsBackupTitle;
+
+  /// No description provided for @settingsBackupDaily.
+  ///
+  /// In en, this message translates to:
+  /// **'Daily'**
+  String get settingsBackupDaily;
+
+  /// No description provided for @settingsBackupWeekly.
+  ///
+  /// In en, this message translates to:
+  /// **'Weekly'**
+  String get settingsBackupWeekly;
+
+  /// No description provided for @settingsBackupMonthly.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly'**
+  String get settingsBackupMonthly;
+
+  /// No description provided for @settingsBackupEveryNDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Every {days} days'**
+  String settingsBackupEveryNDays(int days);
+
+  /// No description provided for @settingsBackupNoFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'no folder'**
+  String get settingsBackupNoFolder;
+
+  /// No description provided for @settingsBackupFrequency.
+  ///
+  /// In en, this message translates to:
+  /// **'Frequency'**
+  String get settingsBackupFrequency;
+
+  /// No description provided for @settingsBackupChooseFolder.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose destination folder'**
+  String get settingsBackupChooseFolder;
+
+  /// No description provided for @settingsBackupPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password'**
+  String get settingsBackupPassword;
+
+  /// No description provided for @settingsBackupPasswordKeep.
+  ///
+  /// In en, this message translates to:
+  /// **'Backup password (leave empty = keep)'**
+  String get settingsBackupPasswordKeep;
+
+  /// No description provided for @settingsLockNowTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Lock now'**
+  String get settingsLockNowTitle;
+
+  /// No description provided for @settingsLockNowSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Close the session immediately'**
+  String get settingsLockNowSubtitle;
+
+  /// No description provided for @settingsVersionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get settingsVersionLabel;
+
+  /// No description provided for @settingsAboutTagline.
+  ///
+  /// In en, this message translates to:
+  /// **'Local-first password manager'**
+  String get settingsAboutTagline;
+
   /// No description provided for @languageSystem.
   ///
   /// In en, this message translates to:

@@ -12,4 +12,7 @@ abstract final class AppConstants {
   // Session
   static const int kDefaultAutoLockMinutes = 5;
   static const int kDefaultClipboardClearSeconds = 30;
+
+  // App metadata (mantener en sync con `version:` de pubspec.yaml).
+  static const String appVersion = '1.0.0';
 }

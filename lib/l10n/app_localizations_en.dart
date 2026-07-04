@@ -130,6 +130,116 @@ class AppLocalizationsEn extends AppLocalizations {
   String get settingsQuickFillTryNow => 'Try now';
 
   @override
+  String get commonDisabled => 'Disabled';
+
+  @override
+  String get settingsSectionSecurity => 'Security';
+
+  @override
+  String get settingsSectionData => 'Data';
+
+  @override
+  String get settingsSectionAbout => 'About';
+
+  @override
+  String get settingsSectionDanger => 'Danger zone';
+
+  @override
+  String get settingsThemeTitle => 'App theme';
+
+  @override
+  String get themeSystem => 'System';
+
+  @override
+  String get themeLight => 'Light';
+
+  @override
+  String get themeDark => 'Dark';
+
+  @override
+  String get themeDim => 'Dim';
+
+  @override
+  String get themeOled => 'OLED';
+
+  @override
+  String get settingsWipeTitle => 'Wipe vault after failed attempts';
+
+  @override
+  String get settingsWipeSubtitle =>
+      'Anti brute-force protection (irreversible)';
+
+  @override
+  String get settingsSyncComputerTitle => 'Sync computer';
+
+  @override
+  String get settingsSyncComputerSubtitle => 'Pair with desktop SoloKey';
+
+  @override
+  String get settingsExportImportTitle => 'Export / Import';
+
+  @override
+  String get settingsExportImportSubtitle =>
+      'Make encrypted backups of your vault';
+
+  @override
+  String get settingsAutofillTitle => 'System autofill';
+
+  @override
+  String get settingsAutofillSubtitle => 'Fill passwords in other apps';
+
+  @override
+  String get settingsPasskeysTitle => 'Passkey backup';
+
+  @override
+  String get settingsPasskeysSubtitle => 'Store your passkey backups';
+
+  @override
+  String get settingsBackupTitle => 'Automatic backup';
+
+  @override
+  String get settingsBackupDaily => 'Daily';
+
+  @override
+  String get settingsBackupWeekly => 'Weekly';
+
+  @override
+  String get settingsBackupMonthly => 'Monthly';
+
+  @override
+  String settingsBackupEveryNDays(int days) {
+    return 'Every $days days';
+  }
+
+  @override
+  String get settingsBackupNoFolder => 'no folder';
+
+  @override
+  String get settingsBackupFrequency => 'Frequency';
+
+  @override
+  String get settingsBackupChooseFolder => 'Choose destination folder';
+
+  @override
+  String get settingsBackupPassword => 'Backup password';
+
+  @override
+  String get settingsBackupPasswordKeep =>
+      'Backup password (leave empty = keep)';
+
+  @override
+  String get settingsLockNowTitle => 'Lock now';
+
+  @override
+  String get settingsLockNowSubtitle => 'Close the session immediately';
+
+  @override
+  String get settingsVersionLabel => 'Version';
+
+  @override
+  String get settingsAboutTagline => 'Local-first password manager';
+
+  @override
   String get languageSystem => 'Follow system';
 
   @override

@@ -11,12 +11,14 @@ import 'package:launch_at_startup/launch_at_startup.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../app/di/injection.dart';
+import '../../../core/constants/app_constants.dart';
 import '../../../core/infrastructure/security/app_lifecycle_observer.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
 import '../../../core/services/scheduled_backup_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../l10n/language_mode.dart';
 import '../../../router/app_router.dart';
+import '../../../shared/widgets/detail_group.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../domain/entities/app_security_settings.dart';
@@ -138,33 +140,25 @@ class _SettingsBody extends StatelessWidget {
     final isDesktop = !kIsWeb &&
         (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
     return ListView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
       children: [
-        _SectionHeader(label: l10n.settingsSectionAppearance),
-        const SizedBox(height: 8),
-        _SettingsCard(
+        // ── Apariencia ──────────────────────────────────────────────────────
+        SectionHeader(text: l10n.settingsSectionAppearance),
+        DetailGroup(
           children: [
             _ThemeModeTile(
               current: settings.themeMode,
               onChanged: (key) => onUpdate(settings.copyWith(themeMode: key)),
             ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _SectionHeader(label: l10n.settingsSectionLanguage),
-        const SizedBox(height: 8),
-        _SettingsCard(
-          children: [
             _LanguageModeTile(
               current: settings.locale,
               onChanged: (key) => onUpdate(settings.copyWith(locale: key)),
             ),
           ],
         ),
-        const SizedBox(height: 24),
-        _SectionHeader(label: l10n.settingsSectionAutoLock),
-        const SizedBox(height: 8),
-        _SettingsCard(
+        // ── Seguridad ───────────────────────────────────────────────────────
+        SectionHeader(text: l10n.settingsSectionSecurity),
+        DetailGroup(
           children: [
             _SliderTile(
               icon: Icons.timer_rounded,
@@ -178,18 +172,11 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(autoLockMinutes: v.round()),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _SectionHeader(label: l10n.settingsSectionClipboard),
-        const SizedBox(height: 8),
-        _SettingsCard(
-          children: [
             _SliderTile(
               icon: Icons.content_paste_off_rounded,
               label: l10n.settingsClearClipboardLabel,
-              valueLabel:
-                  l10n.settingsClearClipboardValue(settings.clearClipboardSeconds),
+              valueLabel: l10n
+                  .settingsClearClipboardValue(settings.clearClipboardSeconds),
               value: settings.clearClipboardSeconds.toDouble(),
               min: 10,
               max: 120,
@@ -198,13 +185,6 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(clearClipboardSeconds: v.round()),
               ),
             ),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _SectionHeader(label: l10n.settingsSectionPrivacy),
-        const SizedBox(height: 8),
-        _SettingsCard(
-          children: [
             _ToggleTile(
               icon: Icons.fingerprint_rounded,
               label: l10n.settingsBiometricLabel,
@@ -214,7 +194,6 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(biometricEnabled: v),
               ),
             ),
-            const _Divider(),
             _ToggleTile(
               icon: Icons.visibility_off_rounded,
               label: l10n.settingsObscureLabel,
@@ -224,8 +203,7 @@ class _SettingsBody extends StatelessWidget {
                 settings.copyWith(obscureOnBackground: v),
               ),
             ),
-            if (isDesktop) ...[
-              const _Divider(),
+            if (isDesktop)
               _ToggleTile(
                 icon: Icons.rocket_launch_rounded,
                 label: l10n.settingsAutostartLabel,
@@ -235,8 +213,6 @@ class _SettingsBody extends StatelessWidget {
                   settings.copyWith(autostartEnabled: v),
                 ),
               ),
-            ],
-            const _Divider(),
             _WipeAfterAttemptsTile(
               current: settings.wipeAfterFailedAttempts,
               onChanged: (n) =>
@@ -244,17 +220,16 @@ class _SettingsBody extends StatelessWidget {
             ),
           ],
         ),
+        // ── Quick-Fill (solo escritorio) ────────────────────────────────────
         if (isDesktop) ...[
-          const SizedBox(height: 24),
-          _SectionHeader(label: l10n.settingsSectionQuickFill),
-          const SizedBox(height: 8),
-          const _SettingsCard(
-            children: [_QuickFillInfoTile()],
-          ),
+          SectionHeader(text: l10n.settingsSectionQuickFill),
+          const DetailGroup(children: [_QuickFillInfoTile()]),
         ],
-        const SizedBox(height: 32),
+        // ── Datos ───────────────────────────────────────────────────────────
         _DataManagementSection(),
-        const SizedBox(height: 32),
+        // ── Acerca de ───────────────────────────────────────────────────────
+        const _AboutSection(),
+        // ── Zona peligrosa ──────────────────────────────────────────────────
         _DangerZone(),
       ],
     );
@@ -401,40 +376,6 @@ class _LanguageModeTile extends StatelessWidget {
   }
 }
 
-class _SectionHeader extends StatelessWidget {
-  const _SectionHeader({required this.label});
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Text(
-      label.toUpperCase(),
-      style: TextStyle(
-        color: context.palette.textMuted,
-        fontSize: 11,
-        fontWeight: FontWeight.w700,
-        letterSpacing: 1.2,
-      ),
-    );
-  }
-}
-
-class _SettingsCard extends StatelessWidget {
-  const _SettingsCard({required this.children});
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: context.palette.card,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(children: children),
-    );
-  }
-}
-
 class _SliderTile extends StatelessWidget {
   const _SliderTile({
     required this.icon,
@@ -559,20 +500,6 @@ class _ToggleTile extends StatelessWidget {
   }
 }
 
-class _Divider extends StatelessWidget {
-  const _Divider();
-
-  @override
-  Widget build(BuildContext context) {
-    return Divider(
-      height: 1,
-      indent: 48,
-      endIndent: 16,
-      color: context.palette.divider,
-    );
-  }
-}
-
 /// Anti brute-force: wipe the vault after N failed unlock attempts (0 = off).
 class _WipeAfterAttemptsTile extends StatelessWidget {
   const _WipeAfterAttemptsTile(
@@ -586,6 +513,7 @@ class _WipeAfterAttemptsTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 12, 16, 14),
       child: Column(
@@ -599,10 +527,10 @@ class _WipeAfterAttemptsTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Borrar bóveda tras intentos fallidos',
+                    Text(l10n.settingsWipeTitle,
                         style:
                             TextStyle(color: palette.textPrimary, fontSize: 14)),
-                    Text('Protección anti fuerza bruta (irreversible)',
+                    Text(l10n.settingsWipeSubtitle,
                         style:
                             TextStyle(color: palette.textMuted, fontSize: 11)),
                   ],
@@ -634,7 +562,7 @@ class _WipeAfterAttemptsTile extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    n == 0 ? 'Desactivado' : '$n',
+                    n == 0 ? l10n.commonDisabled : '$n',
                     style: TextStyle(
                       color: selected ? color : palette.textMuted,
                       fontSize: 12.5,
@@ -667,9 +595,19 @@ class _ThemeModeTile extends StatelessWidget {
         AppThemeMode.system => AppPalette.dark,
       };
 
+  static String _themeLabel(AppLocalizations l10n, AppThemeMode m) =>
+      switch (m) {
+        AppThemeMode.system => l10n.themeSystem,
+        AppThemeMode.light => l10n.themeLight,
+        AppThemeMode.dark => l10n.themeDark,
+        AppThemeMode.dim => l10n.themeDim,
+        AppThemeMode.oled => l10n.themeOled,
+      };
+
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       child: Column(
@@ -680,7 +618,7 @@ class _ThemeModeTile extends StatelessWidget {
               Icon(Icons.palette_rounded, color: palette.accent, size: 20),
               const SizedBox(width: 12),
               Text(
-                'Tema de la aplicación',
+                l10n.settingsThemeTitle,
                 style: TextStyle(
                     color: palette.textPrimary,
                     fontSize: 14,
@@ -700,6 +638,7 @@ class _ThemeModeTile extends StatelessWidget {
                 final m = AppThemeMode.values[i];
                 return _ThemeSwatch(
                   mode: m,
+                  label: _themeLabel(l10n, m),
                   preview: _previewPalette(m),
                   selected: m.key == current,
                   accent: palette.accent,
@@ -719,6 +658,7 @@ class _ThemeModeTile extends StatelessWidget {
 class _ThemeSwatch extends StatelessWidget {
   const _ThemeSwatch({
     required this.mode,
+    required this.label,
     required this.preview,
     required this.selected,
     required this.accent,
@@ -726,6 +666,7 @@ class _ThemeSwatch extends StatelessWidget {
   });
 
   final AppThemeMode mode;
+  final String label;
   final AppPalette preview;
   final bool selected;
   final Color accent;
@@ -775,7 +716,7 @@ class _ThemeSwatch extends StatelessWidget {
           ),
           const SizedBox(height: 7),
           Text(
-            mode.label == 'Seguir el sistema' ? 'Sistema' : mode.label,
+            label,
             style: TextStyle(
               color: selected ? accent : palette.textMuted,
               fontSize: 11,
@@ -842,117 +783,80 @@ class _DataManagementSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(label: 'Gestión de datos'),
-        const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            color: palette.card,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              if (!ResponsiveLayout.isDesktop(context)) ...[
-                ListTile(
-                  leading: Icon(
-                    Icons.sync_rounded,
-                    color: palette.accent,
-                  ),
-                  title: Text(
-                    'Sincronizar Computadora',
-                    style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                  ),
-                  subtitle: Text(
-                    'Vincula con SoloKey de escritorio',
-                    style: TextStyle(color: palette.textMuted, fontSize: 12),
-                  ),
-                  trailing: Icon(
-                    Icons.chevron_right_rounded,
-                    color: palette.textDisabled,
-                  ),
-                  onTap: () => context.push(AppRoutes.sync),
-                ),
-                Divider(
-                  height: 1,
-                  indent: 56,
-                  color: palette.divider,
-                ),
-              ],
-              ListTile(
-                leading: Icon(
-                  Icons.sync_alt_rounded,
-                  color: palette.accent,
-                ),
-                title: Text(
-                  'Exportar / Importar',
-                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                ),
-                subtitle: Text(
-                  'Haz backups cifrados de tu bóveda',
-                  style: TextStyle(color: palette.textMuted, fontSize: 12),
-                ),
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: palette.textDisabled,
-                ),
-                onTap: () => context.push(AppRoutes.transfer),
+        SectionHeader(text: l10n.settingsSectionData),
+        DetailGroup(
+          children: [
+            if (!ResponsiveLayout.isDesktop(context))
+              _DataRow(
+                icon: Icons.sync_rounded,
+                iconColor: palette.accent,
+                title: l10n.settingsSyncComputerTitle,
+                subtitle: l10n.settingsSyncComputerSubtitle,
+                onTap: () => context.push(AppRoutes.sync),
               ),
-              Divider(
-                height: 1,
-                indent: 56,
-                color: palette.divider,
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.auto_fix_high_rounded,
-                  color: palette.accent,
-                ),
-                title: Text(
-                  'Autocompletado del sistema',
-                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                ),
-                subtitle: Text(
-                  'Completa contraseñas en otras apps',
-                  style: TextStyle(color: palette.textMuted, fontSize: 12),
-                ),
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: palette.textDisabled,
-                ),
-                onTap: () => context.push(AppRoutes.autofillOnboarding),
-              ),
-              Divider(
-                height: 1,
-                indent: 56,
-                color: palette.divider,
-              ),
-              ListTile(
-                leading: Icon(
-                  Icons.fingerprint_rounded,
-                  color: palette.typePasskey,
-                ),
-                title: Text(
-                  'Respaldo de Passkeys',
-                  style: TextStyle(color: palette.textPrimary, fontSize: 14),
-                ),
-                subtitle: Text(
-                  'Guarda tus respaldos de passkey',
-                  style: TextStyle(color: palette.textMuted, fontSize: 12),
-                ),
-                trailing: Icon(
-                  Icons.chevron_right_rounded,
-                  color: palette.textDisabled,
-                ),
-                onTap: () => context.push(AppRoutes.passkeys),
-              ),
-              Divider(height: 1, indent: 56, color: palette.divider),
-              const _ScheduledBackupTile(),
-            ],
-          ),
+            _DataRow(
+              icon: Icons.sync_alt_rounded,
+              iconColor: palette.accent,
+              title: l10n.settingsExportImportTitle,
+              subtitle: l10n.settingsExportImportSubtitle,
+              onTap: () => context.push(AppRoutes.transfer),
+            ),
+            _DataRow(
+              icon: Icons.auto_fix_high_rounded,
+              iconColor: palette.accent,
+              title: l10n.settingsAutofillTitle,
+              subtitle: l10n.settingsAutofillSubtitle,
+              onTap: () => context.push(AppRoutes.autofillOnboarding),
+            ),
+            _DataRow(
+              icon: Icons.fingerprint_rounded,
+              iconColor: palette.typePasskey,
+              title: l10n.settingsPasskeysTitle,
+              subtitle: l10n.settingsPasskeysSubtitle,
+              onTap: () => context.push(AppRoutes.passkeys),
+            ),
+            const _ScheduledBackupTile(),
+          ],
         ),
       ],
+    );
+  }
+}
+
+/// A navigation row (icon · title · subtitle · chevron) used inside the Data
+/// section's [DetailGroup]. Kept local to Settings — it wraps [ListTile] with
+/// the muted subtitle styling the screen uses everywhere.
+class _DataRow extends StatelessWidget {
+  const _DataRow({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final String subtitle;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    return ListTile(
+      leading: Icon(icon, color: iconColor),
+      title: Text(title,
+          style: TextStyle(color: palette.textPrimary, fontSize: 14)),
+      subtitle: Text(subtitle,
+          style: TextStyle(color: palette.textMuted, fontSize: 12)),
+      trailing:
+          Icon(Icons.chevron_right_rounded, color: palette.textDisabled),
+      onTap: onTap,
     );
   }
 }
@@ -964,26 +868,27 @@ class _ScheduledBackupTile extends ConsumerWidget {
 
   static const _intervals = [0, 1, 7, 30];
 
-  String _intervalLabel(int days) => switch (days) {
-        0 => 'Desactivado',
-        1 => 'Diario',
-        7 => 'Semanal',
-        30 => 'Mensual',
-        _ => 'Cada $days días',
+  String _intervalLabel(AppLocalizations l10n, int days) => switch (days) {
+        0 => l10n.commonDisabled,
+        1 => l10n.settingsBackupDaily,
+        7 => l10n.settingsBackupWeekly,
+        30 => l10n.settingsBackupMonthly,
+        _ => l10n.settingsBackupEveryNDays(days),
       };
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     final settings = ref.watch(settingsNotifierProvider).valueOrNull;
     final interval = settings?.scheduledBackupIntervalDays ?? 0;
     final dir = settings?.backupDirectory;
     final subtitle = interval <= 0
-        ? 'Desactivado'
-        : '${_intervalLabel(interval)} → ${dir == null ? 'sin carpeta' : dir.split(RegExp(r'[\\/]')).last}';
+        ? l10n.commonDisabled
+        : '${_intervalLabel(l10n, interval)} → ${dir == null ? l10n.settingsBackupNoFolder : dir.split(RegExp(r'[\\/]')).last}';
     return ListTile(
       leading: Icon(Icons.backup_rounded, color: palette.accent),
-      title: Text('Backup automático',
+      title: Text(l10n.settingsBackupTitle,
           style: TextStyle(color: palette.textPrimary, fontSize: 14)),
       subtitle: Text(subtitle,
           style: TextStyle(color: palette.textMuted, fontSize: 12),
@@ -997,6 +902,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
   Future<void> _showConfig(
       BuildContext context, WidgetRef ref, AppSecuritySettings? settings) async {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     var interval = settings?.scheduledBackupIntervalDays ?? 0;
     var dir = settings?.backupDirectory;
     final pwdCtrl = TextEditingController();
@@ -1009,14 +915,14 @@ class _ScheduledBackupTile extends ConsumerWidget {
       builder: (dialogContext) => StatefulBuilder(
         builder: (dialogContext, setLocal) => AlertDialog(
           backgroundColor: palette.drawer,
-          title: Text('Backup automático',
+          title: Text(l10n.settingsBackupTitle,
               style: TextStyle(color: palette.textPrimary, fontSize: 18)),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Frecuencia',
+                Text(l10n.settingsBackupFrequency,
                     style: TextStyle(color: palette.textMuted, fontSize: 12)),
                 const SizedBox(height: 8),
                 Wrap(
@@ -1037,7 +943,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
                           border: Border.all(
                               color: sel ? palette.accent : palette.divider),
                         ),
-                        child: Text(_intervalLabel(n),
+                        child: Text(_intervalLabel(l10n, n),
                             style: TextStyle(
                                 color: sel ? palette.accent : palette.textMuted,
                                 fontSize: 12)),
@@ -1054,7 +960,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
                   },
                   icon: const Icon(Icons.folder_open_rounded, size: 18),
                   label: Text(
-                    dir == null ? 'Elegir carpeta destino' : dir!,
+                    dir == null ? l10n.settingsBackupChooseFolder : dir!,
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -1065,8 +971,8 @@ class _ScheduledBackupTile extends ConsumerWidget {
                   style: TextStyle(color: palette.textPrimary),
                   decoration: InputDecoration(
                     labelText: hasPwd
-                        ? 'Contraseña del backup (dejar vacío = mantener)'
-                        : 'Contraseña del backup',
+                        ? l10n.settingsBackupPasswordKeep
+                        : l10n.settingsBackupPassword,
                     labelStyle: TextStyle(color: palette.textMuted),
                   ),
                 ),
@@ -1076,7 +982,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Cancelar'),
+              child: Text(l10n.commonCancel),
             ),
             TextButton(
               onPressed: () async {
@@ -1095,7 +1001,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
                 // Dispara un backup de inmediato si ya esta todo configurado.
                 await svc.runIfDue();
               },
-              child: const Text('Guardar'),
+              child: Text(l10n.commonSave),
             ),
           ],
         ),
@@ -1104,28 +1010,67 @@ class _ScheduledBackupTile extends ConsumerWidget {
   }
 }
 
+/// "About" section: app name, version and short tagline. Read-only.
+class _AboutSection extends StatelessWidget {
+  const _AboutSection();
+
+  @override
+  Widget build(BuildContext context) {
+    final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionHeader(text: l10n.settingsSectionAbout),
+        DetailGroup(
+          children: [
+            ListTile(
+              leading: Icon(Icons.shield_rounded, color: palette.accent),
+              title: Text('SoloKey',
+                  style: TextStyle(
+                      color: palette.textPrimary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600)),
+              subtitle: Text(l10n.settingsAboutTagline,
+                  style: TextStyle(color: palette.textMuted, fontSize: 12)),
+              trailing: Text(
+                '${l10n.settingsVersionLabel} ${AppConstants.appVersion}',
+                style: TextStyle(
+                  color: palette.textMuted,
+                  fontSize: 12,
+                  fontFamily: AppTheme.monoFamily,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+
 class _DangerZone extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
+    final l10n = AppLocalizations.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const _SectionHeader(label: 'Zona peligrosa'),
-        const SizedBox(height: 8),
+        SectionHeader(text: l10n.settingsSectionDanger),
         Container(
           decoration: BoxDecoration(
             color: palette.card,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppTheme.rCard),
             border: Border.all(
                 color: palette.danger.withValues(alpha: 0.3)),
           ),
           child: ListTile(
             leading: Icon(Icons.lock_reset_rounded,
                 color: palette.danger),
-            title: Text('Bloquear ahora',
+            title: Text(l10n.settingsLockNowTitle,
                 style: TextStyle(color: palette.danger)),
-            subtitle: Text('Cierra la sesión inmediatamente',
+            subtitle: Text(l10n.settingsLockNowSubtitle,
                 style: TextStyle(color: palette.textMuted, fontSize: 12)),
             onTap: () {
               ref.read(vaultNotifierProvider.notifier).lock();

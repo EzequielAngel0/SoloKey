@@ -130,6 +130,117 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsQuickFillTryNow => 'Probar ahora';
 
   @override
+  String get commonDisabled => 'Desactivado';
+
+  @override
+  String get settingsSectionSecurity => 'Seguridad';
+
+  @override
+  String get settingsSectionData => 'Datos';
+
+  @override
+  String get settingsSectionAbout => 'Acerca de';
+
+  @override
+  String get settingsSectionDanger => 'Zona peligrosa';
+
+  @override
+  String get settingsThemeTitle => 'Tema de la aplicación';
+
+  @override
+  String get themeSystem => 'Sistema';
+
+  @override
+  String get themeLight => 'Claro';
+
+  @override
+  String get themeDark => 'Oscuro';
+
+  @override
+  String get themeDim => 'Tenue';
+
+  @override
+  String get themeOled => 'OLED';
+
+  @override
+  String get settingsWipeTitle => 'Borrar bóveda tras intentos fallidos';
+
+  @override
+  String get settingsWipeSubtitle =>
+      'Protección anti fuerza bruta (irreversible)';
+
+  @override
+  String get settingsSyncComputerTitle => 'Sincronizar computadora';
+
+  @override
+  String get settingsSyncComputerSubtitle =>
+      'Vincula con SoloKey de escritorio';
+
+  @override
+  String get settingsExportImportTitle => 'Exportar / Importar';
+
+  @override
+  String get settingsExportImportSubtitle =>
+      'Haz backups cifrados de tu bóveda';
+
+  @override
+  String get settingsAutofillTitle => 'Autocompletado del sistema';
+
+  @override
+  String get settingsAutofillSubtitle => 'Completa contraseñas en otras apps';
+
+  @override
+  String get settingsPasskeysTitle => 'Respaldo de Passkeys';
+
+  @override
+  String get settingsPasskeysSubtitle => 'Guarda tus respaldos de passkey';
+
+  @override
+  String get settingsBackupTitle => 'Backup automático';
+
+  @override
+  String get settingsBackupDaily => 'Diario';
+
+  @override
+  String get settingsBackupWeekly => 'Semanal';
+
+  @override
+  String get settingsBackupMonthly => 'Mensual';
+
+  @override
+  String settingsBackupEveryNDays(int days) {
+    return 'Cada $days días';
+  }
+
+  @override
+  String get settingsBackupNoFolder => 'sin carpeta';
+
+  @override
+  String get settingsBackupFrequency => 'Frecuencia';
+
+  @override
+  String get settingsBackupChooseFolder => 'Elegir carpeta destino';
+
+  @override
+  String get settingsBackupPassword => 'Contraseña del backup';
+
+  @override
+  String get settingsBackupPasswordKeep =>
+      'Contraseña del backup (dejar vacío = mantener)';
+
+  @override
+  String get settingsLockNowTitle => 'Bloquear ahora';
+
+  @override
+  String get settingsLockNowSubtitle => 'Cierra la sesión inmediatamente';
+
+  @override
+  String get settingsVersionLabel => 'Versión';
+
+  @override
+  String get settingsAboutTagline => 'Gestor de contraseñas local-first';
+
+  @override
   String get languageSystem => 'Seguir el sistema';
 
   @override
