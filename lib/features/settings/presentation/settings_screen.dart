@@ -324,6 +324,7 @@ class _ShortcutsSection extends StatelessWidget {
   static String _label(AppLocalizations l10n, AppShortcut s) => switch (s) {
         AppShortcut.commandPalette => l10n.shortcutCommandPalette,
         AppShortcut.newCredential => l10n.shortcutNewCredential,
+        AppShortcut.editCredential => l10n.shortcutEditCredential,
         AppShortcut.lock => l10n.shortcutLock,
       };
 

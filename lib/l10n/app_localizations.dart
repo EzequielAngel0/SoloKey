@@ -620,6 +620,12 @@ abstract class AppLocalizations {
   /// **'New credential'**
   String get shortcutNewCredential;
 
+  /// No description provided for @shortcutEditCredential.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit selected'**
+  String get shortcutEditCredential;
+
   /// No description provided for @shortcutLock.
   ///
   /// In en, this message translates to:

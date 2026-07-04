@@ -84,6 +84,12 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
         ref.read(desktopRightPaneModeProvider.notifier).state =
             RightPaneMode.create;
+      case AppShortcut.editCredential:
+        // Editar la credencial seleccionada (no-op si no hay ninguna).
+        if (ref.read(desktopSelectedCredentialIdProvider) != null) {
+          ref.read(desktopRightPaneModeProvider.notifier).state =
+              RightPaneMode.edit;
+        }
       case AppShortcut.lock:
         ref.read(vaultNotifierProvider.notifier).lock();
         context.go(AppRoutes.unlock);

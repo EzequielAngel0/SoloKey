@@ -309,6 +309,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get shortcutNewCredential => 'Nueva credencial';
 
   @override
+  String get shortcutEditCredential => 'Editar seleccionada';
+
+  @override
   String get shortcutLock => 'Bloquear bóveda';
 
   @override

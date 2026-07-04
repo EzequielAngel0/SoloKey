@@ -101,6 +101,7 @@
   "settingsSectionShortcuts": "Atajos de teclado",
   "shortcutCommandPalette": "Paleta de comandos",
   "shortcutNewCredential": "Nueva credencial",
+  "shortcutEditCredential": "Editar seleccionada",
   "shortcutLock": "Bloquear bóveda",
   "shortcutReset": "Restablecer atajos",
   "shortcutEditTitle": "Asignar atajo",

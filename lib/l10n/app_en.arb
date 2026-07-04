@@ -119,6 +119,7 @@
   "settingsSectionShortcuts": "Keyboard shortcuts",
   "shortcutCommandPalette": "Command palette",
   "shortcutNewCredential": "New credential",
+  "shortcutEditCredential": "Edit selected",
   "shortcutLock": "Lock vault",
   "shortcutReset": "Reset to defaults",
   "shortcutEditTitle": "Set shortcut",

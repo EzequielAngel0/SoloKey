@@ -76,9 +76,10 @@ void main() {
   });
 
   group('AppShortcut', () {
-    test('defaults are Ctrl+K / Ctrl+N / Ctrl+L', () {
+    test('defaults are Ctrl+K / Ctrl+N / Ctrl+E / Ctrl+L', () {
       expect(AppShortcut.commandPalette.defaultBinding.serialize(), 'ctrl+k');
       expect(AppShortcut.newCredential.defaultBinding.serialize(), 'ctrl+n');
+      expect(AppShortcut.editCredential.defaultBinding.serialize(), 'ctrl+e');
       expect(AppShortcut.lock.defaultBinding.serialize(), 'ctrl+l');
     });
 

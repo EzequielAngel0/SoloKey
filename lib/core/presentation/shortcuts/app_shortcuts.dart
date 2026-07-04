@@ -138,6 +138,10 @@ enum AppShortcut {
     'new_credential',
     ShortcutBinding(trigger: LogicalKeyboardKey.keyN, control: true),
   ),
+  editCredential(
+    'edit_credential',
+    ShortcutBinding(trigger: LogicalKeyboardKey.keyE, control: true),
+  ),
   lock(
     'lock',
     ShortcutBinding(trigger: LogicalKeyboardKey.keyL, control: true),
