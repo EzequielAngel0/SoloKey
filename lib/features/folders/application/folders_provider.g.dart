@@ -24,7 +24,7 @@ final folderRepositoryProvider =
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef FolderRepositoryRef = AutoDisposeProviderRef<IFolderRepository>;
-String _$foldersNotifierHash() => r'92e666a1aa396ccb3e715b8109b69cc138ab766a';
+String _$foldersNotifierHash() => r'd564caff304fb269d88e0f1df1abac859d8f2c4e';
 
 /// See also [FoldersNotifier].
 @ProviderFor(FoldersNotifier)

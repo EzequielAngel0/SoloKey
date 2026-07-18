@@ -86,7 +86,7 @@ final deleteCredentialUseCaseProvider =
 typedef DeleteCredentialUseCaseRef =
     AutoDisposeProviderRef<DeleteCredentialUseCase>;
 String _$credentialsNotifierHash() =>
-    r'6b1ee823569b050ba47f254ced549a60c9e17acc';
+    r'81b8a17d69dca2b9019f413e12e1b63ff089892f';
 
 /// See also [CredentialsNotifier].
 @ProviderFor(CredentialsNotifier)

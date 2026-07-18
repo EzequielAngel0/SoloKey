@@ -26,7 +26,7 @@ final syncEventsSourceProvider = Provider<SyncEventsSource>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef SyncEventsSourceRef = ProviderRef<SyncEventsSource>;
-String _$syncStatusHash() => r'33c3a28f50aff1088fa15a0bf7533ff6740b1e38';
+String _$syncStatusHash() => r'1989e975335a3d5e8b2f4be26e32bc6242a8068c';
 
 /// App-wide sync status. Listens to the sync engine and, crucially, **refreshes
 /// the credential/folder providers whenever a delta is applied** so the vault
