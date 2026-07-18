@@ -294,6 +294,9 @@ estado real es:
 | Frente | Estado |
 | :--- | :--- |
 | Bugs de escritorio (auto-refresh sync, resumen de sync, carpetas editar/eliminar, QR de pantalla, sidebar) | ✅ resueltos (commits `1b740da`, `0df7554`, `b3b55dc`, `104432f`, `5d702e9`) |
+| Botón "Sincronizar ahora" en el escritorio | ✅ el PC manda `sync_request` E2EE a los celulares conectados; la ronda delta es bidireccional, así que también viajan los cambios del PC |
+| Sync de **archivos seguros** en el delta P2P | ✅ manifest + LWW + push con contenido descifrado/re-cifrado por dispositivo (mismo modelo de re-keying que las credenciales; el plaintext solo viaja dentro del canal E2EE con K_sync). Tarjeta de resumen con fila "Archivos". Retrocompatible: un peer viejo ignora las claves nuevas del protocolo |
+| Archivos seguros: búsqueda, orden (recientes/nombre/tamaño) y notas | ✅ pipeline puro `visibleSecureFiles` + editor de nota (metadato NO cifrado, con aviso en el hint) |
 | Switch HIBP no persistía | ✅ `AppSecuritySettings.hibpCheckEnabled` + auditoría lo lee/escribe vía `SettingsNotifier` |
 | Icono de taskbar (BUG-WIN) | ✅ propiedades Relaunch* en el property store (falta solo verificación visual) |
 | Red de tests (prompts 95–99) | ✅ completa; piso de cobertura **62.9%**, 495/495 en verde |

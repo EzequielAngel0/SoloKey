@@ -47,6 +47,13 @@
 - [ ] Con ambas apps abiertas y conectadas (paso 2), **crear una credencial en
       el celular** → en ≤ ~60 s debe aparecer en el PC **sin tocar nada**.
 - [ ] **Editar una credencial en el PC** → debe llegar sola al celular.
+- [ ] **Botón "Sincronizar ahora" del PC** (pantalla Sincronizar, panel
+      conectado): al tocarlo, el celular corre la ronda al instante y el PC
+      muestra "Sincronización pedida a N dispositivo(s)". Sin celulares
+      conectados debe decir "No hay dispositivos conectados".
+- [ ] **Archivos seguros:** agregar un archivo en el celular → tras la ronda
+      aparece en Archivos seguros del PC (y viceversa), se puede abrir/exportar
+      con la clave local, y la tarjeta de resumen muestra la fila **Archivos**.
 - [ ] Apagar el Wi-Fi del celular 1 minuto y reencenderlo → la conexión debe
       **auto-reconectar** (heartbeat + retry) y el siguiente cambio sincronizar.
 - [ ] Notificación nativa "N cambios sincronizados" al aplicar un delta en el
