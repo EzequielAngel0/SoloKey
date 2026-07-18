@@ -14,7 +14,7 @@ import '../../../router/app_router.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
-import '../../sync/infrastructure/sync_service.dart';
+import '../../sync/domain/i_sync_service.dart';
 import '../../../theme/app_palette.dart';
 import '../application/vault_state_provider.dart';
 
@@ -108,7 +108,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     if (!_isDesktopPlatform) return;
 
     try {
-      final syncService = getIt<SyncService>();
+      final syncService = getIt<ISyncService>();
       _remoteUnlockSub = syncService.serverEvents.listen((event) {
         if (!mounted) return;
 
@@ -273,7 +273,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   Future<void> _requestPhoneApproval() async {
     final l10n = AppLocalizations.of(context);
     try {
-      final sent = await getIt<SyncService>().requestApproval();
+      final sent = await getIt<ISyncService>().requestApproval();
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
