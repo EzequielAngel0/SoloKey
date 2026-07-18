@@ -17,6 +17,7 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   locale: json['locale'] as String? ?? 'system',
   wipeAfterFailedAttempts:
       (json['wipeAfterFailedAttempts'] as num?)?.toInt() ?? 0,
+  hibpCheckEnabled: json['hibpCheckEnabled'] as bool? ?? false,
   autostartEnabled: json['autostartEnabled'] as bool? ?? false,
   scheduledBackupIntervalDays:
       (json['scheduledBackupIntervalDays'] as num?)?.toInt() ?? 0,
@@ -45,6 +46,7 @@ Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
   'themeMode': instance.themeMode,
   'locale': instance.locale,
   'wipeAfterFailedAttempts': instance.wipeAfterFailedAttempts,
+  'hibpCheckEnabled': instance.hibpCheckEnabled,
   'autostartEnabled': instance.autostartEnabled,
   'scheduledBackupIntervalDays': instance.scheduledBackupIntervalDays,
   'backupDirectory': instance.backupDirectory,

@@ -7,6 +7,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import '../../../app/di/injection.dart';
 import '../../../core/services/security_audit_service.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../settings/domain/entities/app_security_settings.dart';
+import '../../settings/presentation/settings_screen.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/score_ring.dart';
 import '../../../shared/widgets/status_chip.dart';
@@ -19,21 +21,18 @@ part 'security_audit_screen.g.dart';
 Future<List<AuditIssue>> auditResults(Ref ref, bool checkBreaches) =>
     getIt<SecurityAuditService>().runAudit(checkBreaches: checkBreaches);
 
-class SecurityAuditScreen extends ConsumerStatefulWidget {
+class SecurityAuditScreen extends ConsumerWidget {
   const SecurityAuditScreen({super.key});
 
   @override
-  ConsumerState<SecurityAuditScreen> createState() => _SecurityAuditScreenState();
-}
-
-class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
-  bool _checkBreaches = false;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final auditAsync = ref.watch(auditResultsProvider(_checkBreaches));
+    // El switch HIBP vive en AppSecuritySettings (no en estado local) para que
+    // sobreviva al salir de la pantalla o cambiar de modulo.
+    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final checkBreaches = settings?.hibpCheckEnabled ?? false;
+    final auditAsync = ref.watch(auditResultsProvider(checkBreaches));
     final issues = auditAsync.valueOrNull;
 
     return Scaffold(
@@ -126,16 +125,18 @@ class _SecurityAuditScreenState extends ConsumerState<SecurityAuditScreen> {
                           ),
                         ),
                         Switch(
-                          value: _checkBreaches,
+                          value: checkBreaches,
                           activeThumbColor: palette.accent,
                           activeTrackColor: palette.accent.withValues(alpha: 0.3),
                           inactiveThumbColor: palette.textDisabled,
                           inactiveTrackColor: palette.surface,
                           onChanged: (val) {
                             HapticFeedback.mediumImpact();
-                            setState(() {
-                              _checkBreaches = val;
-                            });
+                            final current =
+                                settings ?? AppSecuritySettings.defaults();
+                            ref
+                                .read(settingsNotifierProvider.notifier)
+                                .save(current.copyWith(hibpCheckEnabled: val));
                           },
                         ),
                       ],

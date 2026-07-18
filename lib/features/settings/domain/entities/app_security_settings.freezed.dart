@@ -30,6 +30,9 @@ mixin _$AppSecuritySettings {
   String get locale =>
       throw _privateConstructorUsedError; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   int get wipeAfterFailedAttempts =>
+      throw _privateConstructorUsedError; // Auditoria: verificar filtraciones online (HaveIBeenPwned, k-Anonymity).
+  // Persistido para que el switch no se resetee al salir de la pantalla.
+  bool get hibpCheckEnabled =>
       throw _privateConstructorUsedError; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
   bool get autostartEnabled =>
       throw _privateConstructorUsedError; // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
@@ -78,6 +81,7 @@ abstract class $AppSecuritySettingsCopyWith<$Res> {
     String themeMode,
     String locale,
     int wipeAfterFailedAttempts,
+    bool hibpCheckEnabled,
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
     String? backupDirectory,
@@ -114,6 +118,7 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
     Object? themeMode = null,
     Object? locale = null,
     Object? wipeAfterFailedAttempts = null,
+    Object? hibpCheckEnabled = null,
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
@@ -156,6 +161,10 @@ class _$AppSecuritySettingsCopyWithImpl<$Res, $Val extends AppSecuritySettings>
                 ? _value.wipeAfterFailedAttempts
                 : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
                       as int,
+            hibpCheckEnabled: null == hibpCheckEnabled
+                ? _value.hibpCheckEnabled
+                : hibpCheckEnabled // ignore: cast_nullable_to_non_nullable
+                      as bool,
             autostartEnabled: null == autostartEnabled
                 ? _value.autostartEnabled
                 : autostartEnabled // ignore: cast_nullable_to_non_nullable
@@ -223,6 +232,7 @@ abstract class _$$AppSecuritySettingsImplCopyWith<$Res>
     String themeMode,
     String locale,
     int wipeAfterFailedAttempts,
+    bool hibpCheckEnabled,
     bool autostartEnabled,
     int scheduledBackupIntervalDays,
     String? backupDirectory,
@@ -258,6 +268,7 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
     Object? themeMode = null,
     Object? locale = null,
     Object? wipeAfterFailedAttempts = null,
+    Object? hibpCheckEnabled = null,
     Object? autostartEnabled = null,
     Object? scheduledBackupIntervalDays = null,
     Object? backupDirectory = freezed,
@@ -300,6 +311,10 @@ class __$$AppSecuritySettingsImplCopyWithImpl<$Res>
             ? _value.wipeAfterFailedAttempts
             : wipeAfterFailedAttempts // ignore: cast_nullable_to_non_nullable
                   as int,
+        hibpCheckEnabled: null == hibpCheckEnabled
+            ? _value.hibpCheckEnabled
+            : hibpCheckEnabled // ignore: cast_nullable_to_non_nullable
+                  as bool,
         autostartEnabled: null == autostartEnabled
             ? _value.autostartEnabled
             : autostartEnabled // ignore: cast_nullable_to_non_nullable
@@ -360,6 +375,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     this.themeMode = 'system',
     this.locale = 'system',
     this.wipeAfterFailedAttempts = 0,
+    this.hibpCheckEnabled = false,
     this.autostartEnabled = false,
     this.scheduledBackupIntervalDays = 0,
     this.backupDirectory,
@@ -399,6 +415,11 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
   @override
   @JsonKey()
   final int wipeAfterFailedAttempts;
+  // Auditoria: verificar filtraciones online (HaveIBeenPwned, k-Anonymity).
+  // Persistido para que el switch no se resetee al salir de la pantalla.
+  @override
+  @JsonKey()
+  final bool hibpCheckEnabled;
   // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
   @override
   @JsonKey()
@@ -451,7 +472,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
 
   @override
   String toString() {
-    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity, shortcutOverrides: $shortcutOverrides, desktopSidebarCollapsed: $desktopSidebarCollapsed, desktopLastTab: $desktopLastTab, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
+    return 'AppSecuritySettings(autoLockMinutes: $autoLockMinutes, clearClipboardSeconds: $clearClipboardSeconds, biometricEnabled: $biometricEnabled, obscureOnBackground: $obscureOnBackground, themeMode: $themeMode, locale: $locale, wipeAfterFailedAttempts: $wipeAfterFailedAttempts, hibpCheckEnabled: $hibpCheckEnabled, autostartEnabled: $autostartEnabled, scheduledBackupIntervalDays: $scheduledBackupIntervalDays, backupDirectory: $backupDirectory, uiDensity: $uiDensity, shortcutOverrides: $shortcutOverrides, desktopSidebarCollapsed: $desktopSidebarCollapsed, desktopLastTab: $desktopLastTab, windowWidth: $windowWidth, windowHeight: $windowHeight, windowX: $windowX, windowY: $windowY)';
   }
 
   @override
@@ -475,6 +496,8 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
                   wipeAfterFailedAttempts,
                 ) ||
                 other.wipeAfterFailedAttempts == wipeAfterFailedAttempts) &&
+            (identical(other.hibpCheckEnabled, hibpCheckEnabled) ||
+                other.hibpCheckEnabled == hibpCheckEnabled) &&
             (identical(other.autostartEnabled, autostartEnabled) ||
                 other.autostartEnabled == autostartEnabled) &&
             (identical(
@@ -508,7 +531,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     runtimeType,
     autoLockMinutes,
     clearClipboardSeconds,
@@ -517,6 +540,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     themeMode,
     locale,
     wipeAfterFailedAttempts,
+    hibpCheckEnabled,
     autostartEnabled,
     scheduledBackupIntervalDays,
     backupDirectory,
@@ -528,7 +552,7 @@ class _$AppSecuritySettingsImpl implements _AppSecuritySettings {
     windowHeight,
     windowX,
     windowY,
-  );
+  ]);
 
   /// Create a copy of AppSecuritySettings
   /// with the given fields replaced by the non-null parameter values.
@@ -556,6 +580,7 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
     final String themeMode,
     final String locale,
     final int wipeAfterFailedAttempts,
+    final bool hibpCheckEnabled,
     final bool autostartEnabled,
     final int scheduledBackupIntervalDays,
     final String? backupDirectory,
@@ -585,7 +610,10 @@ abstract class _AppSecuritySettings implements AppSecuritySettings {
   @override
   String get locale; // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
   @override
-  int get wipeAfterFailedAttempts; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
+  int get wipeAfterFailedAttempts; // Auditoria: verificar filtraciones online (HaveIBeenPwned, k-Anonymity).
+  // Persistido para que el switch no se resetee al salir de la pantalla.
+  @override
+  bool get hibpCheckEnabled; // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
   @override
   bool get autostartEnabled; // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
   @override

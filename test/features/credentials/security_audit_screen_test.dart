@@ -5,10 +5,13 @@ import 'package:go_router/go_router.dart';
 import 'package:password_manager/core/services/security_audit_service.dart';
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/presentation/security_audit_screen.dart';
+import 'package:password_manager/features/settings/domain/entities/app_security_settings.dart';
+import 'package:password_manager/features/settings/presentation/settings_screen.dart';
 import 'package:password_manager/l10n/app_localizations.dart';
 import 'package:password_manager/router/app_router.dart';
 import 'package:password_manager/theme/app_theme.dart';
 
+import '../../support/fake_settings_repository.dart';
 import '../../support/widget_harness.dart';
 
 Credential _c(String id) => Credential(
@@ -33,12 +36,14 @@ AuditIssue _issue(
       breachCount: breachCount,
     );
 
-Future<void> pumpAudit(
+Future<FakeSettingsRepository> pumpAudit(
   WidgetTester tester, {
   required List<AuditIssue> offline,
   List<AuditIssue>? online,
+  FakeSettingsRepository? settingsRepo,
 }) async {
   tolerateInkHiddenPaintWarnings();
+  final repo = settingsRepo ?? FakeSettingsRepository();
   await pumpApp(
     tester,
     const SecurityAuditScreen(),
@@ -47,11 +52,14 @@ Future<void> pumpAudit(
       auditResultsProvider(false).overrideWith((ref) async => offline),
       if (online != null)
         auditResultsProvider(true).overrideWith((ref) async => online),
+      // The HIBP switch reads/persists through AppSecuritySettings.
+      settingsRepositoryProvider.overrideWithValue(repo),
     ],
     surfaceSize: const Size(820, 1400),
   );
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
+  return repo;
 }
 
 void main() {
@@ -77,9 +85,10 @@ void main() {
     expect(find.text('Warning'), findsWidgets);
   });
 
-  testWidgets('toggling HIBP switches to the breach-aware result set',
+  testWidgets(
+      'toggling HIBP switches to the breach-aware result set and persists',
       (tester) async {
-    await pumpAudit(
+    final repo = await pumpAudit(
       tester,
       offline: [_issue('1', AuditSeverity.warning, AuditIssueType.tooShort)],
       online: [
@@ -98,6 +107,28 @@ void main() {
     await tester.pump(const Duration(milliseconds: 50));
 
     // Online pass (checkBreaches == true) surfaces the breached credential.
+    expect(find.text('cred-2'), findsOneWidget);
+    // The toggle is written through to settings, not kept as widget state.
+    expect(repo.settings.hibpCheckEnabled, isTrue);
+  });
+
+  testWidgets('HIBP switch starts ON when settings already persist it',
+      (tester) async {
+    await pumpAudit(
+      tester,
+      offline: [_issue('1', AuditSeverity.warning, AuditIssueType.tooShort)],
+      online: [
+        _issue('2', AuditSeverity.critical, AuditIssueType.breached,
+            breachCount: 3),
+      ],
+      settingsRepo: FakeSettingsRepository(
+        AppSecuritySettings.defaults().copyWith(hibpCheckEnabled: true),
+      ),
+    );
+
+    // The persisted value drives the switch and the breach-aware audit run.
+    final switchWidget = tester.widget<Switch>(find.byType(Switch));
+    expect(switchWidget.value, isTrue);
     expect(find.text('cred-2'), findsOneWidget);
   });
 

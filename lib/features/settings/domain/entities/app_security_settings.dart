@@ -15,6 +15,9 @@ class AppSecuritySettings with _$AppSecuritySettings {
     @Default('system') String locale,
     // Anti brute-force: borra la boveda tras N intentos fallidos. 0 = desactivado.
     @Default(0) int wipeAfterFailedAttempts,
+    // Auditoria: verificar filtraciones online (HaveIBeenPwned, k-Anonymity).
+    // Persistido para que el switch no se resetee al salir de la pantalla.
+    @Default(false) bool hibpCheckEnabled,
     // Escritorio: iniciar SoloKey con el sistema (minimizado en la bandeja).
     @Default(false) bool autostartEnabled,
     // Backup automatico cifrado: intervalo en dias (0 = desactivado) + carpeta destino.
