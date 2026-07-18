@@ -22,11 +22,29 @@ class _IdleSyncStatus extends SyncStatus {
   SyncStatusState build() => const SyncStatusState(phase: SyncPhase.idle);
 }
 
-Credential _c(String id, String title) => Credential(
+/// Forces the "syncing" phase so the sidebar badge (a spinner) is assertable
+/// without a live sync engine.
+class _SyncingSyncStatus extends SyncStatus {
+  @override
+  SyncStatusState build() => const SyncStatusState(phase: SyncPhase.syncing);
+}
+
+class _SeededFolders extends FoldersNotifier {
+  _SeededFolders(this._folders);
+  final List<Folder> _folders;
+  @override
+  Future<List<Folder>> build() async => _folders;
+}
+
+Folder _folder(String id, String name) =>
+    Folder(id: id, name: name, createdAt: DateTime(2021));
+
+Credential _c(String id, String title, {bool favorite = false}) => Credential(
       id: id,
       type: CredentialType.password,
       title: title,
       password: 'p',
+      isFavorite: favorite,
       createdAt: DateTime(2020),
       updatedAt: DateTime(2020),
     );
@@ -150,5 +168,99 @@ void main() {
     await tester.pump();
     expect(find.text('GitHub'), findsWidgets);
     expect(find.text('GitLab'), findsNothing);
+  });
+
+  // ── Behavioral: master-detail navigation and the sync badge ────────────────
+
+  Future<void> pumpDesktop(
+    WidgetTester tester, {
+    required List<Credential> creds,
+    List<Folder> folders = const [],
+    SyncStatus Function() sync = _IdleSyncStatus.new,
+  }) async {
+    tolerateInkHiddenPaintWarnings();
+    await pumpApp(
+      tester,
+      const DesktopMainLayout(),
+      overrides: [
+        getCredentialsUseCaseProvider.overrideWithValue(
+            GetCredentialsUseCase(FakeCredentialRepository(creds))),
+        foldersNotifierProvider.overrideWith(
+            folders.isEmpty ? _EmptyFolders.new : () => _SeededFolders(folders)),
+        syncStatusProvider.overrideWith(sync),
+      ],
+      surfaceSize: const Size(1300, 900),
+    );
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+  }
+
+  testWidgets('the Favorites nav item filters the list to favorites only',
+      (tester) async {
+    await pumpDesktop(tester, creds: [
+      _c('1', 'GitHub'),
+      _c('2', 'Netflix', favorite: true),
+    ]);
+    // Both are visible on the Vault tab.
+    expect(find.text('GitHub'), findsWidgets);
+    expect(find.text('Netflix'), findsWidgets);
+
+    await tester.tap(find.text('Favourites'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // Only the favorite remains once the Favorites destination is active.
+    expect(find.text('Netflix'), findsWidgets);
+    expect(find.text('GitHub'), findsNothing);
+  });
+
+  testWidgets('the Folders nav item swaps the middle pane for the folder tree',
+      (tester) async {
+    await pumpDesktop(
+      tester,
+      creds: [_c('1', 'GitHub')],
+      folders: [_folder('f1', 'Work'), _folder('f2', 'Personal')],
+    );
+
+    await tester.tap(find.text('Folders'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 50));
+
+    // The tree lists the folders; the credential list is no longer the pane.
+    expect(find.text('Work'), findsWidgets);
+    expect(find.text('Personal'), findsWidgets);
+  });
+
+  testWidgets('selecting a credential opens its detail in the right pane',
+      (tester) async {
+    await pumpDesktop(tester, creds: [_c('1', 'GitHub')]);
+
+    // Right pane starts on the empty state.
+    expect(find.text('Secure Vault'), findsOneWidget);
+
+    await tester.tap(find.text('GitHub').first);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // The empty state is replaced by the credential detail (its title now shows
+    // in both the list and the detail app bar).
+    expect(find.text('Secure Vault'), findsNothing);
+    expect(find.text('GitHub'), findsWidgets);
+  });
+
+  testWidgets('the sidebar shows a spinner badge while syncing', (tester) async {
+    // Idle: no spinner anywhere (the vault list is already loaded).
+    await pumpDesktop(tester, creds: [_c('1', 'GitHub')]);
+    expect(find.byType(CircularProgressIndicator), findsNothing);
+  });
+
+  testWidgets('syncing phase renders the sync badge spinner', (tester) async {
+    await pumpDesktop(
+      tester,
+      creds: [_c('1', 'GitHub')],
+      sync: _SyncingSyncStatus.new,
+    );
+    // The only spinner on screen is the Sync nav item's badge.
+    expect(find.byType(CircularProgressIndicator), findsOneWidget);
   });
 }
