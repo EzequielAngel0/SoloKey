@@ -138,6 +138,13 @@ class _LastSyncSection extends StatelessWidget {
               updated: summary.foldersUpdated,
               removed: summary.foldersDeleted,
             ),
+            _CountRow(
+              icon: Icons.folder_shared_rounded,
+              label: l10n.syncFilesLabel,
+              added: summary.filesAdded,
+              updated: summary.filesUpdated,
+              removed: summary.filesDeleted,
+            ),
             InkWell(
               onTap: onToggleItems,
               child: Padding(
@@ -268,9 +275,11 @@ class _ItemRow extends StatelessWidget {
           l10n.syncActionRemoved
         ),
     };
-    final kindIcon = change.kind == SyncEntityKind.folder
-        ? Icons.folder_rounded
-        : Icons.vpn_key_rounded;
+    final kindIcon = switch (change.kind) {
+      SyncEntityKind.folder => Icons.folder_rounded,
+      SyncEntityKind.file => Icons.insert_drive_file_rounded,
+      SyncEntityKind.credential => Icons.vpn_key_rounded,
+    };
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 9, 12, 9),
       child: Row(
@@ -370,6 +379,8 @@ class _HistoryRow extends StatelessWidget {
         '${summary.credentialsTotal} ${l10n.syncCredentialsLabel.toLowerCase()}',
       if (summary.foldersTotal > 0)
         '${summary.foldersTotal} ${l10n.syncFoldersLabel.toLowerCase()}',
+      if (summary.filesTotal > 0)
+        '${summary.filesTotal} ${l10n.syncFilesLabel.toLowerCase()}',
     ];
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 9, 12, 9),

@@ -6,6 +6,8 @@ import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../secure_files/domain/entities/secure_file.dart';
+import '../../secure_files/domain/repositories/i_secure_file_repository.dart';
 import '../domain/sync_summary.dart';
 
 /// DTO exchanged over the E2EE WebSocket channel for delta-sync.
@@ -80,11 +82,18 @@ class DeltaSyncResult {
 /// **Conflict resolution:** Last-Write-Wins (LWW) on `updatedAt` timestamps.
 /// Tie-breaker: alphabetically smaller UUID wins (deterministic on both sides).
 class DeltaSyncManager {
-  DeltaSyncManager(this._db, this._securityService, this._sessionManager);
+  DeltaSyncManager(this._db, this._securityService, this._sessionManager,
+      {ISecureFileRepository? secureFiles})
+      : _secureFiles = secureFiles;
 
   final AppDatabase _db;
   final ISecurityService _securityService;
   final SessionManager _sessionManager;
+
+  /// Storage/crypto for secure-file contents. Optional so pure-DB tests can
+  /// construct the manager without it — when null, the file lane of the sync
+  /// degrades to an empty manifest and apply becomes a no-op.
+  final ISecureFileRepository? _secureFiles;
 
   /// Returns the in-RAM master key, or throws if the vault is locked.
   /// Required to re-encrypt credential payloads from the wire format to the
@@ -114,6 +123,21 @@ class DeltaSyncManager {
         isDeleted: false,
       );
     }).toList();
+  }
+
+  /// Builds a manifest of all local secure-file entries (metadata only; the
+  /// encrypted contents travel later in the delta/push steps, re-keyed).
+  /// Empty when no [ISecureFileRepository] was provided.
+  Future<List<SyncManifestItem>> buildSecureFileManifest() async {
+    if (_secureFiles == null) return const [];
+    final rows = await _db.secureFileDao.getAll();
+    return rows
+        .map((row) => SyncManifestItem(
+              id: row.id,
+              updatedAt: row.updatedAt,
+              isDeleted: false,
+            ))
+        .toList();
   }
 
   /// Builds a manifest of all local folder entries.
@@ -268,6 +292,60 @@ class DeltaSyncManager {
     return (toRequest: toRequest, toPush: toPush);
   }
 
+  /// Same as [computeCredentialDeltas] but for secure files. LWW on
+  /// `updatedAt`; contents are exchanged re-keyed like credential payloads.
+  Future<({List<String> toRequest, List<SyncManifestItem> toPush})>
+      computeSecureFileDeltas(List<SyncManifestItem> remoteManifest) async {
+    final repo = _secureFiles;
+    if (repo == null) {
+      return (toRequest: const <String>[], toPush: const <SyncManifestItem>[]);
+    }
+    final localRows = await _db.secureFileDao.getAll();
+    final localMap = {for (final row in localRows) row.id: row};
+
+    final toRequest = <String>[];
+    final toPush = <SyncManifestItem>[];
+    final seenIds = <String>{};
+
+    for (final remote in remoteManifest) {
+      seenIds.add(remote.id);
+      final local = localMap[remote.id];
+
+      if (local == null) {
+        if (!remote.isDeleted) {
+          toRequest.add(remote.id);
+        }
+      } else {
+        final resolution = resolveSyncConflict(
+          localUpdatedAt: local.updatedAt,
+          remoteUpdatedAt: remote.updatedAt,
+          localId: local.id,
+          remoteId: remote.id,
+        );
+
+        if (resolution == SyncConflictWinner.remote) {
+          if (remote.isDeleted) {
+            await repo.delete(remote.id);
+          } else {
+            toRequest.add(remote.id);
+          }
+        } else {
+          final item = await buildSecureFilePushItem(local.id);
+          if (item != null) toPush.add(item);
+        }
+      }
+    }
+
+    for (final entry in localMap.entries) {
+      if (!seenIds.contains(entry.key)) {
+        final item = await buildSecureFilePushItem(entry.key);
+        if (item != null) toPush.add(item);
+      }
+    }
+
+    return (toRequest: toRequest, toPush: toPush);
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // Applying remote rows to local DB
   // ─────────────────────────────────────────────────────────────────────────
@@ -329,6 +407,97 @@ class DeltaSyncManager {
       isDeleted: false,
       rowData: _folderEntryToJson(row),
     );
+  }
+
+  /// Builds a single push item for a requested secure-file id: metadata plus
+  /// the DECRYPTED contents (base64) — the wire is E2EE with K_sync, and the
+  /// receiver re-encrypts under its own vault key (same re-keying model as
+  /// credential payloads). Returns null when the row/blob is missing or cannot
+  /// be decrypted, so one broken file never aborts the whole round.
+  Future<SyncManifestItem?> buildSecureFilePushItem(String id) async {
+    final repo = _secureFiles;
+    if (repo == null) return null;
+    try {
+      final meta = await repo.getById(id);
+      if (meta == null) return null;
+      final plain = await repo.readDecrypted(id);
+      final contentPlain = base64Encode(plain);
+      zeroBuffer(plain);
+      return SyncManifestItem(
+        id: meta.id,
+        updatedAt: meta.updatedAt.millisecondsSinceEpoch,
+        isDeleted: false,
+        rowData: {
+          'id': meta.id,
+          'name': meta.name,
+          'size_bytes': meta.sizeBytes,
+          'stored_file_name': meta.storedFileName,
+          'mime_hint': meta.mimeHint,
+          'note': meta.note,
+          'folder_id': meta.folderId,
+          'is_favorite': meta.isFavorite,
+          'created_at': meta.createdAt.millisecondsSinceEpoch,
+          'updated_at': meta.updatedAt.millisecondsSinceEpoch,
+          'content_plain': contentPlain,
+        },
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Applies full secure-file rows received from the remote device: re-encrypts
+  /// the contents under the LOCAL vault key and upserts metadata verbatim.
+  Future<List<SyncItemChange>> applyRemoteSecureFiles(
+      List<SyncManifestItem> items) async {
+    final repo = _secureFiles;
+    if (repo == null || items.isEmpty) return const [];
+    final changes = <SyncItemChange>[];
+    for (final item in items) {
+      if (item.isDeleted) {
+        final existing = await repo.getById(item.id);
+        await repo.delete(item.id);
+        changes.add(SyncItemChange(
+          id: item.id,
+          name: existing?.name ?? item.id,
+          kind: SyncEntityKind.file,
+          action: SyncChangeAction.deleted,
+        ));
+        continue;
+      }
+
+      final data = item.rowData;
+      if (data == null) continue;
+
+      final existing = await repo.getById(item.id);
+      final plain =
+          Uint8List.fromList(base64Decode(data['content_plain'] as String));
+      final meta = SecureFile(
+        id: data['id'] as String,
+        name: data['name'] as String,
+        sizeBytes: data['size_bytes'] as int? ?? plain.length,
+        storedFileName:
+            data['stored_file_name'] as String? ?? '${data['id']}.enc',
+        mimeHint: data['mime_hint'] as String?,
+        note: data['note'] as String?,
+        folderId: data['folder_id'] as String?,
+        isFavorite: data['is_favorite'] as bool? ?? false,
+        createdAt:
+            DateTime.fromMillisecondsSinceEpoch(data['created_at'] as int),
+        updatedAt:
+            DateTime.fromMillisecondsSinceEpoch(data['updated_at'] as int),
+      );
+      await repo.applySynced(meta, plain);
+      zeroBuffer(plain);
+      changes.add(SyncItemChange(
+        id: item.id,
+        name: meta.name,
+        kind: SyncEntityKind.file,
+        action:
+            existing == null ? SyncChangeAction.added : SyncChangeAction.updated,
+      ));
+    }
+    return changes;
   }
 
   /// Applies a list of full folder rows received from the remote device and

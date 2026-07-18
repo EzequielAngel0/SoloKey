@@ -106,6 +106,23 @@ class SecureFileRepositoryImpl implements ISecureFileRepository {
   }
 
   @override
+  Future<void> applySynced(SecureFile meta, Uint8List plainBytes) async {
+    final key = _session.getKeyCopy();
+    if (key == null) throw StateError('Vault is locked');
+    try {
+      final encrypted = await _security.encrypt(plainBytes, key);
+      final dir = await _dir();
+      final file =
+          File('${dir.path}${Platform.pathSeparator}${meta.storedFileName}');
+      await file.writeAsBytes(encrypted, flush: true);
+    } finally {
+      key.fillRange(0, key.length, 0);
+    }
+    // Verbatim upsert — _toCompanion keeps the given timestamps untouched.
+    await _dao.upsert(_toCompanion(meta));
+  }
+
+  @override
   Future<void> delete(String id) async {
     final entry = await _dao.getById(id);
     if (entry != null) {

@@ -41,6 +41,7 @@ class FakeSyncService implements ISyncService {
   bool sendRemoteUnlockResult = true;
   bool hasPairingKeyResult = false;
   int requestApprovalResult = 0;
+  int requestSyncFromDevicesResult = 0;
 
   bool serverRunning = false;
   bool clientConnected = false;
@@ -52,6 +53,7 @@ class FakeSyncService implements ISyncService {
   int stopServerCalls = 0;
   int removePairingKeyCalls = 0;
   int requestSyncCalls = 0;
+  int requestSyncFromDevicesCalls = 0;
   int resumeCalls = 0;
   int sendRemoteUnlockCalls = 0;
   final List<PairingPayload> pairCalls = <PairingPayload>[];
@@ -104,6 +106,12 @@ class FakeSyncService implements ISyncService {
 
   @override
   Future<int> requestApproval() async => requestApprovalResult;
+
+  @override
+  Future<int> requestSyncFromDevices() async {
+    requestSyncFromDevicesCalls++;
+    return requestSyncFromDevicesResult;
+  }
 
   // ── ISyncService: mobile client ──────────────────────────────────────────────
   @override

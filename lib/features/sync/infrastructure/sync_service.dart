@@ -17,6 +17,7 @@ import '../../../core/domain/crypto_utils.dart';
 import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../secure_files/domain/repositories/i_secure_file_repository.dart';
 import '../domain/connected_device.dart';
 import '../domain/i_sync_service.dart';
 import '../domain/pairing_payload.dart';
@@ -26,13 +27,14 @@ import 'delta_sync_manager.dart';
 
 @lazySingleton
 class SyncService implements ISyncService {
-  SyncService(
-      this._storage, this._db, this._securityService, this._sessionManager);
+  SyncService(this._storage, this._db, this._securityService,
+      this._sessionManager, this._secureFileRepository);
 
   final FlutterSecureStorage _storage;
   final AppDatabase _db;
   final ISecurityService _securityService;
   final SessionManager _sessionManager;
+  final ISecureFileRepository _secureFileRepository;
 
   static const String _serviceType = '_solokey-sync._tcp';
   static const String _kSyncKeyName = 'solokey_sync_key';
@@ -117,8 +119,9 @@ class SyncService implements ISyncService {
   @override
   int get connectedDeviceCount => connectedDevices.length;
 
-  late final DeltaSyncManager _deltaSyncManager =
-      DeltaSyncManager(_db, _securityService, _sessionManager);
+  late final DeltaSyncManager _deltaSyncManager = DeltaSyncManager(
+      _db, _securityService, _sessionManager,
+      secureFiles: _secureFileRepository);
 
   // ───────────────────────────────────────────────────────────────────────────
   // DESKTOP: Server Operations
@@ -409,6 +412,22 @@ class SyncService implements ISyncService {
     return sent;
   }
 
+  /// Desktop-initiated sync: pushes a `sync_request` to every connected phone.
+  /// The phone reacts by running its normal [requestSync] round, which is
+  /// bidirectional — so the desktop's local changes travel too. Returns how
+  /// many phones were asked.
+  @override
+  Future<int> requestSyncFromDevices() async {
+    var sent = 0;
+    for (final peer in _peers) {
+      if (peer.key == null) continue;
+      await _sendEncryptedToPeer(peer, {'action': 'sync_request'});
+      sent++;
+    }
+    if (sent > 0) _serverEventController.add('sync_requested');
+    return sent;
+  }
+
   Future<void> _sendEncryptedToPeer(
       _ServerPeer peer, Map<String, dynamic> plainMsg) async {
     final ch = peer.channel;
@@ -487,6 +506,12 @@ class SyncService implements ISyncService {
               SyncManifestItem.fromJson(i as Map<String, dynamic>))
           .toList();
 
+      // Parse remote secure-file manifest (absent on older peers).
+      final remoteFileManifest = (payload['files'] as List? ?? [])
+          .map((i) =>
+              SyncManifestItem.fromJson(i as Map<String, dynamic>))
+          .toList();
+
       // Compute credential deltas
       final credDeltas =
           await _deltaSyncManager.computeCredentialDeltas(remoteCredManifest);
@@ -495,16 +520,22 @@ class SyncService implements ISyncService {
       final folderDeltas =
           await _deltaSyncManager.computeFolderDeltas(remoteFolderManifest);
 
+      // Compute secure-file deltas
+      final fileDeltas =
+          await _deltaSyncManager.computeSecureFileDeltas(remoteFileManifest);
+
       // Send response: our items to push + list of IDs we need
       await _sendEncryptedMessage(ws, {
         'action': 'sync_response',
         'payload': {
           'request_credential_ids': credDeltas.toRequest,
           'request_folder_ids': folderDeltas.toRequest,
+          'request_file_ids': fileDeltas.toRequest,
           'push_credentials':
               credDeltas.toPush.map((i) => i.toJson()).toList(),
           'push_folders':
               folderDeltas.toPush.map((i) => i.toJson()).toList(),
+          'push_files': fileDeltas.toPush.map((i) => i.toJson()).toList(),
         },
       }, peer);
 
@@ -540,17 +571,27 @@ class SyncService implements ISyncService {
       final folderChanges =
           await _deltaSyncManager.applyRemoteFolders(remoteFolders);
 
+      // Apply received secure-file rows (absent on older peers).
+      final remoteFiles = (payload['files'] as List? ?? [])
+          .map(
+              (i) => SyncManifestItem.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final fileChanges =
+          await _deltaSyncManager.applyRemoteSecureFiles(remoteFiles);
+
       // Acknowledge sync completion (wire format unchanged: counts only).
       await _sendEncryptedMessage(ws, {
         'action': 'sync_complete',
         'payload': {
           'credentials_applied': credChanges.length,
           'folders_applied': folderChanges.length,
+          'files_applied': fileChanges.length,
         },
       }, peer);
 
       // Record what changed on THIS (desktop) vault and refresh the UI.
-      await _recordApplied([...credChanges, ...folderChanges], peer.name);
+      await _recordApplied(
+          [...credChanges, ...folderChanges, ...fileChanges], peer.name);
 
       peer.status = DeviceSyncStatus.synced;
       _serverEventController.add('devices_changed');
@@ -814,8 +855,11 @@ class SyncService implements ISyncService {
           await _deltaSyncManager.buildCredentialManifest();
       final folderManifest =
           await _deltaSyncManager.buildFolderManifest();
+      final fileManifest =
+          await _deltaSyncManager.buildSecureFileManifest();
 
-      // Send manifest to server
+      // Send manifest to server ('files' is optional on the wire — an older
+      // peer without secure-file sync simply ignores the key).
       await _sendEncryptedClientMessage({
         'action': 'sync_manifest',
         'payload': {
@@ -823,6 +867,7 @@ class SyncService implements ISyncService {
               credManifest.map((i) => i.toJson()).toList(),
           'folders':
               folderManifest.map((i) => i.toJson()).toList(),
+          'files': fileManifest.map((i) => i.toJson()).toList(),
         },
       });
 
@@ -870,6 +915,12 @@ class SyncService implements ISyncService {
         // envio del DUK). No se usa FCM: requiere la app conectada.
         _clientEventController.add('approval_request');
         break;
+      case 'sync_request':
+        // El escritorio pidio sincronizar AHORA (boton "Sincronizar" del PC).
+        // El delta es bidireccional, asi que una ronda iniciada por el celular
+        // deja ambos lados al dia.
+        unawaited(requestSync());
+        break;
       default:
         debugPrint('[SyncService Client] Unknown action: $action');
     }
@@ -898,15 +949,25 @@ class SyncService implements ISyncService {
       final folderChanges =
           await _deltaSyncManager.applyRemoteFolders(pushedFolders);
 
+      // Apply secure files the server pushed to us (absent on older peers).
+      final pushedFiles = (payload['push_files'] as List? ?? [])
+          .map((i) => SyncManifestItem.fromJson(i as Map<String, dynamic>))
+          .toList();
+      final fileChanges =
+          await _deltaSyncManager.applyRemoteSecureFiles(pushedFiles);
+
       // Record what changed on THIS (mobile) vault and refresh the UI. The
       // desktop's name is not known on the client side, so leave it null.
-      await _recordApplied([...credChanges, ...folderChanges], null);
+      await _recordApplied(
+          [...credChanges, ...folderChanges, ...fileChanges], null);
 
       // Now send the rows the server requested from us
       final requestedCredIds =
           List<String>.from(payload['request_credential_ids'] ?? []);
       final requestedFolderIds =
           List<String>.from(payload['request_folder_ids'] ?? []);
+      final requestedFileIds =
+          List<String>.from(payload['request_file_ids'] ?? []);
 
       final credsToSend = <SyncManifestItem>[];
       for (final id in requestedCredIds) {
@@ -920,6 +981,12 @@ class SyncService implements ISyncService {
         if (item != null) foldersToSend.add(item);
       }
 
+      final filesToSend = <SyncManifestItem>[];
+      for (final id in requestedFileIds) {
+        final item = await _deltaSyncManager.buildSecureFilePushItem(id);
+        if (item != null) filesToSend.add(item);
+      }
+
       // Push the requested rows to the server
       await _sendEncryptedClientMessage({
         'action': 'sync_push',
@@ -928,6 +995,7 @@ class SyncService implements ISyncService {
               credsToSend.map((i) => i.toJson()).toList(),
           'folders':
               foldersToSend.map((i) => i.toJson()).toList(),
+          'files': filesToSend.map((i) => i.toJson()).toList(),
         },
       });
 
@@ -941,8 +1009,9 @@ class SyncService implements ISyncService {
     final payload = msg['payload'] as Map<String, dynamic>? ?? {};
     final credsApplied = payload['credentials_applied'] ?? 0;
     final foldersApplied = payload['folders_applied'] ?? 0;
+    final filesApplied = payload['files_applied'] ?? 0;
     _clientEventController.add(
-        'sync_completed:creds=$credsApplied,folders=$foldersApplied');
+        'sync_completed:creds=$credsApplied,folders=$foldersApplied,files=$filesApplied');
   }
 
   void _handleWifiUnlockResponse(Map<String, dynamic> msg) {

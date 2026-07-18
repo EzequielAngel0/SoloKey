@@ -106,6 +106,47 @@ void main() {
       expect(tester.takeException(), isNull);
     });
 
+    testWidgets('the Sync-now button asks the connected phones and reports it',
+        (tester) async {
+      fake.serverRunning = true;
+      fake.hasPairingKeyResult = true;
+      fake.devices = const [
+        ConnectedDevice(
+            id: 'a', name: 'Pixel 7', status: DeviceSyncStatus.connected),
+        ConnectedDevice(
+            id: 'b', name: 'Galaxy S24', status: DeviceSyncStatus.connected),
+      ];
+      fake.requestSyncFromDevicesResult = 2;
+
+      await pumpPairing(tester, size: desktopSize);
+      await flush(tester);
+
+      await tester.ensureVisible(find.text('Sync now'));
+      await tester.tap(find.text('Sync now'));
+      await flush(tester);
+
+      expect(fake.requestSyncFromDevicesCalls, 1);
+      expect(find.text('Sync requested from 2 devices'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('Sync now with nobody connected reports no devices',
+        (tester) async {
+      fake.serverRunning = true;
+      fake.hasPairingKeyResult = true;
+
+      await pumpPairing(tester, size: desktopSize);
+      await flush(tester);
+
+      await tester.ensureVisible(find.text('Sync now'));
+      await tester.tap(find.text('Sync now'));
+      await flush(tester);
+
+      expect(fake.requestSyncFromDevicesCalls, 1);
+      expect(find.text('No devices connected'), findsOneWidget);
+      expect(tester.takeException(), isNull);
+    });
+
     testWidgets('surfaces a server-start failure', (tester) async {
       fake.startServerThrows = Exception('no available port');
       await pumpPairing(tester, size: desktopSize);

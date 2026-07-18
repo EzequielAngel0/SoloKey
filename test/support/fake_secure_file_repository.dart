@@ -15,6 +15,11 @@ class FakeSecureFileRepository implements ISecureFileRepository {
   Uint8List decryptedBytes = Uint8List.fromList(const [1, 2, 3, 4]);
   int readDecryptedCalls = 0;
   int addFileCalls = 0;
+  int applySyncedCalls = 0;
+
+  /// Copy of the plaintext passed to the last [applySynced] call, captured at
+  /// call time (the sync caller zeroes its own buffer right after).
+  Uint8List? lastAppliedBytes;
 
   @override
   Future<List<SecureFile>> getAll() async => List.of(store);
@@ -58,6 +63,18 @@ class FakeSecureFileRepository implements ISecureFileRepository {
   Future<Uint8List> readDecrypted(String id) async {
     readDecryptedCalls++;
     return Uint8List.fromList(decryptedBytes);
+  }
+
+  @override
+  Future<void> applySynced(SecureFile meta, Uint8List plainBytes) async {
+    applySyncedCalls++;
+    lastAppliedBytes = Uint8List.fromList(plainBytes);
+    final i = store.indexWhere((f) => f.id == meta.id);
+    if (i == -1) {
+      store.add(meta);
+    } else {
+      store[i] = meta;
+    }
   }
 
   @override

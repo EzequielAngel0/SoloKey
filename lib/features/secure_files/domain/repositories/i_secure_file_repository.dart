@@ -25,6 +25,12 @@ abstract interface class ISecureFileRepository {
   /// [StateError] if the vault is locked.
   Future<Uint8List> readDecrypted(String id);
 
+  /// Sync-apply: re-encrypts [plainBytes] with the LOCAL session key, writes the
+  /// blob to disk and upserts [meta] VERBATIM (ids and timestamps untouched —
+  /// LWW depends on `updatedAt` staying exactly as the source device set it).
+  /// Throws [StateError] if the vault is locked.
+  Future<void> applySynced(SecureFile meta, Uint8List plainBytes);
+
   /// Deletes a single file (disk blob + metadata).
   Future<void> delete(String id);
 

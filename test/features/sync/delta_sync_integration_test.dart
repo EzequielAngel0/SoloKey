@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:drift/native.dart';
@@ -7,8 +8,11 @@ import 'package:password_manager/core/infrastructure/security/i_security_service
 import 'package:password_manager/core/infrastructure/security/session_manager.dart';
 import 'package:password_manager/features/credentials/domain/entities/credential.dart';
 import 'package:password_manager/features/credentials/infrastructure/credential_dto.dart';
+import 'package:password_manager/features/secure_files/domain/entities/secure_file.dart';
 import 'package:password_manager/features/sync/domain/sync_summary.dart';
 import 'package:password_manager/features/sync/infrastructure/delta_sync_manager.dart';
+
+import '../../support/fake_secure_file_repository.dart';
 
 /// Identity "crypto": exercises the sync data path deterministically without the
 /// real Argon2id/AES isolates. encrypt/decrypt are pass-through.
@@ -180,6 +184,127 @@ void main() {
       // Row still present → applying again is an update, not an add.
       final applied = await mgr.applyRemoteCredentials([pushItem!]);
       expect(applied.single.action, SyncChangeAction.updated);
+    });
+  });
+
+  group('DeltaSyncManager secure-file deltas (real in-memory DB + fake store)',
+      () {
+    late FakeSecureFileRepository filesRepo;
+    late DeltaSyncManager fileMgr;
+
+    SecureFile meta(String id, int updatedAt, {String name = 'doc.txt'}) =>
+        SecureFile(
+          id: id,
+          name: name,
+          sizeBytes: 4,
+          storedFileName: '$id.enc',
+          createdAt: DateTime.fromMillisecondsSinceEpoch(1),
+          updatedAt: DateTime.fromMillisecondsSinceEpoch(updatedAt),
+        );
+
+    /// Seeds BOTH lanes the manager reads: the drift row (manifest/LWW) and the
+    /// fake store (metadata + decrypted contents for the push item).
+    Future<void> putFile(String id, int updatedAt,
+        {String name = 'doc.txt'}) async {
+      await db.secureFileDao.upsert(SecureFileEntriesCompanion.insert(
+        id: id,
+        name: name,
+        sizeBytes: 4,
+        storedFileName: '$id.enc',
+        createdAt: 1,
+        updatedAt: updatedAt,
+      ));
+      filesRepo.store.add(meta(id, updatedAt, name: name));
+    }
+
+    setUp(() {
+      filesRepo = FakeSecureFileRepository();
+      final session = SessionManager()..storeKey(Uint8List(32));
+      fileMgr = DeltaSyncManager(db, _IdentitySecurity(), session,
+          secureFiles: filesRepo);
+    });
+
+    test('without a repo the file lane degrades to empty/no-op', () async {
+      expect(await mgr.buildSecureFileManifest(), isEmpty);
+      final delta = await mgr.computeSecureFileDeltas(
+          [const SyncManifestItem(id: 'x', updatedAt: 1, isDeleted: false)]);
+      expect(delta.toRequest, isEmpty);
+      expect(delta.toPush, isEmpty);
+      expect(await mgr.applyRemoteSecureFiles(const []), isEmpty);
+    });
+
+    test('manifest lists the local rows with their updatedAt', () async {
+      await putFile('f1', 111);
+      await putFile('f2', 222);
+      final manifest = await fileMgr.buildSecureFileManifest();
+      expect(manifest.map((i) => i.id), containsAll(<String>['f1', 'f2']));
+      expect(
+          manifest.firstWhere((i) => i.id == 'f2').updatedAt, 222);
+    });
+
+    test('LWW: newer remote requested, local-only pushed WITH its contents',
+        () async {
+      await putFile('older', 100); // remote newer → request
+      await putFile('mine', 300); // only local → push
+      filesRepo.decryptedBytes = Uint8List.fromList([9, 8, 7]);
+
+      final delta = await fileMgr.computeSecureFileDeltas([
+        const SyncManifestItem(id: 'older', updatedAt: 200, isDeleted: false),
+        const SyncManifestItem(id: 'ghost', updatedAt: 50, isDeleted: false),
+      ]);
+
+      expect(delta.toRequest, containsAll(<String>['older', 'ghost']));
+      final pushed = delta.toPush.singleWhere((i) => i.id == 'mine');
+      expect(pushed.rowData!['name'], 'doc.txt');
+      // The contents travel base64-encoded and decrypted-for-rekeying.
+      expect(base64Decode(pushed.rowData!['content_plain'] as String),
+          [9, 8, 7]);
+    });
+
+    test('applyRemoteSecureFiles re-encrypts via the repo and reports changes',
+        () async {
+      final item = SyncManifestItem(
+        id: 'in1',
+        updatedAt: 400,
+        isDeleted: false,
+        rowData: {
+          'id': 'in1',
+          'name': 'backup.json',
+          'size_bytes': 3,
+          'stored_file_name': 'in1.enc',
+          'mime_hint': 'json',
+          'note': null,
+          'folder_id': null,
+          'is_favorite': false,
+          'created_at': 1,
+          'updated_at': 400,
+          'content_plain': base64Encode([1, 2, 3]),
+        },
+      );
+
+      final applied = await fileMgr.applyRemoteSecureFiles([item]);
+
+      expect(applied.single.kind, SyncEntityKind.file);
+      expect(applied.single.action, SyncChangeAction.added);
+      expect(applied.single.name, 'backup.json');
+      expect(filesRepo.applySyncedCalls, 1);
+      expect(filesRepo.lastAppliedBytes, [1, 2, 3]);
+      // Metadata landed verbatim (updatedAt preserved for future LWW rounds).
+      final stored = filesRepo.store.single;
+      expect(stored.updatedAt.millisecondsSinceEpoch, 400);
+
+      // Applying again over the now-existing file reports updated.
+      final again = await fileMgr.applyRemoteSecureFiles([item]);
+      expect(again.single.action, SyncChangeAction.updated);
+    });
+
+    test('a tombstone deletes through the repo', () async {
+      await putFile('gone', 100);
+      final applied = await fileMgr.applyRemoteSecureFiles(
+          [const SyncManifestItem(id: 'gone', updatedAt: 999, isDeleted: true)]);
+      expect(applied.single.action, SyncChangeAction.deleted);
+      expect(applied.single.name, 'doc.txt');
+      expect(filesRepo.store, isEmpty);
     });
   });
 }

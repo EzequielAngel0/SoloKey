@@ -14,6 +14,12 @@ void main() {
         kind: SyncEntityKind.folder,
         action: a,
       );
+  SyncItemChange file(String id, SyncChangeAction a) => SyncItemChange(
+        id: id,
+        name: 'file-$id',
+        kind: SyncEntityKind.file,
+        action: a,
+      );
 
   group('SyncSummary counters', () {
     test('splits credentials and folders by action', () {
@@ -42,6 +48,28 @@ void main() {
       final s = SyncSummary.empty();
       expect(s.isEmpty, isTrue);
       expect(s.total, 0);
+    });
+
+    test('splits secure files by action and round-trips their kind', () {
+      final s = SyncSummary(
+        timestamp: DateTime.fromMillisecondsSinceEpoch(1000),
+        changes: [
+          file('x', SyncChangeAction.added),
+          file('y', SyncChangeAction.updated),
+          file('z', SyncChangeAction.deleted),
+          cred('a', SyncChangeAction.added),
+        ],
+      );
+      expect(s.filesAdded, 1);
+      expect(s.filesUpdated, 1);
+      expect(s.filesDeleted, 1);
+      expect(s.filesTotal, 3);
+      expect(s.credentialsTotal, 1);
+
+      final back = SyncSummary.fromJson(s.toJson());
+      expect(back.filesTotal, 3);
+      expect(
+          back.changes.where((c) => c.kind == SyncEntityKind.file).length, 3);
     });
   });
 

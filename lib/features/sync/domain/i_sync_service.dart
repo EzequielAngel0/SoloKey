@@ -27,6 +27,11 @@ abstract interface class ISyncService implements SyncEventsSource {
   /// many phones the request reached.
   Future<int> requestApproval();
 
+  /// Desktop-initiated sync: asks every connected phone to start a delta-sync
+  /// round NOW (the delta is bidirectional, so one round brings both vaults to
+  /// parity). Returns how many phones the request reached.
+  Future<int> requestSyncFromDevices();
+
   // ── Mobile client ─────────────────────────────────────────────────────────
   Future<bool> pairWithDesktop(PairingPayload payload);
   Future<bool> requestSync();

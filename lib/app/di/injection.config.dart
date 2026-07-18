@@ -127,14 +127,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i286.IVaultRepository>(
       () => _i939.VaultRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
     );
-    gh.lazySingleton<_i706.SyncService>(
-      () => _i706.SyncService(
-        gh<_i558.FlutterSecureStorage>(),
-        gh<_i1042.AppDatabase>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-      ),
-    );
     gh.lazySingleton<_i229.SetupVaultUseCase>(
       () => _i229.SetupVaultUseCase(
         gh<_i286.IVaultRepository>(),
@@ -193,9 +185,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i657.ISettingsRepository>(),
       ),
     );
-    gh.lazySingleton<_i1055.ISyncService>(
-      () => registerModule.syncService(gh<_i706.SyncService>()),
-    );
     gh.lazySingleton<_i332.VaultExportService>(
       () => _i332.VaultExportService(
         gh<_i366.ICredentialRepository>(),
@@ -244,6 +233,18 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i558.FlutterSecureStorage>(),
         gh<_i795.SessionManager>(),
       ),
+    );
+    gh.lazySingleton<_i706.SyncService>(
+      () => _i706.SyncService(
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i1042.AppDatabase>(),
+        gh<_i1023.ISecurityService>(),
+        gh<_i795.SessionManager>(),
+        gh<_i112.ISecureFileRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i1055.ISyncService>(
+      () => registerModule.syncService(gh<_i706.SyncService>()),
     );
     return this;
   }

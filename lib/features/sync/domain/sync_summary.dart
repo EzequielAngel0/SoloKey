@@ -1,5 +1,5 @@
 /// What kind of vault entity a synced change refers to.
-enum SyncEntityKind { credential, folder }
+enum SyncEntityKind { credential, folder, file }
 
 /// What happened to a synced entity on THIS device when a delta was applied.
 enum SyncChangeAction { added, updated, deleted }
@@ -73,6 +73,8 @@ class SyncSummary {
       changes.where((c) => c.kind == SyncEntityKind.credential);
   Iterable<SyncItemChange> get _folders =>
       changes.where((c) => c.kind == SyncEntityKind.folder);
+  Iterable<SyncItemChange> get _files =>
+      changes.where((c) => c.kind == SyncEntityKind.file);
 
   int get credentialsAdded =>
       _creds.where((c) => c.action == SyncChangeAction.added).length;
@@ -89,6 +91,14 @@ class SyncSummary {
   int get foldersDeleted =>
       _folders.where((c) => c.action == SyncChangeAction.deleted).length;
   int get foldersTotal => _folders.length;
+
+  int get filesAdded =>
+      _files.where((c) => c.action == SyncChangeAction.added).length;
+  int get filesUpdated =>
+      _files.where((c) => c.action == SyncChangeAction.updated).length;
+  int get filesDeleted =>
+      _files.where((c) => c.action == SyncChangeAction.deleted).length;
+  int get filesTotal => _files.length;
 
   Map<String, dynamic> toJson() => {
         'timestamp': timestamp.millisecondsSinceEpoch,

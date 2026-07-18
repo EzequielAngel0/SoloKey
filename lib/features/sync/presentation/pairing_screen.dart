@@ -253,6 +253,18 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
     );
   }
 
+  /// Boton "Sincronizar ahora" del escritorio: pide la ronda delta a los
+  /// celulares conectados y refleja el resultado bajo la lista de dispositivos.
+  Future<void> _requestSyncNow() async {
+    final sent = await getIt<ISyncService>().requestSyncFromDevices();
+    if (!mounted) return;
+    final l10n = AppLocalizations.of(context);
+    setState(() {
+      _serverStatusMessage =
+          sent > 0 ? l10n.syncNowRequested(sent) : l10n.syncNowNoDevices;
+    });
+  }
+
   Widget _buildDesktopConnectedSection(PairingState state) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
@@ -332,6 +344,18 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
           spacing: 12,
           runSpacing: 12,
           children: [
+            // Sync iniciado desde el escritorio: pide a los celulares conectados
+            // que corran una ronda delta AHORA (la ronda es bidireccional).
+            ElevatedButton.icon(
+              onPressed: _requestSyncNow,
+              icon: const Icon(Icons.sync_rounded),
+              label: Text(l10n.syncNowButton),
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(0, 46),
+                backgroundColor: palette.primary,
+                foregroundColor: palette.background,
+              ),
+            ),
             OutlinedButton.icon(
               onPressed: () async {
                 await getIt<ISyncService>().removePairingKey();
@@ -349,16 +373,14 @@ class _DesktopPairingViewState extends ConsumerState<_DesktopPairingView> {
                 side: BorderSide(color: palette.error),
               ),
             ),
-            ElevatedButton.icon(
+            OutlinedButton.icon(
               onPressed: () {
                 ref.read(pairingNotifierProvider.notifier).startDesktopServer();
               },
               icon: const Icon(Icons.qr_code_rounded),
               label: Text(l10n.syncShowQr),
-              style: ElevatedButton.styleFrom(
+              style: OutlinedButton.styleFrom(
                 minimumSize: const Size(0, 46),
-                backgroundColor: palette.primary,
-                foregroundColor: palette.background,
               ),
             ),
           ],

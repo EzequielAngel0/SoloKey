@@ -7,6 +7,7 @@ import '../../../app/di/injection.dart';
 import '../../../core/services/notification_service.dart';
 import '../../credentials/application/credentials_provider.dart';
 import '../../folders/application/folders_provider.dart';
+import '../../secure_files/application/secure_files_provider.dart';
 import '../domain/sync_events_source.dart';
 import '../domain/sync_summary.dart';
 import '../infrastructure/sync_service.dart';
@@ -125,6 +126,9 @@ class SyncStatus extends _$SyncStatus {
     if (summary.isNotEmpty) {
       ref.invalidate(credentialsNotifierProvider);
       ref.invalidate(foldersNotifierProvider);
+      if (summary.filesTotal > 0) {
+        ref.invalidate(secureFilesNotifierProvider);
+      }
       _notifySynced(summary.total);
     }
   }
