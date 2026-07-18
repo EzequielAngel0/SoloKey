@@ -82,14 +82,17 @@ Cripto/servicios (`security_service`, `double_envelope`, `recovery`,
 (`vault_view_test`, orden/filtro) y temas (`theme_smoke_test`).
 
 Ya hay una **red de widget tests behaviorales** (prompts 96–99) — **extiéndelos, no los
-dupliques**: formulario y detalle de credencial, ajustes, auditoría (HIBP + navegación),
-bóveda/home, **transferencia** (export/import selectivo, `transfer_screen_test`),
-**escritorio** (`desktop_main_layout_test`: nav master-detail + badge de sync) y
-**archivos seguros** (`secure_files_screen_test`: add/reveal/delete gateados por auth). El
+dupliques**: formulario y detalle de credencial, ajustes, auditoría (HIBP + navegación +
+persistencia del switch), bóveda/home, **transferencia** (export/import selectivo,
+`transfer_screen_test`), **escritorio** (`desktop_main_layout_test`: nav master-detail +
+badge de sync), **archivos seguros** (`secure_files_screen_test`: add/reveal/delete
+gateados por auth) y **acceso** (`unlock_screen_test`: contraseña por SecureKeyboard real,
+desbloqueo remoto con zeroing del buffer, navegación a recovery; más `auto_lock_decision` y
+`decideNotificationTap` como lógica pura con tiempo/instantes inyectados). El
 `integration_test/` ya tiene `app_boot_test` y `vault_e2e_test`. El **piso de cobertura**
-vive en `tool/coverage_min.txt` (hoy **61.9%**) y CI lo hace obligatorio; súbelo al cubrir
-más. El mayor hueco restante son las pantallas grandes aún en smoke (unlock, pairing) y los
-recorridos e2e.
+vive en `tool/coverage_min.txt` (hoy **62.9%**) y CI lo hace obligatorio; súbelo al cubrir
+más. El mayor hueco restante son `sync_service` (infra de red), `pairing_screen` y la rama
+de cámara del `qr_scanner_screen`.
 
 ---
 

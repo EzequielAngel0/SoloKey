@@ -1,5 +1,29 @@
 # 99 · Acceso, auto-bloqueo y servicios de fondo (behavioral + lógica)
 
+> **✅ Hecho (2026-07-18).** Lo cubierto:
+>
+> - `test/features/vault_access/unlock_screen_test.dart` — behavioral: teclea la
+>   contraseña maestra en el **SecureKeyboard real** (las teclas barajadas se localizan
+>   por su label) — correcta navega a home, incorrecta muestra el error localizado y NO
+>   navega; **desbloqueo remoto** con `FakeSyncService` emitiendo `remote_unlock_key:` —
+>   asserta que `executeWithRawKey` recibe la clave decodificada y que la pantalla
+>   **zeroa el buffer** justo después (Zero-Print intacto); enlace de recovery navega.
+>   `unlock_screen` migró de `getIt<SyncService>` a `getIt<ISyncService>` (mismo
+>   singleton, seam de test).
+> - `lib/core/infrastructure/security/auto_lock_decision.dart` — decisión pura
+>   `resumeDecision(backgroundedAt, now, autoLockMinutes)` extraída de
+>   `AppLifecycleObserver._handleResumed` (comportamiento idéntico) +
+>   `test/core/auto_lock_decision_test.dart` con instantes inyectados (borde exacto,
+>   sub-minuto, clamp a 1 min, presupuesto 0).
+> - `decideNotificationTap(payload, actionId)` — ruteo puro de taps extraído de
+>   `NotificationService` (tap en caliente + arranque en frío comparten la decisión) +
+>   `test/core/notification_tap_test.dart` (sentinelas de sync/aprobación, snooze,
+>   cambiar contraseña). `findDueRotations` ya estaba cubierto — no se duplicó.
+>
+> Piso de cobertura **61.9 → 62.9%** (`tool/coverage_min.txt`). 495/495 en verde.
+> Pendiente honesto: la rama de cámara de `qr_scanner_screen` no se automatiza (item 4
+> era "si queda margen"); la biometría nativa sigue mockeada a nivel de canal.
+
 ## 📋 Prompt para pegar en el chat
 
 > Copia **solo** este bloque en un chat nuevo abierto en la raíz del repo. Ya referencia

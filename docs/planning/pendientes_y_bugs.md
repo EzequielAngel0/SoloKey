@@ -268,20 +268,44 @@ Requisitos: Flutter en PATH, toolchain Android, Visual Studio (C++ desktop) e
 
 ## Bugs/pendientes nuevos (revisión 2026-06-29)
 
-- **BUG-WIN (⬜): el logo no se ve en la barra de tareas de Windows.** La barra de
-  **título** ya muestra la "S" (ícono de ventana OK), pero la **taskbar** del
-  proceso vivo sigue genérica pese al `.ico` multi-tamaño. Falta el refuerzo nativo
-  `WM_SETICON` (ICON_BIG + ICON_SMALL) en `windows/runner/win32_window.cpp` tras
-  `CreateWindow`, y asegurar el `AppUserModelID` (`com.angelezequiel.solokey`) +
-  ícono en el acceso directo del instalador. Luego rebuild. Detalle en
-  `ux_overhaul_2026.md` (WIN-ICON).
-- **Rediseño UX pendiente (⬜):** el "rediseño" cerrado (`rediseno_ui_2026.md`) fue
-  **sólo la capa visual** (Graphite Pro). El dueño pidió **rehacer la UX de cada
-  pantalla** (carpetas con breadcrumbs/árbol, detalle de TOTP como código en vivo,
-  detalle por tipo, estados). Plan + prototipo: `ux_overhaul_2026.md` y
-  `ux_overhaul_preview.html`. Pendiente que el dueño elija **Dirección A o B**.
+- **BUG-WIN (✅ 2026-07-18): el logo no se ve en la barra de tareas de Windows.**
+  El refuerzo `WM_SETICON` (ICON_BIG + ICON_SMALL) ya estaba en
+  `windows/runner/win32_window.cpp` y el instalador ya fija el `AppUserModelID`
+  en los accesos directos, pero con un AUMID **explícito** la taskbar del proceso
+  vivo resuelve el ícono desde las propiedades *Relaunch* de la ventana, no desde
+  `WM_SETICON`. Fix: `SetRelaunchProperties()` escribe
+  `PKEY_AppUserModel_RelaunchCommand/DisplayNameResource/IconResource` en el
+  property store de la ventana (`SHGetPropertyStoreForWindow`; `propsys.lib`
+  agregada al CMake del runner). Compila en verde; verificación visual en la
+  checklist de `pruebas_dispositivos_reales.md` §7 (si persiste genérico, anclar
+  y desanclar una vez para refrescar la caché de iconos de Windows).
+- **Rediseño UX (✅):** el rediseño UX pantalla por pantalla (lotes L0–L9 de
+  `ux_overhaul_2026.md`) está **hecho y mergeado a `main`**. El trabajo continuo
+  por pantalla siguió vía `docs/prompts/` (un prompt por chat); sus 6 bugs/pedidos
+  conocidos quedaron **todos resueltos** (ver README de `docs/prompts/`).
 
 ---
 
-*Generado tras revisión del código el 2026-06-28; ampliado 2026-06-29. Actualizar
-el estado (⬜/🟦/✅) conforme se resuelva cada item.*
+## Revisión 2026-07-18 — cierre hacia producción
+
+Con los prompts 10–99 ejecutados (en chats paralelos) y esta pasada final, el
+estado real es:
+
+| Frente | Estado |
+| :--- | :--- |
+| Bugs de escritorio (auto-refresh sync, resumen de sync, carpetas editar/eliminar, QR de pantalla, sidebar) | ✅ resueltos (commits `1b740da`, `0df7554`, `b3b55dc`, `104432f`, `5d702e9`) |
+| Switch HIBP no persistía | ✅ `AppSecuritySettings.hibpCheckEnabled` + auditoría lo lee/escribe vía `SettingsNotifier` |
+| Icono de taskbar (BUG-WIN) | ✅ propiedades Relaunch* en el property store (falta solo verificación visual) |
+| Red de tests (prompts 95–99) | ✅ completa; piso de cobertura **62.9%**, 495/495 en verde |
+| R1 / M1 / M3 | 🟦 implementados; **pendiente SOLO la prueba física PC↔celular** → checklist en [`pruebas_dispositivos_reales.md`](pruebas_dispositivos_reales.md) |
+| Firma de release Android | ⏸️ **pospuesta a pedido del dueño** (los APKs siguen con clave debug: instalables, no aptos para Play Store) |
+| Empaquetado macOS/Linux/iOS | ⏸️ diferido (sin hardware) |
+| Passkeys WebAuthn real | ⬜ opcional, plan en `webauthn_fido2_plan.md` |
+
+**Camino restante a producción:** correr la checklist de dispositivos reales →
+firmar Android (cuando el dueño lo decida) → `build_release.ps1` → distribuir.
+
+---
+
+*Generado tras revisión del código el 2026-06-28; ampliado 2026-06-29 y
+2026-07-18. Actualizar el estado (⬜/🟦/✅) conforme se resuelva cada item.*

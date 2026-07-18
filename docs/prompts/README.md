@@ -52,11 +52,24 @@ i18n, tests y limpieza, y **propone 3–5 features nuevas** de alto valor.
 > construyó y mantiene esta red. Guía técnica del motor y patrones anti-flaky:
 > [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md).
 
-## Estado conocido (bugs/pedidos ya identificados a resolver en estos prompts)
+## Estado conocido (bugs/pedidos identificados — TODOS resueltos)
 
-- **Bóveda de Windows no se auto-actualiza al sincronizar** (hay que cerrar/abrir). → prompt **40**.
-- **Carpetas en Windows no permiten editar ni eliminar.** → prompt **20**.
-- **Al sincronizar no se ve qué credenciales/carpetas se sincronizaron.** → prompt **40**.
-- **Falta capturar el QR desde la pantalla en Windows** para crear TOTP sin copiar el código. → prompt **80**.
-- **Switch de "verificar filtraciones" no persiste** al cambiar de módulo. → prompt **30**.
-- **Sidebar de escritorio mal organizada.** → prompt **70**.
+- ✅ **Bóveda de Windows no se auto-actualiza al sincronizar.** Resuelto en `1b740da`
+  (`syncStatusProvider` invalida credenciales/carpetas tras aplicar el delta).
+- ✅ **Carpetas en Windows no permiten editar ni eliminar.** Resuelto en `b3b55dc` +
+  `1083e2b` + `fbc95a5` (menú contextual, editor con color, borrado sin huerfanar).
+- ✅ **No se ve qué se sincronizó.** Resuelto en `1b740da` + `0df7554` (`SyncSummary` +
+  historial persistido + notificación "N cambios sincronizados").
+- ✅ **Captura de QR desde la pantalla en Windows** para TOTP. Resuelto en `104432f` +
+  `780c4dc` (screen_capturer + zxing2, botón en el formulario).
+- ✅ **Switch de "verificar filtraciones" no persiste.** Resuelto 2026-07-18: vive en
+  `AppSecuritySettings.hibpCheckEnabled` (Keystore) y la pantalla de auditoría lo
+  lee/escribe vía `SettingsNotifier`.
+- ✅ **Sidebar de escritorio mal organizada.** Resuelto en `5d702e9` (secciones, badge
+  Watchtower, tooltips i18n).
+
+**Lo que queda de verdad** (fuera del alcance de estos prompts): validar R1/M1/M3 en
+dispositivos reales con la checklist de
+[`../planning/pruebas_dispositivos_reales.md`](../planning/pruebas_dispositivos_reales.md),
+la firma de release de Android (pendiente a pedido del dueño) y el empaquetado
+macOS/Linux/iOS (diferido por hardware).
