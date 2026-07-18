@@ -121,4 +121,12 @@ guía del motor e2e (patrones anti-flaky) están en
 Toda la documentación está organizada en [docs/](docs/README.md). Puedes visualizar las mejoras planificadas en [docs/planning/feature_ideas.md](docs/planning/feature_ideas.md) y el backlog de estabilización vigente en [docs/planning/pendientes_y_bugs.md](docs/planning/pendientes_y_bugs.md).
 
 ---
+
+## 📄 Licencia
+
+Distribuido bajo la **Licencia MIT** — ver [LICENSE](LICENSE). Puedes usar,
+modificar y redistribuir el código conservando el aviso de copyright; el
+nombre "SoloKey" identifica a la distribución oficial.
+
+---
 *Hecho con ♥, Clean Code, y agentes de Arquitectura Segura.*

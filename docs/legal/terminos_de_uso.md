@@ -4,11 +4,9 @@
 
 > ⚠️ **Nota para el autor (no publicar):** plantilla para revisar y adaptar
 > (idealmente con asesoría legal). Completa los campos entre corchetes y
-> elimina esta nota. Decisión pendiente importante: la **licencia del
-> software** (el repositorio aún no incluye un archivo LICENSE). Si el código
-> va a ser público en el portfolio, elige una licencia explícita (p. ej. MIT si
-> quieres permisividad total, o GPLv3 si quieres que los derivados sigan siendo
-> abiertos) y alinea la sección 2 con esa elección.
+> elimina esta nota. El software se distribuye bajo **licencia MIT** (archivo
+> `LICENSE` en la raíz del repositorio); las secciones 2 y 4 ya están
+> alineadas con ella.
 
 ---
 
@@ -18,13 +16,14 @@ Al descargar, instalar o usar SoloKey ("la aplicación"), desarrollada por
 **Ángel Ezequiel Barbosa Lomelí** ("el desarrollador"), aceptas estos términos.
 Si no estás de acuerdo, no uses la aplicación.
 
-## 2. Licencia de uso
+## 2. Licencia
 
-Se te concede una licencia gratuita, no exclusiva e intransferible para
-instalar y usar SoloKey en tus dispositivos personales.
-**[SI EL REPOSITORIO ES PÚBLICO CON LICENCIA OSS: sustituir por "SoloKey se
-distribuye bajo la licencia (MIT/GPLv3/…); el texto completo está disponible en
-el repositorio", y mantener coherencia entre ambos.]**
+SoloKey es software de código abierto distribuido bajo la **Licencia MIT**. El
+texto completo de la licencia está disponible en el archivo `LICENSE` del
+repositorio ([github.com/EzequielAngel0/SoloKey](https://github.com/EzequielAngel0/SoloKey))
+y prevalece sobre cualquier resumen. En términos simples: puedes usar, copiar,
+modificar y redistribuir el software, incluso con fines comerciales, siempre
+que conserves el aviso de copyright y el texto de la licencia.
 
 ## 3. Naturaleza local-first y responsabilidad sobre tus datos
 
@@ -44,8 +43,11 @@ Te comprometes a usar SoloKey únicamente con fines lícitos y a no:
   ilegítimamente o de terceros sin su autorización;
 - intentar interferir con dispositivos de otras personas a través de la
   función de sincronización;
-- redistribuir la aplicación haciéndola pasar por tuya o alterada sin
-  indicarlo. **[AJUSTAR SEGÚN LA LICENCIA ELEGIDA.]**
+- redistribuir versiones modificadas sin conservar el aviso de copyright y la
+  licencia MIT, o haciéndolas pasar por la versión oficial de SoloKey. El
+  nombre "SoloKey" identifica a la distribución oficial del desarrollador; los
+  forks son bienvenidos bajo los términos de la licencia, pero no deben
+  presentarse como la versión oficial.
 
 ## 5. Sin garantías
 
