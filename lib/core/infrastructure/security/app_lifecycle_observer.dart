@@ -6,6 +6,7 @@ import 'package:injectable/injectable.dart';
 import '../../../app/di/injection.dart';
 import '../../../features/settings/domain/repositories/i_settings_repository.dart';
 import '../clipboard/clipboard_service.dart';
+import 'auto_lock_decision.dart';
 import 'session_manager.dart';
 
 /// Observes app lifecycle events to enforce security policies:
@@ -99,16 +100,20 @@ class AppLifecycleObserver with WidgetsBindingObserver {
   }
 
   Future<void> _handleResumed() async {
-    if (_backgroundedAt == null) return;
-    final elapsed = DateTime.now().difference(_backgroundedAt!);
+    final backgroundedAt = _backgroundedAt;
+    if (backgroundedAt == null) return;
     _backgroundedAt = null;
 
     final settings = await _settingsRepo.getSettings();
-    if (elapsed.inMinutes >= settings.autoLockMinutes) {
+    final decision = resumeDecision(
+      backgroundedAt: backgroundedAt,
+      now: DateTime.now(),
+      autoLockMinutes: settings.autoLockMinutes,
+    );
+    if (decision.lock) {
       _lockVault();
     } else {
-      final remaining = settings.autoLockMinutes - elapsed.inMinutes;
-      _resetInactivityTimer(remaining.clamp(1, settings.autoLockMinutes));
+      _resetInactivityTimer(decision.restartMinutes);
     }
   }
 

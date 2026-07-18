@@ -118,6 +118,32 @@ const String _kApprovalPayload = '__approve_login__';
 const int _kSyncNotificationId = 990002;
 const String _kSyncPayload = '__synced__';
 
+// ── Tap routing (pure, shared by foreground tap and cold start) ───────────────
+
+enum NotificationTapKind { none, openSync, snooze, openCredential }
+
+/// Pure routing decision for a notification tap: sentinel payloads open the
+/// Sync screen, the snooze action mutes a rotation reminder, anything else
+/// deep-links to the credential in [payload]. Extracted from the plugin
+/// callbacks so it is unit-testable (test/core/notification_tap_test.dart).
+/// The snooze action only exists on rotation notifications, whose payload is
+/// always a credential id — never one of the Sync sentinels.
+({NotificationTapKind kind, String? credentialId}) decideNotificationTap({
+  String? payload,
+  String? actionId,
+}) {
+  if (payload == null) {
+    return (kind: NotificationTapKind.none, credentialId: null);
+  }
+  if (payload == _kApprovalPayload || payload == _kSyncPayload) {
+    return (kind: NotificationTapKind.openSync, credentialId: null);
+  }
+  if (actionId == _kActionSnooze3d) {
+    return (kind: NotificationTapKind.snooze, credentialId: payload);
+  }
+  return (kind: NotificationTapKind.openCredential, credentialId: payload);
+}
+
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
   DueRotation item,
@@ -244,18 +270,25 @@ class NotificationService {
         final resp = launch?.notificationResponse;
         final payload = resp?.payload;
         if ((launch?.didNotificationLaunchApp ?? false) && payload != null) {
-          if (resp!.actionId == _kActionSnooze3d) {
-            final until =
-                DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
-            await _db.credentialDao.markRotationPrompted(payload, until);
-          } else if (payload == _kApprovalPayload || payload == _kSyncPayload) {
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => NotificationNavigation.openSync(),
-            );
-          } else {
-            WidgetsBinding.instance.addPostFrameCallback(
-              (_) => NotificationNavigation.openCredential(payload),
-            );
+          final action = decideNotificationTap(
+            payload: payload,
+            actionId: resp!.actionId,
+          );
+          switch (action.kind) {
+            case NotificationTapKind.snooze:
+              final until =
+                  DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+              await _db.credentialDao.markRotationPrompted(payload, until);
+            case NotificationTapKind.openSync:
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => NotificationNavigation.openSync(),
+              );
+            case NotificationTapKind.openCredential:
+              WidgetsBinding.instance.addPostFrameCallback(
+                (_) => NotificationNavigation.openCredential(payload),
+              );
+            case NotificationTapKind.none:
+              break;
           }
         }
       }
@@ -382,27 +415,27 @@ class NotificationService {
   }
 
   void _onMobileTap(NotificationResponse response) {
-    final id = response.payload;
-    if (id == null) return;
-    if (id == _kApprovalPayload) {
-      // M3: abrir la pantalla de Sincronizar para aprobar el desbloqueo.
-      NotificationNavigation.openSync();
-      return;
+    final action = decideNotificationTap(
+      payload: response.payload,
+      actionId: response.actionId,
+    );
+    switch (action.kind) {
+      case NotificationTapKind.none:
+        return;
+      case NotificationTapKind.openSync:
+        // Aprobacion de login (M3) o "N cambios sincronizados".
+        NotificationNavigation.openSync();
+      case NotificationTapKind.snooze:
+        // Posponer 3 dias: empuja lastRotationPromptedAt al futuro para silenciar.
+        final id = action.credentialId!;
+        final until =
+            DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+        unawaited(_db.credentialDao.markRotationPrompted(id, until));
+        unawaited(_mobilePlugin.cancel(id: id.hashCode));
+      case NotificationTapKind.openCredential:
+        // Toque normal o [Cambiar contraseña] → abre el detalle de la credencial.
+        NotificationNavigation.openCredential(action.credentialId!);
     }
-    if (id == _kSyncPayload) {
-      // "N cambios sincronizados": abre Sincronizar para ver el resumen.
-      NotificationNavigation.openSync();
-      return;
-    }
-    if (response.actionId == _kActionSnooze3d) {
-      // Posponer 3 dias: empuja lastRotationPromptedAt al futuro para silenciar.
-      final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
-      unawaited(_db.credentialDao.markRotationPrompted(id, until));
-      unawaited(_mobilePlugin.cancel(id: id.hashCode));
-      return;
-    }
-    // Toque normal o [Cambiar contraseña] → abre el detalle de la credencial.
-    NotificationNavigation.openCredential(id);
   }
 
   @disposeMethod
