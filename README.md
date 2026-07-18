@@ -86,9 +86,15 @@ SoloKey tiene una **red de pruebas real** organizada como pirámide **unit → w
 
 - **Unit + widget** en `test/**` (espeja `lib/**`), con harness compartido
   `test/support/widget_harness.dart` y fakes reutilizables en `test/support/`
-  (repositorios en memoria, `fake_secure_storage.dart`). Cubren cripto/servicios,
+  (repositorios en memoria, `fake_secure_storage.dart`, `fake_sync_service.dart`,
+  `fake_file_picker.dart`, `fake_secure_file_repository.dart`). Cubren cripto/servicios,
   los *use cases* de bóveda (unlock/setup/wipe), providers (bóveda, carpetas, sync)
-  y los widgets del kit y de cada pantalla.
+  y widget tests **behaviorales** (interacción real, no solo "renderiza") de las pantallas
+  de mayor superficie: formulario/detalle, ajustes, auditoría, transferencia
+  (export/import selectivo), escritorio (master-detail + badge de sync) y archivos seguros.
+- **Piso de cobertura con ratchet:** `flutter test --coverage && dart run
+  tool/check_coverage.dart <min>` mide sin contar generados; el mínimo vive en
+  `tool/coverage_min.txt` (hoy **61.9%**) y CI falla si baja. Súbelo al cubrir más.
 - **Integración e2e** en `integration_test/**` (motor `integration_test`):
   `app_boot_test.dart` (arranque seguro en cualquier equipo) y `vault_e2e_test.dart`
   (recorrido real crear→bloquear→desbloquear→revelar), este **gateado** tras

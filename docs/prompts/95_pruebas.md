@@ -76,10 +76,20 @@ seed remoto). La guía `PRUEBAS_INTEGRACION.md` ya está escrita con este supues
 ## Ya cubierto (extiéndelo, no lo dupliques)
 
 Cripto/servicios (`security_service`, `double_envelope`, `recovery`,
-`ssh_key_generator`, `brute_force_guard`, `csv_import`, `security_audit`), sync
-(`pairing_payload`, `delta_sync_manager`, `delta_sync_integration`), vista de bóveda
-(`vault_view_test`, orden/filtro) y temas (`theme_smoke_test`). **Casi no hay widget
-tests ni un solo `integration_test`** — ahí está el mayor hueco.
+`ssh_key_generator`, `brute_force_guard`, `csv_import`, `security_audit`,
+`vault_export_service`), sync (`pairing_payload`, `delta_sync_manager`,
+`delta_sync_integration`, `pairing_notifier`, `fake_sync_service`), vista de bóveda
+(`vault_view_test`, orden/filtro) y temas (`theme_smoke_test`).
+
+Ya hay una **red de widget tests behaviorales** (prompts 96–99) — **extiéndelos, no los
+dupliques**: formulario y detalle de credencial, ajustes, auditoría (HIBP + navegación),
+bóveda/home, **transferencia** (export/import selectivo, `transfer_screen_test`),
+**escritorio** (`desktop_main_layout_test`: nav master-detail + badge de sync) y
+**archivos seguros** (`secure_files_screen_test`: add/reveal/delete gateados por auth). El
+`integration_test/` ya tiene `app_boot_test` y `vault_e2e_test`. El **piso de cobertura**
+vive en `tool/coverage_min.txt` (hoy **61.9%**) y CI lo hace obligatorio; súbelo al cubrir
+más. El mayor hueco restante son las pantallas grandes aún en smoke (unlock, pairing) y los
+recorridos e2e.
 
 ---
 

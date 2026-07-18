@@ -1,5 +1,21 @@
 # 98 · Behavioral: escritorio, transferencia y archivos seguros
 
+> **✅ Hecho (2026-07-18).** Las tres pantallas ya son **behaviorales** (no smoke):
+>
+> - `test/features/vault_transfer/transfer_screen_test.dart` — export por ids/password
+>   (asserta que se exporta SOLO lo seleccionado) e import selectivo via seam sobre
+>   `VaultExportService` + `FilePicker` fake (hoja de selección → confirmar → resultado).
+> - `test/core/desktop_main_layout_test.dart` — nav Favoritos/Carpetas cambia el panel,
+>   seleccionar credencial abre su detalle en el panel derecho y el badge de sync muestra
+>   spinner en fase `syncing` (override de `syncStatusProvider`).
+> - `test/features/secure_files/secure_files_screen_test.dart` — agregar via picker, borrar
+>   gateado por auth + confirmación y revelar/exportar solo tras biometría (denegado → no
+>   descifra).
+>
+> Seams reutilizables nuevos: `test/support/fake_file_picker.dart` y
+> `test/support/fake_secure_file_repository.dart`. Piso de cobertura **57.5 → 61.9%**
+> (`tool/coverage_min.txt`). Si vuelves a tocar estas pantallas, **extiende** estas suites.
+
 ## 📋 Prompt para pegar en el chat
 
 > Copia **solo** este bloque en un chat nuevo abierto en la raíz del repo. Ya referencia
