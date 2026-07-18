@@ -3518,6 +3518,48 @@ abstract class AppLocalizations {
   /// **'Rename file'**
   String get secureFilesRenameTitle;
 
+  /// No description provided for @secureFilesSearchHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search files…'**
+  String get secureFilesSearchHint;
+
+  /// No description provided for @secureFilesSortRecent.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent'**
+  String get secureFilesSortRecent;
+
+  /// No description provided for @secureFilesSortName.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get secureFilesSortName;
+
+  /// No description provided for @secureFilesSortSize.
+  ///
+  /// In en, this message translates to:
+  /// **'Size'**
+  String get secureFilesSortSize;
+
+  /// No description provided for @secureFilesEditNote.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit note'**
+  String get secureFilesEditNote;
+
+  /// No description provided for @secureFilesNoteHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Note (not encrypted; do not put secrets here)'**
+  String get secureFilesNoteHint;
+
+  /// No description provided for @secureFilesNoResults.
+  ///
+  /// In en, this message translates to:
+  /// **'No results for your search'**
+  String get secureFilesNoResults;
+
   /// No description provided for @secureFilesMove.
   ///
   /// In en, this message translates to:
@@ -3847,6 +3889,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show QR'**
   String get syncShowQr;
+
+  /// No description provided for @syncNowButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Sync now'**
+  String get syncNowButton;
+
+  /// No description provided for @syncNowRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{Sync requested from 1 device} other{Sync requested from {count} devices}}'**
+  String syncNowRequested(int count);
+
+  /// No description provided for @syncNowNoDevices.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices connected'**
+  String get syncNowNoDevices;
 
   /// No description provided for @syncWaitingDevices.
   ///
@@ -4201,6 +4261,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Folders'**
   String get syncFoldersLabel;
+
+  /// No description provided for @syncFilesLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Files'**
+  String get syncFilesLabel;
 
   /// No description provided for @syncCountAdded.
   ///

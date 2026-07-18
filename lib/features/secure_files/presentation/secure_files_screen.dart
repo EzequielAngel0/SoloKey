@@ -11,11 +11,13 @@ import '../../../core/utils/auth_helper.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../shared/utils/relative_time.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/solo_filter_chip.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../theme/app_palette.dart';
 import '../../folders/application/folders_provider.dart';
 import '../application/secure_file_import.dart';
 import '../application/secure_files_provider.dart';
+import '../application/secure_files_view.dart';
 import '../domain/entities/secure_file.dart';
 
 /// Standalone "Secure files" vault section. Stores arbitrary files (SSH keys,
@@ -34,6 +36,10 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
 
   /// (done, total) while a batch is being encrypted, or null when idle.
   ({int done, int total})? _progress;
+
+  // Search + sort state feeding the pure [visibleSecureFiles] pipeline.
+  String _query = '';
+  SecureFilesSort _sort = SecureFilesSort.recent;
 
   void _snack(String msg, {bool error = false}) {
     if (!mounted) return;
@@ -232,6 +238,43 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     await ref.read(secureFilesNotifierProvider.notifier).rename(file, newName);
   }
 
+  /// Edits the (non-sensitive) user note attached to the file. Empty clears it.
+  Future<void> _editNote(SecureFile file) async {
+    final l10n = AppLocalizations.of(context);
+    final palette = context.palette;
+    final ctrl = TextEditingController(text: file.note ?? '');
+    final result = await showDialog<String>(
+      context: context,
+      builder: (_) => AlertDialog(
+        backgroundColor: palette.drawer,
+        title: Text(l10n.secureFilesEditNote,
+            style: TextStyle(color: palette.textPrimary)),
+        content: TextField(
+          controller: ctrl,
+          autofocus: true,
+          maxLines: 4,
+          minLines: 2,
+          style: TextStyle(color: palette.textPrimary),
+          decoration: InputDecoration(hintText: l10n.secureFilesNoteHint),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ctrl.text),
+            child: Text(l10n.commonSave),
+          ),
+        ],
+      ),
+    );
+    if (result == null || !mounted) return;
+    await ref
+        .read(secureFilesNotifierProvider.notifier)
+        .updateNote(file, result);
+  }
+
   Future<void> _moveFile(SecureFile file) async {
     final l10n = AppLocalizations.of(context);
     final palette = context.palette;
@@ -375,6 +418,22 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
               },
             ),
             ListTile(
+              leading: Icon(Icons.sticky_note_2_outlined,
+                  color: palette.textPrimary),
+              title: Text(l10n.secureFilesEditNote,
+                  style: TextStyle(color: palette.textPrimary)),
+              subtitle: file.note == null
+                  ? null
+                  : Text(file.note!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: palette.textMuted, fontSize: 12)),
+              onTap: () {
+                Navigator.pop(context);
+                _editNote(file);
+              },
+            ),
+            ListTile(
               leading: Icon(Icons.folder_rounded, color: palette.accent),
               title: Text(l10n.secureFilesMove,
                   style: TextStyle(color: palette.textPrimary)),
@@ -403,6 +462,48 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  /// Search field + sort chips shown above the list (only when there ARE files).
+  Widget _buildSearchAndSortHeader(AppPalette palette, AppLocalizations l10n) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextField(
+            onChanged: (v) => setState(() => _query = v),
+            style: TextStyle(color: palette.textPrimary, fontSize: 14),
+            decoration: InputDecoration(
+              hintText: l10n.secureFilesSearchHint,
+              prefixIcon:
+                  Icon(Icons.search_rounded, color: palette.textMuted, size: 20),
+              isDense: true,
+            ),
+          ),
+          const SizedBox(height: 10),
+          SoloFilterChipBar(
+            children: [
+              SoloFilterChip(
+                label: l10n.secureFilesSortRecent,
+                selected: _sort == SecureFilesSort.recent,
+                onTap: () => setState(() => _sort = SecureFilesSort.recent),
+              ),
+              SoloFilterChip(
+                label: l10n.secureFilesSortName,
+                selected: _sort == SecureFilesSort.name,
+                onTap: () => setState(() => _sort = SecureFilesSort.name),
+              ),
+              SoloFilterChip(
+                label: l10n.secureFilesSortSize,
+                selected: _sort == SecureFilesSort.size,
+                onTap: () => setState(() => _sort = SecureFilesSort.size),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -442,27 +543,38 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
                     subtitle: l10n.secureFilesEmptyDesc,
                   );
                 }
-                final sorted = [...files]..sort((a, b) {
-                    if (a.isFavorite != b.isFavorite) {
-                      return a.isFavorite ? -1 : 1;
-                    }
-                    return b.createdAt.compareTo(a.createdAt);
-                  });
-                return ListView.separated(
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 88),
-                  itemCount: sorted.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: 8),
-                  itemBuilder: (context, i) => _SecureFileTile(
-                    file: sorted[i],
-                    folderName: sorted[i].folderId == null
-                        ? null
-                        : folderNames[sorted[i].folderId],
-                    onTap: () => _onTapFile(sorted[i]),
-                    onMore: () => _showOptions(sorted[i]),
-                    onToggleFavorite: () => ref
-                        .read(secureFilesNotifierProvider.notifier)
-                        .toggleFavorite(sorted[i]),
-                  ),
+                final sorted =
+                    visibleSecureFiles(files, query: _query, sort: _sort);
+                return Column(
+                  children: [
+                    _buildSearchAndSortHeader(palette, l10n),
+                    Expanded(
+                      child: sorted.isEmpty
+                          ? EmptyState(
+                              icon: Icons.search_off_rounded,
+                              title: l10n.secureFilesNoResults,
+                              subtitle: '',
+                            )
+                          : ListView.separated(
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 8, 16, 88),
+                              itemCount: sorted.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(height: 8),
+                              itemBuilder: (context, i) => _SecureFileTile(
+                                file: sorted[i],
+                                folderName: sorted[i].folderId == null
+                                    ? null
+                                    : folderNames[sorted[i].folderId],
+                                onTap: () => _onTapFile(sorted[i]),
+                                onMore: () => _showOptions(sorted[i]),
+                                onToggleFavorite: () => ref
+                                    .read(secureFilesNotifierProvider.notifier)
+                                    .toggleFavorite(sorted[i]),
+                              ),
+                            ),
+                    ),
+                  ],
                 );
               },
             ),
@@ -589,6 +701,19 @@ class _SecureFileTile extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: palette.textMuted, fontSize: 12),
                     ),
+                    if (file.note != null) ...[
+                      const SizedBox(height: 2),
+                      Text(
+                        file.note!,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                          color: palette.textDisabled,
+                          fontSize: 12,
+                          fontStyle: FontStyle.italic,
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

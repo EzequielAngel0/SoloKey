@@ -1915,6 +1915,28 @@ class AppLocalizationsEs extends AppLocalizations {
   String get secureFilesRenameTitle => 'Renombrar archivo';
 
   @override
+  String get secureFilesSearchHint => 'Buscar archivos…';
+
+  @override
+  String get secureFilesSortRecent => 'Recientes';
+
+  @override
+  String get secureFilesSortName => 'Nombre';
+
+  @override
+  String get secureFilesSortSize => 'Tamaño';
+
+  @override
+  String get secureFilesEditNote => 'Editar nota';
+
+  @override
+  String get secureFilesNoteHint =>
+      'Nota (no cifrada; no pongas secretos aquí)';
+
+  @override
+  String get secureFilesNoResults => 'Sin resultados para tu búsqueda';
+
+  @override
   String get secureFilesMove => 'Mover a carpeta';
 
   @override
@@ -2132,6 +2154,23 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncShowQr => 'Mostrar QR';
 
   @override
+  String get syncNowButton => 'Sincronizar ahora';
+
+  @override
+  String syncNowRequested(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: 'Sincronización pedida a $count dispositivos',
+      one: 'Sincronización pedida a 1 dispositivo',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get syncNowNoDevices => 'No hay dispositivos conectados';
+
+  @override
   String get syncWaitingDevices => 'Esperando dispositivos…';
 
   @override
@@ -2335,6 +2374,9 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get syncFoldersLabel => 'Carpetas';
+
+  @override
+  String get syncFilesLabel => 'Archivos';
 
   @override
   String syncCountAdded(int count) {

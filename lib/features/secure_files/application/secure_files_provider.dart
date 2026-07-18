@@ -61,6 +61,15 @@ class SecureFilesNotifier extends _$SecureFilesNotifier {
         .updateMeta(file.copyWith(isFavorite: !file.isFavorite));
     await refresh();
   }
+
+  /// Sets or clears the user note attached to a file (metadata only — the
+  /// encrypted blob is untouched). An empty/whitespace note clears it.
+  Future<void> updateNote(SecureFile file, String? note) async {
+    final trimmed = note?.trim();
+    await ref.read(secureFileRepositoryProvider).updateMeta(
+        file.copyWith(note: (trimmed == null || trimmed.isEmpty) ? null : trimmed));
+    await refresh();
+  }
 }
 
 @riverpod

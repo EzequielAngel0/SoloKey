@@ -174,4 +174,79 @@ void main() {
       expect(repo.readDecryptedCalls, 0);
     });
   });
+
+  group('search, sort and notes', () {
+    testWidgets('typing in the search box narrows the list', (tester) async {
+      await pumpFiles(tester, seed: [
+        _file('1', 'photo.png', mime: 'png'),
+        _file('2', 'creds.json', mime: 'json'),
+      ]);
+
+      await tester.enterText(find.byType(TextField), 'photo');
+      await tester.pump();
+
+      expect(find.text('photo.png'), findsOneWidget);
+      expect(find.text('creds.json'), findsNothing);
+
+      // No matches → the "no results" empty state, not the onboarding one.
+      await tester.enterText(find.byType(TextField), 'zzz');
+      await tester.pump();
+      expect(find.text('No results for your search'), findsOneWidget);
+    });
+
+    testWidgets('the Name sort chip reorders the list alphabetically',
+        (tester) async {
+      // Seeded newest-last so recency order differs from name order.
+      final older = DateTime(2020, 1, 1);
+      final newer = DateTime(2021, 1, 1);
+      await pumpFiles(tester, seed: [
+        SecureFile(
+            id: '1',
+            name: 'zeta.txt',
+            sizeBytes: 1,
+            storedFileName: '1.enc',
+            createdAt: newer,
+            updatedAt: newer),
+        SecureFile(
+            id: '2',
+            name: 'alpha.txt',
+            sizeBytes: 1,
+            storedFileName: '2.enc',
+            createdAt: older,
+            updatedAt: older),
+      ]);
+
+      // Default (recent): the newer zeta renders above alpha.
+      expect(tester.getTopLeft(find.text('zeta.txt')).dy,
+          lessThan(tester.getTopLeft(find.text('alpha.txt')).dy));
+
+      await tester.tap(find.text('Name'));
+      await tester.pump();
+
+      expect(tester.getTopLeft(find.text('alpha.txt')).dy,
+          lessThan(tester.getTopLeft(find.text('zeta.txt')).dy));
+    });
+
+    testWidgets('editing the note persists it and shows it on the tile',
+        (tester) async {
+      final repo =
+          await pumpFiles(tester, seed: [_file('1', 'key.pem', mime: 'pem')]);
+
+      await tester.tap(find.byIcon(Icons.more_vert_rounded));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Edit note'));
+      await tester.pumpAndSettle();
+
+      await tester.enterText(
+        find.descendant(
+            of: find.byType(AlertDialog), matching: find.byType(TextField)),
+        'work laptop key',
+      );
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
+
+      expect(repo.store.single.note, 'work laptop key');
+      expect(find.text('work laptop key'), findsOneWidget);
+    });
+  });
 }
