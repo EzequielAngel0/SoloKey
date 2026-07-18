@@ -2,6 +2,11 @@
 
 #include <dwmapi.h>
 #include <flutter_windows.h>
+#include <propkey.h>
+#include <propvarutil.h>
+#include <shobjidl.h>
+
+#include <string>
 
 #include "resource.h"
 
@@ -51,6 +56,38 @@ void EnableFullDpiSupportIfAvailable(HWND hwnd) {
     enable_non_client_dpi_scaling(hwnd);
   }
   FreeLibrary(user32_module);
+}
+
+// Writes the relaunch identity onto the window's shell property store. With an
+// explicit AppUserModelID (set process-wide in main.cpp) the taskbar button of
+// the live process resolves its icon from these properties or from a pinned
+// shortcut — not from WM_SETICON — so without RelaunchIconResource the taskbar
+// can stay generic even though the title bar shows the right icon.
+void SetRelaunchProperties(HWND window) {
+  wchar_t exe_path[MAX_PATH];
+  if (GetModuleFileName(nullptr, exe_path, MAX_PATH) == 0) {
+    return;
+  }
+  IPropertyStore* store = nullptr;
+  if (FAILED(SHGetPropertyStoreForWindow(window, IID_PPV_ARGS(&store)))) {
+    return;
+  }
+  const std::wstring icon_resource = std::wstring(exe_path) + L",0";
+  PROPVARIANT var;
+  if (SUCCEEDED(InitPropVariantFromString(exe_path, &var))) {
+    store->SetValue(PKEY_AppUserModel_RelaunchCommand, var);
+    PropVariantClear(&var);
+  }
+  if (SUCCEEDED(InitPropVariantFromString(L"SoloKey", &var))) {
+    store->SetValue(PKEY_AppUserModel_RelaunchDisplayNameResource, var);
+    PropVariantClear(&var);
+  }
+  if (SUCCEEDED(InitPropVariantFromString(icon_resource.c_str(), &var))) {
+    store->SetValue(PKEY_AppUserModel_RelaunchIconResource, var);
+    PropVariantClear(&var);
+  }
+  store->Commit();
+  store->Release();
 }
 
 }  // namespace
@@ -164,6 +201,8 @@ bool Win32Window::Create(const std::wstring& title,
     SendMessage(window, WM_SETICON, ICON_SMALL,
                 reinterpret_cast<LPARAM>(icon_small));
   }
+
+  SetRelaunchProperties(window);
 
   UpdateTheme(window);
 
