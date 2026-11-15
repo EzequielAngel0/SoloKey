@@ -11,7 +11,7 @@ docs/
 ├── arquitectura/          Cómo está hecha: ARQUITECTURA (central), SYNC_P2P, ROTACION
 ├── adr/                   Decisiones de fondo con su porqué (no se reescriben)
 ├── producto/              Qué hace (PRODUCTO) y qué podría hacer (IDEAS)
-├── diseno/                La v2: REDISENO_V2 (decisiones DEC-1 a 6, dirección, fases)
+├── diseno/                La v2: REDISENO_V2 (decisiones aprobadas, dirección, orden)
 ├── sesiones/              Un doc por carril (A Núcleo, B Diseño, C Pantallas, D Plataforma, E Calidad)
 ├── seguridad/             SEGURIDAD (amenazas, hallazgos con estado) y el plan de WEBAUTHN
 ├── proceso/               RAMAS, PRUEBAS, PRUEBAS_INTEGRACION, PRUEBAS_EN_DISPOSITIVOS

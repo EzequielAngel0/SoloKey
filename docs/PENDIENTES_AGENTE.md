@@ -127,6 +127,8 @@ Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/D.md, docs/ad
 docs/arquitectura/ARQUITECTURA.md. ListAgents y avisa que eres el carril D.
 AL EMPEZAR, confirma con el dueno (AskUserQuestion) el orden de docs/sesiones/D.md: PLA-5, PLA-4, PLA-6, PLA-3, PLA-1.
 - PLA-5 y PLA-4 van SOLOS: ningun otro carril toca codigo mientras tanto (cambian casi todos los archivos). Una rama por ID.
+- PLA-5: SOLO el paquete Dart. NO toques CompanyName/ProductName de windows/runner/Runner.rc, BINARY_NAME ni el applicationId:
+  de ahi sale la ruta de la boveda real del dueno (la app arrancaria vacia). Detalle en docs/sesiones/D.md §PLA-5.
 - PLA-4: una mayor por commit; flutter_secure_storage 11 debe seguir leyendo el .dat de la v1 (probar con una COPIA).
 - PLA-3 y PLA-6: imagenes y volumenes de Podman con prefijo solokey-, comando de limpieza en docs/proceso/PRUEBAS.md. NADA
   nuevo en el host: Rust, NDK y emulador solo en contenedor. La VM de Podman tiene /dev/kvm.

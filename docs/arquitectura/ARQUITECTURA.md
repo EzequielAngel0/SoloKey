@@ -56,7 +56,7 @@ Por qué estos parámetros: [ADR-0003](../adr/0003-cifrado-de-la-boveda.md).
 | Qué | Dónde | Cifrado |
 |---|---|---|
 | Credenciales | drift `CredentialEntries` | Todo lo sensible en un payload JSON cifrado (BLOB); en claro solo id, tipo, carpeta, favorito, oculto, orden, fechas y lo de rotación |
-| Carpetas, categorías | `FolderEntries`, `CategoryEntries` | Nombres en claro (decisión de la v1, revisar en la v2) |
+| Carpetas, categorías | `FolderEntries`, `CategoryEntries` | Nombres en claro (decisión de la v1; en la v2 van cifrados, [ADR-0009](../adr/0009-formato-de-boveda-v2.md)) |
 | Historial de contraseñas | `PasswordHistoryEntries` | Cifrado |
 | Archivos seguros | `SecureFileEntries` + archivos en `getApplicationSupportDirectory()` | Cifrados en reposo; la vista previa solo en RAM |
 | Configuración de la bóveda | `flutter_secure_storage` (Keystore en Android, DPAPI en Windows) | `MasterKeyConfig`, ajustes de seguridad, `K_sync` de cada par |
