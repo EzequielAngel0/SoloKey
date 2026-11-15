@@ -5,7 +5,7 @@
 > unitarios/de widget en verde**, pero el flujo cruzado PC↔celular **no puede
 > probarse desde un solo equipo**. Esta es la checklist para validarlos con un
 > PC Windows y un celular Android **en la misma red Wi-Fi**. Hasta completarla,
-> esos tres items siguen 🟦 en `pendientes_y_bugs.md`.
+> esos tres items siguen abiertos en `../PENDIENTES.md`.
 >
 > Requisitos: instalar en el PC el `SoloKey-<ver>-setup.exe` y en el celular el
 > `SoloKey-<ver>-universal.apk` de `dist/` (generados con `build_release.ps1`).
@@ -106,5 +106,5 @@
 | 6 | WiFi-unlock | | | |
 | 7 | B1 + icono taskbar | | | |
 
-> Al completar la tabla: actualizar `pendientes_y_bugs.md` (pasar R1/M1/M3 de
+> Al completar la tabla: actualizar `../PENDIENTES.md` (pasar R1/M1/M3 de
 > 🟦 a ✅ o abrir bugs con lo encontrado) y el estado final de `CLAUDE.md`.

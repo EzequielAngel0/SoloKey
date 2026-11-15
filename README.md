@@ -96,7 +96,7 @@ SoloKey tiene una **red de pruebas real** organizada como pirámide **unit → w
   ruteo de notificaciones como lógica pura con tiempo inyectado).
 - **Piso de cobertura con ratchet:** `flutter test --coverage && dart run
   tool/check_coverage.dart <min>` mide sin contar generados; el mínimo vive en
-  `tool/coverage_min.txt` (hoy **62.9%**) y CI falla si baja. Súbelo al cubrir más.
+  `tool/coverage_min.txt` (hoy **63.4%**) y CI falla si baja. Súbelo al cubrir más.
 - **Integración e2e** en `integration_test/**` (motor `integration_test`):
   `app_boot_test.dart` (arranque seguro en cualquier equipo) y `vault_e2e_test.dart`
   (recorrido real crear→bloquear→desbloquear→revelar), este **gateado** tras
@@ -111,14 +111,14 @@ flutter test integration_test/app_boot_test.dart -d windows  # e2e seguro
 **Regla viva del proyecto:** *toca código → toca sus tests* (unit para lógica,
 widget para UI); `flutter test` queda verde en cada cambio. El proceso completo y la
 guía del motor e2e (patrones anti-flaky) están en
-[`docs/prompts/95_pruebas.md`](docs/prompts/95_pruebas.md) y
-[`docs/prompts/PRUEBAS_INTEGRACION.md`](docs/prompts/PRUEBAS_INTEGRACION.md).
+[`docs/proceso/PRUEBAS.md`](docs/proceso/PRUEBAS.md) y
+[`docs/proceso/PRUEBAS_INTEGRACION.md`](docs/proceso/PRUEBAS_INTEGRACION.md).
 
 ---
 
 ## 💡 Próximos pasos y Roadmap
 
-Toda la documentación está organizada en [docs/](docs/README.md). Puedes visualizar las mejoras planificadas en [docs/planning/feature_ideas.md](docs/planning/feature_ideas.md) y el backlog de estabilización vigente en [docs/planning/pendientes_y_bugs.md](docs/planning/pendientes_y_bugs.md).
+Toda la documentación está organizada en [docs/](docs/README.md). Lo que falta vive en [docs/PENDIENTES.md](docs/PENDIENTES.md) y la propuesta de la versión 2 (rediseño completo) en [docs/design/REDISENO_V2.md](docs/design/REDISENO_V2.md).
 
 ---
 

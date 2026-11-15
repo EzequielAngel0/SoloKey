@@ -1,6 +1,6 @@
 # WebAuthn / FIDO2 real — evaluacion de esfuerzo y plan por fases
 
-> Origen: `docs/prompts/51_archivos_passkeys.md` ("Feature grande: WebAuthn/FIDO2
+> Origen: `docs/archive/2026-07_prompts_por_pantalla/51_archivos_passkeys.md` ("Feature grande: WebAuthn/FIDO2
 > real via Windows Hello / Android Credential Manager, no solo respaldo").
 > Este documento **evalua** el esfuerzo y propone un plan; **no** se implemento
 > en la pasada del prompt 51 (guardarrail: no romper cripto/persistencia/sync).

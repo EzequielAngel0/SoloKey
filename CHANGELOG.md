@@ -5,6 +5,15 @@ Registro técnico de cambios de SoloKey. Formato inspirado en
 [SemVer](https://semver.org/lang/es/). Las notas "para humanos" de cada
 versión viven en la página de Releases de GitHub.
 
+## [Unreleased]
+
+### Cambiado
+
+- **Docs y proceso (2026-11-14)**: rama `develop` de integración (CI también en `develop`); método por sesiones
+  (`docs/sesiones/`, carriles A a E) y `docs/PENDIENTES.md` como lo abierto; plan de la v2 en `docs/design/REDISENO_V2.md`;
+  guías `docs/proceso/PRUEBAS.md` y `RAMAS.md`; `tool/quitar-worktree.ps1` (quita un worktree sin vaciar el caché de Pub).
+  Lo terminado de la v1 (prompts por pantalla, diseño Graphite Pro, roadmap y bugs) pasa a `docs/archive/`.
+
 ## [1.1.0] — 2026-07-18
 
 ### Añadido
