@@ -93,3 +93,6 @@ vault_guard_db*
 **/ios/Pods/
 **/ios/.symlinks/
 **/ios/Flutter/ephemeral/
+# Vectores de la v1 (CAL-2): boveda DE PRUEBA, generada en Podman; la unica excepcion a las reglas de arriba.
+!vectores/v1/boveda/vault_guard_db.sqlite
+!vectores/v1/boveda/export.skvault
