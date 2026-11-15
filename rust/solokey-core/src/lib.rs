@@ -7,6 +7,7 @@ pub mod api;
 pub mod crypto;
 pub mod error;
 pub mod migrate_v1;
+pub mod sync;
 pub mod v1;
 pub mod vault;
 
