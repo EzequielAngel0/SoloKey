@@ -7,6 +7,14 @@ versión viven en la página de Releases de GitHub.
 
 ## [Unreleased]
 
+### Arreglado
+
+- **Respaldo del runner de integración (CAL-4, 2026-11-15)**: `run_integration_tests.ps1` no respaldaba `secure_files\` ni el
+  `flutter_secure_storage.dat` de la identidad actual (la regex de `Runner.rc` no leía el formato `"valor" "\0"` y solo quedaba la
+  ruta vieja `com.vaultguard`). El snapshot pasa a `tool/respaldo-boveda.psm1`: carpeta entera con hash por archivo, falla cerrado si
+  no lee la identidad, sale con 2 si algo no vuelve igual y limpia los `*.e2e-backup` de cada carpeta de soporte. Prueba sobre una
+  bóveda falsa: `tool/probar-respaldo-boveda.ps1` (vista en rojo sin la carpeta y con la regex vieja).
+
 ### Cambiado
 
 - **Docs y proceso (2026-11-14)**: rama `develop` de integración (CI también en `develop`); método por sesiones

@@ -15,7 +15,8 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|---|
 | Unit | `test/**` (espeja `lib/**`) | `flutter test` | Cripto, servicios, use cases, providers, lógica pura con tiempo inyectado. |
 | Widget | `test/**` con `test/support/widget_harness.dart` | `flutter test` | Behavioral: interactúa (tocar, escribir, revelar), no solo "renderiza". Fakes en `test/support/`. |
-| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda antes y restaura en `finally`). |
+| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). |
+| Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
@@ -47,7 +48,7 @@ que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-
 - Tras `enterText` en la búsqueda, avanza más de 250 ms (debounce).
 - BD de prueba: `AppDatabase.forTesting(NativeDatabase.memory())`.
 - En Windows, `integration_test` corre **un archivo por invocación** (instancia única de la app).
-- El build de prueba de escritorio comparte el almacenamiento con la app instalada (`Documents\vault_guard_db.sqlite` y el `.dat` de `flutter_secure_storage`): por eso el E2E destructivo va SOLO con `run_integration_tests.ps1`.
+- El build de prueba de escritorio comparte el almacenamiento con la app instalada (`Documents\vault_guard_db.sqlite`, el `.dat` de `flutter_secure_storage` y `secure_files\`, en `%APPDATA%\<CompanyName>\<ProductName>` de `Runner.rc`): por eso el E2E destructivo va SOLO con `run_integration_tests.ps1`.
 
 ## Dispositivos y emulador
 

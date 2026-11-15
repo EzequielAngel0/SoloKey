@@ -12,7 +12,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 | # | Qué | Sesión | Estado |
 |---|---|---|---|
 | 0 | Decidir DEC-1 a DEC-10 y aprobar lo de cada carril | General | ✓ 2026-11-15 |
-| 1 | Cimientos: renombrar el paquete (PLA-5) y subir dependencias (PLA-4), **sin otro carril tocando código**. En paralelo, ligera: CAL-4 y CAL-2 | D, y E | ☐ abrir ya |
+| 1 | Cimientos: renombrar el paquete (PLA-5) y subir dependencias (PLA-4), **sin otro carril tocando código**. En paralelo, ligera: CAL-4 ✓ y CAL-2 | D, y E | ☐ abrir ya |
 | 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ⊘ espera a 1 |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ⊘ espera a PLA-3 |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5, CAL-3) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
@@ -169,4 +169,4 @@ Resumen AL FINAL, con el CI terminado (gh run watch).
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1, DIS-2, DIS-3, DIS-5, DIS-4 |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-10, PAN-1 a PAN-9 |
 | D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-5, PLA-4, PLA-6, PLA-3, PLA-1; PLA-7 y 8 aprobados, el dueño dice cuándo |
-| E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-4, CAL-2, CAL-5, CAL-3, CAL-1, SEG-1, SEG-2; SEC-003 y SEC-008 los cierra la v2 |
+| E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-2, CAL-5, CAL-3, CAL-1, SEG-1, SEG-2 (CAL-4 ✓); SEC-003 y SEC-008 los cierra la v2 |
