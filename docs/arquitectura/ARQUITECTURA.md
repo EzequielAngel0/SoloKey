@@ -62,7 +62,8 @@ Por qué estos parámetros: [ADR-0003](../adr/0003-cifrado-de-la-boveda.md).
 | Configuración de la bóveda | `flutter_secure_storage` (Keystore en Android, DPAPI en Windows) | `MasterKeyConfig`, ajustes de seguridad, `K_sync` de cada par |
 
 BD `vault_guard_db`, esquema **v10** (`app_database.dart`), con migraciones paso a paso. **Cambiar el formato exige vectores de
-prueba** que demuestren que una bóveda anterior se sigue abriendo (CAL-2). Por qué así: [ADR-0005](../adr/0005-datos-en-sqlite-con-payload-cifrado.md).
+prueba** que demuestren que una bóveda anterior se sigue abriendo: los de la v1 están en
+[`vectores/v1/`](../../vectores/v1/LEEME.md) (CAL-2), con sus rarezas (la maestra entra a Argon2id con doble codificación UTF-8). Por qué así: [ADR-0005](../adr/0005-datos-en-sqlite-con-payload-cifrado.md).
 
 ## 5. Sincronización P2P
 

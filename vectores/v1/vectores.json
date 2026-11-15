@@ -1,0 +1,477 @@
+{
+  "formato": "vectores-solokey-v1",
+  "generadoCon": "tool/vectores_v1/generar_vectores.dart (codigo de la app v1)",
+  "generadoEl": "2026-11-15T14:28:27.494830Z",
+  "nota": "Boveda de PRUEBA; ningun dato es real. Fechas en ms desde epoch (UTC).",
+  "boveda": {
+    "masterPassword": "Prueba-v1 contraseña maestra ñ 🔑",
+    "wrongPassword": "Prueba-v1 contraseña maestra ñ 🔐",
+    "masterKeyConfig": {
+      "salt": "E9Q4DeImHTqkPfGFDp6V39cfKlm4Y0/EYJ+pfOiVL6w=",
+      "kdfAlgorithm": "argon2id",
+      "kdfParams": {
+        "memory": 65536,
+        "iterations": 3,
+        "parallelism": 4,
+        "keyLength": 32
+      },
+      "verificationData": "1Xb++c3GUI37yJNqxyl44wdTIGg8/1hgDT6NM245HQ+vZgqov0l02O9Jkq8nYNU="
+    },
+    "derivedKeyHex": "07cc9f26e85f51a1c3e258c404671f7b0e6dbc69f4792c093ebfb0f5fa26e724",
+    "verificationPlaintext": "SoloKey::v1::verify",
+    "recoveryCode": "5Xc4-HoUy-cTvX-4EcI-e/IQ-3Cqx-uGqS-/h24-GFhA-IK6+-ipI",
+    "secureStorage": {
+      "master_key_config": "{\"salt\":\"E9Q4DeImHTqkPfGFDp6V39cfKlm4Y0/EYJ+pfOiVL6w=\",\"kdfAlgorithm\":\"argon2id\",\"kdfParams\":{\"memory\":65536,\"iterations\":3,\"parallelism\":4,\"keyLength\":32},\"verificationData\":\"1Xb++c3GUI37yJNqxyl44wdTIGg8/1hgDT6NM245HQ+vZgqov0l02O9Jkq8nYNU=\"}",
+      "vault_metadata": "{\"id\":\"146986e3-e9aa-4a33-b9fd-89211fe9c1d1\",\"createdAt\":\"2026-11-15T14:28:23.340884\",\"updatedAt\":\"2026-11-15T14:28:23.340884\",\"isInitialized\":true}",
+      "recovery_key_hash": "BJX9h36PgLOeP83qzcZxP08TXTdsnfyZ32plNfRvdnU=",
+      "recovery_encrypted_master": "guw7ve3e6MCWlRAJQVR4YzVXW2CF5CvM7bgRJoW5EfDM1Xw5xlRnyY/oqROu/IL9aGZYVbxk8Pck+0QN"
+    },
+    "schemaVersion": 10,
+    "archivos": {
+      "bd": "boveda/vault_guard_db.sqlite",
+      "secureFiles": "boveda/secure_files/",
+      "export": "boveda/export.skvault"
+    }
+  },
+  "kdf": [
+    {
+      "uso": "boveda (Argon2id 64 MiB, 3, 4, 32 B); entrada con doble codificacion UTF-8",
+      "password": "Prueba-v1 contraseña maestra ñ 🔑",
+      "kdfInputHex": "5072756562612d763120636f6e7472617365c383c2b161206d61657374726120c383c2b120c3b0c29fc294c291",
+      "saltBase64": "E9Q4DeImHTqkPfGFDp6V39cfKlm4Y0/EYJ+pfOiVL6w=",
+      "memoryKiB": 65536,
+      "iterations": 3,
+      "parallelism": 4,
+      "keyHex": "07cc9f26e85f51a1c3e258c404671f7b0e6dbc69f4792c093ebfb0f5fa26e724"
+    },
+    {
+      "uso": "doble cifrado con PIN (Argon2id 32 MiB, 2, 2, 32 B)",
+      "password": "482915",
+      "kdfInputHex": "343832393135",
+      "saltBase64": "wfNSfkZ/edUDO1Am3sIwrro+h0UnlnF/8nkbc0CB2dE=",
+      "memoryKiB": 32768,
+      "iterations": 2,
+      "parallelism": 2,
+      "keyHex": "110ea567931a95405cc3f86a1f4a40ce87327d59b9779de37edb059059b747c8"
+    }
+  ],
+  "aesGcm": {
+    "formato": "nonce(12) || ciphertext || tag(16)",
+    "keyHex": "fffefdfcfbfaf9f8f7f6f5f4f3f2f1f0efeeedecebeae9e8e7e6e5e4e3e2e1e0",
+    "plaintextUtf8": "vector AES-GCM de la v1 ñ",
+    "blobHex": "5f5e5dbf228faec17f1add0b78e5e9186f5e55a39134a037f5a5fc32e426c36def190631dfb50ab9f06923742ef1617287a863637a4d"
+  },
+  "dobleCifrado": {
+    "formato": "double_enc_v1:<sal base64>:<base64(nonce||ct||tag)>",
+    "pin": "482915",
+    "muestra": "double_enc_v1:wfNSfkZ/edUDO1Am3sIwrro+h0UnlnF/8nkbc0CB2dE=:bRwKJTCFEUle6MGqE7X4UOiCEtzmMzzKG7EN0WhVxfIbZxbopv0s",
+    "plaintext": "campo doble",
+    "credencial": "a0000000-0000-4000-8000-000000000008",
+    "plaintextDeLaCredencial": {
+      "password": "clave del banco ñ",
+      "customFields[0]": "9876"
+    }
+  },
+  "export": {
+    "archivo": "boveda/export.skvault",
+    "formato": "magic \"SKVE2\\0\\0\\0\"(8) || sal(32) || nonce(12) || ct || tag(16); Argon2id 64 MiB, 3, 2",
+    "password": "exportación de prueba v1",
+    "kdfInputHex": "6578706f7274616369c3b36e20646520707275656261207631",
+    "nota": "La contrasena de exportacion va directa en UTF-8 (sin la doble codificacion de la maestra)"
+  },
+  "credenciales": [
+    {
+      "id": "a0000000-0000-4000-8000-000000000001",
+      "type": "password",
+      "title": "Correo personal"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000002",
+      "type": "apiKey",
+      "title": "API de pruebas"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000003",
+      "type": "secureNote",
+      "title": "Nota segura larga"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000004",
+      "type": "totp",
+      "title": "TOTP de ejemplo"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000005",
+      "type": "passkey",
+      "title": "Passkey de ejemplo"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000006",
+      "type": "sshKey",
+      "title": "Llave SSH"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000007",
+      "type": "password",
+      "title": "Vacía (solo título)"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000008",
+      "type": "password",
+      "title": "Banco (doble cifrado)"
+    }
+  ],
+  "payloads": [
+    {
+      "id": "a0000000-0000-4000-8000-000000000001",
+      "payloadJson": "{\"username\":\"persona@example.com\",\"password\":\"contraseña nueva v2\",\"website\":\"https://mail.example.com/login?x=1&y=2\",\"notes\":\"Nota corta\",\"customFields\":[{\"label\":\"PIN\",\"value\":\"0420\",\"isSecret\":true},{\"label\":\"Pregunta\",\"value\":\"Color favorito: azul\",\"isSecret\":false}],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000002",
+      "payloadJson": "{\"username\":null,\"password\":\"sk_test_0123456789abcdefABCDEF\",\"website\":null,\"notes\":null,\"customFields\":[],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000003",
+      "payloadJson": "{\"username\":null,\"password\":null,\"website\":null,\"notes\":\"Línea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\\nLínea larga con acentos áéíóú y 🔒.\",\"customFields\":[],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000004",
+      "payloadJson": "{\"username\":\"persona\",\"password\":\"otpauth://totp/Ejemplo:persona?secret=JBSWY3DPEHPK3PXP&issuer=Ejemplo&algorithm=SHA1&digits=6&period=30\",\"website\":null,\"notes\":null,\"customFields\":[],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000005",
+      "payloadJson": "{\"username\":\"persona\",\"password\":\"AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=\",\"website\":\"https://example.com\",\"notes\":null,\"customFields\":[],\"passkeyMetadata\":{\"rpId\":\"example.com\",\"rpName\":\"Example Inc.\",\"credentialId\":\"Y3JlZGVudGlhbC1pZC1kZS1wcnVlYmE\",\"aaguid\":\"00000000-0000-0000-0000-000000000000\",\"userDisplayName\":\"Persona de Prueba\",\"userVerificationRequired\":true},\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000006",
+      "payloadJson": "{\"username\":null,\"password\":null,\"website\":null,\"notes\":null,\"customFields\":[],\"passkeyMetadata\":null,\"sshKeyMetadata\":{\"privateKey\":\"-----BEGIN OPENSSH PRIVATE KEY-----\\nb3BlbnNzaC1rZXktdjEAAAAA\\n-----END OPENSSH PRIVATE KEY-----\\n\",\"publicKey\":\"ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIprueba persona@equipo\",\"passphrase\":\"frase de paso\",\"keyType\":\"Ed25519\"}}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000007",
+      "payloadJson": "{\"username\":null,\"password\":null,\"website\":null,\"notes\":null,\"customFields\":[],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    },
+    {
+      "id": "a0000000-0000-4000-8000-000000000008",
+      "payloadJson": "{\"username\":\"cliente-123\",\"password\":\"double_enc_v1:/Bj+30fKjLlYxt6aswxA1eAuEih6RnDCHK8Nj5m6fK4=:SNkkfShNGMKsPENWGsZeXQowENxQhXAk790YJSxOQHw+KHIFgM3PtLuzv2+4+A==\",\"website\":null,\"notes\":null,\"customFields\":[{\"label\":\"NIP\",\"value\":\"double_enc_v1:2D11IPdzA7qVb35hk9HKnae8mAHIV+jscRtQxCPjA3o=:XMZLYIZGTq1YDA/WlsDF3f4DQ8SrktJwDo8cS/lmbtE=\",\"isSecret\":true},{\"label\":\"Sucursal\",\"value\":\"Centro\",\"isSecret\":false}],\"passkeyMetadata\":null,\"sshKeyMetadata\":null}"
+    }
+  ],
+  "secureFiles": [
+    {
+      "id": "bbf7d6e3-775f-45f4-bbe7-751af73c7b5b",
+      "name": "factura ñ.pdf",
+      "storedFileName": "bbf7d6e3-775f-45f4-bbe7-751af73c7b5b.enc",
+      "plaintextBase64": "JVBERi0xLjQgY29udGVuaWRvIGRlIHBydWViYSDDsQ==",
+      "plaintextSha256": "f274bec3dbcdd2059c6e649017ae296bfeec58c1b38076e9ceef3b75b7eaad4c"
+    },
+    {
+      "id": "ebaba4ee-f268-4c65-b02b-1938971d79a2",
+      "name": "vacío.txt",
+      "storedFileName": "ebaba4ee-f268-4c65-b02b-1938971d79a2.enc",
+      "plaintextBase64": "",
+      "plaintextSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "id": "49c34db7-6cf8-438f-899c-3a6cfdda910e",
+      "name": "binario.bin",
+      "storedFileName": "49c34db7-6cf8-438f-899c-3a6cfdda910e.enc",
+      "plaintextBase64": "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",
+      "plaintextSha256": "d010f6d76d0eb4dce5d5b5b34014a8a157ec4380a66c24d7d455a9bf652db14a"
+    }
+  ],
+  "filas": {
+    "credential_entries": [
+      {
+        "id": "a0000000-0000-4000-8000-000000000001",
+        "title": "Correo personal",
+        "type": "password",
+        "category_id": null,
+        "folder_id": null,
+        "is_favorite": 1,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "e9276967ecddfa270376c1178c10afcb1666ab149b309af83001eb3d12662c267d3211e6ac6fafd9ee824b84753ab07a358aea1ee404debf01724d0c652977a09b46eef6c26a0c30e93b88c31fcec4286b9b127fe7b368eb8ee54221e1759c77b3f369df8fd198108a7ab1a1fc89e6bf6145e13e6a8ef0e75a329e8cc464f5dfdcd41b8e5edd310998c64bd4d6956437b51de0b9c42d63e564bac4ab65bdf271c5da071111b2d1421b28df30f1cc57cea3eee449e06bf1bcd3c9b4963098ff3d73871df0f11832ff04324ce21517faf8609207138b1bd160e1cb32c176313a02e9e063164fda301b39bdadba50a4bf3b89f6fe2f44d208fdee58f6262355b79fc008d6206b86af8f7f16d2c5c25af88772624dd5cb0bde941fba140c3301748447c39a335246a763910294ba2dc182fa760f295dec75671d4f2fd51d41209f4f7f739a3a0aa11b2c54cfc8f5b988c2d13c4fe2ce6106641fbf3c"
+        },
+        "created_at": 1767323645000,
+        "updated_at": 1767324245000,
+        "rotation_interval": "custom",
+        "custom_rotation_days": 45,
+        "last_rotation_prompted_at": 1767324845000,
+        "is_hidden": 0,
+        "sort_order": 2
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000002",
+        "title": "API de pruebas",
+        "type": "apiKey",
+        "category_id": "f0000000-0000-4000-8000-000000000002",
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "1c27204f6e4822ad87baf3bb03a6993db9388b82fac71bf6815d1b27d7df12ce831cf071336f875c3e107241b4e8a8a5cc15778b2e02b022ef100dfa4f899b905a466ff23275f0f3b6d4e36ae445122eece2c04e1db4a585e4fbd2f0411638e06de943c0cc6e2a26504adaa30d31e57c5fdba93a880cc51d3e3e4e079f11cfb14467805e73c36ec3cdd02f59c126398e31128349450592bb69eef467f2c8fff8b0dc91ddc218f0ce04e0dc0d88666a50e64cce25"
+        },
+        "created_at": 1767323765000,
+        "updated_at": 1767323765000,
+        "rotation_interval": "quarterly",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000003",
+        "title": "Nota segura larga",
+        "type": "secureNote",
+        "category_id": "f0000000-0000-4000-8000-000000000001",
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "7e6e3334eaf50a3a1d195cb01ed345aa1adf9186d066e8463e96c57ba37f7b15f4a30ee8748e9ce0ab187791890aa9fceb13e82afdd96d580239d3e93b5ec7fc8b8515873886374f63d35afb3a60b8228af4109fbb746bf9f32911f7441d3fd805eac866c30e4f7ed0214a97862b0c0f694d15ca47b016ce5402d8376b2d92d2cd3263e4ef0f823ec6372844a41677acfede0107ae77acf0bbb9826a42c483e607ef167787996e3c255c328059a105899efdfa694169024c9c33c78a0016738358443e5d4622e67f91f69f136c2c816f040caf0d68e655682e05a6a2ea8f5d4feb3447f817961c3e3da2c79fa0448ecf03ec9b1f6ecb2980d3e42e2c2064a6a70d62e6aaeedd3d0d185a809ed507b33271073abfd1ccd4b879d05be8fc32b01e72b7f093ff71af697534771a9c643fadeccf011c33ec24eb4b2d2488b2414580e4b4a0982ab5fdd8abacf0f758a1d6fb32489851b1b997d7de4d4287ae0156b71b81946ca6b3ee27d47b448592d0b778035656aad0d3de4b6b6b5740ea024afede61f9c96d83fc6d9f78bde5ebfb06a8e991f1c727d1683f84304dbc8093dc1dc6c702ffff15f4818db34cc9f81dfcaa088d847cbb8f8ad4d82eedb45d06ae532066a2c21719db3e3d1518bdea346d86650b9a03df883a1a9988e1342143f37e1cb25f4fb13fdd38dc72a0cfd2b53319d83060680f2f4786e3120d8a6ce3f2cd6275a7a6f03cf61552732d3badf52aac34db1355737ca914c4141d7bde0a1a53c8fc9ed4df829046c993b37d387fa3d2c604a7874742569e183affeb6abc24bfaba01b49dccd580e68fe38289c757477b490a992fb20d5c8dbd35b1b2debe398062bcbe8aa3cf3d2f98ce36f1609a740799c41ffa64f2fd6815078ae152394d48f707a28eeaa3a4479512e145fa28ad74bb0ffcabbbac3129aa9f0560cc96a24d3385c0653c08959918d8a9757e89aae41f45c8b93b137efaadaaa283d14fdf0ba8ce5cfa7adbf022a9409a8390ae3c38f1ea466408ab3ac166d9e742fa3f25b533f3003ac65c908fed32860012256e3dce8eba3e1073253d55d005c74e0a503b9a2bfc215c5d3eebc4ae3a0d8a59b748666b9897b1e31e6f7ca0ae44f773c97372f4fe97be8b28a57065208333e2ecf5edd1ca9374b589de5c76664715307bc66302f32a2093649a998c4eda5bded70e996304a71ea715f7705c6e0b1f5b4e4e7f225c44daf3c3899ec9573c4fbddbabc940374ae2e0c1eeea4e75ebeb125aba69578df7c979758192584edd7844b624e666e44c5e946a75ccc015af6958abdbb05c9a339a5ea1802a5da3b75bd206f15ece8eb72f960670a0079f65657d7ea43b4b6555c538b24204a06cc18e7693bada317a3ece74c09c7be9fc4389c2984e567dbc41c72cfe267db86243c0a7dd5270d86322551673e897799147bcda197cf8d35b456ad202f5ed235e0c9e8ab0fc58f86722b8c6b7f3fac6a3a76a6016cdf16c4a2273ebefd423709f465463716d37f081325c4b80c5a6c96f1bb3ef3a23b56115d0da5ac1707b5d79beb171adda993e1e0f846cf05dbc1521b0fa7f3bb9d939225ae2dbac71e7c8b6e31aa29664fb1b97a8d99655eaf0c5808c15754d96cc5b3b54156fbf25a76fc921022b750c308d4c6521aa855268c37cd5c14eef9fdc4e91b01827228a0bd32c5aece980b6c1a474d291c2f5196fce17e25027203520067ab0ad60da51a6775bf08622bfaf6c51ac699b4568fa0a0f3d0cc4eff43bb06307cf135164ef9cf6a08333a6c7c6cef622006be066033201a3657a4e84cf7bf8ef9ebd10700081907651e69e13dba3b6455dd041933a9ea9870dfe1905a095f44f99a50c92d831ff760a64d6130367e0e1dd902479d46823a25ec2b5cd473369885f23a5e37bc723bee5c62eae0abec154742eda1c02bad5c6e39bdbb8e5d7a6dc77b9f5c36d3c6662896eda9fd300f981541d395b83aca01dcac5c36773537eb8c324db38cf93ea6f8395509e208e99225806a71e3630a5aa641ab7ee6c1f12718ae1ecf698154ba35e5c286ffc4f0ffb995b786115af91ea86b4953b544cb37c2c08f235c2805c1923025e46cea73c47ea45f4b24cf9095e86db3f74d2d8065b08b2a1ec55b05f73716bbd33325a6507adc2f54dae597ba000ac2bdcd105eddecb2531fd1df76e8d01b95a77715ca4f934efddfad93ded65b8b5bc1f4de51e489012307f2dbe2a168625aea820db5acaaf30c83b73e151d833e32fb11fe2b9fae83675be963eb6650f754365e9d4bc9bd4a527b3022f2870b2d7a2774657084e07255734a77873269971944c67bfe7dc1e7e337dc62a80e708fb4547f8c83da7de833bf8db7599fa2c4cf8a46c8f6c359733d87ea38e7ea5033d58ca9a8897a836fcbe1c860e98b6741480f9da421d170110319a6fabe8600731e46db9ecad8d30f1411293eea37a54991df9b56c59b349684d02ede003d6cc6e7a3c6c0e3e8149177e43f276711b08ccadd9403049755b44019ce0ae4ea01c67c4dfa2dece75c85c20f614aec8500a7ed4edf86f1e20d9c70035f2dd276d3561cc22151b877291453518eb55de2714943b974627f05aaadf09bb10d8a8f2a788fdb1f0379425d902152fc5f4040f7fbdb10c0e6a57027a12c7201e086a98743a1bbe418b82ee9550d7df09792a6f66654195674357417d92364c2d924c80673b9dffed70492eaad558fdc133573674f5cc56548edcf8a146e95103648ae02"
+        },
+        "created_at": 1767323825000,
+        "updated_at": 1794752906155,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 1,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000004",
+        "title": "TOTP de ejemplo",
+        "type": "totp",
+        "category_id": "f0000000-0000-4000-8000-000000000001",
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "453d2792d3dc582821559c528a29bd490ec89f983bc373795e573ac47a6a58953c9da2524b47ab4dfcf9fa298e48da3e25a922444299f9490a1cdc14f625fc43186a7c3e2b7db7c9412c71c5e9ed17375dbf6a76d73f52ed0df773dde1a601c9f3796b0c17c2026e510573d1eee6d6df27cf31c3ecb17b457b51c7e4302abc40d292cdae953a4aa8ed49470decafd1da918f3070be493916d049eb5ca2132a9b6a98ff20b4ef9773ce432b18a710c3965fa8d3a80edfa65dd553f07a9b33b79b06d6b7b9d397d6742f919df5a9025123298c81769daf5f0f9efefc79cc822006afd256b36ee4675879715d259238d84dc3e3889a473859e5f0fea35caed2252d84b6"
+        },
+        "created_at": 1767323945000,
+        "updated_at": 1767323945000,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000005",
+        "title": "Passkey de ejemplo",
+        "type": "passkey",
+        "category_id": null,
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "4b128716176a76eed590f986ad8d7088c858d46a5cf7e0883ec7fab5378cc58f9effe934a3d451ba75a854e4b13c438d47dd670c20653a8af924e42f69158193785a9e1094d5c159f6d5b91ffa1e71ffcecb6c8f536c58805fc1597cf58978d56b6ec80dc1d3bb092c974e57e1d82d58ab98678aaaa2ca9e47b652e5532c4e8a92c780b4ae14cf15c3c463ab6a9fe4956e6d028d0f6297f581fb4e16edabbe09ea2943e9f791afcec5c2f2117f42b3159872d74d16c4d548b4c67faad7b65bd627ef5835ac5e89f65d4a11654778ad9422af38fdca2f0ebfd24747aa470718a0e51bc738baa3c8365b57f93c5fb2460b36641d857e5270e5e1bf1bb4bf4947ba07a24848a6216d6b6ea1da68aab2e3d3601c9add5dd9c68354341fc1175822b04004d51f50fdb0adfeea9cfe7eab1e89b8422d19852548784c0bd51ea3a1eac77e4d077f647c6ea255aca6de5fbeef88df83542218f465ee9dccc0cee535e4454fdfe2351204be3cb91d75808ee7e1b65eb3fc8c0e16420a5c7d8540718c14d78ed98f22ed745d6d7d36f23623d54e8df519ab4cfc3074b520d90978dc33dc62fd3a2e25b3364307e1"
+        },
+        "created_at": 1767324005000,
+        "updated_at": 1767324005000,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000006",
+        "title": "Llave SSH",
+        "type": "sshKey",
+        "category_id": null,
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "9cfc549b4186be2d6e7bf337233c3884613ad582cd37db9ccf5f0ae849f441c17569687476a28e4732d8770f65fb6b7e3ca3cf8418d8d995df741d32f4969c429b82655a176e49c738c07365c362cea1115ebff0b3a54b0885fa9c4d263e1d71ce6f397377ae648fe00149b6a864bf86aa8516d03b7c00da1a349581148753837f0eecadf942411fddc357cb5b09e952d5d898f05102b396e16cf705ede176c64d7b6f45533aadb386346e4f8a3deb3f1bec0de5338cac93bf4ffa648010cda18e45f729f0ab35ff4fda5fbf2300fa2f9549c4f9f626e0dc8e018b6c968783ba17585c068252f472cf0ca0ea08206a9a00d7a69a8507e2b41e6c66ab1a73b4e95d34f7072f18f7d40cdadb3e8469e9b2dfcd1b648b86efa6bf1768c9d9243a3abb47dc341f9874abfe88620ce21b6da13df90db5b1f34078a3e599e294e6f0ceeeae595c6bfb516aefc980a27c6de29b0dd429fd9c675dbe9878669890ad2a95afad26bafa8bda6a7701197fe9a6623e6b87e7f83a6bde9932da5393a70079f1df"
+        },
+        "created_at": 1767324065000,
+        "updated_at": 1767324065000,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000007",
+        "title": "Vacía (solo título)",
+        "type": "password",
+        "category_id": null,
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 0,
+        "encrypted_payload": {
+          "hex": "26598f460f1b85673622e596f9ab148e945e620e682c5c35cb30e247b04e0759f20b834d03771b1a181cff42d4c2048118514e98c71ff673f4b74ca2145804d10af51b762a19b28443bd370685a5ec0efc5236633dce020a3e03be4747eaec267188355a3a7e984ee1e4983ff5744fa95af36f9abea3cc61a9681aeadba6f73c95083d52f166daacb31f7a28c2e042cc83a81093e7e99e46"
+        },
+        "created_at": 1767324125000,
+        "updated_at": 1767324125000,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      },
+      {
+        "id": "a0000000-0000-4000-8000-000000000008",
+        "title": "Banco (doble cifrado)",
+        "type": "password",
+        "category_id": null,
+        "folder_id": null,
+        "is_favorite": 0,
+        "is_double_encrypted": 1,
+        "encrypted_payload": {
+          "hex": "d0738950fe8a70120e9fa4b2892bdfe52b89847a113d5e63388f7676b903e04bd87f0366e72cc5fbb9432508cd78f49aadb8281772ef446357a1fb4c7e39ce4cf1cd97451c9c8abfce8cac0487bba3a0afbb0b8d59d5c2e47c7fb08bfe7eb190b319daad1a39a5887bd5526fdd4108a9872073f10c8bb2b4f60c40b5da32cd5c6ad33d43ffce2a93b7b6696ee45045467ef1c70e0e4948abd6aafffb5a6250f3d3108e3b4e6d7ce5eb17e7a086ef3fc63244838b38f4ae6d52697808540a17fd3c1eb4c002b254ba1bbb1eac4527f0daa905486634241d1d4621ee9cd1125771fd0bfe78c46e214385e7118f8012eaa5aefc542d9d57d8aa21e752e36aabf2795dc66796cf0e36e04895b87143d5c08be4c6277ce9d878864ea32966163172df9c7922baf30bd95dae21b8b8b153d017d22688b1a1d9daf92c5d7cb57a3d8752ac17461149f2e8a347d6b65ee8219305994e729b96c7d5546958a2037d63a4b3e6178eed4274c5ec4cc572667bca9abb2987381020ad693c8222f6f44539928a77c51c6d96a1ee040cb9395610dbab776a505e6aee91e23c58d264a7ba5b317d1e728124b6a28109fa55e8d1bebf7690a739fdbbcf6f69152ca3f0131af89bf8e665de15858de4f68b5d698b610e966e9f9f325b3f46df1aca4193d27e543bc24a69"
+        },
+        "created_at": 1767324185000,
+        "updated_at": 1767324185000,
+        "rotation_interval": "none",
+        "custom_rotation_days": null,
+        "last_rotation_prompted_at": null,
+        "is_hidden": 0,
+        "sort_order": 0
+      }
+    ],
+    "folder_entries": [
+      {
+        "id": "f0000000-0000-4000-8000-000000000001",
+        "parent_id": null,
+        "name": "Trabajo",
+        "icon": "folder",
+        "color_hex": "#6C63FF",
+        "is_favorite": 0,
+        "created_at": 1767323105000
+      },
+      {
+        "id": "f0000000-0000-4000-8000-000000000002",
+        "parent_id": "f0000000-0000-4000-8000-000000000001",
+        "name": "Servidores ñandú",
+        "icon": "dns",
+        "color_hex": "#00897B",
+        "is_favorite": 1,
+        "created_at": 1767323165000
+      }
+    ],
+    "category_entries": [
+      {
+        "id": "c0000000-0000-4000-8000-000000000001",
+        "name": "Categoría heredada",
+        "icon": "label",
+        "created_at": 1767323225000
+      }
+    ],
+    "password_history_entries": [
+      {
+        "id": "1b44bba7-ea00-41da-a297-16c82ed26db3",
+        "credential_id": "a0000000-0000-4000-8000-000000000001",
+        "encrypted_payload": {
+          "hex": "47ce1a48d129b582c1fa84e32167a7b8c76c8938b8207ee92a650893a62820287346e6bcafd734418def8b96aa4c95c3a6b119b60e01ba5c23f480bf67ffeba399a5a730571a4d6f7f5732155af5f8f3cc5e2db58e2d0c6b65fa1aa8e036166d74fda557169ae884effd480fba67c33594dccadd4e6cd24a81508ae40c8e81039ad6d0f61159f22bd834b424b2a548edca5815a6a7890bebd4e86bd5d7712d371f0c4cbd76ff59ec2aa986209f9e9daad86f9dd3fbf4b1811c888393d648204ae2413e9056ec0236766fd1fb976408d17b66da9d99741faebbee8898db10dc20f9c2f81a3618a27cb9ba477f2dc5853ed88ef0243b777f8c7dbc704be028c0f4bc9e166d027d634ca6e21ee7a2ff1d0448cd8aaa681d0420748e51aeac3fdb0fe1f089c9a76bd79d2810062f0cf3d029d4b2ba08759f13a5bd301cc2e35dc53d55e2b3e5daa8bb12ceffa3dce2e0915ce0c20865b53a0294d64aea06a3db14d153e0b6dff8393403c03a289f"
+        },
+        "created_at": 1794752905324
+      },
+      {
+        "id": "f33ab2e2-e91e-4b49-861f-8268f75e76d8",
+        "credential_id": "a0000000-0000-4000-8000-000000000001",
+        "encrypted_payload": {
+          "hex": "e9276967ecddfa270376c1178c10afcb1666ab149b309af83001eb3d12662c267d3211e6ac6fafd9ee824b84753ab07a358aea1ee404debf01724d0c652977a09b46eef6c26a0c30e93b88c31fcec4286b9b127fe7b368eb8ee54221e1759c77b3f369df8fd198108a7ab1a1fc89e6bf6145e13e6a8ef0e75a329e8cc464f5dfdcd41b8e5edd310998c64bd4d6956437b51de0b9c42d63e564bac4ab65bdf271c5da071111b2d1421b28df30f1cc57cea3eee449e06bf1bcd3c9b4963098ff3d73871df0f11832ff04324ce21517faf8609207138b1bd160e1cb32c176313a02e9e063164fda301b39bdadba50a4bf3b89f6fe2f44d208fdee58f6262355b79fc008d6206b86af8f7f16d2c5c25af88772624dd5cb0bde941fba140c3301748447c39a335246a763910294ba2dc182fa760f295dec75671d4f2fd51d41209f4f7f739a3a0aa11b2c54cfc8f5b988c2d13c4fe2ce6106641fbf3c"
+        },
+        "created_at": 1794752906136
+      },
+      {
+        "id": "715cb65b-a026-4d13-8413-a23f17cd5345",
+        "credential_id": "a0000000-0000-4000-8000-000000000002",
+        "encrypted_payload": {
+          "hex": "1c27204f6e4822ad87baf3bb03a6993db9388b82fac71bf6815d1b27d7df12ce831cf071336f875c3e107241b4e8a8a5cc15778b2e02b022ef100dfa4f899b905a466ff23275f0f3b6d4e36ae445122eece2c04e1db4a585e4fbd2f0411638e06de943c0cc6e2a26504adaa30d31e57c5fdba93a880cc51d3e3e4e079f11cfb14467805e73c36ec3cdd02f59c126398e31128349450592bb69eef467f2c8fff8b0dc91ddc218f0ce04e0dc0d88666a50e64cce25"
+        },
+        "created_at": 1794752905519
+      },
+      {
+        "id": "16604d43-d085-4f16-9f18-12315adbb5d9",
+        "credential_id": "a0000000-0000-4000-8000-000000000003",
+        "encrypted_payload": {
+          "hex": "7e6e3334eaf50a3a1d195cb01ed345aa1adf9186d066e8463e96c57ba37f7b15f4a30ee8748e9ce0ab187791890aa9fceb13e82afdd96d580239d3e93b5ec7fc8b8515873886374f63d35afb3a60b8228af4109fbb746bf9f32911f7441d3fd805eac866c30e4f7ed0214a97862b0c0f694d15ca47b016ce5402d8376b2d92d2cd3263e4ef0f823ec6372844a41677acfede0107ae77acf0bbb9826a42c483e607ef167787996e3c255c328059a105899efdfa694169024c9c33c78a0016738358443e5d4622e67f91f69f136c2c816f040caf0d68e655682e05a6a2ea8f5d4feb3447f817961c3e3da2c79fa0448ecf03ec9b1f6ecb2980d3e42e2c2064a6a70d62e6aaeedd3d0d185a809ed507b33271073abfd1ccd4b879d05be8fc32b01e72b7f093ff71af697534771a9c643fadeccf011c33ec24eb4b2d2488b2414580e4b4a0982ab5fdd8abacf0f758a1d6fb32489851b1b997d7de4d4287ae0156b71b81946ca6b3ee27d47b448592d0b778035656aad0d3de4b6b6b5740ea024afede61f9c96d83fc6d9f78bde5ebfb06a8e991f1c727d1683f84304dbc8093dc1dc6c702ffff15f4818db34cc9f81dfcaa088d847cbb8f8ad4d82eedb45d06ae532066a2c21719db3e3d1518bdea346d86650b9a03df883a1a9988e1342143f37e1cb25f4fb13fdd38dc72a0cfd2b53319d83060680f2f4786e3120d8a6ce3f2cd6275a7a6f03cf61552732d3badf52aac34db1355737ca914c4141d7bde0a1a53c8fc9ed4df829046c993b37d387fa3d2c604a7874742569e183affeb6abc24bfaba01b49dccd580e68fe38289c757477b490a992fb20d5c8dbd35b1b2debe398062bcbe8aa3cf3d2f98ce36f1609a740799c41ffa64f2fd6815078ae152394d48f707a28eeaa3a4479512e145fa28ad74bb0ffcabbbac3129aa9f0560cc96a24d3385c0653c08959918d8a9757e89aae41f45c8b93b137efaadaaa283d14fdf0ba8ce5cfa7adbf022a9409a8390ae3c38f1ea466408ab3ac166d9e742fa3f25b533f3003ac65c908fed32860012256e3dce8eba3e1073253d55d005c74e0a503b9a2bfc215c5d3eebc4ae3a0d8a59b748666b9897b1e31e6f7ca0ae44f773c97372f4fe97be8b28a57065208333e2ecf5edd1ca9374b589de5c76664715307bc66302f32a2093649a998c4eda5bded70e996304a71ea715f7705c6e0b1f5b4e4e7f225c44daf3c3899ec9573c4fbddbabc940374ae2e0c1eeea4e75ebeb125aba69578df7c979758192584edd7844b624e666e44c5e946a75ccc015af6958abdbb05c9a339a5ea1802a5da3b75bd206f15ece8eb72f960670a0079f65657d7ea43b4b6555c538b24204a06cc18e7693bada317a3ece74c09c7be9fc4389c2984e567dbc41c72cfe267db86243c0a7dd5270d86322551673e897799147bcda197cf8d35b456ad202f5ed235e0c9e8ab0fc58f86722b8c6b7f3fac6a3a76a6016cdf16c4a2273ebefd423709f465463716d37f081325c4b80c5a6c96f1bb3ef3a23b56115d0da5ac1707b5d79beb171adda993e1e0f846cf05dbc1521b0fa7f3bb9d939225ae2dbac71e7c8b6e31aa29664fb1b97a8d99655eaf0c5808c15754d96cc5b3b54156fbf25a76fc921022b750c308d4c6521aa855268c37cd5c14eef9fdc4e91b01827228a0bd32c5aece980b6c1a474d291c2f5196fce17e25027203520067ab0ad60da51a6775bf08622bfaf6c51ac699b4568fa0a0f3d0cc4eff43bb06307cf135164ef9cf6a08333a6c7c6cef622006be066033201a3657a4e84cf7bf8ef9ebd10700081907651e69e13dba3b6455dd041933a9ea9870dfe1905a095f44f99a50c92d831ff760a64d6130367e0e1dd902479d46823a25ec2b5cd473369885f23a5e37bc723bee5c62eae0abec154742eda1c02bad5c6e39bdbb8e5d7a6dc77b9f5c36d3c6662896eda9fd300f981541d395b83aca01dcac5c36773537eb8c324db38cf93ea6f8395509e208e99225806a71e3630a5aa641ab7ee6c1f12718ae1ecf698154ba35e5c286ffc4f0ffb995b786115af91ea86b4953b544cb37c2c08f235c2805c1923025e46cea73c47ea45f4b24cf9095e86db3f74d2d8065b08b2a1ec55b05f73716bbd33325a6507adc2f54dae597ba000ac2bdcd105eddecb2531fd1df76e8d01b95a77715ca4f934efddfad93ded65b8b5bc1f4de51e489012307f2dbe2a168625aea820db5acaaf30c83b73e151d833e32fb11fe2b9fae83675be963eb6650f754365e9d4bc9bd4a527b3022f2870b2d7a2774657084e07255734a77873269971944c67bfe7dc1e7e337dc62a80e708fb4547f8c83da7de833bf8db7599fa2c4cf8a46c8f6c359733d87ea38e7ea5033d58ca9a8897a836fcbe1c860e98b6741480f9da421d170110319a6fabe8600731e46db9ecad8d30f1411293eea37a54991df9b56c59b349684d02ede003d6cc6e7a3c6c0e3e8149177e43f276711b08ccadd9403049755b44019ce0ae4ea01c67c4dfa2dece75c85c20f614aec8500a7ed4edf86f1e20d9c70035f2dd276d3561cc22151b877291453518eb55de2714943b974627f05aaadf09bb10d8a8f2a788fdb1f0379425d902152fc5f4040f7fbdb10c0e6a57027a12c7201e086a98743a1bbe418b82ee9550d7df09792a6f66654195674357417d92364c2d924c80673b9dffed70492eaad558fdc133573674f5cc56548edcf8a146e95103648ae02"
+        },
+        "created_at": 1794752905704
+      },
+      {
+        "id": "afbf4895-1e6e-4490-ad1c-a3e9d692e23d",
+        "credential_id": "a0000000-0000-4000-8000-000000000004",
+        "encrypted_payload": {
+          "hex": "453d2792d3dc582821559c528a29bd490ec89f983bc373795e573ac47a6a58953c9da2524b47ab4dfcf9fa298e48da3e25a922444299f9490a1cdc14f625fc43186a7c3e2b7db7c9412c71c5e9ed17375dbf6a76d73f52ed0df773dde1a601c9f3796b0c17c2026e510573d1eee6d6df27cf31c3ecb17b457b51c7e4302abc40d292cdae953a4aa8ed49470decafd1da918f3070be493916d049eb5ca2132a9b6a98ff20b4ef9773ce432b18a710c3965fa8d3a80edfa65dd553f07a9b33b79b06d6b7b9d397d6742f919df5a9025123298c81769daf5f0f9efefc79cc822006afd256b36ee4675879715d259238d84dc3e3889a473859e5f0fea35caed2252d84b6"
+        },
+        "created_at": 1794752905839
+      },
+      {
+        "id": "caa668bf-2f7e-4156-8252-bcf105cd11bd",
+        "credential_id": "a0000000-0000-4000-8000-000000000005",
+        "encrypted_payload": {
+          "hex": "4b128716176a76eed590f986ad8d7088c858d46a5cf7e0883ec7fab5378cc58f9effe934a3d451ba75a854e4b13c438d47dd670c20653a8af924e42f69158193785a9e1094d5c159f6d5b91ffa1e71ffcecb6c8f536c58805fc1597cf58978d56b6ec80dc1d3bb092c974e57e1d82d58ab98678aaaa2ca9e47b652e5532c4e8a92c780b4ae14cf15c3c463ab6a9fe4956e6d028d0f6297f581fb4e16edabbe09ea2943e9f791afcec5c2f2117f42b3159872d74d16c4d548b4c67faad7b65bd627ef5835ac5e89f65d4a11654778ad9422af38fdca2f0ebfd24747aa470718a0e51bc738baa3c8365b57f93c5fb2460b36641d857e5270e5e1bf1bb4bf4947ba07a24848a6216d6b6ea1da68aab2e3d3601c9add5dd9c68354341fc1175822b04004d51f50fdb0adfeea9cfe7eab1e89b8422d19852548784c0bd51ea3a1eac77e4d077f647c6ea255aca6de5fbeef88df83542218f465ee9dccc0cee535e4454fdfe2351204be3cb91d75808ee7e1b65eb3fc8c0e16420a5c7d8540718c14d78ed98f22ed745d6d7d36f23623d54e8df519ab4cfc3074b520d90978dc33dc62fd3a2e25b3364307e1"
+        },
+        "created_at": 1794752905944
+      },
+      {
+        "id": "d4eccc96-d60b-42af-aa52-e4e03d4881be",
+        "credential_id": "a0000000-0000-4000-8000-000000000006",
+        "encrypted_payload": {
+          "hex": "9cfc549b4186be2d6e7bf337233c3884613ad582cd37db9ccf5f0ae849f441c17569687476a28e4732d8770f65fb6b7e3ca3cf8418d8d995df741d32f4969c429b82655a176e49c738c07365c362cea1115ebff0b3a54b0885fa9c4d263e1d71ce6f397377ae648fe00149b6a864bf86aa8516d03b7c00da1a349581148753837f0eecadf942411fddc357cb5b09e952d5d898f05102b396e16cf705ede176c64d7b6f45533aadb386346e4f8a3deb3f1bec0de5338cac93bf4ffa648010cda18e45f729f0ab35ff4fda5fbf2300fa2f9549c4f9f626e0dc8e018b6c968783ba17585c068252f472cf0ca0ea08206a9a00d7a69a8507e2b41e6c66ab1a73b4e95d34f7072f18f7d40cdadb3e8469e9b2dfcd1b648b86efa6bf1768c9d9243a3abb47dc341f9874abfe88620ce21b6da13df90db5b1f34078a3e599e294e6f0ceeeae595c6bfb516aefc980a27c6de29b0dd429fd9c675dbe9878669890ad2a95afad26bafa8bda6a7701197fe9a6623e6b87e7f83a6bde9932da5393a70079f1df"
+        },
+        "created_at": 1794752906034
+      },
+      {
+        "id": "ff94e172-4c2c-42e5-be05-21b1484eba02",
+        "credential_id": "a0000000-0000-4000-8000-000000000007",
+        "encrypted_payload": {
+          "hex": "26598f460f1b85673622e596f9ab148e945e620e682c5c35cb30e247b04e0759f20b834d03771b1a181cff42d4c2048118514e98c71ff673f4b74ca2145804d10af51b762a19b28443bd370685a5ec0efc5236633dce020a3e03be4747eaec267188355a3a7e984ee1e4983ff5744fa95af36f9abea3cc61a9681aeadba6f73c95083d52f166daacb31f7a28c2e042cc83a81093e7e99e46"
+        },
+        "created_at": 1794752906067
+      },
+      {
+        "id": "59bb72a5-2c1d-4aa8-8fb8-ee9258927663",
+        "credential_id": "a0000000-0000-4000-8000-000000000008",
+        "encrypted_payload": {
+          "hex": "d0738950fe8a70120e9fa4b2892bdfe52b89847a113d5e63388f7676b903e04bd87f0366e72cc5fbb9432508cd78f49aadb8281772ef446357a1fb4c7e39ce4cf1cd97451c9c8abfce8cac0487bba3a0afbb0b8d59d5c2e47c7fb08bfe7eb190b319daad1a39a5887bd5526fdd4108a9872073f10c8bb2b4f60c40b5da32cd5c6ad33d43ffce2a93b7b6696ee45045467ef1c70e0e4948abd6aafffb5a6250f3d3108e3b4e6d7ce5eb17e7a086ef3fc63244838b38f4ae6d52697808540a17fd3c1eb4c002b254ba1bbb1eac4527f0daa905486634241d1d4621ee9cd1125771fd0bfe78c46e214385e7118f8012eaa5aefc542d9d57d8aa21e752e36aabf2795dc66796cf0e36e04895b87143d5c08be4c6277ce9d878864ea32966163172df9c7922baf30bd95dae21b8b8b153d017d22688b1a1d9daf92c5d7cb57a3d8752ac17461149f2e8a347d6b65ee8219305994e729b96c7d5546958a2037d63a4b3e6178eed4274c5ec4cc572667bca9abb2987381020ad693c8222f6f44539928a77c51c6d96a1ee040cb9395610dbab776a505e6aee91e23c58d264a7ba5b317d1e728124b6a28109fa55e8d1bebf7690a739fdbbcf6f69152ca3f0131af89bf8e665de15858de4f68b5d698b610e966e9f9f325b3f46df1aca4193d27e543bc24a69"
+        },
+        "created_at": 1794752906101
+      }
+    ],
+    "secure_file_entries": [
+      {
+        "id": "49c34db7-6cf8-438f-899c-3a6cfdda910e",
+        "name": "binario.bin",
+        "size_bytes": 4096,
+        "stored_file_name": "49c34db7-6cf8-438f-899c-3a6cfdda910e.enc",
+        "mime_hint": "bin",
+        "note": "nota de binario.bin",
+        "folder_id": null,
+        "is_favorite": 0,
+        "created_at": 1794752906269,
+        "updated_at": 1794752906269
+      },
+      {
+        "id": "bbf7d6e3-775f-45f4-bbe7-751af73c7b5b",
+        "name": "factura ñ.pdf",
+        "size_bytes": 31,
+        "stored_file_name": "bbf7d6e3-775f-45f4-bbe7-751af73c7b5b.enc",
+        "mime_hint": "pdf",
+        "note": "nota de factura ñ.pdf",
+        "folder_id": null,
+        "is_favorite": 0,
+        "created_at": 1794752906204,
+        "updated_at": 1794752906204
+      },
+      {
+        "id": "ebaba4ee-f268-4c65-b02b-1938971d79a2",
+        "name": "vacío.txt",
+        "size_bytes": 0,
+        "stored_file_name": "ebaba4ee-f268-4c65-b02b-1938971d79a2.enc",
+        "mime_hint": "txt",
+        "note": "nota de vacío.txt",
+        "folder_id": null,
+        "is_favorite": 0,
+        "created_at": 1794752906235,
+        "updated_at": 1794752906235
+      }
+    ]
+  }
+}

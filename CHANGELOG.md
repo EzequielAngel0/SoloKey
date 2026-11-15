@@ -9,6 +9,10 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Vectores de prueba de la bóveda v1 (CAL-2, 2026-11-15)**: `vectores/v1/` (BD drift v10, archivos seguros, `.skvault` y
+  `vectores.json` con entradas, claves, almacén seguro, filas y payloads en claro) para que el núcleo Rust pruebe la migración
+  (NUC-2). Salen del código real de la v1 en Podman (`tool/vectores_v1/generar.ps1`, nunca la bóveda real) y se comprueban sin
+  Dart con `tool/vectores_v1/verificar.ps1` (Python). Hallazgo: la maestra entra a Argon2id con doble codificación UTF-8.
 - **CI de Linux en Podman (CAL-3, 2026-11-15)**: `tool/ci-linux.ps1` corre el job `analyze-test-coverage` de `tests.yml` con la
   misma versión de Flutter, en la imagen `localhost/solokey-ci-linux:<versión>` (`tool/ci-linux/Containerfile`, Ubuntu 24.04 y el
   tarball oficial; `ghcr.io/cirruslabs/flutter` no publica la 3.44.4) y el volumen `solokey-pub-cache`. Copia el árbol dentro
