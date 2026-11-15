@@ -118,7 +118,7 @@ guía del motor e2e (patrones anti-flaky) están en
 
 ## 💡 Próximos pasos y Roadmap
 
-Toda la documentación está organizada en [docs/](docs/README.md). Lo que falta vive en [docs/PENDIENTES.md](docs/PENDIENTES.md) y la propuesta de la versión 2 (rediseño completo) en [docs/design/REDISENO_V2.md](docs/design/REDISENO_V2.md).
+Toda la documentación está organizada en [docs/](docs/README.md). Lo que falta vive en [docs/PENDIENTES_AGENTE.md](docs/PENDIENTES_AGENTE.md) y la propuesta de la versión 2 (rediseño completo) en [docs/diseno/REDISENO_V2.md](docs/diseno/REDISENO_V2.md).
 
 ---
 

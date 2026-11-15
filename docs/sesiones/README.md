@@ -6,8 +6,8 @@ Cómo se desarrolla SoloKey. Hay una **sesión general** y **carriles**:
   dependencias y ramas, decide con el dueño, prueba en los dispositivos (PC + celular) y publica a `main` con su permiso.
 - Cada **carril** desarrolla completo lo aprobado de SU área, en su worktree (`..\SoloKey-<carril>`), y tiene su doc aquí.
 
-Los prompts para abrir cada sesión están en [`../PENDIENTES.md`](../PENDIENTES.md) ▶. Ramas y worktrees:
-[`../proceso/RAMAS.md`](../proceso/RAMAS.md). El plan que mueve todo esto: [`../design/REDISENO_V2.md`](../design/REDISENO_V2.md).
+Los prompts para abrir cada sesión están en [`../PENDIENTES_AGENTE.md`](../PENDIENTES_AGENTE.md) ▶. Ramas y worktrees:
+[`../proceso/RAMAS.md`](../proceso/RAMAS.md). El plan que mueve todo esto: [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md).
 
 | Carril | Qué toca | Doc |
 |---|---|---|
@@ -31,7 +31,7 @@ Los prompts para abrir cada sesión están en [`../PENDIENTES.md`](../PENDIENTES
    D `PLA-`, E `CAL-` y `SEG-`.
 6. **Máquina**: como mucho DOS sesiones pesadas a la vez (build de Flutter, Rust o emulador) y una ligera (docs, lectura). El
    emulador y el celular de pruebas los comparten otras sesiones: `ListAgents` antes de tomarlos.
-7. **Docs compartidos** (`CHANGELOG.md`, `PENDIENTES.md`, `lib/l10n/*.arb`): cada carril escribe en su parte; quien mergea segundo
+7. **Docs compartidos** (`CHANGELOG.md`, `PENDIENTES_AGENTE.md`, `lib/l10n/*.arb`): cada carril escribe en su parte; quien mergea segundo
    rebasa y conserva las líneas de los dos.
 
 ## Plantilla de un doc de carril

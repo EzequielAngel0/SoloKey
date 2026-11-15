@@ -3,7 +3,7 @@
 Qué se prueba, con qué y cómo se sabe que una prueba protege de verdad. El motor de
 integración (Windows y Android, patrones anti-flaky) está en
 [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md); la checklist PC + celular, en
-[`../planning/pruebas_dispositivos_reales.md`](../planning/pruebas_dispositivos_reales.md).
+[`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md).
 
 ## La red
 
@@ -12,7 +12,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 | Unit | `test/**` (espeja `lib/**`) | `flutter test` | Cripto, servicios, use cases, providers, lógica pura con tiempo inyectado. |
 | Widget | `test/**` con `test/support/widget_harness.dart` | `flutter test` | Behavioral: interactúa (tocar, escribir, revelar), no solo "renderiza". Fakes en `test/support/`. |
 | Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda antes y restaura en `finally`). |
-| Dispositivos | PC + celular en la misma red | a mano | [`pruebas_dispositivos_reales.md`](../planning/pruebas_dispositivos_reales.md) |
+| Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
 
@@ -23,6 +23,9 @@ integración (Windows y Android, patrones anti-flaky) está en
 | CI | analyze + test + cobertura, en `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
 
 El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio.
+
+**Runners**: el CI corre en máquinas de GitHub (`ubuntu-latest`), gratis por ser un repo público. **No hay runners propios**: nada
+que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-0007](../adr/0007-red-de-calidad-y-ci.md).
 
 ## Reglas
 
@@ -42,6 +45,22 @@ El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja
 - En Windows, `integration_test` corre **un archivo por invocación** (instancia única de la app).
 - El build de prueba de escritorio comparte el almacenamiento con la app instalada (`Documents\vault_guard_db.sqlite` y el `.dat` de `flutter_secure_storage`): por eso el E2E destructivo va SOLO con `run_integration_tests.ps1`.
 
+## Dispositivos y emulador
+
+**Antes de tocar el emulador, el celular o un build pesado: `ListAgents`** (son de todo el equipo, también de otros proyectos).
+
+| Para | Cómo |
+|---|---|
+| Ver qué hay conectado | `flutter devices` (Windows, el emulador y el celular por USB o `adb pair`) |
+| Emulador de Android | AVD `Pixel_9`: `C:\Android\Sdk\emulator\emulator.exe -avd Pixel_9` (Android Studio no hace falta) |
+| Correr en debug | `flutter run -d <id>`; en Windows, `flutter run -d windows` **abre la bóveda REAL** del dueño (comparte el almacenamiento): leer sí, nada destructivo |
+| Letra al 200% | `adb shell settings put system font_scale 2.0`; al terminar, de vuelta a `1.0` |
+| Modo oscuro | `adb shell cmd uimode night yes` (y `no` para volver) |
+| El celular del dueño | Es su teléfono con su bóveda: **nunca desinstalar la app** (borra la bóveda). Instalar encima con `adb install -r`; si la firma no coincide, parar y preguntarle |
+| Al terminar | Dejar la app corriendo (emulador o Windows) para que él la vea, letra al 100%; sin capturas, solo decirle dónde está |
+
+La prueba física PC y celular de la sync tiene su checklist: [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md).
+
 ## Reproducir CI en Linux (Podman)
 
 Receta (aún no corrida en este repo; la imagen sale de la versión que fija `tests.yml`). Se copia el árbol dentro del
@@ -54,5 +73,5 @@ podman run --rm -v "C:/Proyectos/Flutter/SoloKey:/src:ro" ghcr.io/cirruslabs/flu
   bash -c "cp -r /src /work && cd /work && rm -rf .dart_tool build && flutter pub get >/dev/null && flutter analyze && flutter test"
 ```
 
-Para el núcleo en Rust (si se aprueba, ver [`../design/REDISENO_V2.md`](../design/REDISENO_V2.md)), `cargo test` corre igual en
+Para el núcleo en Rust (si se aprueba, ver [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md)), `cargo test` corre igual en
 `docker.io/library/rust` sin instalar nada en Windows.

@@ -10,9 +10,15 @@ versión viven en la página de Releases de GitHub.
 ### Cambiado
 
 - **Docs y proceso (2026-11-14)**: rama `develop` de integración (CI también en `develop`); método por sesiones
-  (`docs/sesiones/`, carriles A a E) y `docs/PENDIENTES.md` como lo abierto; plan de la v2 en `docs/design/REDISENO_V2.md`;
-  guías `docs/proceso/PRUEBAS.md` y `RAMAS.md`; `tool/quitar-worktree.ps1` (quita un worktree sin vaciar el caché de Pub).
-  Lo terminado de la v1 (prompts por pantalla, diseño Graphite Pro, roadmap y bugs) pasa a `docs/archive/`.
+  (`docs/sesiones/`, carriles A a E); plan de la v2 en `docs/diseno/REDISENO_V2.md`; guías `docs/proceso/PRUEBAS.md` y
+  `RAMAS.md`; `tool/quitar-worktree.ps1` (quita un worktree sin vaciar el caché de Pub). Lo terminado de la v1 (prompts por
+  pantalla, diseño Graphite Pro, roadmap y bugs) pasa a `docs/archive/v1/`.
+- **Arquitectura de `docs/` (2026-11-14)**: `PENDIENTES_AGENTE.md` y `PENDIENTES_DUENO.md` en la raíz de `docs/`; documento
+  central `arquitectura/ARQUITECTURA.md`; decisiones en `adr/` (0001 a 0007); `producto/PRODUCTO.md` e `IDEAS.md`;
+  `seguridad/SEGURIDAD.md` con el estado de cada hallazgo (SEC-001, 002, 004, 005 y 006 arreglados; 003, 007 y 008 abiertos). Se borran
+  `spec/`, `architecture/` y el informe de marzo (absorbidos); el resto se renombra por carpetas en español. El archivo pasa a
+  `archive/v1/` con nombres en mayúsculas; ADR 0004 a 0007 (Flutter único, SQLite, sync P2P, calidad y CI); `.gitignore` limpio;
+  emulador, celular y runners en `proceso/PRUEBAS.md`.
 
 ## [1.1.0] — 2026-07-18
 

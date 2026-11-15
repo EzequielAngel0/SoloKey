@@ -1,6 +1,6 @@
 # Carril A · Núcleo (cripto, bóveda, BD, sync)
 
-Reglas y plantilla: [`README.md`](README.md). Plan: [`../design/REDISENO_V2.md`](../design/REDISENO_V2.md) §2 y §5.
+Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §2 y §5.
 
 ## Aprobado, para desarrollar (en orden)
 
@@ -27,7 +27,7 @@ Nada aprobado todavía: todo depende de DEC-1 (stack), que decide la sesión gen
 | ID | Qué | Para qué | Esf. |
 |---|---|---|---|
 | NUC-4 ◇ | Si DEC-1 = R0: endurecer el borrado de secretos en Dart (buffers únicos, sin `String` intermedios en revelar y copiar) | Lo más cercano a `zeroize` sin cambiar de lenguaje | M |
-| NUC-5 ◇ | Passkeys WebAuthn real (Credential Manager en Android) | Hoy es solo "respaldo de passkey"; plan en [`../planning/webauthn_fido2_plan.md`](../planning/webauthn_fido2_plan.md) | XL |
+| NUC-5 ◇ | Passkeys WebAuthn real (Credential Manager en Android) | Hoy es solo "respaldo de passkey"; plan en [`../seguridad/WEBAUTHN.md`](../seguridad/WEBAUTHN.md) | XL |
 
 ## No reabre
 

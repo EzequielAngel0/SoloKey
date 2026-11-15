@@ -1,6 +1,6 @@
 # Carril C · Pantallas y flujos (móvil y escritorio)
 
-Reglas y plantilla: [`README.md`](README.md). Plan: [`../design/REDISENO_V2.md`](../design/REDISENO_V2.md) §4. Las pantallas se
+Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §4. Las pantallas se
 arman con el kit de B; si falta una pieza, se pide a B (§Necesita), no se inventa en la pantalla.
 
 ## Aprobado, para desarrollar (en orden)
