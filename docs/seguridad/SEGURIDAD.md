@@ -24,12 +24,12 @@ Qué protege la app, contra qué, y lo que sigue abierto. Los controles técnico
 |---|---|---|
 | SEC-001 | El código de recuperación iba al portapapeles sin limpieza | ✓ Arreglado: ya no hay `Clipboard.setData` fuera de `ClipboardService` |
 | SEC-002 | El archivo temporal del export quedaba tras compartirlo | ✓ Arreglado: se borra tras el share (`vault_export_service.dart`) |
-| SEC-003 | La contraseña maestra viaja como `String` (inmutable, no se puede poner a cero) | ◐ Abierto: límite de Dart; se mitiga acortando su vida. El núcleo en Rust (DEC-1) lo resolvería |
+| SEC-003 | La contraseña maestra viaja como `String` (inmutable, no se puede poner a cero) | ◐ Abierto en la v1: límite de Dart; se mitiga acortando su vida. Lo cierra el núcleo Rust de la v2 ([ADR-0008](../adr/0008-nucleo-en-rust.md), NUC-1) |
 | SEC-004 | Ocultar en segundo plano venía apagado | ✓ Arreglado: `obscureOnBackground` en `true` por defecto |
 | SEC-005 | El `android:label` no decía SoloKey | ✓ Arreglado |
 | SEC-006 | Faltaba `allowBackup="false"` | ✓ Arreglado (también `fullBackupContent="false"`) |
 | SEC-007 | El secreto TOTP quedaba en claro en el árbol de widgets | ◐ Mitigado: los secretos revelados se ocultan solos y al ir a segundo plano; revisar en SEG-1 |
-| SEC-008 | La sync usa `ws://` sin TLS; la confidencialidad depende solo del cifrado por mensaje | ◐ Abierto: aceptable por el E2EE, pero sin TLS se ven metadatos (tamaños, horas). Decidir en SEG-1 |
+| SEC-008 | La sync usa `ws://` sin TLS; la confidencialidad depende solo del cifrado por mensaje | ◐ Abierto en la v1: aceptable por el E2EE, pero se ven metadatos (tamaños, horas). Decidido: la v2 cifra el canal entero ([ADR-0010](../adr/0010-sync-v2-canal-cifrado.md), NUC-3) |
 
 Los hallazgos 001 a 007 son de la auditoría del 2026-03-30 (v1.0.0); su estado se comprobó en el código el 2026-11-14. El
 SEC-008 salió al revisar la arquitectura ese mismo día.

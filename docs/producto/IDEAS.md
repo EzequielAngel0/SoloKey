@@ -10,7 +10,6 @@ M un día, L varios días, XL semanas.
 | Auto-Type estilo KeePass (`usuario{TAB}contraseña{ENTER}`) | Llenar sin pasar por el portapapeles | Windows | M | D |
 | Buscador flotante tipo Spotlight sobre el atajo global | Buscar sin abrir la ventana entera | Windows | M | C |
 | Modo portable (bóveda junto al `.exe`, en una USB) | Llevar la bóveda sin instalar | Windows | M | D |
-| Passkeys reales con Credential Manager | Cumplir la promesa de passkeys; hoy es solo respaldo ([plan](../seguridad/WEBAUTHN.md)) | Android | XL | A + D |
 | Widget de TOTP favoritos y botón "bloquear ya" en ajustes rápidos | Códigos a la mano sin abrir la app | Android | M | D |
 | Importar el QR de migración de Google Authenticator (`otpauth-migration://`) | Pasar todos los TOTP de un escaneo | Android | S | A |
 | PIN de coacción (abre una bóveda señuelo o borra) | Protección si obligan a abrirla | Ambas | L | A |
