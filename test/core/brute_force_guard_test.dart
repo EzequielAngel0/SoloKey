@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/services/brute_force_guard.dart';
+import 'package:solokey/core/services/brute_force_guard.dart';
 
 void main() {
   group('BruteForceGuard.lockoutForAttempts (escalating backoff)', () {

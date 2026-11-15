@@ -7,15 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 // used here only to mock the FilePicker platform channel in tests.
 // ignore: depend_on_referenced_packages
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
-import 'package:password_manager/core/infrastructure/security/i_security_service.dart';
-import 'package:password_manager/core/infrastructure/security/security_service_impl.dart';
-import 'package:password_manager/core/infrastructure/security/session_manager.dart';
-import 'package:password_manager/core/services/csv_import_service.dart';
-import 'package:password_manager/core/services/vault_export_service.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
-import 'package:password_manager/features/credentials/domain/repositories/i_credential_repository.dart';
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
+import 'package:solokey/core/infrastructure/security/i_security_service.dart';
+import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
+import 'package:solokey/core/infrastructure/security/session_manager.dart';
+import 'package:solokey/core/services/csv_import_service.dart';
+import 'package:solokey/core/services/vault_export_service.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/domain/entities/password_history.dart';
+import 'package:solokey/features/credentials/domain/repositories/i_credential_repository.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
 
 import '../support/fake_folder_repository.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/vault_access/presentation/setup_screen.dart';
-import 'package:password_manager/shared/widgets/password_requirements_checklist.dart';
-import 'package:password_manager/shared/widgets/step_indicator.dart';
+import 'package:solokey/features/vault_access/presentation/setup_screen.dart';
+import 'package:solokey/shared/widgets/password_requirements_checklist.dart';
+import 'package:solokey/shared/widgets/step_indicator.dart';
 
 import '../../support/widget_harness.dart';
 

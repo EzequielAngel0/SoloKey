@@ -1,7 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/security/double_envelope_service.dart';
-import 'package:password_manager/core/infrastructure/security/security_service_impl.dart';
+import 'package:solokey/core/infrastructure/security/double_envelope_service.dart';
+import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 
 class FakeSecureStorage extends Fake implements FlutterSecureStorage {
   final Map<String, String> _data = {};

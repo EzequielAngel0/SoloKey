@@ -3,16 +3,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/credentials_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/presentation/credential_form_screen.dart';
-import 'package:password_manager/features/credentials/presentation/widgets/password_generator_widget.dart';
-import 'package:password_manager/features/folders/application/folders_provider.dart';
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
-import 'package:password_manager/shared/widgets/password_strength_indicator.dart';
-import 'package:password_manager/shared/widgets/secure_text_field.dart';
-import 'package:password_manager/theme/app_theme.dart';
+import 'package:solokey/features/credentials/application/credentials_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/presentation/credential_form_screen.dart';
+import 'package:solokey/features/credentials/presentation/widgets/password_generator_widget.dart';
+import 'package:solokey/features/folders/application/folders_provider.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
+import 'package:solokey/l10n/app_localizations.dart';
+import 'package:solokey/shared/widgets/password_strength_indicator.dart';
+import 'package:solokey/shared/widgets/secure_text_field.dart';
+import 'package:solokey/theme/app_theme.dart';
 
 import '../../support/widget_harness.dart';
 

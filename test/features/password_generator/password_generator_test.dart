@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/password_generator/domain/password_generator.dart';
+import 'package:solokey/features/password_generator/domain/password_generator.dart';
 
 /// Zero-Print: `Random.secure()` is not seedable, so we never assert a fixed
 /// string — only invariants (length, pool membership, per-charset guarantee,

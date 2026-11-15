@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/duplicate_detector.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/application/duplicate_detector.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
 
 Credential _cred({
   required String id,

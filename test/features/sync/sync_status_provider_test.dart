@@ -2,14 +2,14 @@ import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:password_manager/features/credentials/application/credential_use_cases.dart';
-import 'package:password_manager/features/credentials/application/credentials_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/folders/application/folders_provider.dart';
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
-import 'package:password_manager/features/sync/application/sync_status_provider.dart';
-import 'package:password_manager/features/sync/domain/sync_events_source.dart';
-import 'package:password_manager/features/sync/domain/sync_summary.dart';
+import 'package:solokey/features/credentials/application/credential_use_cases.dart';
+import 'package:solokey/features/credentials/application/credentials_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/folders/application/folders_provider.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
+import 'package:solokey/features/sync/application/sync_status_provider.dart';
+import 'package:solokey/features/sync/domain/sync_events_source.dart';
+import 'package:solokey/features/sync/domain/sync_summary.dart';
 
 import '../../support/fake_credential_repository.dart';
 import '../../support/fake_folder_repository.dart';

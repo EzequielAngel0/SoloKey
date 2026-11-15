@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:qr_flutter/qr_flutter.dart';
-import 'package:password_manager/core/services/biometric_auth_service.dart';
-import 'package:password_manager/features/credentials/application/credential_health_provider.dart';
-import 'package:password_manager/features/credentials/application/credentials_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/presentation/credential_detail_screen.dart';
+import 'package:solokey/core/services/biometric_auth_service.dart';
+import 'package:solokey/features/credentials/application/credential_health_provider.dart';
+import 'package:solokey/features/credentials/application/credentials_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/presentation/credential_detail_screen.dart';
 
 import '../../../support/widget_harness.dart';
 

@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/sync/domain/pairing_payload.dart';
+import 'package:solokey/features/sync/domain/pairing_payload.dart';
 
 void main() {
   group('PairingPayload', () {

@@ -126,7 +126,7 @@ no se puede automatizar:
 ```dart
 import 'package:integration_test/integration_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/main.dart' as app;
+import 'package:solokey/main.dart' as app;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();   // motor E2E, no el de widget tests

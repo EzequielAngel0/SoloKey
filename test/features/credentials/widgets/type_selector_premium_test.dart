@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/presentation/widgets/type_selector_premium.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/presentation/widgets/type_selector_premium.dart';
+import 'package:solokey/l10n/app_localizations.dart';
 
 import '../../../support/widget_harness.dart';
 

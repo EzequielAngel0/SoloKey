@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
-import 'package:password_manager/features/credentials/domain/repositories/i_credential_repository.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/domain/entities/password_history.dart';
+import 'package:solokey/features/credentials/domain/repositories/i_credential_repository.dart';
 
 /// Minimal in-memory [ICredentialRepository] for logic/widget tests. Holds a
 /// fixed list; mutating methods are no-ops unless a test needs otherwise.

@@ -30,7 +30,7 @@ import '../../../../features/secure_files/presentation/secure_files_screen.dart'
 import '../../../../features/settings/presentation/settings_screen.dart';
 import '../../../../features/vault_access/application/vault_state_provider.dart';
 import '../../../../features/sync/presentation/pairing_screen.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:solokey/l10n/app_localizations.dart';
 import 'desktop_layout_state.dart';
 import 'auto_lock_manager.dart';
 

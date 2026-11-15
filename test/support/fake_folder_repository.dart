@@ -1,5 +1,5 @@
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
-import 'package:password_manager/features/folders/domain/repositories/i_folder_repository.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
+import 'package:solokey/features/folders/domain/repositories/i_folder_repository.dart';
 
 /// In-memory [IFolderRepository] for logic/widget tests. Mutates its backing
 /// list so tests can assert on re-parenting / deletion side effects.

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
-import 'package:password_manager/features/credentials/infrastructure/screen_qr_scanner.dart';
+import 'package:solokey/features/credentials/infrastructure/screen_qr_scanner.dart';
 
 void main() {
   // These exercise the scanner orchestration with an injected capture function,

@@ -1,4 +1,4 @@
-name: password_manager
+name: solokey
 description: Local-First Password Manager — Secure Vault for Android.
 publish_to: 'none'
 version: 1.1.0+2

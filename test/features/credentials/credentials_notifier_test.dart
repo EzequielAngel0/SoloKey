@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/credential_use_cases.dart';
-import 'package:password_manager/features/credentials/application/credentials_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
-import 'package:password_manager/features/credentials/domain/repositories/i_credential_repository.dart';
+import 'package:solokey/features/credentials/application/credential_use_cases.dart';
+import 'package:solokey/features/credentials/application/credentials_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/domain/entities/password_history.dart';
+import 'package:solokey/features/credentials/domain/repositories/i_credential_repository.dart';
 
 import '../../support/fake_credential_repository.dart';
 

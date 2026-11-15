@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
-import 'package:password_manager/theme/app_theme.dart';
+import 'package:solokey/l10n/app_localizations.dart';
+import 'package:solokey/theme/app_theme.dart';
 
 /// Minimal shell every SoloKey widget test needs, in one place:
 ///  - a [ProviderScope] with the given [overrides] (use-case providers throw

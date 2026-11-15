@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:password_manager/features/autofill/infrastructure/autofill_settings_service.dart';
-import 'package:password_manager/features/autofill/presentation/autofill_onboarding_screen.dart';
+import 'package:solokey/features/autofill/infrastructure/autofill_settings_service.dart';
+import 'package:solokey/features/autofill/presentation/autofill_onboarding_screen.dart';
 
 import '../../support/widget_harness.dart';
 

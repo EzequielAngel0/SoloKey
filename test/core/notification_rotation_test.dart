@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/database/app_database.dart';
-import 'package:password_manager/core/services/notification_service.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/infrastructure/credential_dto.dart';
+import 'package:solokey/core/infrastructure/database/app_database.dart';
+import 'package:solokey/core/services/notification_service.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/infrastructure/credential_dto.dart';
 
 /// `findDueRotations` reads ONLY plain columns and takes an injected [now], so
 /// it's fully deterministic here — no wall clock, no decryption.

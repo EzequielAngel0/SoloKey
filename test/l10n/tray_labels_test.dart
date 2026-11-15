@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:solokey/l10n/app_localizations.dart';
 
 /// The desktop tray context menu is built from these localized strings (see
 /// `App._setTrayMenu`), resolved via `lookupAppLocalizations` because that

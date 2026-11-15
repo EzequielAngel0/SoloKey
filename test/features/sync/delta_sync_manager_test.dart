@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/sync/infrastructure/delta_sync_manager.dart';
+import 'package:solokey/features/sync/infrastructure/delta_sync_manager.dart';
 
 void main() {
   group('resolveSyncConflict (Last-Write-Wins)', () {

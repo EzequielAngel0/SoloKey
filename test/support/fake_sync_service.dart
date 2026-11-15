@@ -1,9 +1,9 @@
 import 'dart:async';
 
-import 'package:password_manager/features/sync/domain/connected_device.dart';
-import 'package:password_manager/features/sync/domain/i_sync_service.dart';
-import 'package:password_manager/features/sync/domain/pairing_payload.dart';
-import 'package:password_manager/features/sync/domain/sync_summary.dart';
+import 'package:solokey/features/sync/domain/connected_device.dart';
+import 'package:solokey/features/sync/domain/i_sync_service.dart';
+import 'package:solokey/features/sync/domain/pairing_payload.dart';
+import 'package:solokey/features/sync/domain/sync_summary.dart';
 
 /// Reusable in-memory fake of [ISyncService] for widget/unit tests.
 ///

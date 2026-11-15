@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/vault_access/domain/master_password_policy.dart';
+import 'package:solokey/features/vault_access/domain/master_password_policy.dart';
 
 void main() {
   group('MasterPasswordPolicy', () {

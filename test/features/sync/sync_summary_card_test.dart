@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/sync/application/sync_status_provider.dart';
-import 'package:password_manager/features/sync/domain/sync_summary.dart';
-import 'package:password_manager/features/sync/presentation/widgets/sync_summary_card.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
-import 'package:password_manager/theme/app_theme.dart';
+import 'package:solokey/features/sync/application/sync_status_provider.dart';
+import 'package:solokey/features/sync/domain/sync_summary.dart';
+import 'package:solokey/features/sync/presentation/widgets/sync_summary_card.dart';
+import 'package:solokey/l10n/app_localizations.dart';
+import 'package:solokey/theme/app_theme.dart';
 
 /// Overrides [SyncStatus] with a fixed state so the card can be rendered without
 /// the sync engine / DI.

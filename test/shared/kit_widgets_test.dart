@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/shared/widgets/password_requirements_checklist.dart';
-import 'package:password_manager/shared/widgets/score_ring.dart';
-import 'package:password_manager/shared/widgets/solo_filter_chip.dart';
-import 'package:password_manager/shared/widgets/status_chip.dart';
-import 'package:password_manager/shared/widgets/type_badge.dart';
-import 'package:password_manager/theme/app_palette.dart';
+import 'package:solokey/shared/widgets/password_requirements_checklist.dart';
+import 'package:solokey/shared/widgets/score_ring.dart';
+import 'package:solokey/shared/widgets/solo_filter_chip.dart';
+import 'package:solokey/shared/widgets/status_chip.dart';
+import 'package:solokey/shared/widgets/type_badge.dart';
+import 'package:solokey/theme/app_palette.dart';
 
 import '../support/widget_harness.dart';
 

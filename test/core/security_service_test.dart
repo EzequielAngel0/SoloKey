@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/security/security_service_impl.dart';
-import 'package:password_manager/core/infrastructure/security/session_manager.dart';
+import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
+import 'package:solokey/core/infrastructure/security/session_manager.dart';
 
 void main() {
   late SecurityServiceImpl sut;

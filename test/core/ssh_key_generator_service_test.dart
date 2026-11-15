@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/services/ssh_key_generator_service.dart';
+import 'package:solokey/core/services/ssh_key_generator_service.dart';
 
 void main() {
   late SshKeyGeneratorService sut;

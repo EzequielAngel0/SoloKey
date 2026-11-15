@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/password_generator/domain/password_generator.dart';
-import 'package:password_manager/shared/widgets/password_strength_indicator.dart';
+import 'package:solokey/features/password_generator/domain/password_generator.dart';
+import 'package:solokey/shared/widgets/password_strength_indicator.dart';
 
 import '../support/widget_harness.dart';
 

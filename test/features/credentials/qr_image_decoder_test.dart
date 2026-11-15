@@ -3,8 +3,8 @@ import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:image/image.dart' as img;
-import 'package:password_manager/features/credentials/domain/otpauth.dart';
-import 'package:password_manager/features/credentials/infrastructure/qr_image_decoder.dart';
+import 'package:solokey/features/credentials/domain/otpauth.dart';
+import 'package:solokey/features/credentials/infrastructure/qr_image_decoder.dart';
 
 void main() {
   group('decodeQrFromImageBytes', () {
