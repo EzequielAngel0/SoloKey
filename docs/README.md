@@ -13,7 +13,7 @@ docs/
 ├── producto/              Qué hace (PRODUCTO) y qué podría hacer (IDEAS)
 ├── diseno/                La v2: REDISENO_V2 (decisiones aprobadas, dirección, orden)
 ├── sesiones/              Un doc por carril (A Núcleo, B Diseño, C Pantallas, D Plataforma, E Calidad)
-├── seguridad/             SEGURIDAD (amenazas, hallazgos con estado) y el plan de WEBAUTHN
+├── seguridad/             SEGURIDAD (hallazgos con estado), AMENAZAS_V2 (requisitos por carril) y WEBAUTHN
 ├── proceso/               RAMAS, PRUEBAS, PRUEBAS_INTEGRACION, PRUEBAS_EN_DISPOSITIVOS
 ├── publicacion/           PUBLICAR (tiendas y release) e IOS
 ├── legal/                 PRIVACIDAD y TERMINOS (plantillas por revisar)
@@ -41,7 +41,7 @@ docs/
    | Cómo está hecha la app hoy | `arquitectura/ARQUITECTURA.md` (manda el código si difieren) |
    | Qué hace la app | `producto/PRODUCTO.md` |
    | Qué se decidió y por qué | `adr/` (una ADR no se reescribe: se reemplaza por otra) |
-   | Riesgos y hallazgos de seguridad | `seguridad/SEGURIDAD.md` |
+   | Riesgos y hallazgos de seguridad | `seguridad/SEGURIDAD.md` (y lo que la v2 debe cumplir: `seguridad/AMENAZAS_V2.md`) |
    | Cómo se prueba | `proceso/PRUEBAS.md` |
 
 2. **En línea, solo lo vigente.** Lo terminado de un carril sale en la misma rama que lo cierra a
