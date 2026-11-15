@@ -4,17 +4,18 @@ Reglas y plantilla: [`README.md`](README.md). Cómo se prueba: [`../proceso/PRUE
 [ADR-0011](../adr/0011-pruebas-e2e-principal.md) (E2E como red principal, unitarias solo en Rust) y
 [ADR-0012](../adr/0012-todo-en-podman.md) (Podman).
 
+Hecho: [`../archive/sesiones/E_HECHO.md`](../archive/sesiones/E_HECHO.md).
+
 ## Aprobado, para desarrollar (en orden)
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | CAL-4 | `run_integration_tests.ps1` respalda y restaura también `secure_files/` (hoy solo DB y `.dat`) | S | ☐ | [ver](#cal-4) |
-| 2 | CAL-2 | Vectores de prueba de la v1 (KDF, cifrado, `verificationData`, payload, fila de BD) generados con la app v1 y versionados | S | ☐ | Los necesita A para la migración (NUC-2) |
-| 3 | CAL-5 | Harness E2E de la v2: Android en Podman (emulador sin pantalla o celular por adb en Wi-Fi), Windows en local con bóveda aislada y en `windows-latest`; gates nuevos en `PRUEBAS.md` | L | ☐ | [ver](#cal-5) |
-| 4 | CAL-3 | `tool/ci-linux.ps1`: reproduce el CI en Podman con la versión de `tests.yml` | S | ☐ | Rojo en CI y verde en local = el SO |
-| 5 | CAL-1 | E2E con la letra al 200% (Android `font_scale` 2.0; Windows escala de texto) y los dos temas, con datos largos, por pantalla | M | ☐ | Gate de cada PAN |
-| 6 | SEG-1 | Modelo de amenazas de la v2 (RAM, disco, portapapeles, sync Noise, migración, importación) con la skill `security-audit` | M | ☐ | El informe anterior es de julio |
-| 7 | SEG-2 | Fuzz en Rust (`cargo-fuzz` en Podman) de los parsers de fuera: CSV, `otpauth://`, `.skvault`, mensajes de sync | M | ☐ | Cuando A los tenga en el núcleo |
+| 1 | CAL-2 | Vectores de prueba de la v1 (KDF, cifrado, `verificationData`, payload, fila de BD) generados con la app v1 y versionados | S | ☐ | Los necesita A para la migración (NUC-2) |
+| 2 | CAL-5 | Harness E2E de la v2: Android en Podman (emulador sin pantalla o celular por adb en Wi-Fi), Windows en local con bóveda aislada y en `windows-latest`; gates nuevos en `PRUEBAS.md` | L | ☐ | [ver](#cal-5) |
+| 3 | CAL-3 | `tool/ci-linux.ps1`: reproduce el CI en Podman con la versión de `tests.yml` | S | ☐ | Rojo en CI y verde en local = el SO |
+| 4 | CAL-1 | E2E con la letra al 200% (Android `font_scale` 2.0; Windows escala de texto) y los dos temas, con datos largos, por pantalla | M | ☐ | Gate de cada PAN |
+| 5 | SEG-1 | Modelo de amenazas de la v2 (RAM, disco, portapapeles, sync Noise, migración, importación) con la skill `security-audit` | M | ☐ | El informe anterior es de julio |
+| 6 | SEG-2 | Fuzz en Rust (`cargo-fuzz` en Podman) de los parsers de fuera: CSV, `otpauth://`, `.skvault`, mensajes de sync | M | ☐ | Cuando A los tenga en el núcleo |
 
 ## Necesita de otros carriles
 
@@ -32,13 +33,6 @@ Reglas y plantilla: [`README.md`](README.md). Cómo se prueba: [`../proceso/PRUE
 | Nuevas pruebas unitarias o de widgets en Dart | ADR-0011: en la v2 solo E2E y unitarias de Rust |
 
 ## Detalle
-
-### CAL-4
-
-Encontrado el 2026-11-15 al respaldar la bóveda del dueño: los archivos seguros viven en
-`%APPDATA%\Angel Ezequiel Barbosa Lomeli\SoloKey\secure_files\*.enc` y el script no los copia. `resetVault` no los borra
-directo, pero una prueba que pase por "borrar bóveda" (`WipeVaultUseCase` llama a `deleteAll`) sí, y no se restaurarían. Agregar
-la carpeta entera al snapshot con su hash y probar el arreglo viéndolo fallar antes.
 
 ### CAL-5
 
