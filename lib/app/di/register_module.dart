@@ -10,8 +10,16 @@ import '../../features/sync/infrastructure/sync_service.dart';
 @module
 abstract class RegisterModule {
   @lazySingleton
+  /// En Android, la v10 migra sola lo que la v9 guardó con
+  /// EncryptedSharedPreferences (la v11 ya no sabe leerlo: PLA-4).
+  /// `resetOnError: false` porque su default borra TODO el almacén ante un
+  /// error de lectura, y ahí vive la configuración de la bóveda.
   FlutterSecureStorage get secureStorage => const FlutterSecureStorage(
-        aOptions: AndroidOptions(encryptedSharedPreferences: true),
+        aOptions: AndroidOptions(
+          resetOnError: false,
+          migrateOnAlgorithmChange: true,
+          migrateWithBackup: true,
+        ),
       );
 
   @lazySingleton
