@@ -41,3 +41,9 @@ pub enum CoreError {
     #[error("error de archivo: {0}")]
     Io(String),
 }
+
+impl From<rusqlite::Error> for CoreError {
+    fn from(e: rusqlite::Error) -> Self {
+        CoreError::Db(e.to_string())
+    }
+}
