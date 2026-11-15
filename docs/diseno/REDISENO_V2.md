@@ -1,20 +1,26 @@
 # SoloKey v2: propuesta de rediseño completo
 
-Propuesta del 2026-11-14. El dueño pidió rehacer SoloKey por completo (colores, estilo, idiomas e incluso el lenguaje,
-con Rust sobre la mesa) y dio libertad para proponer. **Nada de esto está decidido**: la primera sesión general lo
-repasa con él (§1) y lo que apruebe pasa a los carriles ([`../sesiones/README.md`](../sesiones/README.md)).
+Propuesta del 2026-11-14, **decidida con el dueño el 2026-11-15** (§1; el porqué de cada decisión está en su ADR). Lo aprobado
+ya está en los carriles ([`../sesiones/README.md`](../sesiones/README.md)) con su orden en
+[`../PENDIENTES_AGENTE.md`](../PENDIENTES_AGENTE.md) ▶.
 El rediseño anterior (Graphite Pro, julio 2026) quedó en [`../archive/v1/diseno/`](../archive/v1/diseno/GRAPHITE_PRO.md).
 
-## 1. Decisiones para el dueño
+## 1. Decisiones (aprobadas el 2026-11-15)
 
-| ID | Decisión | Opciones | Recomendada |
+| ID | Decisión | Aprobado | ADR |
 |---|---|---|---|
-| DEC-1 | Lenguaje y stack | R0 Flutter como hoy · R1 núcleo Rust + interfaz Flutter · R2 todo Rust (Slint) · R3 Tauri 2 | **R1**, después de un prototipo que abra tu bóveda actual ([§2](#2-stack-dec-1)) |
-| DEC-2 | Dirección visual | A "Tinta y papel" · B Grafito renovado · C Marca con color | **A** ([§3](#3-direccion-visual-dec-2)) |
-| DEC-3 | Temas | Claro + oscuro + seguir al sistema · los 4 de hoy (claro, oscuro, dim, oled) | **Dos temas y seguir al sistema**: la mitad de pantallas que revisar |
-| DEC-4 | Idiomas | Español como fuente + inglés · inglés como fuente (hoy) | **Español como fuente** (`template-arb-file: app_es.arb`), textos sin jerga |
-| DEC-5 | Vibraciones y sonidos | Fuera · como hoy (22 `HapticFeedback`) | **Fuera**: la app no vibra ni suena; solo las notificaciones del sistema |
-| DEC-6 | Nombre y logo | Conservar "SoloKey" y redibujar el monograma en el estilo nuevo · nombre nuevo | **Conservar el nombre**, logo redibujado plano |
+| DEC-1 | Lenguaje y stack | **R1 directo**: núcleo `solokey-core` en Rust + interfaz Flutter, sin prototipo comparativo | [0008](../adr/0008-nucleo-en-rust.md) |
+| DEC-1b | Formato de la bóveda | **Formato propio de la v2 desde el inicio**, versionado y con metadatos cifrados; migración única desde la v1 con copia previa | [0009](../adr/0009-formato-de-boveda-v2.md) |
+| DEC-1c | Sync | **Canal entero cifrado** (Noise) y protocolo versionado; v1 y v2 no se mezclan | [0010](../adr/0010-sync-v2-canal-cifrado.md) |
+| DEC-2 | Dirección visual y letra | **A · Tinta y papel** + **Atkinson Hyperlegible** Next y Mono | [0013](../adr/0013-diseno-idioma-y-experiencia-v2.md) |
+| DEC-3 | Temas | **Claro, oscuro y seguir al sistema** | 0013 |
+| DEC-4 | Idiomas | **Español como fuente** + inglés | 0013 |
+| DEC-5 | Vibraciones y sonidos | **Fuera** | 0013 |
+| DEC-6 | Nombre y logo | **SoloKey**, monograma redibujado plano | 0013 |
+| DEC-7 | Experiencia (§4) | **Aprobada completa** | 0013 |
+| DEC-8 | Pruebas | **E2E en Android y Windows como red principal**; unitarias solo en Rust; las de Dart se borran al reescribir cada parte | [0011](../adr/0011-pruebas-e2e-principal.md) |
+| DEC-9 | Herramientas | **Todo en Podman**, nada nuevo en el host (Rust tampoco); E2E de Windows en local con bóveda aislada y en CI | [0012](../adr/0012-todo-en-podman.md) |
+| DEC-10 | Publicación | **Solo la v2.0.0 al final**, sin betas intermedias; `main` la recibe cuando el dueño lo pida | |
 
 ## 2. Stack (DEC-1)
 
@@ -28,10 +34,9 @@ en un isolate), Drift/SQLite, sync P2P por WebSocket con X25519.
 | En contra | La cripto sigue en Dart | Dos toolchains; `rustup` en el host (la DLL de Windows necesita MSVC) y el NDK para Android; builds más lentos | Autofill de Android, biometría, Keystore, notificaciones, bandeja y atajos se escriben a mano (JNI, Win32); ecosistema móvil verde; se reescribe todo, pruebas incluidas | El webview gasta más memoria y obliga a rehacerlo todo; un webview en una bóveda abre superficie XSS; el autofill sigue siendo Kotlin |
 | Esfuerzo | M | L | XL | XL |
 
-**Recomendación: R1, pero solo después del prototipo NUC-0** (carril A): un crate que abre una bóveda creada por la v1
-(vectores de prueba generados con la app actual), llamado desde Flutter en Android y en Windows, midiendo tiempo de
-desbloqueo, tamaño del APK y del instalador. El dueño usa la v1 y el prototipo lado a lado y decide.
-La decisión queda en `docs/adr/0001-*.md`.
+**Decidido: R1 directo** (sin el prototipo comparativo que se recomendaba). `rustup` **no** va al host: todo lo de Rust se
+compila en Podman, la DLL de Windows de forma cruzada ([ADR-0012](../adr/0012-todo-en-podman.md)). Por qué:
+[ADR-0008](../adr/0008-nucleo-en-rust.md).
 
 ## 3. Dirección visual (DEC-2)
 
@@ -57,7 +62,8 @@ La decisión queda en `docs/adr/0001-*.md`.
 - **Tipos de credencial por icono, no por color** (hoy hay 6 colores de tipo).
 - **Liso**: sin degradados, vidrio, brillos ni biseles. Hoy hay degradados en `autofill_onboarding_screen.dart`,
   `security_audit_screen.dart` y `secure_keyboard.dart`. Profundidad = borde fino + sombra suave; esquinas de 12.
-- **Tipografía**: Inter (interfaz) y JetBrains Mono (secretos y códigos), empaquetadas sin red. Cuerpo 16 en móvil y 14 en
+- **Tipografía** (decidida): Atkinson Hyperlegible Next (interfaz) y Atkinson Hyperlegible Mono (secretos y códigos),
+  empaquetadas sin red. Cuerpo 16 en móvil y 14 en
   escritorio; en una contraseña revelada, números y símbolos con otro peso, no otro color.
 - **Movimiento**: transiciones cortas (200 ms o menos) y nada decorativo (fuera el escalonado de listas y el shimmer);
   respeta "reducir movimiento".
@@ -77,19 +83,23 @@ La decisión queda en `docs/adr/0001-*.md`.
 
 ## 5. Reglas que no cambian
 
-- **La bóveda de la v1 se abre en la v2 sin perder nada.** Se prueba con una COPIA de una bóveda real, nunca con la real
-  (`run_integration_tests.ps1` respalda y restaura).
+- **La bóveda de la v1 se migra a la v2 sin perder nada** (copia automática antes; [ADR-0009](../adr/0009-formato-de-boveda-v2.md)).
+  Se prueba con vectores de la v1 (CAL-2) y con una COPIA de una bóveda real, nunca con la real.
 - Sync entre versiones: protocolo versionado; un par v1 con uno v2 no mezcla datos y lo dice claro.
+- Ninguna prueba toca la bóveda real: las E2E usan un directorio de datos aislado ([ADR-0011](../adr/0011-pruebas-e2e-principal.md)).
 - Local-first: sin nube ni telemetría; red solo para la LAN y HIBP (opcional).
 - Zero-Print (`avoid_print`), dominio ciego (la interfaz no hace cripto), i18n completo, colores solo por token.
 
 ## 6. Orden
 
+Detalle por carril y prompts: [`../PENDIENTES_AGENTE.md`](../PENDIENTES_AGENTE.md) ▶.
+
 | Fase | Qué | Carril |
 |---|---|---|
-| 0 | Decidir DEC-1 a DEC-6 con el dueño | General |
-| 1 | Sistema de diseño (tokens, tema, kit, galería en debug, prueba al 200%) y, en paralelo, el prototipo Rust | B y A |
-| 2 | Pantallas por flujo: acceso, bóveda y detalle, formulario, carpetas, seguridad, sync, ajustes, transferencia y archivos, escritorio | C |
-| 3 | Si DEC-1 = R1: el núcleo reemplaza por partes (cripto, luego bóveda y BD, luego sync) | A |
-| 4 | Entrega: firma de Android, instalador, v2.0.0 | D |
-| Todo el tiempo | Pruebas, cobertura, seguridad | E |
+| 0 | Decisiones con el dueño | General ✓ (2026-11-15) |
+| 1 | Cimientos, con nadie más tocando código: renombrar el paquete (PLA-5) y subir dependencias mayores (PLA-4); respaldo de archivos seguros (CAL-4) y vectores de la v1 (CAL-2) | D y E |
+| 2 | Sistema de diseño (DIS-1 a DIS-3, DIS-5) en paralelo con la imagen de build en Podman (PLA-3) y el núcleo cripto en Rust (NUC-1) | B, D y A (dos pesadas a la vez) |
+| 3 | Pantallas por flujo (PAN-10, luego PAN-1 a PAN-9), cada una con su E2E y borrando las pruebas viejas; formato v2 y migración (NUC-2); harness E2E (CAL-5) | C, A y E |
+| 4 | Sync v2 (NUC-3), logo (DIS-4), firma de Android (PLA-1), escaneo (PLA-6), 200%, amenazas y fuzz (CAL-1, SEG-1, SEG-2) | A, B, D y E |
+| 5 | v2.0.0: PR `develop` a `main` y `build_release.ps1`, solo con el permiso del dueño | General |
+| Después | Passkeys reales con WebAuthn (NUC-5) | A |

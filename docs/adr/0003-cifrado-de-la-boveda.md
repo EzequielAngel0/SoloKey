@@ -1,6 +1,6 @@
 # ADR-0003: Argon2id + AES-256-GCM sobre el payload completo
 
-Estado: Vigente (2026-03-30) · Decide: el dueño
+Estado: Vigente (2026-03-30); en la v2 los mismos algoritmos los ejecuta el núcleo Rust (ADR-0008) · Decide: el dueño
 
 ## Contexto
 La bóveda debe resistir el robo del archivo y del equipo apagado, sin que el cifrado congele la interfaz.

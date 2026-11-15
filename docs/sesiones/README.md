@@ -11,7 +11,7 @@ Los prompts para abrir cada sesión están en [`../PENDIENTES_AGENTE.md`](../PEN
 
 | Carril | Qué toca | Doc |
 |---|---|---|
-| **A · Núcleo** | Cripto, formato de bóveda, BD, sync; el prototipo y el núcleo en Rust si se aprueba (DEC-1). `lib/core/infrastructure/`, `lib/features/sync/infrastructure/`, `rust/` | [`A.md`](A.md) |
+| **A · Núcleo** | Cripto, formato de bóveda, BD, sync y parsers, en el núcleo Rust `solokey-core` (ADR-0008). `lib/core/infrastructure/`, `lib/features/sync/infrastructure/`, `rust/` | [`A.md`](A.md) |
 | **B · Diseño** | Sistema de diseño: tokens, tema, tipografía, kit de componentes, logo e iconos, galería en debug. `lib/theme/`, `lib/shared/widgets/`, `assets/` | [`B.md`](B.md) |
 | **C · Pantallas** | Flujos y pantallas, móvil y escritorio (son los mismos archivos), textos e idiomas. `lib/features/*/presentation/`, `lib/core/presentation/`, `lib/router/`, `lib/l10n/` | [`C.md`](C.md) |
 | **D · Plataforma y entrega** | Lo nativo de Android y Windows (autofill, instancia única, bandeja, instalador), firma, `build_release.ps1`, CI, dependencias. `android/`, `windows/`, `installer/`, `.github/`, `pubspec.yaml` | [`D.md`](D.md) |

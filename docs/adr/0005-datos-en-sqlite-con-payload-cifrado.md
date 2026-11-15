@@ -1,6 +1,6 @@
 # ADR-0005: Datos en SQLite (drift) con el payload cifrado en un BLOB
 
-Estado: Vigente (2026-03) · Decide: el dueño
+Estado: Vigente en la v1 (2026-03); en la v2 la reemplaza ADR-0009 · Decide: el dueño
 
 ## Contexto
 La bóveda necesita listar, buscar y ordenar rápido sin descifrar todo, y migrar el esquema entre versiones sin perder datos.

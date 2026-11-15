@@ -1,6 +1,6 @@
 # ADR-0007: Red de calidad local con trinquete de cobertura y CI en máquinas de GitHub
 
-Estado: Vigente (2026-07; runners confirmados el 2026-11-14) · Decide: el dueño
+Estado: Vigente en la v1 (2026-07; runners confirmados el 2026-11-14); en la v2 la reemplaza ADR-0011 · Decide: el dueño
 
 ## Contexto
 Un gestor de contraseñas no puede romper la bóveda en una actualización, y lo desarrollan agentes en paralelo.

@@ -5,6 +5,10 @@ integración (Windows y Android, patrones anti-flaky) está en
 [`PRUEBAS_INTEGRACION.md`](PRUEBAS_INTEGRACION.md); la checklist PC + celular, en
 [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md).
 
+> **La v2 cambia la red** (decidido el 2026-11-15): E2E en Android y Windows como red principal, pruebas unitarias solo en Rust,
+> y las de Dart se borran al reescribir cada parte ([ADR-0011](../adr/0011-pruebas-e2e-principal.md)); todo en Podman salvo lo
+> que Windows exige ([ADR-0012](../adr/0012-todo-en-podman.md)). Esta guía describe la v1 hasta que el carril E la reescriba (CAL-5).
+
 ## La red
 
 | Nivel | Dónde | Cómo se corre | Notas |
@@ -73,5 +77,5 @@ podman run --rm -v "C:/Proyectos/Flutter/SoloKey:/src:ro" ghcr.io/cirruslabs/flu
   bash -c "cp -r /src /work && cd /work && rm -rf .dart_tool build && flutter pub get >/dev/null && flutter analyze && flutter test"
 ```
 
-Para el núcleo en Rust (si se aprueba, ver [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md)), `cargo test` corre igual en
-`docker.io/library/rust` sin instalar nada en Windows.
+Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)), `cargo test` corre en `docker.io/library/rust` (luego en la
+imagen `solokey-build` de PLA-3) sin instalar nada en Windows.
