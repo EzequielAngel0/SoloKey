@@ -9,6 +9,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Núcleo Rust `solokey-core`, cripto (NUC-1, parte Rust, 2026-11-15)**: workspace `rust/` con Argon2id + AES-256-GCM
+  (`argon2`, `aes-gcm`, `zeroize`), lectura de las rarezas de la v1 (doble UTF-8 de la maestra, `double_enc_v1`, código de
+  recuperación) y la API para `flutter_rust_bridge` (`src/api/`). `cargo test` en Podman (`rust/cargo.ps1`) con los vectores de
+  CAL-2: da byte a byte lo de la v1. Imagen `localhost/solokey-rust` (`rust/Containerfile`) para el puente y las librerías nativas.
+
 - **Vectores de prueba de la bóveda v1 (CAL-2, 2026-11-15)**: `vectores/v1/` (BD drift v10, archivos seguros, `.skvault` y
   `vectores.json` con entradas, claves, almacén seguro, filas y payloads en claro) para que el núcleo Rust pruebe la migración
   (NUC-2). Salen del código real de la v1 en Podman (`tool/vectores_v1/generar.ps1`, nunca la bóveda real) y se comprueban sin

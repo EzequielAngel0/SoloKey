@@ -9,7 +9,7 @@ Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`]
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | NUC-1 | Crate `solokey-core` con la cripto (Argon2id, AES-256-GCM, `zeroize`) detrás de `ISecurityService`, vía `flutter_rust_bridge` 2; corre en Android y Windows | L | ☐ | [ver](#nuc-1) |
+| 1 | NUC-1 | Crate `solokey-core` con la cripto (Argon2id, AES-256-GCM, `zeroize`) detrás de `ISecurityService`, vía `flutter_rust_bridge` 2; corre en Android y Windows | L | ◐ Rust hecho; falta el puente Dart | [ver](#nuc-1) |
 | 2 | NUC-2 | Formato de bóveda v2 (SQLite con `rusqlite`, cabecera versionada, metadatos cifrados) y migración única desde la v1 con copia previa | XL | ☐ | [ver](#nuc-2) |
 | 3 | NUC-3 | Sync v2 en el núcleo: canal Noise con llaves fijadas en el QR, protocolo versionado, LWW, aviso claro entre v1 y v2 | XL | ☐ | [ver](#nuc-3) |
 | 4 | NUC-6 | Directorio de datos configurable (bóveda aislada para E2E); la ruta real solo sin la bandera de prueba | S | ☐ | Lo pide E (CAL-5); va con NUC-2 |
