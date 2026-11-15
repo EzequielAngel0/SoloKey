@@ -24,10 +24,36 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      # Solo unit/widget (test/**). Los integration_test/** necesitan dispositivo
-      # y se corren a demanda en local (ver docs/proceso/PRUEBAS_INTEGRACION.md).
+      # Solo unit/widget (test/**). Los integration_test/** van en el job e2e-windows.
       - name: Test + coverage
         run: flutter test --coverage
 
       - name: Coverage gate
         run: dart run tool/check_coverage.dart "$(cat tool/coverage_min.txt)"
+
+  # E2E de escritorio (CAL-5). vault_e2e_test BORRA la boveda: aqui no hay una real
+  # (runner desechable). En el equipo del duenio, solo con run_integration_tests.ps1.
+  # Un archivo por invocacion (en Windows no se pueden encadenar) y cada corrida en su
+  # paso, para que un fallo de la primera no lo tape la segunda.
+  e2e-windows:
+    runs-on: windows-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: E2E app_boot_test (no destructivo)
+        run: flutter test integration_test/app_boot_test.dart -d windows
+
+      - name: E2E vault_e2e_test (corrida 1 de 2)
+        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1
+
+      - name: E2E vault_e2e_test (corrida 2 de 2, sobre la boveda que dejo la 1)
+        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1
