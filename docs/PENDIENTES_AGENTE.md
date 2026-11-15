@@ -23,7 +23,8 @@ dueno, verificas y publicas con su permiso.
 Carga la skill solokey. ListAgents (el emulador y el celular los comparten otras sesiones).
 1. RAMAS: git fetch; worktrees y ramas de sesiones cortadas (git worktree list; git log origin/develop.. en cada uno):
    mergear lo terminado y verificado o preguntarle. Quitar worktrees solo con .\tool\quitar-worktree.ps1.
-2. DEPENDENCIAS: flutter pub outdated (y el escaneo de PLA-6 cuando exista); lo que tenga arreglo de seguridad, contarselo.
+2. DEPENDENCIAS: flutter pub outdated (cuando existan, los escaneos PLA-6 a 8 de docs/sesiones/D.md: deps, Dependabot y ramas);
+   lo que tenga arreglo de seguridad, contarselo.
 3. DECISIONES: repasar con el dueno docs/PENDIENTES_DUENO.md, docs/diseno/REDISENO_V2.md §1 (DEC-1 a DEC-6) y lo marcado ◇ en
    docs/sesiones/*.md, con AskUserQuestion y la recomendada primero. Lo aprobado pasa a "Aprobado, para desarrollar" de su
    carril, con orden; una decision de fondo, ademas, a docs/adr/.
@@ -57,5 +58,5 @@ Resumen AL FINAL, con el CI del ultimo push terminado (gh run watch).
 | A · Núcleo | [`sesiones/A.md`](sesiones/A.md) | NUC-0 a 3 en espera de DEC-1; NUC-4 y 5 propuestas |
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1 a 5 propuestas |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-1 a 10 propuestas |
-| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-1 a 3 en espera; PLA-4 a 6 propuestas |
+| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-6 a 8 (escaneos) aprobados sin desarrollar; PLA-1 a 3 en espera; PLA-4 y 5 propuestas |
 | E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-1 a 3 y SEG-1 a 2 propuestas; SEC-003, 007 y 008 abiertos ([`seguridad/SEGURIDAD.md`](seguridad/SEGURIDAD.md)) |
