@@ -65,6 +65,29 @@ BD `vault_guard_db`, esquema **v10** (`app_database.dart`), con migraciones paso
 prueba** que demuestren que una bóveda anterior se sigue abriendo: los de la v1 están en
 [`vectores/v1/`](../../vectores/v1/LEEME.md) (CAL-2), con sus rarezas (la maestra entra a Argon2id con doble codificación UTF-8). Por qué así: [ADR-0005](../adr/0005-datos-en-sqlite-con-payload-cifrado.md).
 
+### 4.1 Formato de la bóveda v2 (núcleo Rust, NUC-2)
+
+Lo define y lo maneja `rust/solokey-core/src/vault.rs` ([ADR-0009](../adr/0009-formato-de-boveda-v2.md)). La app todavía usa la v1
+de arriba hasta que entre el puente a Dart.
+
+| Pieza | Cómo |
+|---|---|
+| Archivo | `solokey.vault` (SQLite por `rusqlite`) en el directorio de datos que pasa Flutter; `application_id` `SKV2`, `user_version` 2 |
+| `header` (una fila, en claro) | Versión del formato, id de la bóveda, Argon2id y sus parámetros, sal, y la **DEK** (32 bytes aleatorios) envuelta dos veces: `key_by_master` (clave de la maestra) y `key_by_recovery` (código), más `key_check` para abrir con la DEK (biometría) |
+| `records` | En claro solo `id` y `version` (del sobre, hoy 1). El resto es un sobre JSON `{kind, updatedAt, deleted, data}` con AES-256-GCM y la DEK; el AAD lleva versión e id, así que una fila copiada en otra no abre |
+| `blobs` | Contenido de los archivos seguros, cifrado con la DEK y atado a su id |
+| Tipos (`kind`) | `credential`, `folder`, `category`, `history`, `file`; los que empiezan por `_` son locales del equipo y la sync no los manda |
+| Al abrir | Se descifran todos los sobres a un índice en RAM (`Zeroizing`); se pone a cero al cerrar |
+| Maestra y código | Cambiar la maestra o recuperar con el código solo re-envuelve la DEK: no se re-cifra nada y no se pierde nada (cierra SEC-009). El código es base64 sin `=` en grupos de 4 con guiones, como en la v1 |
+| Borrados | Lápida (`deleted`, `data` = `null`) para que la sync propague; `purge` borra sin rastro. `PRAGMA secure_delete` encendido |
+| `data` | El JSON de la entidad de Dart en camelCase. Credencial = columnas de la v1 + su payload en un solo objeto (la carpeta sigue en `categoryId`); historial = foto del payload + `credentialId` |
+
+**Migración única desde la v1** (`migrate_v1.rs`): verifica la maestra (con la doble UTF-8), copia la v1 entera a un directorio de
+respaldo y la comprueba por hash, lee **la copia**, escribe la v2 en `solokey.vault.migrando` con una DEK nueva, la reabre con la
+maestra y compara cada registro y cada archivo con la v1; solo entonces la renombra y retira los originales (la copia se queda). Si
+algo falla, la v1 queda intacta y no hay v2. La maestra de la v2 entra en UTF-8 simple. El código de recuperación de la v1 no sirve
+en la v2: la bóveda migrada nace sin código y la app pide generar uno.
+
 ## 5. Sincronización P2P
 
 | Paso | Cómo |

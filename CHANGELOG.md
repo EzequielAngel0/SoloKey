@@ -13,7 +13,11 @@ versión viven en la página de Releases de GitHub.
   portapapeles y pantalla, sync Noise, migración, lo que entra de fuera, recuperación, pruebas), con el estado de la v1 y el
   requisito y carril de cada fila. Hallazgos nuevos en `SEGURIDAD.md`: SEC-009 (recuperar con el código deja la bóveda ilegible,
   reproducido), SEC-010 (`bio_master_key` sin atar a la biometría) y SEC-011 (portapapeles sin marcar como sensible).
-
+- **Formato de bóveda v2 y migración desde la v1 (NUC-2, parte Rust, 2026-11-15)**: `vault.rs` (SQLite `solokey.vault`, cabecera
+  versionada, DEK aleatoria envuelta por maestra y por código, sobres cifrados con AAD por id; en claro solo id y versión) y
+  `migrate_v1.rs` (verifica, copia con hash, convierte desde la copia, reabre y compara todo, y solo entonces activa la v2). Probado
+  con la bóveda de CAL-2: conteos, payloads, doble sobre y hash de cada archivo iguales; maestra mala o archivo alterado dejan la
+  v1 intacta. Cierra SEC-009 en el núcleo. Formato en `ARQUITECTURA.md` §4.1.
 - **Núcleo Rust `solokey-core`, cripto (NUC-1, parte Rust, 2026-11-15)**: workspace `rust/` con Argon2id + AES-256-GCM
   (`argon2`, `aes-gcm`, `zeroize`), lectura de las rarezas de la v1 (doble UTF-8 de la maestra, `double_enc_v1`, código de
   recuperación) y la API para `flutter_rust_bridge` (`src/api/`). `cargo test` en Podman (`rust/cargo.ps1`) con los vectores de
