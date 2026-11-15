@@ -13,6 +13,10 @@ versión viven en la página de Releases de GitHub.
   portapapeles y pantalla, sync Noise, migración, lo que entra de fuera, recuperación, pruebas), con el estado de la v1 y el
   requisito y carril de cada fila. Hallazgos nuevos en `SEGURIDAD.md`: SEC-009 (recuperar con el código deja la bóveda ilegible,
   reproducido), SEC-010 (`bio_master_key` sin atar a la biometría) y SEC-011 (portapapeles sin marcar como sensible).
+- **Sync v2 en el núcleo (NUC-3, parte Rust, 2026-11-15)**: `sync/channel.rs` (Noise `IK` con `snow`, llave del par fijada en el
+  QR, tramas de saludo con `SKS2` + versión para reconocer a un par v1 u otra versión, mensajes largos partidos y juntados) y
+  `sync/protocol.rs` (delta con `Summary` y `Push`, LWW con desempate determinista por lápida y hash, archivos y lápidas viajan, lo
+  local no). Sin E/S: el socket queda en Flutter. Arregla en la v2 el empate de la v1, que dejaba a cada equipo con lo suyo.
 - **Formato de bóveda v2 y migración desde la v1 (NUC-2, parte Rust, 2026-11-15)**: `vault.rs` (SQLite `solokey.vault`, cabecera
   versionada, DEK aleatoria envuelta por maestra y por código, sobres cifrados con AAD por id; en claro solo id y versión) y
   `migrate_v1.rs` (verifica, copia con hash, convierte desde la copia, reabre y compara todo, y solo entonces activa la v2). Probado

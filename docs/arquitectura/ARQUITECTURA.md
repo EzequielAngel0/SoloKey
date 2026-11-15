@@ -102,6 +102,21 @@ en la v2: la bóveda migrada nace sin código y la app pide generar uno.
 Diseño original con diagramas: [`SYNC_P2P.md`](SYNC_P2P.md) (plan de junio; donde difiera, por ejemplo el TLS con certificado
 fijado que no se construyó, manda esta tabla). Por qué así: [ADR-0006](../adr/0006-sync-p2p-en-la-lan.md).
 
+### 5.1 Sync v2 (núcleo Rust, NUC-3)
+
+`rust/solokey-core/src/sync/` ([ADR-0010](../adr/0010-sync-v2-canal-cifrado.md)), **sin E/S**: Flutter mueve los bytes (WebSocket
+binario, descubrimiento, QR) y guarda la identidad del equipo y las llaves fijadas de sus pares en el almacén seguro.
+
+| Pieza | Cómo |
+|---|---|
+| Patrón | `Noise_IK_25519_ChaChaPoly_SHA256` (crate `snow`), prólogo `SoloKey sync v2` |
+| Por qué `IK` | Quien escanea el QR ya tiene la llave estática del otro: lo autentica desde el primer mensaje y nadie en medio puede suplantarlo. Su propia llave viaja cifrada en ese mensaje; el otro la acepta si trae el token de un uso del QR (emparejar) o si ya la tiene fijada (reconectar). Un patrón para los dos casos, sin certificados |
+| Versión | Las dos tramas del saludo empiezan con `SKS2` + versión (2) en claro. Una trama JSON es la v1, otra versión se rechaza: los datos no se mezclan y la app dice que hay que actualizar los dos (`PeerIsV1`, `PeerVersion`) |
+| Canal | Todo va cifrado y autenticado; un mensaje largo se parte en tramas de 64 KiB como mucho y se junta (tope 256 MiB). Una trama alterada o repetida se rechaza |
+| Delta | Cada lado manda `Summary` (id, fecha, lápida y SHA-256 de los datos), luego un `Push` con lo que gana (y el contenido de los archivos), y aplica lo que gana del otro. Los registros `_…` no viajan |
+| LWW | Gana la fecha más nueva; con la misma fecha gana la lápida y después el hash mayor. Determinista: los dos equipos eligen lo mismo (en la v1 el empate comparaba el id consigo mismo y cada equipo se quedaba con lo suyo) |
+| Fechas | Se guardan tal cual las puso el equipo de origen |
+
 ## 6. Plataformas
 
 | Plataforma | Qué tiene propio |
