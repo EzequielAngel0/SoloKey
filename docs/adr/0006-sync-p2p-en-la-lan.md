@@ -1,6 +1,6 @@
 # ADR-0006: Sync P2P en la LAN, cifrada por mensaje, gana la última escritura
 
-Estado: Vigente (2026-07) · Decide: el dueño
+Estado: Vigente en la v1 (2026-07); en la v2 la reemplaza ADR-0010 · Decide: el dueño
 
 ## Contexto
 Sin nube ([ADR-0001](0001-local-first-sin-nube.md)), el celular y la PC tienen que ponerse de acuerdo solos, en la misma red.
