@@ -12,8 +12,7 @@ Hecho: [`../archive/sesiones/E_HECHO.md`](../archive/sesiones/E_HECHO.md).
 |---|---|---|---|---|---|
 | 1 | CAL-5 | Harness E2E de la v2: Android en Podman (emulador sin pantalla o celular por adb en Wi-Fi), Windows en local con bóveda aislada y en `windows-latest`; gates nuevos en `PRUEBAS.md` | L | ☐ | [ver](#cal-5) |
 | 2 | CAL-1 | E2E con la letra al 200% (Android `font_scale` 2.0; Windows escala de texto) y los dos temas, con datos largos, por pantalla | M | ☐ | Gate de cada PAN |
-| 3 | SEG-1 | Modelo de amenazas de la v2 (RAM, disco, portapapeles, sync Noise, migración, importación) con la skill `security-audit` | M | ☐ | El informe anterior es de julio |
-| 4 | SEG-2 | Fuzz en Rust (`cargo-fuzz` en Podman) de los parsers de fuera: CSV, `otpauth://`, `.skvault`, mensajes de sync | M | ☐ | Cuando A los tenga en el núcleo |
+| 3 | SEG-2 | Fuzz en Rust (`cargo-fuzz` en Podman) de los parsers de fuera: CSV, `otpauth://`, `.skvault`, mensajes de sync | M | ☐ | Cuando A los tenga en el núcleo |
 
 ## Necesita de otros carriles
 

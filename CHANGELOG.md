@@ -9,6 +9,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Modelo de amenazas de la v2 (SEG-1, 2026-11-15)**: `docs/seguridad/AMENAZAS_V2.md`, por superficie (RAM, disco,
+  portapapeles y pantalla, sync Noise, migración, lo que entra de fuera, recuperación, pruebas), con el estado de la v1 y el
+  requisito y carril de cada fila. Hallazgos nuevos en `SEGURIDAD.md`: SEC-009 (recuperar con el código deja la bóveda ilegible,
+  reproducido), SEC-010 (`bio_master_key` sin atar a la biometría) y SEC-011 (portapapeles sin marcar como sensible).
+
 - **Vectores de prueba de la bóveda v1 (CAL-2, 2026-11-15)**: `vectores/v1/` (BD drift v10, archivos seguros, `.skvault` y
   `vectores.json` con entradas, claves, almacén seguro, filas y payloads en claro) para que el núcleo Rust pruebe la migración
   (NUC-2). Salen del código real de la v1 en Podman (`tool/vectores_v1/generar.ps1`, nunca la bóveda real) y se comprueban sin
