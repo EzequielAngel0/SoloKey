@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/sync/domain/sync_network_utils.dart';
+import 'package:solokey/features/sync/domain/sync_network_utils.dart';
 
 void main() {
   group('isPrivateIpv4', () {

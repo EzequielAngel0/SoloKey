@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/sync/domain/sync_summary.dart';
+import 'package:solokey/features/sync/domain/sync_summary.dart';
 
 void main() {
   SyncItemChange cred(String id, SyncChangeAction a) => SyncItemChange(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/shared/widgets/secure_keyboard/secure_keyboard.dart';
+import 'package:solokey/shared/widgets/secure_keyboard/secure_keyboard.dart';
 
 import '../support/widget_harness.dart';
 

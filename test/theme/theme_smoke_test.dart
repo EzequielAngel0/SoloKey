@@ -2,9 +2,9 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/shared/widgets/solo_filter_chip.dart';
-import 'package:password_manager/theme/app_palette.dart';
-import 'package:password_manager/theme/app_theme.dart';
+import 'package:solokey/shared/widgets/solo_filter_chip.dart';
+import 'package:solokey/theme/app_palette.dart';
+import 'package:solokey/theme/app_theme.dart';
 
 /// Visual QA (UI-9): the four Graphite Pro themes must each build a screen that
 /// exercises the new shared components (filter chips, NavigationBar, buttons,

@@ -2,10 +2,10 @@ import 'dart:typed_data';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/vault_access/application/unlock_vault_use_case.dart';
-import 'package:password_manager/features/vault_access/application/vault_exceptions.dart';
-import 'package:password_manager/features/vault_access/application/vault_state_provider.dart';
-import 'package:password_manager/features/vault_access/domain/entities/vault_session.dart';
+import 'package:solokey/features/vault_access/application/unlock_vault_use_case.dart';
+import 'package:solokey/features/vault_access/application/vault_exceptions.dart';
+import 'package:solokey/features/vault_access/application/vault_state_provider.dart';
+import 'package:solokey/features/vault_access/domain/entities/vault_session.dart';
 
 /// Fake unlock use case whose [execute] throws a preconfigured error, so we can
 /// assert how [VaultNotifier] maps each domain exception onto a SEMANTIC

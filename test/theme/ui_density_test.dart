@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/theme/ui_density.dart';
+import 'package:solokey/theme/ui_density.dart';
 
 void main() {
   group('UiDensity', () {

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/vault_view_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/application/vault_view_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
 
 Credential _c({
   required String id,

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/services/otpauth_import_service.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/core/services/otpauth_import_service.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
 
 void main() {
   final service = OtpAuthImportService();

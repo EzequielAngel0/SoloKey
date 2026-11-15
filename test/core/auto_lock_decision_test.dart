@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/security/auto_lock_decision.dart';
+import 'package:solokey/core/infrastructure/security/auto_lock_decision.dart';
 
 // Pure auto-lock decision (prompt 99): every instant is injected, so the edge
 // cases that only bite in production (exact boundary, sub-minute background,

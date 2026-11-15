@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/domain/otpauth.dart';
+import 'package:solokey/features/credentials/domain/otpauth.dart';
 
 void main() {
   group('OtpauthParser.parse', () {

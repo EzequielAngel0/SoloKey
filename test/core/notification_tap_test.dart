@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/services/notification_service.dart';
+import 'package:solokey/core/services/notification_service.dart';
 
 // Pure tap-routing decision (prompt 99). The payload sentinels and the snooze
 // action id are part of the notification protocol persisted in shown

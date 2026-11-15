@@ -17,6 +17,8 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **PLA-5 (2026-11-15)**: el paquete Dart pasa de `password_manager` a `solokey` (`pubspec.yaml` e imports `package:solokey/`).
+  Sin cambios en `Runner.rc`, `BINARY_NAME`, `applicationId` ni `project()` de CMake: la bóveda existente se sigue abriendo.
 - **Docs y proceso (2026-11-14)**: rama `develop` de integración (CI también en `develop`); método por sesiones
   (`docs/sesiones/`, carriles A a E); plan de la v2 en `docs/diseno/REDISENO_V2.md`; guías `docs/proceso/PRUEBAS.md` y
   `RAMAS.md`; `tool/quitar-worktree.ps1` (quita un worktree sin vaciar el caché de Pub). Lo terminado de la v1 (prompts por

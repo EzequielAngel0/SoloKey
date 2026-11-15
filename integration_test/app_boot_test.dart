@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:password_manager/features/vault_access/presentation/setup_screen.dart';
-import 'package:password_manager/features/vault_access/presentation/unlock_screen.dart';
+import 'package:solokey/features/vault_access/presentation/setup_screen.dart';
+import 'package:solokey/features/vault_access/presentation/unlock_screen.dart';
 
-import 'package:password_manager/main.dart' as app;
+import 'package:solokey/main.dart' as app;
 
 import 'support/e2e_helpers.dart';
 

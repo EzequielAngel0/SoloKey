@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/credential_use_cases.dart';
-import 'package:password_manager/features/credentials/application/credentials_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/presentation/home_screen.dart';
-import 'package:password_manager/features/credentials/presentation/widgets/credential_list_widget.dart';
-import 'package:password_manager/shared/widgets/empty_state.dart';
-import 'package:password_manager/shared/widgets/score_ring.dart';
-import 'package:password_manager/shared/widgets/shimmer_loader.dart';
+import 'package:solokey/features/credentials/application/credential_use_cases.dart';
+import 'package:solokey/features/credentials/application/credentials_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/presentation/home_screen.dart';
+import 'package:solokey/features/credentials/presentation/widgets/credential_list_widget.dart';
+import 'package:solokey/shared/widgets/empty_state.dart';
+import 'package:solokey/shared/widgets/score_ring.dart';
+import 'package:solokey/shared/widgets/shimmer_loader.dart';
 
 import '../../support/fake_credential_repository.dart';
 import '../../support/widget_harness.dart';

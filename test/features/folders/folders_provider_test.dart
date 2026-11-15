@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/folders/application/folders_provider.dart';
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
+import 'package:solokey/features/folders/application/folders_provider.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
 
 import '../../support/fake_folder_repository.dart';
 

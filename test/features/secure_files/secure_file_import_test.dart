@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/secure_files/application/secure_file_import.dart';
+import 'package:solokey/features/secure_files/application/secure_file_import.dart';
 
 void main() {
   group('isWithinSecureFileLimit', () {

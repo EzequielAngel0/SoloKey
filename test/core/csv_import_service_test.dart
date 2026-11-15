@@ -1,8 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/services/csv_import_service.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
-import 'package:password_manager/features/credentials/domain/repositories/i_credential_repository.dart';
+import 'package:solokey/core/services/csv_import_service.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/domain/entities/password_history.dart';
+import 'package:solokey/features/credentials/domain/repositories/i_credential_repository.dart';
 
 class FakeCredentialRepository implements ICredentialRepository {
   final List<Credential> saved = [];

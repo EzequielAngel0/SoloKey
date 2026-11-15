@@ -8,11 +8,10 @@ el host).
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | PLA-5 | Renombrar el paquete Dart `password_manager` a `solokey` (imports, `pubspec.yaml`, CI) | S | ☐ | [ver](#pla-5); **solo, sin otro carril tocando código** |
-| 2 | PLA-4 | Subir dependencias mayores (Riverpod 3, go_router 18, freezed 3, flutter_secure_storage 11, local_auth 3, `window_manager`, `tray_manager`, drift 2.35) | L | ☐ | [ver](#pla-4) |
-| 3 | PLA-6 | `tool\escaneo-deps.ps1`: OSV-Scanner en Podman sobre `pubspec.lock` y `Cargo.lock` + `flutter pub outdated` + alertas de Dependabot abiertas | S | ☐ | [ver](#detalle-escaneos-pla-6-a-8) |
-| 4 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
-| 5 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
+| 1 | PLA-4 | Subir dependencias mayores (Riverpod 3, go_router 18, freezed 3, flutter_secure_storage 11, local_auth 3, `window_manager`, `tray_manager`, drift 2.35) | L | ☐ | [ver](#pla-4); **solo, sin otro carril tocando código** |
+| 2 | PLA-6 | `tool\escaneo-deps.ps1`: OSV-Scanner en Podman sobre `pubspec.lock` y `Cargo.lock` + `flutter pub outdated` + alertas de Dependabot abiertas | S | ☐ | [ver](#detalle-escaneos-pla-6-a-8) |
+| 3 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
+| 4 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
 
 ## Aprobado, sin desarrollar (el dueño dice cuándo)
 
@@ -45,18 +44,6 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 | Betas intermedias publicadas | DEC-10: solo la v2.0.0 al final |
 
 ## Detalle
-
-### PLA-5
-
-- **Solo el nombre del paquete Dart** (`name:` de `pubspec.yaml` e imports `package:password_manager/`). Cambia casi todos los
-  archivos: ningún otro carril toca código mientras dura.
-- **NO tocar** lo que decide dónde vive la bóveda del dueño o cómo se instala: `CompanyName` y `ProductName` de
-  `windows/runner/Runner.rc` (forman la ruta `%APPDATA%\Angel Ezequiel Barbosa Lomeli\SoloKey` del almacén seguro y de
-  `secure_files`), `BINARY_NAME` (`SoloKey`, lo usan el instalador y el arranque con Windows), el `applicationId` de Android y la
-  ruta vieja `com.vaultguard\password_manager` que respalda `run_integration_tests.ps1`. `project(password_manager)` de
-  `windows/CMakeLists.txt` puede quedarse.
-- Verificar: `flutter analyze` en 0, pruebas en verde, y que la app de Windows abre la bóveda real **sin pedir crear una nueva**
-  (respaldo previo en `%USERPROFILE%\SoloKey-respaldo-20261114-235706`).
 
 ### PLA-4
 

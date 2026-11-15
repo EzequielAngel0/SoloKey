@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
-import 'package:password_manager/features/sync/application/pairing_notifier.dart';
-import 'package:password_manager/features/sync/domain/i_sync_service.dart';
-import 'package:password_manager/features/sync/domain/pairing_payload.dart';
+import 'package:solokey/features/sync/application/pairing_notifier.dart';
+import 'package:solokey/features/sync/domain/i_sync_service.dart';
+import 'package:solokey/features/sync/domain/pairing_payload.dart';
 
 import '../../support/fake_sync_service.dart';
 

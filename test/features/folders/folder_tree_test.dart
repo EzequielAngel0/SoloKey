@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/folders/domain/entities/folder.dart';
-import 'package:password_manager/features/folders/domain/folder_tree.dart';
+import 'package:solokey/features/folders/domain/entities/folder.dart';
+import 'package:solokey/features/folders/domain/folder_tree.dart';
 
 Folder _f(String id, {String? parent, String? name}) => Folder(
       id: id,

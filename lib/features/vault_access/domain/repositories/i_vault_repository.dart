@@ -1,5 +1,5 @@
-import 'package:password_manager/features/vault_access/domain/entities/master_key_config.dart';
-import 'package:password_manager/features/vault_access/domain/entities/vault.dart';
+import 'package:solokey/features/vault_access/domain/entities/master_key_config.dart';
+import 'package:solokey/features/vault_access/domain/entities/vault.dart';
 
 abstract interface class IVaultRepository {
   Future<Vault?> getVault();

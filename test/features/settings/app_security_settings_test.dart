@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/settings/domain/entities/app_security_settings.dart';
+import 'package:solokey/features/settings/domain/entities/app_security_settings.dart';
 
 void main() {
   group('AppSecuritySettings', () {

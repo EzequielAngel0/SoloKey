@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/secure_files/application/secure_files_view.dart';
-import 'package:password_manager/features/secure_files/domain/entities/secure_file.dart';
+import 'package:solokey/features/secure_files/application/secure_files_view.dart';
+import 'package:solokey/features/secure_files/domain/entities/secure_file.dart';
 
 SecureFile _f(
   String id, {

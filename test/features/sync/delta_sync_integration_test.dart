@@ -3,14 +3,14 @@ import 'dart:typed_data';
 
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/database/app_database.dart';
-import 'package:password_manager/core/infrastructure/security/i_security_service.dart';
-import 'package:password_manager/core/infrastructure/security/session_manager.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/infrastructure/credential_dto.dart';
-import 'package:password_manager/features/secure_files/domain/entities/secure_file.dart';
-import 'package:password_manager/features/sync/domain/sync_summary.dart';
-import 'package:password_manager/features/sync/infrastructure/delta_sync_manager.dart';
+import 'package:solokey/core/infrastructure/database/app_database.dart';
+import 'package:solokey/core/infrastructure/security/i_security_service.dart';
+import 'package:solokey/core/infrastructure/security/session_manager.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/infrastructure/credential_dto.dart';
+import 'package:solokey/features/secure_files/domain/entities/secure_file.dart';
+import 'package:solokey/features/sync/domain/sync_summary.dart';
+import 'package:solokey/features/sync/infrastructure/delta_sync_manager.dart';
 
 import '../../support/fake_secure_file_repository.dart';
 

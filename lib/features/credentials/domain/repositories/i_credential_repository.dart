@@ -1,6 +1,6 @@
-import 'package:password_manager/features/credentials/domain/entities/category.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/domain/entities/password_history.dart';
+import 'package:solokey/features/credentials/domain/entities/category.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/domain/entities/password_history.dart';
 
 abstract interface class ICredentialRepository {
   Future<List<Credential>> getAll();

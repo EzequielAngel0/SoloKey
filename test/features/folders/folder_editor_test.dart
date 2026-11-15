@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/folders/application/folders_provider.dart';
-import 'package:password_manager/features/folders/presentation/folder_actions.dart';
-import 'package:password_manager/l10n/app_localizations.dart';
+import 'package:solokey/features/folders/application/folders_provider.dart';
+import 'package:solokey/features/folders/presentation/folder_actions.dart';
+import 'package:solokey/l10n/app_localizations.dart';
 
 import '../../support/fake_folder_repository.dart';
 import '../../support/widget_harness.dart';

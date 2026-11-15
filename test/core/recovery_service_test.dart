@@ -2,12 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/core/infrastructure/security/security_service_impl.dart';
-import 'package:password_manager/core/infrastructure/security/session_manager.dart';
-import 'package:password_manager/core/services/recovery_service.dart';
-import 'package:password_manager/features/vault_access/domain/entities/master_key_config.dart';
-import 'package:password_manager/features/vault_access/domain/entities/vault.dart';
-import 'package:password_manager/features/vault_access/domain/repositories/i_vault_repository.dart';
+import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
+import 'package:solokey/core/infrastructure/security/session_manager.dart';
+import 'package:solokey/core/services/recovery_service.dart';
+import 'package:solokey/features/vault_access/domain/entities/master_key_config.dart';
+import 'package:solokey/features/vault_access/domain/entities/vault.dart';
+import 'package:solokey/features/vault_access/domain/repositories/i_vault_repository.dart';
 
 class FakeSecureStorage extends FlutterSecureStorage {
   final Map<String, String> _data = {};

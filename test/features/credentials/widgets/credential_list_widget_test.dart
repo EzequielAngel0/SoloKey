@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:password_manager/features/credentials/application/credential_health_provider.dart';
-import 'package:password_manager/features/credentials/domain/entities/credential.dart';
-import 'package:password_manager/features/credentials/presentation/widgets/credential_card.dart';
-import 'package:password_manager/features/credentials/presentation/widgets/credential_list_widget.dart';
-import 'package:password_manager/shared/widgets/detail_group.dart';
+import 'package:solokey/features/credentials/application/credential_health_provider.dart';
+import 'package:solokey/features/credentials/domain/entities/credential.dart';
+import 'package:solokey/features/credentials/presentation/widgets/credential_card.dart';
+import 'package:solokey/features/credentials/presentation/widgets/credential_list_widget.dart';
+import 'package:solokey/shared/widgets/detail_group.dart';
 
 import '../../../support/widget_harness.dart';
 

@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
-import 'package:password_manager/features/secure_files/domain/entities/secure_file.dart';
-import 'package:password_manager/features/secure_files/domain/repositories/i_secure_file_repository.dart';
+import 'package:solokey/features/secure_files/domain/entities/secure_file.dart';
+import 'package:solokey/features/secure_files/domain/repositories/i_secure_file_repository.dart';
 
 /// In-memory [ISecureFileRepository] for widget tests. `addFile`/`delete`/
 /// `updateMeta` mutate the backing list so the screen's list reflects the change

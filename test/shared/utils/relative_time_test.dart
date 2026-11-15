@@ -1,7 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:password_manager/l10n/app_localizations_en.dart';
-import 'package:password_manager/shared/utils/relative_time.dart';
+import 'package:solokey/l10n/app_localizations_en.dart';
+import 'package:solokey/shared/utils/relative_time.dart';
 
 void main() {
   final l10n = AppLocalizationsEn();
