@@ -11,7 +11,7 @@ import 'package:password_manager/theme/app_theme.dart';
 ///    so `context.palette` resolves;
 ///  - the i18n delegates so `AppLocalizations.of(context)` works.
 ///
-/// Reminders (see docs/prompts/95_pruebas.md):
+/// Reminders (see docs/proceso/PRUEBAS.md):
 ///  - Do NOT `pumpAndSettle` when a `Timer.periodic` is alive (e.g. the TOTP
 ///    card) — bump frames with `tester.pump(Duration(...))` instead.
 ///  - After typing in the search field, advance > 250 ms to fire the debounce.

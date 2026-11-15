@@ -6,7 +6,7 @@
 > Delta-Sync LWW, bandeja del sistema, hotkeys, instalador Inno Setup,
 > reconexión sin QR (handshake resume) y desbloqueo/aprobación desde el celular.
 > Pendientes: empaquetado **macOS/Linux** y probar el flujo PC↔celular en
-> dispositivos reales. El estado vigente está en `../planning/pendientes_y_bugs.md`.
+> dispositivos reales. El estado vigente está en `../PENDIENTES.md`.
 > Este documento se conserva como **referencia de diseño** (histórico).
 
 Este documento sirve como la guía técnica definitiva y el plan de implementación paso a paso para desarrollar el **SoloKey Desktop Companion** (Windows, macOS y Linux) en un chat posterior. Permite la reutilización directa de la lógica de negocio (Clean Architecture) y criptografía de la app móvil.

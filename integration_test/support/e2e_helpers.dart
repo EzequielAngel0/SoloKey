@@ -6,7 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 
-/// Shared engine for SoloKey E2E flows. See docs/prompts/PRUEBAS_INTEGRACION.md.
+/// Shared engine for SoloKey E2E flows. See docs/proceso/PRUEBAS_INTEGRACION.md.
 ///
 /// Golden rules baked in here:
 ///  - **Never** `pumpAndSettle` (TOTP `Timer.periodic`, auto-lock ticker and the

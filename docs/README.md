@@ -1,105 +1,53 @@
-# 📚 Documentación de SoloKey
+# Documentación de SoloKey
 
-Índice de toda la documentación del proyecto, organizada por propósito.
-Última reorganización: **2026-07-03**.
+Reorganizada el **2026-11-14**: sesiones por carril y un hecho, una fuente.
+
+**Empieza por aquí:** [`PENDIENTES.md`](PENDIENTES.md) (lo abierto y los prompts de cada sesión) y
+[`design/REDISENO_V2.md`](design/REDISENO_V2.md) (la propuesta de la v2).
 
 ```
 docs/
-├── spec/          Especificación fundacional (set secuenciado 00–05)
-├── architecture/  Evolución arquitectónica
-├── design/        Rediseño de UI/UX (Graphite Pro) — planes + previews
-├── prompts/       Prompts detallados por pantalla (uno por chat) ← EMPEZAR AQUI para mejorar
-├── security/      Auditorías e informes de seguridad
-├── features/      Planes/diseño de features concretas
-├── planning/      Roadmap, backlog vigente e ideas
-└── release/       Empaquetado y publicación por plataforma
+├── PENDIENTES.md   Lo abierto, del dueño y por carril, y los prompts ▶
+├── sesiones/       Un doc por carril (A Núcleo, B Diseño, C Pantallas, D Plataforma, E Calidad)
+├── design/         Propuesta de la v2
+├── proceso/        Ramas, pruebas, integración
+├── planning/       Checklist en dispositivos, ideas, plan de WebAuthn
+├── features/       Diseño de features ya construidas (companion, rotación)
+├── spec/           Especificación fundacional (histórica)
+├── security/       Informe de auditoría (julio 2026)
+├── release/        Publicación y guía de iOS
+├── legal/          Privacidad y términos
+├── portfolio/      Caso de estudio y CV
+└── archive/        Lo cerrado
 ```
 
-> **¿Vas a mejorar una pantalla?** Ve a [`prompts/`](prompts/README.md): trae un
-> prompt detallado por pantalla (móvil + escritorio) con audit → plan → ejecución,
-> features propuestas y guardarraíles. Úsalo uno por chat.
+| Doc | Para qué |
+|---|---|
+| [`PENDIENTES.md`](PENDIENTES.md) | Qué falta, de quién, y cómo abrir cada sesión |
+| [`sesiones/README.md`](sesiones/README.md) | Carriles, reglas y plantilla |
+| [`design/REDISENO_V2.md`](design/REDISENO_V2.md) | Decisiones de la v2 (stack, dirección visual, temas, idiomas) |
+| [`proceso/RAMAS.md`](proceso/RAMAS.md) | `main` / `develop` / ramas cortas, commits, worktrees |
+| [`proceso/PRUEBAS.md`](proceso/PRUEBAS.md) | La red de pruebas, gates y reglas |
+| [`proceso/PRUEBAS_INTEGRACION.md`](proceso/PRUEBAS_INTEGRACION.md) | Motor `integration_test` en Windows y Android |
+| [`planning/pruebas_dispositivos_reales.md`](planning/pruebas_dispositivos_reales.md) | Checklist PC + celular (R1, M1, M3) |
+| [`planning/feature_ideas.md`](planning/feature_ideas.md) | Ideas sueltas (lo aprobado va a un carril) |
+| [`../CHANGELOG.md`](../CHANGELOG.md) | Qué cambió en el código, por versión |
 
----
+## Regla de documentación
 
-## 🟢 Estado del proyecto (2026-07-03)
+1. **Un hecho, una fuente.** Cada tipo de hecho se escribe completo en UN archivo; los demás enlazan, no resumen.
 
-Estabilización **cerrada**, i18n **completo** (es/en, UI + servicios), `flutter
-analyze` sin issues y **61 tests verde**. Artefactos de release generados en
-`dist/` (APKs + instalador Windows) vía `build_release.ps1`. **Rediseño UI/UX
-Graphite Pro** mergeado a `main` (ver [`design/`](design/)); trabajo continuo por
-pantalla vía [`prompts/`](prompts/README.md).
+   | Hecho | Fuente única |
+   |---|---|
+   | Qué cambió en el código | `CHANGELOG.md` (`[Unreleased]` hasta publicar) |
+   | Qué falta | `PENDIENTES.md` y el doc de su carril en `sesiones/` |
+   | Qué se decidió y por qué | `adr/` (se crea con la primera decisión: DEC-1) |
+   | Cómo se prueba | `proceso/PRUEBAS.md` |
 
-**Pendiente real / próximo:** auto-refresh de la Bóveda de Windows al sincronizar,
-editar/eliminar carpetas en escritorio, ver qué se sincronizó, captura de QR en
-Windows para TOTP (todo con prompt en `prompts/`); probar el flujo PC↔celular en
-dispositivos; empaquetado macOS/Linux/iOS (diferido).
-
-## 🟢 Empezar por aquí
-
-- **¿Qué falta / estado vigente?** → [planning/pendientes_y_bugs.md](planning/pendientes_y_bugs.md) — backlog con estado de cada item, build de release y notas.
-- **¿Qué se ha hecho y en qué orden?** → [planning/roadmap_desarrollo.md](planning/roadmap_desarrollo.md) — documento vivo de lotes.
-- **Ideas a futuro** → [planning/feature_ideas.md](planning/feature_ideas.md) (ya separa "implementado" de "pendiente").
-
-> Documentos **vivos** (se mantienen al día): los de `planning/` y este índice.
-> Documentos **históricos / punto-en-el-tiempo** (no se reescriben): `spec/` (la
-> especificación fundacional), `security/security_audit_report.md` y los planes de
-> `features/`. El roadmap "Fases 9–13" del `CLAUDE.md` raíz quedó histórico — la
-> fuente de verdad del estado es `planning/`.
-
----
-
-## 📂 Por carpeta
-
-### `spec/` — Especificación fundacional
-| Doc | Contenido |
-| :--- | :--- |
-| [00_requirements_confirmation.md](spec/00_requirements_confirmation.md) | Confirmación de requisitos iniciales |
-| [01_project_context_and_scope.md](spec/01_project_context_and_scope.md) | Contexto y alcance del proyecto |
-| [02_architecture.md](spec/02_architecture.md) | Arquitectura base (Clean Architecture, capas) |
-| [03_domain.md](spec/03_domain.md) | Modelo de dominio (entidades, repositorios) |
-| [04_security.md](spec/04_security.md) | Especificación de seguridad (cripto, KDF, RAM) |
-| [05_ux_and_flows.md](spec/05_ux_and_flows.md) | UX y flujos de pantalla |
-
-### `architecture/` — Evolución arquitectónica
-| Doc | Contenido |
-| :--- | :--- |
-| [architecture_v2.md](architecture/architecture_v2.md) | Revisión arquitectónica posterior |
-
-### `design/` — Rediseño de UI/UX (Graphite Pro)
-| Doc | Contenido |
-| :--- | :--- |
-| [rediseno_ui_2026.md](design/rediseno_ui_2026.md) | Capa visual Graphite Pro (tokens, tema, nav) — **hecho** |
-| [rediseno_preview.html](design/rediseno_preview.html) | Preview visual del sistema de diseño |
-| [ux_overhaul_2026.md](design/ux_overhaul_2026.md) | Rediseño UX pantalla por pantalla (lotes L0–L9) — **hecho** |
-| [ux_overhaul_preview.html](design/ux_overhaul_preview.html) | Prototipo A/B del rediseño UX |
-
-### `prompts/` — Prompts de mejora por pantalla
-| Doc | Contenido |
-| :--- | :--- |
-| [README.md](prompts/README.md) | Índice + cómo usar (uno por chat) |
-| [00_contexto_compartido.md](prompts/00_contexto_compartido.md) | Preámbulo (reglas/gates) a pegar antes de cada prompt |
-| 10–90 | Prompts detallados: bóveda, detalle, formulario, carpetas, seguridad, sync, transferencia, ajustes, archivos/passkeys, acceso, escritorio, captura QR, transversal |
-
-### `security/` — Auditorías
-| Doc | Contenido |
-| :--- | :--- |
-| [security_audit_report.md](security/security_audit_report.md) | Informe de auditoría de seguridad |
-
-### `features/` — Planes de feature
-| Doc | Contenido |
-| :--- | :--- |
-| [desktop_companion_planning.md](features/desktop_companion_planning.md) | Plan maestro del companion de escritorio + sync P2P E2EE |
-| [password_rotation_reminders.md](features/password_rotation_reminders.md) | Recordatorios nativos de rotación de contraseñas |
-
-### `planning/` — Roadmap y backlog
-| Doc | Contenido |
-| :--- | :--- |
-| [roadmap_desarrollo.md](planning/roadmap_desarrollo.md) | Documento vivo de lotes y estado |
-| [pendientes_y_bugs.md](planning/pendientes_y_bugs.md) | Backlog de estabilización vigente (bugs + mejoras) |
-| [feature_ideas.md](planning/feature_ideas.md) | Ideas y características futuras |
-
-### `release/` — Publicación
-| Doc | Contenido |
-| :--- | :--- |
-| [publishing_requirements.md](release/publishing_requirements.md) | Requisitos de publicación |
-| [ios_compilation_guide.md](release/ios_compilation_guide.md) | Guía de compilación para iOS |
+2. **En línea, solo lo abierto.** Lo terminado sale al archivo en la misma rama que lo cierra, en una o dos líneas
+   (`archive/sesiones/<carril>_HECHO.md`). Un doc que ya no es accionable va a `archive/` con su fila en
+   [`archive/README.md`](archive/README.md); no se borra del git.
+3. **Tablas, no párrafos.** Pendientes y carriles van en tablas de celdas de una línea; lo largo, abajo en *Detalle*.
+4. **Al cerrar una feature**, en su misma rama: `CHANGELOG.md`, su carril, `PENDIENTES.md` ▶ y un `grep` de `docs/` por lo que
+   cambió (nombres de pantallas, rutas, comandos).
+5. Sin raya larga en lo que se redacta para el dueño: comas, dos puntos o paréntesis.

@@ -8,7 +8,7 @@
   Drift en Documents (vault_guard_db.sqlite) y el secure storage DPAPI
   (flutter_secure_storage.dat). En una maquina con vault real esto borraria los
   datos del usuario, por eso esta gateado tras --dart-define=E2E_ALLOW_WIPE=1
-  (ver docs/prompts/PRUEBAS_INTEGRACION.md).
+  (ver docs/proceso/PRUEBAS_INTEGRACION.md).
 
   Este script:
     1) Cierra cualquier SoloKey.exe abierto (libera el lock de instancia unica y
