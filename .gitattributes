@@ -1,0 +1,2 @@
+# Lo que se lee dentro de Linux (Podman) va siempre con LF, aunque core.autocrlf sea true.
+tool/ci-linux/Containerfile text eol=lf
