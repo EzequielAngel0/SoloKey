@@ -194,7 +194,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
         localizedReason: AppLocalizations.of(context).unlockBiometricReason,
         // En escritorio permitimos el PIN de Windows Hello (no solo biometria);
         // en movil exigimos biometria estricta.
-        options: AuthenticationOptions(biometricOnly: !_isDesktopPlatform),
+        biometricOnly: !_isDesktopPlatform,
       );
       if (!authenticated || !mounted) return;
 

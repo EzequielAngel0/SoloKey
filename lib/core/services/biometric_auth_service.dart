@@ -32,13 +32,13 @@ class BiometricAuthService {
     try {
       return await _auth.authenticate(
         localizedReason: reason,
-        options: const AuthenticationOptions(
-          stickyAuth: true,
-          biometricOnly: false,
-        ),
+        persistAcrossBackgrounding: true,
       );
+    } on LocalAuthException catch (_) {
+      // Cancelado, bloqueado o sin credenciales: se falla de forma segura.
+      return false;
     } on PlatformException catch (_) {
-      // Cualquier excepción de plataforma durante el check (ej. cancelado) 
+      // Errores de plataforma que local_auth 3 no traduce.
       return false;
     }
   }
