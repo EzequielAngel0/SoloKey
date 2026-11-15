@@ -7,6 +7,14 @@ versión viven en la página de Releases de GitHub.
 
 ## [Unreleased]
 
+### Añadido
+
+- **CI de Linux en Podman (CAL-3, 2026-11-15)**: `tool/ci-linux.ps1` corre el job `analyze-test-coverage` de `tests.yml` con la
+  misma versión de Flutter, en la imagen `localhost/solokey-ci-linux:<versión>` (`tool/ci-linux/Containerfile`, Ubuntu 24.04 y el
+  tarball oficial; `ghcr.io/cirruslabs/flutter` no publica la 3.44.4) y el volumen `solokey-pub-cache`. Copia el árbol dentro
+  del contenedor, pasa el script como archivo (PowerShell 5.1 rompe las comillas de los argumentos) y sale con el código del paso
+  que falló.
+
 ### Arreglado
 
 - **Respaldo del runner de integración (CAL-4, 2026-11-15)**: `run_integration_tests.ps1` no respaldaba `secure_files\` ni el

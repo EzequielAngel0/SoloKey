@@ -68,15 +68,20 @@ La prueba física PC y celular de la sync tiene su checklist: [`PRUEBAS_EN_DISPO
 
 ## Reproducir CI en Linux (Podman)
 
-Receta (aún no corrida en este repo; la imagen sale de la versión que fija `tests.yml`). Se copia el árbol dentro del
-contenedor en vez de compilar sobre el montaje, porque `pub get` escribe rutas absolutas de Linux en `.dart_tool` y
-dejaría el árbol de Windows sin poder correr sus tests:
+`tool/ci-linux.ps1` (CAL-3) corre los pasos del job `analyze-test-coverage` de `tests.yml` (pub get, analyze, test con
+cobertura y su gate) en Podman, con la misma versión de Flutter, leída de `tests.yml`:
 
-```powershell
-podman machine start
-podman run --rm -v "C:/Proyectos/Flutter/SoloKey:/src:ro" ghcr.io/cirruslabs/flutter:3.44.4 `
-  bash -c "cp -r /src /work && cd /work && rm -rf .dart_tool build && flutter pub get >/dev/null && flutter analyze && flutter test"
-```
+| Para | Comando |
+|---|---|
+| El CI entero | `.\tool\ci-linux.ps1` (dice VERDE o ROJO y sale con el código del paso que falló) |
+| Otra cosa | `.\tool\ci-linux.ps1 -Comando 'flutter test test/core'` |
+| Sacar archivos | `-Salida <carpeta>`: se monta en `/out` (así salen los vectores de CAL-2) |
+| Tras subir Flutter en `tests.yml` | Nada: la imagen nueva se construye sola; la vieja se borra con `podman rmi` |
+| Borrarlo todo | `podman rmi localhost/solokey-ci-linux:<versión>; podman volume rm solokey-pub-cache` |
+
+La imagen `localhost/solokey-ci-linux:<versión>` sale de `tool/ci-linux/Containerfile` (Ubuntu 24.04 y el tarball oficial de
+Flutter): `ghcr.io/cirruslabs/flutter` no publica la 3.44.4. El árbol se copia dentro del contenedor en vez de compilar sobre el
+montaje, porque `pub get` escribe rutas de Linux en `.dart_tool` y dejaría el árbol de Windows sin poder correr sus tests.
 
 Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)), `cargo test` corre en `docker.io/library/rust` (luego en la
 imagen `solokey-build` de PLA-3) sin instalar nada en Windows.
