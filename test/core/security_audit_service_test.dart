@@ -147,7 +147,7 @@ void main() {
 
     test('Identifies old passwords', () async {
       // "Contraseña antigua" fires when a non-rotating credential has not been
-      // updated in more than 6 months (180 days), per password_rotation_reminders.md.
+      // updated in more than 6 months (180 days), per docs/arquitectura/ROTACION.md.
       final oldDate = DateTime.now().subtract(const Duration(days: 200));
       final credentials = [
         Credential(

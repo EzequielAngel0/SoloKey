@@ -1,6 +1,6 @@
 # Carril B · Diseño (sistema visual)
 
-Reglas y plantilla: [`README.md`](README.md). Plan: [`../design/REDISENO_V2.md`](../design/REDISENO_V2.md) §3. Antes de diseñar:
+Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §3. Antes de diseñar:
 skills `interface-design` y `mobile-android-design`, y la skill `solokey` §3.
 
 ## Aprobado, para desarrollar (en orden)

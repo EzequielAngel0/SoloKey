@@ -32,7 +32,7 @@ dispositivo.
 
 ## `integration_test` vs. un widget test normal
 
-Ya existen widget/unit tests en `test/` (ver el prompt [`95_pruebas.md`](95_pruebas.md)).
+Ya existen widget/unit tests en `test/` (ver el prompt [`95_PRUEBAS.md`](../archive/v1/prompts/95_PRUEBAS.md)).
 No son lo mismo:
 
 | | `test/*_test.dart` (unit/widget) | `integration_test/*_test.dart` |
@@ -295,6 +295,6 @@ escritorio. Es viable pero lento; por eso, a lo sumo, un **nightly** —nunca en
 ## Referencias
 
 - Prompt que construye toda la suite (unit → widget → integración) en un chat:
-  [`95_pruebas.md`](95_pruebas.md).
-- Reglas, arquitectura y gates del proyecto: [`00_contexto_compartido.md`](00_contexto_compartido.md).
+  [`95_PRUEBAS.md`](../archive/v1/prompts/95_PRUEBAS.md).
+- Reglas, arquitectura y gates del proyecto: [`00_CONTEXTO_COMPARTIDO.md`](../archive/v1/prompts/00_CONTEXTO_COMPARTIDO.md).
 - Docs oficiales de Flutter: [Integration testing](https://docs.flutter.dev/testing/integration-tests).

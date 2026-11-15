@@ -49,19 +49,23 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# VautGuard Custom Ignores
+# Secretos y simbolos de depuracion de --obfuscate (build_release.ps1)
 .env
 .env.*
 debug_info/
-# Ignorar configuraciones locales de IA
-.claude/
-.agents/
-CLAUDE.md
-GEMINI.md
-AGENTS.md
-assets/logo/Gemini_Generated_Image_7oldjg7oldjg7old.png
 
-# ── SoloKey: reglas anadidas por features desarrolladas ──
+# Instrucciones y skills de los agentes: LOCALES (repo publico, dueno 2026-11-14).
+# Solo existe CLAUDE.md; los otros nombres quedan ignorados por si una herramienta los genera.
+.claude/
+CLAUDE.md
+.agents/
+AGENTS.md
+GEMINI.md
+
+# Worktrees de los carriles si alguien los crea dentro del repo (van en ..\SoloKey-<letra>)
+/SoloKey-*/
+
+# SoloKey: reglas anadidas por las features
 
 # Seguridad: llaves de firma Android/iOS (NUNCA versionar)
 **/key.properties
