@@ -141,19 +141,19 @@ doc de docs/ que describa lo que cambiaste. Al terminar PLA-5 y PLA-4 avisa en e
 Quita tu worktree con .\tool\quitar-worktree.ps1 cuando todo este mergeado. Resumen AL FINAL, con el CI terminado.
 ```
 
-### E · Calidad y seguridad (fase 1 en paralelo, ligera; luego fases 4 y 5)
+### E · Calidad y seguridad (fases 4 y 5; la fase 1 ya está: CAL-4, CAL-3, CAL-2, SEG-1)
 
 ```text
 SESION E de SoloKey (Calidad y seguridad). Desarrollas COMPLETO lo aprobado de tu carril y nada de otro.
-Worktree: git worktree add ..\SoloKey-E -b test/e-respaldo-archivos-seguros origin/develop.
-Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/E.md, docs/adr/0009, 0011 y 0012, docs/proceso/PRUEBAS.md
-y PRUEBAS_INTEGRACION.md. ListAgents y avisa que eres el carril E.
-AL EMPEZAR, confirma con el dueno (AskUserQuestion) que se hace hoy, en el orden de docs/sesiones/E.md: CAL-4, CAL-2, CAL-5,
-CAL-3, CAL-1, SEG-1, SEG-2 (CAL-5 en adelante esperan a NUC-6 de A y a PLA-3 de D: mira el ▶).
-- CAL-4 primero: que run_integration_tests.ps1 respalde y restaure secure_files/ con hash; verlo fallar antes del arreglo.
-- CAL-2: vectores generados con la app v1 en un entorno de prueba, NUNCA con la boveda real del dueno.
+Worktree: git worktree add ..\SoloKey-E -b test/e-<id> origin/develop.
+Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/E.md, docs/seguridad/AMENAZAS_V2.md, docs/adr/0011 y 0012,
+docs/proceso/PRUEBAS.md y PRUEBAS_INTEGRACION.md. ListAgents y avisa que eres el carril E.
+AL EMPEZAR, confirma con el dueno (AskUserQuestion) que se hace hoy, en el orden de docs/sesiones/E.md: CAL-5 (resto),
+CAL-1, SEG-2. Mira el ▶ antes: Android de CAL-5 espera a PLA-3 de D, Windows local a NUC-6 de A, CAL-1 a las PAN de C,
+SEG-2 a los parsers de A en el nucleo. Si nada esta desbloqueado, propon (3 a 5) y no construyas.
+- Reproducir el CI de Linux: .\tool\ci-linux.ps1. Vectores de la v1: vectores/v1 (no regenerar sin motivo).
 - La boveda real vive en este equipo: nada de vault_e2e_test a mano. Sin pruebas unitarias ni de widgets nuevas en Dart: la
-  red de la v2 son E2E (Android en Podman, Windows en local con boveda aislada y en windows-latest) y cargo test en Podman.
+  red de la v2 son E2E (Android en Podman, Windows en local con boveda aislada y en windows-2022 en CI) y cargo test en Podman.
 Rama corta por ID, commit de una linea sin acentos ni firma, merge --no-ff a develop y push; luego
 git -C C:\Proyectos\Flutter\SoloKey pull --ff-only origin develop (si esta en develop y limpia).
 Al cerrar cada ID: CHANGELOG [Unreleased], lo hecho a docs/archive/sesiones/E_HECHO.md, el ▶ de docs/PENDIENTES_AGENTE.md y

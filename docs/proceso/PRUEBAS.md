@@ -15,7 +15,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|---|
 | Unit | `test/**` (espeja `lib/**`) | `flutter test` | Cripto, servicios, use cases, providers, lógica pura con tiempo inyectado. |
 | Widget | `test/**` con `test/support/widget_harness.dart` | `flutter test` | Behavioral: interactúa (tocar, escribir, revelar), no solo "renderiza". Fakes en `test/support/`. |
-| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). |
+| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). En CI, el job `e2e-windows` (`windows-2022`, sin bóveda real) corre lo mismo en cada push. |
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
