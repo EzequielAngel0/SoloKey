@@ -18,6 +18,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 | Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). |
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
+| Núcleo Rust | `rust/solokey-core/` (`src/**` y `tests/**`) | `.\rust\cargo.ps1 test` | En Podman; las pruebas de la v1 leen `vectores/v1/`. Clippy: `.\rust\cargo.ps1 clippy --all-targets -- -D warnings` |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
@@ -84,5 +85,11 @@ La imagen `localhost/solokey-ci-linux:<versión>` sale de `tool/ci-linux/Contain
 Flutter): `ghcr.io/cirruslabs/flutter` no publica la 3.44.4. El árbol se copia dentro del contenedor en vez de compilar sobre el
 montaje, porque `pub get` escribe rutas de Linux en `.dart_tool` y dejaría el árbol de Windows sin poder correr sus tests.
 
-Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)), `cargo test` corre en `docker.io/library/rust` (luego en la
-imagen `solokey-build` de PLA-3) sin instalar nada en Windows.
+Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al host:
+
+| Qué | Imagen | Comando | Borrarlo |
+|---|---|---|---|
+| `cargo test`, clippy | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 <args de cargo>` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
+| Puente Dart y librerías nativas | `localhost/solokey-rust:1` (`rust/Containerfile`: Flutter, Rust, `cargo-xwin`, `cargo-ndk`, NDK, `flutter_rust_bridge_codegen`) | `podman build -t localhost/solokey-rust:1 rust` | `podman rmi localhost/solokey-rust:1` |
+
+El carril D puede absorber `rust/Containerfile` en `solokey-build` (PLA-3).

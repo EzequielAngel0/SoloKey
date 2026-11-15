@@ -1,0 +1,41 @@
+# Imagen del nucleo Rust (ADR-0012): genera el puente de flutter_rust_bridge y compila las librerias
+# nativas sin instalar nada en el host. La construye y usa rust/core.ps1 como localhost/solokey-rust:<tag>.
+#   - Puente Dart: flutter_rust_bridge_codegen (necesita Flutter para formatear lo generado).
+#   - Windows: solokey_core.dll cruzada con cargo-xwin (descarga el CRT y el SDK de Windows de Microsoft).
+#   - Android: libsolokey_core.so por ABI con cargo-ndk y el NDK.
+# El carril D la puede absorber en solokey-build (PLA-3).
+FROM docker.io/library/ubuntu:24.04
+
+ARG FLUTTER_VERSION=3.44.4
+ARG RUST_VERSION=1.91.1
+ARG FRB_VERSION=2.11.1
+ARG NDK_VERSION=r27c
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      ca-certificates curl git unzip xz-utils build-essential pkg-config clang lld llvm \
+ && rm -rf /var/lib/apt/lists/*
+
+# Flutter (la misma version que .github/workflows/tests.yml)
+RUN curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+      | tar -xJ -C /opt \
+ && git config --global --add safe.directory '*'
+ENV PATH=/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:$PATH \
+    PUB_CACHE=/pub-cache \
+    CI=true
+RUN flutter config --no-analytics --no-cli-animations > /dev/null && flutter --version
+
+# Rust fijo, con los objetivos de Windows y Android
+ENV RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo PATH=/opt/cargo/bin:$PATH
+RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain ${RUST_VERSION} \
+ && rustup target add x86_64-pc-windows-msvc aarch64-linux-android armv7-linux-androideabi x86_64-linux-android \
+ && rustup component add clippy rustfmt
+RUN cargo install --locked cargo-xwin cargo-ndk \
+ && cargo install --locked flutter_rust_bridge_codegen --version ${FRB_VERSION} \
+ && rm -rf /opt/cargo/registry
+
+# NDK de Android
+RUN curl -fsSL -o /tmp/ndk.zip "https://dl.google.com/android/repository/android-ndk-${NDK_VERSION}-linux.zip" \
+ && unzip -q /tmp/ndk.zip -d /opt && rm /tmp/ndk.zip
+ENV ANDROID_NDK_HOME=/opt/android-ndk-${NDK_VERSION} \
+    XWIN_CACHE_DIR=/xwin-cache
