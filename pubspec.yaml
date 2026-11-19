@@ -69,7 +69,7 @@ dependencies:
   desktop_drop: ^0.8.4
 
   # ── Native Notifications & Background Services ─────────────────
-  flutter_local_notifications: ^20.1.0
+  flutter_local_notifications: ^23.0.0
   local_notifier: ^0.1.6
   workmanager: ^0.10.0
   launch_at_startup: ^0.5.1
