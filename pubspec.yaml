@@ -66,7 +66,6 @@ dependencies:
   shelf: ^1.4.1
   shelf_web_socket: ^2.0.0
   shelf_router: ^1.1.4
-  context_menus: ^1.0.1
   qr_flutter: ^4.1.0
   web_socket_channel: ^3.0.3
   desktop_drop: ^0.8.4
