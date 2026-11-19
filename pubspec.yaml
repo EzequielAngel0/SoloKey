@@ -51,8 +51,6 @@ dependencies:
   path_provider: ^2.1.5
   path: ^1.9.1
   intl: ^0.20.2
-  # 1.5.2+ quita su jvmTarget de Kotlin y rompe el build con AGP < 9 (Java 17 vs Kotlin 21).
-  screen_protector: 1.5.1
   otp: ^3.2.0
   share_plus: ^12.0.2
   file_picker: ^10.3.10
