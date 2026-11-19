@@ -101,7 +101,7 @@ class VaultExportService {
       // Desktop: a native Save dialog. The Windows "share" sheet is unreliable
       // for unpackaged apps ("could not show all the ways to share content"),
       // so we let the user choose where to write the .skvault file.
-      final path = await FilePicker.platform.saveFile(
+      final path = await FilePicker.saveFile(
         dialogTitle: 'SoloKey Backup',
         fileName: fileName,
         bytes: built.bytes,

@@ -1310,7 +1310,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () async {
                     final picked =
-                        await FilePicker.platform.getDirectoryPath();
+                        await FilePicker.getDirectoryPath();
                     if (picked != null) setLocal(() => dir = picked);
                   },
                   icon: const Icon(Icons.folder_open_rounded, size: 18),

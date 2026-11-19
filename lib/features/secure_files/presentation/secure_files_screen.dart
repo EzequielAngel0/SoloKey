@@ -55,7 +55,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
 
   Future<void> _addFromPicker() async {
     final picked =
-        await FilePicker.platform.pickFiles(withData: true, allowMultiple: true);
+        await FilePicker.pickFiles(withData: true, allowMultiple: true);
     if (picked == null || picked.files.isEmpty || !mounted) return;
     await _addAll([
       for (final f in picked.files)
@@ -187,7 +187,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     try {
       final bytes =
           await ref.read(secureFileRepositoryProvider).readDecrypted(file.id);
-      final path = await FilePicker.platform.saveFile(
+      final path = await FilePicker.saveFile(
         fileName: file.name,
         bytes: bytes,
       );

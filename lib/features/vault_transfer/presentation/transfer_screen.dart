@@ -139,7 +139,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
@@ -174,7 +174,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
@@ -208,7 +208,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
