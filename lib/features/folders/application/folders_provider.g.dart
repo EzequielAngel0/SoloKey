@@ -33,7 +33,7 @@ final class FoldersNotifierProvider
   FoldersNotifier create() => FoldersNotifier();
 }
 
-String _$foldersNotifierHash() => r'd564caff304fb269d88e0f1df1abac859d8f2c4e';
+String _$foldersNotifierHash() => r'5e67a06a1dc90c345f9832da230f89b1070578dd';
 
 abstract class _$FoldersNotifier extends $AsyncNotifier<List<Folder>> {
   FutureOr<List<Folder>> build();

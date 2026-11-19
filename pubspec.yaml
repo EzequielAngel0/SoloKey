@@ -23,7 +23,7 @@ dependencies:
   json_annotation: ^4.9.0
 
   # ── Dependency Injection ──────────────────────────────────────
-  get_it: ^8.0.3
+  get_it: ^9.0.0
   injectable: ^2.5.0
 
   # ── Navigation ────────────────────────────────────────────────
