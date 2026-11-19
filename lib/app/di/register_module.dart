@@ -14,11 +14,13 @@ abstract class RegisterModule {
   /// EncryptedSharedPreferences (la v11 ya no sabe leerlo: PLA-4).
   /// `resetOnError: false` porque su default borra TODO el almacén ante un
   /// error de lectura, y ahí vive la configuración de la bóveda.
+  /// NO usar `migrateWithBackup: true`: en 10.3.4 se salta la migración de
+  /// EncryptedSharedPreferences y la app arranca como bóveda nueva (probado
+  /// en el emulador el 2026-11-15).
   FlutterSecureStorage get secureStorage => const FlutterSecureStorage(
         aOptions: AndroidOptions(
           resetOnError: false,
           migrateOnAlgorithmChange: true,
-          migrateWithBackup: true,
         ),
       );
 
