@@ -10,7 +10,7 @@ part 'secure_file.g.dart';
 /// Only this non-sensitive metadata is kept in the database so the list can be
 /// shown without unlocking each file.
 @freezed
-class SecureFile with _$SecureFile {
+abstract class SecureFile with _$SecureFile {
   const factory SecureFile({
     required String id,
 

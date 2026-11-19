@@ -6,7 +6,7 @@ part 'master_key_config.g.dart';
 enum KdfAlgorithm { argon2id, pbkdf2 }
 
 @freezed
-class KdfParams with _$KdfParams {
+abstract class KdfParams with _$KdfParams {
   const factory KdfParams({
     required int memory,       // KB — Argon2id memory cost
     required int iterations,   // time cost
@@ -28,7 +28,7 @@ class KdfParams with _$KdfParams {
 
 /// Stores cryptographic metadata only — the master key is NEVER persisted.
 @freezed
-class MasterKeyConfig with _$MasterKeyConfig {
+abstract class MasterKeyConfig with _$MasterKeyConfig {
   const factory MasterKeyConfig({
     /// Random salt generated once at vault creation (base64-encoded).
     required String salt,

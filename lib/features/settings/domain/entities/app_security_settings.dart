@@ -4,7 +4,7 @@ part 'app_security_settings.freezed.dart';
 part 'app_security_settings.g.dart';
 
 @freezed
-class AppSecuritySettings with _$AppSecuritySettings {
+abstract class AppSecuritySettings with _$AppSecuritySettings {
   const factory AppSecuritySettings({
     @Default(5) int autoLockMinutes,
     @Default(30) int clearClipboardSeconds,

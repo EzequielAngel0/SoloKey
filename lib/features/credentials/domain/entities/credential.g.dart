@@ -6,100 +6,94 @@ part of 'credential.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$CustomFieldImpl _$$CustomFieldImplFromJson(Map<String, dynamic> json) =>
-    _$CustomFieldImpl(
-      label: json['label'] as String,
-      value: json['value'] as String,
-      isSecret: json['isSecret'] as bool? ?? false,
-    );
+_CustomField _$CustomFieldFromJson(Map<String, dynamic> json) => _CustomField(
+  label: json['label'] as String,
+  value: json['value'] as String,
+  isSecret: json['isSecret'] as bool? ?? false,
+);
 
-Map<String, dynamic> _$$CustomFieldImplToJson(_$CustomFieldImpl instance) =>
+Map<String, dynamic> _$CustomFieldToJson(_CustomField instance) =>
     <String, dynamic>{
       'label': instance.label,
       'value': instance.value,
       'isSecret': instance.isSecret,
     };
 
-_$PasskeyMetadataImpl _$$PasskeyMetadataImplFromJson(
-  Map<String, dynamic> json,
-) => _$PasskeyMetadataImpl(
-  rpId: json['rpId'] as String,
-  rpName: json['rpName'] as String?,
-  credentialId: json['credentialId'] as String,
-  aaguid: json['aaguid'] as String?,
-  userDisplayName: json['userDisplayName'] as String?,
-  userVerificationRequired: json['userVerificationRequired'] as bool? ?? true,
-);
+_PasskeyMetadata _$PasskeyMetadataFromJson(Map<String, dynamic> json) =>
+    _PasskeyMetadata(
+      rpId: json['rpId'] as String,
+      rpName: json['rpName'] as String?,
+      credentialId: json['credentialId'] as String,
+      aaguid: json['aaguid'] as String?,
+      userDisplayName: json['userDisplayName'] as String?,
+      userVerificationRequired:
+          json['userVerificationRequired'] as bool? ?? true,
+    );
 
-Map<String, dynamic> _$$PasskeyMetadataImplToJson(
-  _$PasskeyMetadataImpl instance,
-) => <String, dynamic>{
-  'rpId': instance.rpId,
-  'rpName': instance.rpName,
-  'credentialId': instance.credentialId,
-  'aaguid': instance.aaguid,
-  'userDisplayName': instance.userDisplayName,
-  'userVerificationRequired': instance.userVerificationRequired,
-};
+Map<String, dynamic> _$PasskeyMetadataToJson(_PasskeyMetadata instance) =>
+    <String, dynamic>{
+      'rpId': instance.rpId,
+      'rpName': instance.rpName,
+      'credentialId': instance.credentialId,
+      'aaguid': instance.aaguid,
+      'userDisplayName': instance.userDisplayName,
+      'userVerificationRequired': instance.userVerificationRequired,
+    };
 
-_$SshKeyMetadataImpl _$$SshKeyMetadataImplFromJson(Map<String, dynamic> json) =>
-    _$SshKeyMetadataImpl(
+_SshKeyMetadata _$SshKeyMetadataFromJson(Map<String, dynamic> json) =>
+    _SshKeyMetadata(
       privateKey: json['privateKey'] as String,
       publicKey: json['publicKey'] as String,
       passphrase: json['passphrase'] as String?,
       keyType: json['keyType'] as String? ?? 'Ed25519',
     );
 
-Map<String, dynamic> _$$SshKeyMetadataImplToJson(
-  _$SshKeyMetadataImpl instance,
-) => <String, dynamic>{
-  'privateKey': instance.privateKey,
-  'publicKey': instance.publicKey,
-  'passphrase': instance.passphrase,
-  'keyType': instance.keyType,
-};
+Map<String, dynamic> _$SshKeyMetadataToJson(_SshKeyMetadata instance) =>
+    <String, dynamic>{
+      'privateKey': instance.privateKey,
+      'publicKey': instance.publicKey,
+      'passphrase': instance.passphrase,
+      'keyType': instance.keyType,
+    };
 
-_$CredentialImpl _$$CredentialImplFromJson(Map<String, dynamic> json) =>
-    _$CredentialImpl(
-      id: json['id'] as String,
-      type: $enumDecode(_$CredentialTypeEnumMap, json['type']),
-      title: json['title'] as String,
-      username: json['username'] as String?,
-      password: json['password'] as String?,
-      website: json['website'] as String?,
-      notes: json['notes'] as String?,
-      customFields:
-          (json['customFields'] as List<dynamic>?)
-              ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
-              .toList() ??
-          const [],
-      categoryId: json['categoryId'] as String?,
-      folderId: json['folderId'] as String?,
-      isFavorite: json['isFavorite'] as bool? ?? false,
-      isDoubleEncrypted: json['isDoubleEncrypted'] as bool? ?? false,
-      isHidden: json['isHidden'] as bool? ?? false,
-      sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
-      createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      passkeyMetadata: json['passkeyMetadata'] == null
-          ? null
-          : PasskeyMetadata.fromJson(
-              json['passkeyMetadata'] as Map<String, dynamic>,
-            ),
-      sshKeyMetadata: json['sshKeyMetadata'] == null
-          ? null
-          : SshKeyMetadata.fromJson(
-              json['sshKeyMetadata'] as Map<String, dynamic>,
-            ),
-      rotationInterval: json['rotationInterval'] as String? ?? 'none',
-      customRotationDays: (json['customRotationDays'] as num?)?.toInt(),
-      lastRotationPromptedAt: json['lastRotationPromptedAt'] == null
-          ? null
-          : DateTime.parse(json['lastRotationPromptedAt'] as String),
-    );
+_Credential _$CredentialFromJson(Map<String, dynamic> json) => _Credential(
+  id: json['id'] as String,
+  type: $enumDecode(_$CredentialTypeEnumMap, json['type']),
+  title: json['title'] as String,
+  username: json['username'] as String?,
+  password: json['password'] as String?,
+  website: json['website'] as String?,
+  notes: json['notes'] as String?,
+  customFields:
+      (json['customFields'] as List<dynamic>?)
+          ?.map((e) => CustomField.fromJson(e as Map<String, dynamic>))
+          .toList() ??
+      const [],
+  categoryId: json['categoryId'] as String?,
+  folderId: json['folderId'] as String?,
+  isFavorite: json['isFavorite'] as bool? ?? false,
+  isDoubleEncrypted: json['isDoubleEncrypted'] as bool? ?? false,
+  isHidden: json['isHidden'] as bool? ?? false,
+  sortOrder: (json['sortOrder'] as num?)?.toInt() ?? 0,
+  createdAt: DateTime.parse(json['createdAt'] as String),
+  updatedAt: DateTime.parse(json['updatedAt'] as String),
+  passkeyMetadata: json['passkeyMetadata'] == null
+      ? null
+      : PasskeyMetadata.fromJson(
+          json['passkeyMetadata'] as Map<String, dynamic>,
+        ),
+  sshKeyMetadata: json['sshKeyMetadata'] == null
+      ? null
+      : SshKeyMetadata.fromJson(json['sshKeyMetadata'] as Map<String, dynamic>),
+  rotationInterval: json['rotationInterval'] as String? ?? 'none',
+  customRotationDays: (json['customRotationDays'] as num?)?.toInt(),
+  lastRotationPromptedAt: json['lastRotationPromptedAt'] == null
+      ? null
+      : DateTime.parse(json['lastRotationPromptedAt'] as String),
+);
 
-Map<String, dynamic> _$$CredentialImplToJson(
-  _$CredentialImpl instance,
+Map<String, dynamic> _$CredentialToJson(
+  _Credential instance,
 ) => <String, dynamic>{
   'id': instance.id,
   'type': _$CredentialTypeEnumMap[instance.type]!,

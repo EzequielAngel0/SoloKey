@@ -4,7 +4,7 @@ part 'vault.freezed.dart';
 part 'vault.g.dart';
 
 @freezed
-class Vault with _$Vault {
+abstract class Vault with _$Vault {
   const factory Vault({
     required String id,
     required DateTime createdAt,

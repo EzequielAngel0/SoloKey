@@ -6,9 +6,9 @@ part of 'app_security_settings.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-_$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
+_AppSecuritySettings _$AppSecuritySettingsFromJson(
   Map<String, dynamic> json,
-) => _$AppSecuritySettingsImpl(
+) => _AppSecuritySettings(
   autoLockMinutes: (json['autoLockMinutes'] as num?)?.toInt() ?? 5,
   clearClipboardSeconds: (json['clearClipboardSeconds'] as num?)?.toInt() ?? 30,
   biometricEnabled: json['biometricEnabled'] as bool? ?? false,
@@ -36,8 +36,8 @@ _$AppSecuritySettingsImpl _$$AppSecuritySettingsImplFromJson(
   windowY: (json['windowY'] as num?)?.toDouble(),
 );
 
-Map<String, dynamic> _$$AppSecuritySettingsImplToJson(
-  _$AppSecuritySettingsImpl instance,
+Map<String, dynamic> _$AppSecuritySettingsToJson(
+  _AppSecuritySettings instance,
 ) => <String, dynamic>{
   'autoLockMinutes': instance.autoLockMinutes,
   'clearClipboardSeconds': instance.clearClipboardSeconds,

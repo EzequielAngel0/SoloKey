@@ -39,7 +39,7 @@ enum VaultErrorKind {
 }
 
 @freezed
-class VaultState with _$VaultState {
+abstract class VaultState with _$VaultState {
   const factory VaultState.initial() = _Initial;
   const factory VaultState.loading() = _Loading;
   const factory VaultState.unlocked(VaultSession session) = _Unlocked;

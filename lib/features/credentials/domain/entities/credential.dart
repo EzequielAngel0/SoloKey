@@ -15,7 +15,7 @@ enum CredentialType {
 }
 
 @freezed
-class CustomField with _$CustomField {
+abstract class CustomField with _$CustomField {
   const factory CustomField({
     required String label,
     required String value, // stored encrypted
@@ -31,7 +31,7 @@ class CustomField with _$CustomField {
 /// The actual private key handle is stored encrypted inside the standard
 /// [Credential.password] field to reuse the existing AES-256-GCM pipeline.
 @freezed
-class PasskeyMetadata with _$PasskeyMetadata {
+abstract class PasskeyMetadata with _$PasskeyMetadata {
   const factory PasskeyMetadata({
     /// Relying Party identifier, e.g. "example.com"
     required String rpId,
@@ -58,7 +58,7 @@ class PasskeyMetadata with _$PasskeyMetadata {
 
 /// Metadata and keys for an SSH Key.
 @freezed
-class SshKeyMetadata with _$SshKeyMetadata {
+abstract class SshKeyMetadata with _$SshKeyMetadata {
   const factory SshKeyMetadata({
     required String privateKey, // stored encrypted
     required String publicKey,  // stored encrypted
@@ -71,7 +71,7 @@ class SshKeyMetadata with _$SshKeyMetadata {
 }
 
 @freezed
-class Credential with _$Credential {
+abstract class Credential with _$Credential {
   const factory Credential({
     required String id,
     required CredentialType type,
