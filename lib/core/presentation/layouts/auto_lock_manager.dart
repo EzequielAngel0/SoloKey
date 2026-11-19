@@ -62,7 +62,7 @@ class _AutoLockManagerState extends ConsumerState<AutoLockManager> {
   Widget build(BuildContext context) {
     // Keep the timeout in sync with live changes made in the Settings screen.
     ref.listen(settingsNotifierProvider, (_, next) {
-      final minutes = next.valueOrNull?.autoLockMinutes;
+      final minutes = next.value?.autoLockMinutes;
       if (minutes != null && minutes != _autoLockMinutes) {
         _autoLockMinutes = minutes;
         _resetTimer();

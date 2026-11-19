@@ -1,5 +1,5 @@
-// dart format width=80
 // GENERATED CODE - DO NOT MODIFY BY HAND
+// dart format width=80
 
 // **************************************************************************
 // InjectableConfigGenerator
@@ -97,6 +97,30 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i479.AutofillSettingsService>(
       () => _i479.AutofillSettingsService(),
     );
+    gh.lazySingleton<_i714.BruteForceGuard>(
+      () => _i714.BruteForceGuard(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i286.IVaultRepository>(
+      () => _i939.VaultRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i1023.ISecurityService>(
+      () => _i1063.SecurityServiceImpl(),
+    );
+    gh.lazySingleton<_i657.ISettingsRepository>(
+      () => _i569.SettingsRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
+    );
+    gh.lazySingleton<_i229.SetupVaultUseCase>(
+      () => _i229.SetupVaultUseCase(
+        gh<_i286.IVaultRepository>(),
+        gh<_i657.ISettingsRepository>(),
+        gh<_i1023.ISecurityService>(),
+        gh<_i795.SessionManager>(),
+      ),
+    );
+    gh.lazySingleton<_i4.NotificationService>(
+      () => _i4.NotificationService(gh<_i1042.AppDatabase>()),
+      dispose: (i) => i.dispose(),
+    );
     gh.lazySingleton<_i753.CredentialDao>(
       () => registerModule.credentialDao(gh<_i1042.AppDatabase>()),
     );
@@ -112,53 +136,37 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1070.SecureFileDao>(
       () => _i1070.SecureFileDao(gh<_i1042.AppDatabase>()),
     );
-    gh.lazySingleton<_i4.NotificationService>(
-      () => _i4.NotificationService(gh<_i1042.AppDatabase>()),
-      dispose: (i) => i.dispose(),
+    gh.lazySingleton<_i971.DoubleEnvelopeService>(
+      () => _i971.DoubleEnvelopeService(
+        gh<_i1023.ISecurityService>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
     );
-    gh.lazySingleton<_i1023.ISecurityService>(
-      () => _i1063.SecurityServiceImpl(),
+    gh.lazySingleton<_i885.ClipboardService>(
+      () => _i885.ClipboardService(gh<_i657.ISettingsRepository>()),
+    );
+    gh.lazySingleton<_i323.RecoveryService>(
+      () => _i323.RecoveryService(
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i1023.ISecurityService>(),
+        gh<_i795.SessionManager>(),
+        gh<_i286.IVaultRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i301.AppLifecycleObserver>(
+      () => _i301.AppLifecycleObserver(
+        gh<_i795.SessionManager>(),
+        gh<_i657.ISettingsRepository>(),
+      ),
     );
     gh.lazySingleton<_i1067.IFolderRepository>(
       () => _i759.FolderRepositoryImpl(gh<_i496.FolderDao>()),
-    );
-    gh.lazySingleton<_i366.ICategoryRepository>(
-      () => _i316.CategoryRepositoryImpl(gh<_i403.CategoryDao>()),
-    );
-    gh.lazySingleton<_i714.BruteForceGuard>(
-      () => _i714.BruteForceGuard(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i112.ISecureFileRepository>(
       () => _i701.SecureFileRepositoryImpl(
         gh<_i1070.SecureFileDao>(),
         gh<_i1023.ISecurityService>(),
         gh<_i795.SessionManager>(),
-      ),
-    );
-    gh.lazySingleton<_i657.ISettingsRepository>(
-      () => _i569.SettingsRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
-    );
-    gh.lazySingleton<_i366.ICredentialRepository>(
-      () => _i316.CredentialRepositoryImpl(
-        gh<_i753.CredentialDao>(),
-        gh<_i386.PasswordHistoryDao>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-      ),
-    );
-    gh.lazySingleton<_i286.IVaultRepository>(
-      () => _i939.VaultRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
-    );
-    gh.lazySingleton<_i1059.AutofillFetchService>(
-      () => _i1059.AutofillFetchService(
-        gh<_i366.ICredentialRepository>(),
-        gh<_i795.SessionManager>(),
-      ),
-    );
-    gh.lazySingleton<_i971.DoubleEnvelopeService>(
-      () => _i971.DoubleEnvelopeService(
-        gh<_i1023.ISecurityService>(),
-        gh<_i558.FlutterSecureStorage>(),
       ),
     );
     gh.lazySingleton<_i706.SyncService>(
@@ -170,11 +178,20 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i112.ISecureFileRepository>(),
       ),
     );
-    gh.lazySingleton<_i229.SetupVaultUseCase>(
-      () => _i229.SetupVaultUseCase(
-        gh<_i286.IVaultRepository>(),
-        gh<_i657.ISettingsRepository>(),
+    gh.lazySingleton<_i366.ICategoryRepository>(
+      () => _i316.CategoryRepositoryImpl(gh<_i403.CategoryDao>()),
+    );
+    gh.lazySingleton<_i366.ICredentialRepository>(
+      () => _i316.CredentialRepositoryImpl(
+        gh<_i753.CredentialDao>(),
+        gh<_i386.PasswordHistoryDao>(),
         gh<_i1023.ISecurityService>(),
+        gh<_i795.SessionManager>(),
+      ),
+    );
+    gh.lazySingleton<_i1059.AutofillFetchService>(
+      () => _i1059.AutofillFetchService(
+        gh<_i366.ICredentialRepository>(),
         gh<_i795.SessionManager>(),
       ),
     );
@@ -197,20 +214,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1055.ISyncService>(
       () => registerModule.syncService(gh<_i706.SyncService>()),
     );
-    gh.lazySingleton<_i764.CsvImportService>(
-      () => _i764.CsvImportService(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i400.SecurityAuditService>(
-      () => _i400.SecurityAuditService(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i323.RecoveryService>(
-      () => _i323.RecoveryService(
-        gh<_i558.FlutterSecureStorage>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-        gh<_i286.IVaultRepository>(),
-      ),
-    );
     gh.lazySingleton<_i1.WipeVaultUseCase>(
       () => _i1.WipeVaultUseCase(
         gh<_i558.FlutterSecureStorage>(),
@@ -218,9 +221,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i795.SessionManager>(),
         gh<_i112.ISecureFileRepository>(),
       ),
-    );
-    gh.lazySingleton<_i885.ClipboardService>(
-      () => _i885.ClipboardService(gh<_i657.ISettingsRepository>()),
     );
     gh.lazySingleton<_i472.GetCredentialsUseCase>(
       () => _i472.GetCredentialsUseCase(gh<_i366.ICredentialRepository>()),
@@ -231,11 +231,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i472.DeleteCredentialUseCase>(
       () => _i472.DeleteCredentialUseCase(gh<_i366.ICredentialRepository>()),
     );
-    gh.lazySingleton<_i301.AppLifecycleObserver>(
-      () => _i301.AppLifecycleObserver(
-        gh<_i795.SessionManager>(),
-        gh<_i657.ISettingsRepository>(),
-      ),
+    gh.lazySingleton<_i764.CsvImportService>(
+      () => _i764.CsvImportService(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i400.SecurityAuditService>(
+      () => _i400.SecurityAuditService(gh<_i366.ICredentialRepository>()),
     );
     gh.lazySingleton<_i155.UnlockVaultUseCase>(
       () => _i155.UnlockVaultUseCase(

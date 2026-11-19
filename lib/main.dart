@@ -232,6 +232,7 @@ Future<void> main(List<String> args) async {
 
       runApp(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: buildProviderOverrides(),
           child: const App(),
         ),

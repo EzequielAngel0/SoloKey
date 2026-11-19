@@ -6,121 +6,288 @@ part of 'credentials_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$filteredCredentialsHash() =>
-    r'8527d33c4811ff5a5b1103c0376990f1b4152be1';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [filteredCredentials].
-@ProviderFor(filteredCredentials)
-final filteredCredentialsProvider =
-    AutoDisposeFutureProvider<List<Credential>>.internal(
-      filteredCredentials,
-      name: r'filteredCredentialsProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$filteredCredentialsHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+@ProviderFor(CredentialsNotifier)
+final credentialsNotifierProvider = CredentialsNotifierProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef FilteredCredentialsRef = AutoDisposeFutureProviderRef<List<Credential>>;
-String _$getCredentialsUseCaseHash() =>
-    r'82047d0b2f9c4edcc4b9158bc9c5437d47d21037';
+final class CredentialsNotifierProvider
+    extends $AsyncNotifierProvider<CredentialsNotifier, List<Credential>> {
+  CredentialsNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'credentialsNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [getCredentialsUseCase].
-@ProviderFor(getCredentialsUseCase)
-final getCredentialsUseCaseProvider =
-    AutoDisposeProvider<GetCredentialsUseCase>.internal(
-      getCredentialsUseCase,
-      name: r'getCredentialsUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$getCredentialsUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+  @override
+  String debugGetCreateSourceHash() => _$credentialsNotifierHash();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef GetCredentialsUseCaseRef =
-    AutoDisposeProviderRef<GetCredentialsUseCase>;
-String _$saveCredentialUseCaseHash() =>
-    r'b74460b90b0db037070008b70c724be53eecb952';
+  @$internal
+  @override
+  CredentialsNotifier create() => CredentialsNotifier();
+}
 
-/// See also [saveCredentialUseCase].
-@ProviderFor(saveCredentialUseCase)
-final saveCredentialUseCaseProvider =
-    AutoDisposeProvider<SaveCredentialUseCase>.internal(
-      saveCredentialUseCase,
-      name: r'saveCredentialUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$saveCredentialUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef SaveCredentialUseCaseRef =
-    AutoDisposeProviderRef<SaveCredentialUseCase>;
-String _$deleteCredentialUseCaseHash() =>
-    r'a5a0fc5f70a6af57dd4b34eb6e5e116a327d8a79';
-
-/// See also [deleteCredentialUseCase].
-@ProviderFor(deleteCredentialUseCase)
-final deleteCredentialUseCaseProvider =
-    AutoDisposeProvider<DeleteCredentialUseCase>.internal(
-      deleteCredentialUseCase,
-      name: r'deleteCredentialUseCaseProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$deleteCredentialUseCaseHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
-
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef DeleteCredentialUseCaseRef =
-    AutoDisposeProviderRef<DeleteCredentialUseCase>;
 String _$credentialsNotifierHash() =>
     r'81b8a17d69dca2b9019f413e12e1b63ff089892f';
 
-/// See also [CredentialsNotifier].
-@ProviderFor(CredentialsNotifier)
-final credentialsNotifierProvider =
-    AutoDisposeAsyncNotifierProvider<
-      CredentialsNotifier,
-      List<Credential>
-    >.internal(
-      CredentialsNotifier.new,
-      name: r'credentialsNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$credentialsNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$CredentialsNotifier extends $AsyncNotifier<List<Credential>> {
+  FutureOr<List<Credential>> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref =
+        this.ref as $Ref<AsyncValue<List<Credential>>, List<Credential>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<AsyncValue<List<Credential>>, List<Credential>>,
+              AsyncValue<List<Credential>>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$CredentialsNotifier = AutoDisposeAsyncNotifier<List<Credential>>;
+@ProviderFor(CredentialSearchNotifier)
+final credentialSearchNotifierProvider = CredentialSearchNotifierProvider._();
+
+final class CredentialSearchNotifierProvider
+    extends $NotifierProvider<CredentialSearchNotifier, String> {
+  CredentialSearchNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'credentialSearchNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$credentialSearchNotifierHash();
+
+  @$internal
+  @override
+  CredentialSearchNotifier create() => CredentialSearchNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$credentialSearchNotifierHash() =>
     r'1d55355224e12b06375054da8222a32e92946ec8';
 
-/// See also [CredentialSearchNotifier].
-@ProviderFor(CredentialSearchNotifier)
-final credentialSearchNotifierProvider =
-    AutoDisposeNotifierProvider<CredentialSearchNotifier, String>.internal(
-      CredentialSearchNotifier.new,
-      name: r'credentialSearchNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$credentialSearchNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$CredentialSearchNotifier extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$CredentialSearchNotifier = AutoDisposeNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(filteredCredentials)
+final filteredCredentialsProvider = FilteredCredentialsProvider._();
+
+final class FilteredCredentialsProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<Credential>>,
+          List<Credential>,
+          FutureOr<List<Credential>>
+        >
+    with $FutureModifier<List<Credential>>, $FutureProvider<List<Credential>> {
+  FilteredCredentialsProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'filteredCredentialsProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$filteredCredentialsHash();
+
+  @$internal
+  @override
+  $FutureProviderElement<List<Credential>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
+
+  @override
+  FutureOr<List<Credential>> create(Ref ref) {
+    return filteredCredentials(ref);
+  }
+}
+
+String _$filteredCredentialsHash() =>
+    r'8527d33c4811ff5a5b1103c0376990f1b4152be1';
+
+@ProviderFor(getCredentialsUseCase)
+final getCredentialsUseCaseProvider = GetCredentialsUseCaseProvider._();
+
+final class GetCredentialsUseCaseProvider
+    extends
+        $FunctionalProvider<
+          GetCredentialsUseCase,
+          GetCredentialsUseCase,
+          GetCredentialsUseCase
+        >
+    with $Provider<GetCredentialsUseCase> {
+  GetCredentialsUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'getCredentialsUseCaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$getCredentialsUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<GetCredentialsUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  GetCredentialsUseCase create(Ref ref) {
+    return getCredentialsUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(GetCredentialsUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<GetCredentialsUseCase>(value),
+    );
+  }
+}
+
+String _$getCredentialsUseCaseHash() =>
+    r'82047d0b2f9c4edcc4b9158bc9c5437d47d21037';
+
+@ProviderFor(saveCredentialUseCase)
+final saveCredentialUseCaseProvider = SaveCredentialUseCaseProvider._();
+
+final class SaveCredentialUseCaseProvider
+    extends
+        $FunctionalProvider<
+          SaveCredentialUseCase,
+          SaveCredentialUseCase,
+          SaveCredentialUseCase
+        >
+    with $Provider<SaveCredentialUseCase> {
+  SaveCredentialUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'saveCredentialUseCaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$saveCredentialUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<SaveCredentialUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  SaveCredentialUseCase create(Ref ref) {
+    return saveCredentialUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(SaveCredentialUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<SaveCredentialUseCase>(value),
+    );
+  }
+}
+
+String _$saveCredentialUseCaseHash() =>
+    r'b74460b90b0db037070008b70c724be53eecb952';
+
+@ProviderFor(deleteCredentialUseCase)
+final deleteCredentialUseCaseProvider = DeleteCredentialUseCaseProvider._();
+
+final class DeleteCredentialUseCaseProvider
+    extends
+        $FunctionalProvider<
+          DeleteCredentialUseCase,
+          DeleteCredentialUseCase,
+          DeleteCredentialUseCase
+        >
+    with $Provider<DeleteCredentialUseCase> {
+  DeleteCredentialUseCaseProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'deleteCredentialUseCaseProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$deleteCredentialUseCaseHash();
+
+  @$internal
+  @override
+  $ProviderElement<DeleteCredentialUseCase> $createElement(
+    $ProviderPointer pointer,
+  ) => $ProviderElement(pointer);
+
+  @override
+  DeleteCredentialUseCase create(Ref ref) {
+    return deleteCredentialUseCase(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(DeleteCredentialUseCase value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<DeleteCredentialUseCase>(value),
+    );
+  }
+}
+
+String _$deleteCredentialUseCaseHash() =>
+    r'a5a0fc5f70a6af57dd4b34eb6e5e116a327d8a79';

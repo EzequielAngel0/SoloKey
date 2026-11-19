@@ -154,7 +154,7 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
       minutes = settings.autoLockMinutes;
     } catch (_) {
       minutes =
-          ref.read(settingsNotifierProvider).valueOrNull?.autoLockMinutes ?? 5;
+          ref.read(settingsNotifierProvider).value?.autoLockMinutes ?? 5;
     }
     _trayLockTimer = Timer(Duration(minutes: minutes), () {
       ref.read(vaultNotifierProvider.notifier).lock();
@@ -217,7 +217,7 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
       }
       final bounds = await windowManager.getBounds();
       final notifier = ref.read(settingsNotifierProvider.notifier);
-      final current = ref.read(settingsNotifierProvider).valueOrNull;
+      final current = ref.read(settingsNotifierProvider).value;
       if (current == null) return;
       await notifier.save(current.copyWith(
         windowWidth: bounds.width,
@@ -295,7 +295,7 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
 
     // Resolve the active theme reactively from the persisted settings. While the
     // settings are still loading we fall back to the historical dark default.
-    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final settings = ref.watch(settingsNotifierProvider).value;
     final mode = settings == null
         ? AppThemeMode.dark
         : AppThemeMode.fromKey(settings.themeMode);

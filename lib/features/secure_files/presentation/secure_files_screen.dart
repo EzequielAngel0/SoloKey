@@ -91,7 +91,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
 
     // Names already in the store — used to avoid silent duplicates on import.
     final existing = <String>{
-      for (final f in ref.read(secureFilesNotifierProvider).valueOrNull ?? [])
+      for (final f in ref.read(secureFilesNotifierProvider).value ?? [])
         f.name,
     };
 
@@ -278,7 +278,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
   Future<void> _moveFile(SecureFile file) async {
     final l10n = AppLocalizations.of(context);
     final palette = context.palette;
-    final folders = ref.read(foldersNotifierProvider).valueOrNull ?? [];
+    final folders = ref.read(foldersNotifierProvider).value ?? [];
     final picked = await showModalBottomSheet<String>(
       context: context,
       backgroundColor: palette.drawer,
@@ -513,7 +513,7 @@ class _SecureFilesScreenState extends ConsumerState<SecureFilesScreen> {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     final filesAsync = ref.watch(secureFilesNotifierProvider);
-    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+    final folders = ref.watch(foldersNotifierProvider).value ?? [];
     final folderNames = {for (final f in folders) f.id: f.name};
 
     return Scaffold(

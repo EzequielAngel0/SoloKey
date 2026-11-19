@@ -72,7 +72,7 @@ class _FolderTreeState extends ConsumerState<FolderTree> {
   /// hidden entries so it matches the list shown below the tree.
   Map<String?, int> _counts() {
     final creds =
-        ref.watch(credentialsNotifierProvider).valueOrNull ?? const [];
+        ref.watch(credentialsNotifierProvider).value ?? const [];
     final map = <String?, int>{};
     for (final c in creds) {
       if (c.isHidden) continue;

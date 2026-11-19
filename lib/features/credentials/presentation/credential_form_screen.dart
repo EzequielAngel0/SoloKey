@@ -158,7 +158,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   bool get _isDirty => _currentSnapshot() != _baseline;
 
   void _loadExisting() {
-    final creds = ref.read(credentialsNotifierProvider).valueOrNull;
+    final creds = ref.read(credentialsNotifierProvider).value;
     _existing = creds?.where((c) => c.id == widget.existingId).firstOrNull;
     if (_existing != null) {
       _titleCtrl.text = _existing!.title;
@@ -394,7 +394,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
     // Warn (non-blocking) about a likely duplicate when creating a new entry.
     if (_existing == null) {
-      final all = ref.read(credentialsNotifierProvider).valueOrNull ?? const [];
+      final all = ref.read(credentialsNotifierProvider).value ?? const [];
       final dup = findDuplicate(
         all: all,
         type: _type,
@@ -1350,7 +1350,7 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   Consumer(
                     builder: (context, ref, _) {
                       final folders =
-                          ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+                          ref.watch(foldersNotifierProvider).value ?? [];
                       final currentFolder = folders
                           .where((f) => f.id == _folderId)
                           .firstOrNull;

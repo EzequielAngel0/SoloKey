@@ -30,10 +30,10 @@ class SecurityAuditScreen extends ConsumerWidget {
     final l10n = AppLocalizations.of(context);
     // El switch HIBP vive en AppSecuritySettings (no en estado local) para que
     // sobreviva al salir de la pantalla o cambiar de modulo.
-    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final settings = ref.watch(settingsNotifierProvider).value;
     final checkBreaches = settings?.hibpCheckEnabled ?? false;
     final auditAsync = ref.watch(auditResultsProvider(checkBreaches));
-    final issues = auditAsync.valueOrNull;
+    final issues = auditAsync.value;
 
     return Scaffold(
       appBar: VaultAppBar(title: l10n.auditTitle),

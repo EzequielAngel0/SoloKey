@@ -48,7 +48,7 @@ class FolderScreen extends ConsumerWidget {
     final foldersAsync = ref.watch(foldersNotifierProvider);
     final credentialsAsync = ref.watch(filteredCredentialsProvider);
 
-    final folders = foldersAsync.valueOrNull ?? [];
+    final folders = foldersAsync.value ?? [];
     final currentFolder = folders.where((f) => f.id == folderId).firstOrNull;
 
     if (currentFolder == null) {
@@ -58,7 +58,7 @@ class FolderScreen extends ConsumerWidget {
       );
     }
 
-    final allCredentials = credentialsAsync.valueOrNull ?? const [];
+    final allCredentials = credentialsAsync.value ?? const [];
     final subFolders = folders.where((f) => f.parentId == folderId).toList();
     final subCredentials =
         allCredentials.where((c) => c.categoryId == folderId).toList();

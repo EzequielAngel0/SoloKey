@@ -170,7 +170,7 @@ class PasswordHistoryScreen extends ConsumerWidget {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
     try {
-      final creds = ref.read(credentialsNotifierProvider).valueOrNull;
+      final creds = ref.read(credentialsNotifierProvider).value;
       final existing = creds?.firstWhere((c) => c.id == credentialId);
       if (existing == null) throw Exception(l10n.detailNotFound);
 

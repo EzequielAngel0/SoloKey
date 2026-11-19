@@ -1,4 +1,3 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -58,14 +57,14 @@ class FoldersNotifier extends _$FoldersNotifier {
   }
 
   Future<void> renameFolder(String id, String newName) async {
-    final folder = state.valueOrNull?.where((f) => f.id == id).firstOrNull;
+    final folder = state.value?.where((f) => f.id == id).firstOrNull;
     if (folder != null) {
       await updateFolder(folder.copyWith(name: newName));
     }
   }
 
   Future<void> toggleFavorite(String id) async {
-    final folder = state.valueOrNull?.where((f) => f.id == id).firstOrNull;
+    final folder = state.value?.where((f) => f.id == id).firstOrNull;
     if (folder != null) {
       await updateFolder(folder.copyWith(isFavorite: !folder.isFavorite));
     }
