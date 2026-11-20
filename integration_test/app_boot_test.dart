@@ -73,7 +73,7 @@ Future<void> _expectAccessIn(
   required bool isSetup,
 }) async {
   List<String> texts(AppLocalizations l) => isSetup
-      ? [l.setupTitle, l.setupSubtitle, l.setupCreateButton]
+      ? [l.setupStepCreate, l.setupSubtitle, l.setupCreateButton]
       : [l.unlockSubtitle, l.unlockForgotPassword];
   final want = texts(lookupAppLocalizations(Locale(lang)));
   final other =

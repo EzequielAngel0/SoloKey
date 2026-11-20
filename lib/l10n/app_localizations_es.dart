@@ -42,7 +42,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formDeleteField => 'Eliminar campo';
 
   @override
-  String get unlockSubtitle => 'Introduce tu contraseña maestra';
+  String get unlockSubtitle => 'Tu bóveda está cerrada';
 
   @override
   String get unlockMasterPasswordHint => 'Contraseña maestra';
@@ -56,10 +56,7 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get unlockUseBiometrics => 'Usar biometría';
-
-  @override
-  String get unlockWifiAvailable => 'Puedes desbloquear desde tu celular';
+  String get unlockWifiAvailable => 'Aprobar desde el celular';
 
   @override
   String get unlockForgotPassword => '¿Olvidaste tu contraseña maestra?';
@@ -71,9 +68,6 @@ class AppLocalizationsEs extends AppLocalizations {
   String unlockTooManyAttempts(String time) {
     return 'Demasiados intentos. Reintenta en $time.';
   }
-
-  @override
-  String get unlockTapToEnter => 'Toca para ingresar tu contraseña';
 
   @override
   String unlockRemoteFailed(String msg) {
@@ -112,7 +106,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unlockWithBiometrics => 'Desbloquear con biometría';
 
   @override
-  String get unlockOrUseMasterPassword => 'o usa tu contraseña maestra';
+  String get unlockOrUseMasterPassword => 'o escribe tu contraseña maestra';
 
   @override
   String unlockAttemptsBeforeLockout(int count) {
@@ -361,11 +355,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get splashTagline => 'Tu bóveda segura';
 
   @override
-  String get setupTitle => 'Crear contraseña\nmaestra';
-
-  @override
   String get setupSubtitle =>
-      'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.';
+      'Es la llave de tu bóveda. Elige una que recuerdes: en el siguiente paso te damos un código por si algún día la olvidas.';
 
   @override
   String get setupMinChars => 'Mínimo 12 caracteres';
@@ -815,7 +806,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recoveryCodeDescription =>
-      'El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.';
+      'Escribe el código que guardaste al crear tu bóveda. Con él eliges una contraseña maestra nueva.';
 
   @override
   String get recoveryEnterCode => 'Ingresa el código de recuperación';
@@ -849,13 +840,10 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get recoveryCodeWarning =>
-      '¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.';
+      'Solo se muestra esta vez. Guárdalo fuera de este equipo, por ejemplo en papel.';
 
   @override
   String get recoveryCopyCode => 'Copiar código';
-
-  @override
-  String get recoveryCodeSavedContinue => 'Ya lo guardé, continuar';
 
   @override
   String accessStepOf(int current, int total) {
@@ -873,6 +861,42 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get setupStepSaveCode => 'Guarda tu código de recuperación';
+
+  @override
+  String get setupStepImport => 'Trae tus contraseñas';
+
+  @override
+  String get setupCodeIntro =>
+      'Si olvidas tu contraseña maestra, este código es la única forma de volver a entrar.';
+
+  @override
+  String setupCodeConfirmLabel(int group) {
+    return 'Escribe el grupo $group del código';
+  }
+
+  @override
+  String get setupCodeConfirmHelp => 'Así sabemos que lo guardaste bien.';
+
+  @override
+  String setupCodeConfirmWrong(int group) {
+    return 'No coincide con el grupo $group. Revisa el código.';
+  }
+
+  @override
+  String get setupCodeConfirmButton => 'Confirmar y seguir';
+
+  @override
+  String get setupImportBody =>
+      '¿Usabas otro gestor de contraseñas? Puedes traerlas ahora o más tarde desde Ajustes.';
+
+  @override
+  String get setupImportButton => 'Importar contraseñas';
+
+  @override
+  String get setupImportDone => 'Entrar a mi bóveda';
+
+  @override
+  String get unlockUseSecureKeyboard => 'Usar el teclado seguro';
 
   @override
   String get autofillOnboardingTitle => 'Autocompletado';

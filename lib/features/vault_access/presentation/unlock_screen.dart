@@ -15,8 +15,9 @@ import '../../../shared/widgets/secure_keyboard/secure_keyboard.dart';
 import '../../../shared/widgets/secure_keyboard/secure_keyboard_overlay.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
 import '../../sync/domain/i_sync_service.dart';
-import '../../../theme/app_palette.dart';
+import '../../../shared/widgets/kit/kit.dart';
 import '../application/vault_state_provider.dart';
+import 'widgets/access_layout.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
   const UnlockScreen({super.key});
@@ -29,8 +30,10 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   final _localAuth = LocalAuthentication();
   bool _biometricAvailable = false;
 
-  // Number of chars entered via the SecureKeyboard (used for the masked display)
-  int _charCount = 0;
+  final _passwordCtrl = SecretTextController();
+
+  /// Último error, a la vista sobre los botones (no en un aviso que se va).
+  String? _error;
 
   // Remote unlock listener
   StreamSubscription<String>? _remoteUnlockSub;
@@ -54,6 +57,7 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   void dispose() {
     _remoteUnlockSub?.cancel();
     _lockoutTimer?.cancel();
+    _passwordCtrl.dispose();
     super.dispose();
   }
 
@@ -212,7 +216,17 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
   }
 
-  /// Opens the SecureKeyboard overlay and uses the result to unlock.
+  /// Desbloquea con la contraseña escrita en el campo (teclado del sistema).
+  Future<void> _unlockFromField() async {
+    final password = _passwordCtrl.text;
+    if (password.isEmpty) return;
+    // SEC-003: la maestra sale del controlador antes del await.
+    _passwordCtrl.clear();
+    await _unlock(password);
+  }
+
+  /// El teclado seguro, como opción (ADR-0013): no pasa por el teclado del
+  /// sistema.
   Future<void> _openSecureKeyboard() async {
     if (_lockout > Duration.zero) return; // bloqueado por intentos fallidos
     final l10n = AppLocalizations.of(context);
@@ -223,17 +237,20 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       confirmLabel: l10n.unlockButton,
     );
     if (password == null || password.isEmpty || !mounted) return;
+    await _unlock(password);
+  }
 
-    setState(() => _charCount = password.length);
-
+  Future<void> _unlock(String password) async {
+    if (_lockout > Duration.zero) return;
+    FocusScope.of(context).unfocus();
+    setState(() => _error = null);
     await ref.read(vaultNotifierProvider.notifier).unlock(password);
     if (!mounted) return;
     ref.read(vaultNotifierProvider).maybeWhen(
           unlocked: (_) => _navigateHome(),
           error: (kind, lockout, message) {
-            setState(() => _charCount = 0);
             _showError(_localizeVaultError(kind, lockout, message));
-            // Actualiza el contador/lockout tras un intento fallido.
+            // Actualiza el contador y el bloqueo tras un intento fallido.
             _refreshLockout();
           },
           orElse: () {},
@@ -267,9 +284,9 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
     }
   }
 
-  /// Desktop (M3): asks the connected phone(s) to approve unlocking this PC.
-  /// The phone shows a local notification; approving sends back its DUK over the
-  /// E2EE channel and the existing `remote_unlock_key:` listener unlocks here.
+  /// Escritorio: pide al celular vinculado que apruebe abrir esta computadora.
+  /// El celular muestra una notificación; al aprobar manda su llave por el
+  /// canal cifrado y `remote_unlock_key:` desbloquea aquí.
   Future<void> _requestPhoneApproval() async {
     final l10n = AppLocalizations.of(context);
     try {
@@ -278,43 +295,41 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
             sent > 0 ? l10n.unlockApprovalSent : l10n.unlockApprovalNoDevice),
-        backgroundColor:
-            sent > 0 ? context.palette.primary : context.palette.danger,
-        behavior: SnackBarBehavior.floating,
       ));
     } catch (_) {
-      // SyncService puede no estar disponible (p.ej. en tests).
+      // SyncService puede no estar disponible (p. ej. en pruebas).
     }
   }
 
-  /// Primary-action label for the biometric unlock: "Windows Hello" on desktop
-  /// (where `local_auth` also accepts the Hello PIN), "biometrics" on mobile.
+  /// "Windows Hello" en escritorio (acepta también su PIN), biometría en el
+  /// celular.
   String _biometricLabel(AppLocalizations l10n) => _isDesktopPlatform
       ? l10n.unlockWithWindowsHello
       : l10n.unlockWithBiometrics;
 
   IconData get _biometricIcon =>
-      _isDesktopPlatform ? Icons.verified_user_rounded : Icons.fingerprint_rounded;
+      _isDesktopPlatform ? Icons.verified_user_outlined : Icons.fingerprint;
 
-  /// A subtle warning of how many attempts remain before a temporary lock (or,
-  /// if wipe-on-failure is enabled, before the vault is wiped). Returns null
-  /// while there are no failures yet or a lockout is already active.
-  Widget? _attemptsHint(BuildContext context) {
+  /// Cuántos intentos quedan antes del bloqueo temporal (ámbar) o, si está
+  /// activo el borrado tras fallos, antes de borrar la bóveda (rojo). `null`
+  /// sin fallos o con un bloqueo ya activo.
+  Widget? _attemptsHint(AppLocalizations l10n) {
     if (_failedAttempts <= 0 || _lockout > Duration.zero) return null;
-    final l10n = AppLocalizations.of(context);
-    final palette = context.palette;
     if (_wipeThreshold > 0) {
       final left = _wipeThreshold - _failedAttempts;
       if (left > 0) {
-        return _AttemptsHint(
-            text: l10n.unlockAttemptsBeforeWipe(left), color: palette.danger);
+        return Notice(
+          title: l10n.unlockAttemptsBeforeWipe(left),
+          tone: SafetyTone.breach,
+        );
       }
     }
     final freeLeft = BruteForceGuard.freeAttempts - _failedAttempts;
     if (freeLeft > 0) {
-      return _AttemptsHint(
-          text: l10n.unlockAttemptsBeforeLockout(freeLeft),
-          color: palette.warning);
+      return Notice(
+        title: l10n.unlockAttemptsBeforeLockout(freeLeft),
+        tone: SafetyTone.weak,
+      );
     }
     return null;
   }
@@ -322,367 +337,113 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
   void _navigateHome() => context.go(AppRoutes.home);
 
   void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: context.palette.danger,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+    if (mounted) setState(() => _error = msg);
   }
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final isLoading = ref.watch(vaultNotifierProvider).maybeWhen(
-          loading: () => true,
-          orElse: () => false,
-        );
+    final t = Theme.of(context).textTheme;
+    final p = context.palette;
+    final busy = _isRemoteUnlocking ||
+        ref.watch(vaultNotifierProvider).maybeWhen(
+              loading: () => true,
+              orElse: () => false,
+            );
+    final locked = _lockout > Duration.zero;
+    final lockedLabel = l10n.unlockLockedFor(_formatLockout(_lockout));
+    final hint = _attemptsHint(l10n);
 
-    return Scaffold(
-      body: SafeArea(
-        child: CustomScrollView(
-          physics: const ClampingScrollPhysics(),
-          slivers: [
-            SliverFillRemaining(
-              hasScrollBody: false,
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Spacer(),
+    Widget gap([double h = AppSpace.lg]) => SizedBox(height: h);
 
-                    // Logo (flat, no glow)
-                    Center(
-                      child: Image.asset(
-                        'assets/logo/solokey_mark.png',
-                        height: 84,
-                        width: 84,
-                        errorBuilder: (_, _, _) => Image.asset(
-                          'assets/logo/SoloKey.png',
-                          height: 84,
-                          width: 84,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    Center(
-                      child: Text(
-                        'SoloKey',
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w800,
-                          color: palette.textPrimary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: Text(
-                        l10n.unlockSubtitle,
-                        style:
-                            TextStyle(color: palette.textMuted, fontSize: 14),
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Remote unlock indicator (desktop only)
-                    if (_isRemoteUnlocking) ...[
-                      _RemoteUnlockBanner(),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Brute-force lockout banner (con cuenta regresiva)
-                    if (_lockout > Duration.zero) ...[
-                      _LockoutBanner(remainingText: _formatLockout(_lockout)),
-                      const SizedBox(height: 16),
-                    ],
-
-                    // Remaining-attempts hint (before any lockout kicks in).
-                    if (_attemptsHint(context) case final hint?) ...[
-                      hint,
-                      const SizedBox(height: 16),
-                    ],
-
-                    if (_biometricAvailable) ...[
-                      // PRIMARY: biometric / Windows Hello (big button).
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: isLoading || _isRemoteUnlocking
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                    color: palette.accent))
-                            : Semantics(
-                                button: true,
-                                label: _biometricLabel(l10n),
-                                child: ElevatedButton.icon(
-                                  onPressed: _lockout > Duration.zero
-                                      ? null
-                                      : _tryBiometric,
-                                  icon: Icon(_biometricIcon),
-                                  label: Text(_lockout > Duration.zero
-                                      ? l10n.unlockLockedFor(
-                                          _formatLockout(_lockout))
-                                      : _biometricLabel(l10n)),
-                                ),
-                              ),
-                      ),
-                      const SizedBox(height: 20),
-                      // SECONDARY: master-password fallback.
-                      Center(
-                        child: Text(
-                          l10n.unlockOrUseMasterPassword,
-                          style:
-                              TextStyle(color: palette.textMuted, fontSize: 12),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _SecurePasswordTap(
-                        charCount: _charCount,
-                        onTap: _openSecureKeyboard,
-                      ),
-                    ] else ...[
-                      // PRIMARY: master password (no biometric / Hello available).
-                      _SecurePasswordTap(
-                        charCount: _charCount,
-                        onTap: _openSecureKeyboard,
-                      ),
-                      const SizedBox(height: 20),
-                      AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 200),
-                        child: isLoading || _isRemoteUnlocking
-                            ? Center(
-                                child: CircularProgressIndicator(
-                                    color: palette.accent))
-                            : ElevatedButton(
-                                onPressed: _lockout > Duration.zero
-                                    ? null
-                                    : _openSecureKeyboard,
-                                child: Text(_lockout > Duration.zero
-                                    ? l10n.unlockLockedFor(
-                                        _formatLockout(_lockout))
-                                    : l10n.unlockButton),
-                              ),
-                      ),
-                    ],
-
-                    // Desktop (M3): pedir aprobacion de desbloqueo al celular.
-                    if (_isDesktopPlatform) ...[
-                      const SizedBox(height: 8),
-                      Center(
-                        child: TextButton.icon(
-                          onPressed:
-                              _isRemoteUnlocking ? null : _requestPhoneApproval,
-                          icon: Icon(Icons.phonelink_lock_rounded,
-                              color: palette.primary),
-                          label: Text(
-                            l10n.unlockWifiAvailable,
-                            style: TextStyle(
-                              color: palette.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-
-                    const SizedBox(height: 12),
-                    Center(
-                      child: TextButton(
-                        onPressed: () => context.push(AppRoutes.recovery),
-                        child: Text(
-                          l10n.unlockForgotPassword,
-                          style: TextStyle(
-                            color: palette.textMuted,
-                            fontSize: 13,
-                            decoration: TextDecoration.underline,
-                            decorationColor: palette.textMuted,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const Spacer(),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-// ── Sub-widgets ───────────────────────────────────────────────────────────────
-
-class _RemoteUnlockBanner extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: palette.primary.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: palette.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 20,
-            height: 20,
-            child: CircularProgressIndicator(
-              color: palette.primary,
-              strokeWidth: 2,
-            ),
+    return AccessLayout(
+      children: [
+        AccessHeader(title: 'SoloKey', subtitle: l10n.unlockSubtitle),
+        gap(AppSpace.xl),
+        if (_isRemoteUnlocking) ...[
+          Notice(
+            title: l10n.unlockFromMobile,
+            icon: Icons.phonelink_lock_outlined,
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context).unlockFromMobile,
-              style: TextStyle(
-                color: palette.primary,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Icon(
-            Icons.phone_android_rounded,
-            color: palette.primary,
-            size: 18,
-          ),
+          gap(),
         ],
-      ),
-    );
-  }
-}
-
-class _LockoutBanner extends StatelessWidget {
-  const _LockoutBanner({required this.remainingText});
-  final String remainingText;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: palette.danger.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: palette.danger.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.lock_clock_rounded, color: palette.danger, size: 18),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              AppLocalizations.of(context).unlockTooManyAttempts(remainingText),
-              style: TextStyle(
-                color: palette.danger,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
+        if (locked) ...[
+          Notice(
+            title: l10n.unlockTooManyAttempts(_formatLockout(_lockout)),
+            tone: SafetyTone.breach,
+            icon: Icons.lock_clock_outlined,
           ),
+          gap(),
         ],
-      ),
-    );
-  }
-}
-
-class _AttemptsHint extends StatelessWidget {
-  const _AttemptsHint({required this.text, required this.color});
-  final String text;
-  final Color color;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline_rounded, color: color, size: 18),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: TextStyle(
-                color: color,
-                fontSize: 13,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
+        if (_error != null && !locked) ...[
+          Notice(title: _error!, tone: SafetyTone.breach),
+          gap(),
         ],
-      ),
-    );
-  }
-}
+        if (hint != null) ...[hint, gap()],
 
-class _SecurePasswordTap extends StatelessWidget {
-  const _SecurePasswordTap({required this.charCount, required this.onTap});
-  final int charCount;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final palette = context.palette;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: palette.card,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(
-            color: charCount > 0
-                ? palette.accent.withValues(alpha: 0.6)
-                : palette.divider,
+        // Primero la biometría o Windows Hello (ADR-0013).
+        if (_biometricAvailable) ...[
+          PaperButton(
+            label: locked ? lockedLabel : _biometricLabel(l10n),
+            icon: _biometricIcon,
+            onPressed: locked ? null : _tryBiometric,
+            busy: busy,
+            expand: true,
           ),
+          gap(AppSpace.xl),
+          Text(
+            l10n.unlockOrUseMasterPassword,
+            textAlign: TextAlign.center,
+            style: t.bodyMedium?.copyWith(color: p.inkSoft),
+          ),
+          gap(AppSpace.md),
+        ],
+
+        // Después, la contraseña maestra.
+        SecretField(
+          controller: _passwordCtrl,
+          label: l10n.unlockMasterPasswordHint,
+          revealTooltip: l10n.commonShowPassword,
+          hideTooltip: l10n.commonHidePassword,
+          autofocus: !_biometricAvailable && _isDesktopPlatform,
+          enabled: !locked,
+          textInputAction: TextInputAction.go,
+          autofillHints: const [AutofillHints.password],
+          onSubmitted: (_) => _unlockFromField(),
         ),
-        child: Row(
-          children: [
-            Icon(Icons.lock_rounded, color: palette.accent, size: 20),
-            const SizedBox(width: 12),
-            Expanded(
-              child: charCount == 0
-                  ? Text(
-                      AppLocalizations.of(context).unlockTapToEnter,
-                      style: TextStyle(color: palette.textDisabled, fontSize: 14),
-                    )
-                  : Text(
-                      '●' * charCount,
-                      style: TextStyle(
-                        color: palette.textPrimary,
-                        fontSize: 16,
-                        letterSpacing: 3,
-                      ),
-                      overflow: TextOverflow.ellipsis,
-                    ),
-            ),
-            Icon(
-              Icons.keyboard_rounded,
-              color: palette.accent.withValues(alpha: 0.7),
-              size: 18,
-            ),
-          ],
+        gap(AppSpace.md),
+        PaperButton(
+          kind: _biometricAvailable
+              ? PaperButtonKind.secondary
+              : PaperButtonKind.primary,
+          label: locked ? lockedLabel : l10n.unlockButton,
+          onPressed: locked ? null : _unlockFromField,
+          busy: busy && !_biometricAvailable,
+          expand: true,
         ),
-      ),
+        gap(),
+
+        // Lo demás, a la vista y discreto.
+        PaperButton.quiet(
+          label: l10n.unlockUseSecureKeyboard,
+          icon: Icons.keyboard_outlined,
+          onPressed: locked ? null : _openSecureKeyboard,
+          expand: true,
+        ),
+        if (_isDesktopPlatform)
+          PaperButton.quiet(
+            label: l10n.unlockWifiAvailable,
+            icon: Icons.phonelink_lock_outlined,
+            onPressed: _isRemoteUnlocking ? null : _requestPhoneApproval,
+            expand: true,
+          ),
+        PaperButton.quiet(
+          label: l10n.unlockForgotPassword,
+          icon: Icons.help_outline,
+          onPressed: () => context.push(AppRoutes.recovery),
+          expand: true,
+        ),
+      ],
     );
   }
 }

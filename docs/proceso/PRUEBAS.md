@@ -30,7 +30,8 @@ integración (Windows y Android, patrones anti-flaky) está en
 | `pre-push` | `flutter test --coverage` sobre el piso de `tool/coverage_min.txt` | `.githooks/` + `tool/check_coverage.dart` |
 | CI | analyze + test + cobertura; `cargo test` + clippy del núcleo (`rust`); `integration_test/` en Windows (`e2e-windows`) y en un emulador de Android 14 (`e2e-android`). En `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
 
-El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio. Única excepción (dueño, 2026-11-20): la rama que mueve código a Rust y borra sus pruebas Dart (ADR-0011) fija el piso en lo medido, redondeado hacia abajo a un decimal, y lo dice en su CHANGELOG (NUC-1: de 63,4 a 63,2).
+El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio. Única excepción (dueño, 2026-11-20): la rama que mueve código a Rust y borra sus pruebas Dart (ADR-0011) fija el piso en lo medido, redondeado hacia abajo a un decimal, y lo dice en su CHANGELOG (NUC-1: de 63,4 a 63,2). El dueño la amplió el mismo día a las ramas de C que reescriben una
+pantalla y borran sus pruebas de widgets (PAN-1: de 60,4 a 55,6); la red de esas pantallas son las E2E de Windows y Android.
 
 **Runners**: el CI corre en máquinas de GitHub (`ubuntu-latest`), gratis por ser un repo público. **No hay runners propios**: nada
 que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-0007](../adr/0007-red-de-calidad-y-ci.md).
