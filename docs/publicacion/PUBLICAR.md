@@ -54,7 +54,7 @@ repo**: vive en `%USERPROFILE%\SoloKey-firma\` y el dueño guarda el respaldo de
 > *Nota: Ya contamos con unos logos base que podremos procesar para esta etapa.*
 
 ### Iconos de la App (Launcher Icons)
-- [ ] Procesar el logo maestro utilizando scripts como `flutter_launcher_icons` o añadiéndolos manualmente asegurando soporte para resolución Adaptativa (Android M+) y cuadratura estricta para iOS.
+- [x] Logo plano (DIS-4): `flutter test tool/logo/generar_iconos.dart` y luego `dart run flutter_launcher_icons` (adaptativo de Android incluido). iOS no se publica.
 
 ### Splash Screen (Pantalla de Carga)
 - [ ] Configurar pantalla inicial que use el nuevo logo para evitar transiciones de pantalla en blanco, a través de `flutter_native_splash`.

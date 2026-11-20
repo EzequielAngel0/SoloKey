@@ -179,6 +179,7 @@ class _SectionsState extends State<_Sections> {
           _Section('Barras del celular', child: _MobileBars()),
           _Section('Escritorio en tres paneles', child: _Desktop()),
           _Section('Sin nada', child: _Empty()),
+          _Section('Logo', child: _Logos()),
         ],
       ),
     );
@@ -911,6 +912,58 @@ class _Empty extends StatelessWidget {
         action: PaperButton.secondary(
           label: 'Quitar filtros',
           onPressed: () {},
+        ),
+      ),
+    );
+  }
+}
+
+// ── Logo (DIS-4) ────────────────────────────────────────────────────────────
+
+class _Logos extends StatelessWidget {
+  const _Logos();
+
+  @override
+  Widget build(BuildContext context) {
+    return Wrap(
+      spacing: AppSpace.md,
+      runSpacing: AppSpace.md,
+      crossAxisAlignment: WrapCrossAlignment.center,
+      children: [
+        _LogoGround(ground: AppPalette.light.paper),
+        _LogoGround(ground: AppPalette.dark.paper),
+        const SoloKeyMark(size: 64),
+      ],
+    );
+  }
+}
+
+/// El icono a 128, 48, 32 y 16 sobre un fondo fijo (claro u oscuro), como en
+/// un lanzador o la barra de tareas.
+class _LogoGround extends StatelessWidget {
+  const _LogoGround({required this.ground});
+
+  final Color ground;
+
+  @override
+  Widget build(BuildContext context) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: ground,
+        borderRadius: AppRadius.cardAll,
+        border: Border.all(color: context.palette.rule),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpace.lg),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            for (final s in const [128.0, 48.0, 32.0, 16.0]) ...[
+              SoloKeyAppIcon(size: s),
+              if (s != 16) const SizedBox(width: AppSpace.lg),
+            ],
+          ],
         ),
       ),
     );

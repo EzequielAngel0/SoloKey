@@ -16,7 +16,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 | 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ✓ PLA-6 y PLA-3 (2026-11-19); DIS-1, 2, 3 y 5 (2026-11-20; galería: `flutter run -d windows -t lib/main_galeria.dart`) |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ✓ 2026-11-20: la app usa la cripto del núcleo; antes de `flutter test`, `run` o `build`, `.\tool\build.ps1 -Nucleo -Salida rust\dist` |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5 ◐: CI de Windows ✓; CAL-3 ✓) | C, A y E | ◐ PAN-10 ✓ (2026-11-20); NUC-2 y NUC-6 (A) y PAN-1 a 9 (C, con el kit de DIS-2 en `lib/shared/widgets/kit/`) pueden arrancar |
-| 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1 ✓ 2026-11-20), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (✓ arreglado por A, 2026-11-20) |
+| 5 | Sync v2 (NUC-3), logo (DIS-4 ✓ 2026-11-20), firma (PLA-1 ✓ 2026-11-20), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (✓ arreglado por A, 2026-11-20) |
 | 6 | v2.0.0 a `main`, con el permiso del dueño | General | ⊘ espera a 5 |
 
 **Como mucho dos sesiones pesadas a la vez** (build de Flutter, Rust, Podman o emulador) y una ligera. Abrir una sesión por
