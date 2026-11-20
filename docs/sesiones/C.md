@@ -6,13 +6,13 @@ Reglas y plantilla: [`README.md`](README.md). Experiencia aprobada: [`../diseno/
 
 ## Aprobado, para desarrollar (en orden)
 
-Empieza cuando B tenga DIS-1 y DIS-2. **Cada PAN** rehace el flujo en móvil Y escritorio, con sus textos en español (fuente) e
+PAN-10 hecho (2026-11-20, [`C_HECHO`](../archive/sesiones/C_HECHO.md)). El resto empieza cuando B tenga DIS-1 y DIS-2; el dueño aprobó
+(2026-11-20) hacerlas todas conforme B vaya terminando. **Cada PAN** rehace el flujo en móvil Y escritorio, con sus textos en español (fuente) e
 inglés, **su prueba E2E en Android y Windows** (con el harness de E) y **borra las pruebas Dart viejas** de lo que reemplaza
 ([ADR-0011](../adr/0011-pruebas-e2e-principal.md)).
 
 | # | ID | Qué | Archivos de hoy | Esf. | Estado |
 |---|---|---|---|---|---|
-| 1 | PAN-10 | Español como idioma fuente (`template-arb-file: app_es.arb`) y textos sin jerga | `l10n.yaml`, `lib/l10n/*.arb` | M | ☐ |
 | 2 | PAN-1 | Acceso: splash, primer uso en 3 pasos, desbloqueo (biometría primero), recuperación | `vault_access/presentation/*` | L | ☐ |
 | 3 | PAN-2 | Bóveda: búsqueda fija, filtros con la ruta de carpetas, copiar en un toque; barra inferior de 3 | `home_screen`, `credential_card`, `favorites_view`, `folder_list_view` | L | ☐ |
 | 4 | PAN-3 | Detalle por tipo (TOTP en vivo, contraseña, SSH, nota, passkey, API key) | `credential_detail_screen`, `password_history_screen` | L | ☐ |

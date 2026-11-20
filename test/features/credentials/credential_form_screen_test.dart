@@ -109,14 +109,14 @@ void main() {
 
     // Switch to TOTP via the type selector, then let the AnimatedSwitcher fully
     // finish so the outgoing (login) child is removed, not just faded.
-    await tester.tap(find.text('TOTP'));
+    await tester.tap(find.text('Authenticator'));
     await tester.pump(); // kick off the transition
     await tester.pump(const Duration(milliseconds: 350));
     await tester.pump(const Duration(milliseconds: 350));
 
     expect(find.text('2FA SETUP'), findsOneWidget);
     expect(find.text('LOGIN CREDENTIALS'), findsNothing);
-    expect(find.text('TOTP secret key (Base32)'), findsOneWidget);
+    expect(find.text('Secret key'), findsOneWidget);
   });
 
   testWidgets('the generator toggle reveals the password generator',
@@ -221,7 +221,7 @@ void main() {
     await tester.enterText(website, 'not a valid url');
     await tester.pump();
 
-    expect(find.text('Enter a valid URL'), findsOneWidget);
+    expect(find.text('Enter a valid web address'), findsOneWidget);
   });
 
   testWidgets('an invalid Base32 TOTP secret fails inline validation',
@@ -230,7 +230,7 @@ void main() {
     await tester.pump();
 
     // Switch to TOTP and let the AnimatedSwitcher settle.
-    await tester.tap(find.text('TOTP'));
+    await tester.tap(find.text('Authenticator'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
     await tester.pump(const Duration(milliseconds: 350));
@@ -239,7 +239,7 @@ void main() {
     await tester.enterText(find.byType(SecureTextField), '11111111');
     await tester.pump();
 
-    expect(find.text('Invalid Base32 secret (only A–Z and 2–7)'),
+    expect(find.text('Invalid secret key: only letters A to Z and numbers 2 to 7'),
         findsOneWidget);
   });
 
@@ -261,12 +261,12 @@ void main() {
     await pumpForm(tester);
     await tester.pump();
 
-    await tester.tap(find.text('TOTP'));
+    await tester.tap(find.text('Authenticator'));
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 350));
     await tester.pump(const Duration(milliseconds: 350));
 
-    final pasteBtn = find.text('Paste otpauth link');
+    final pasteBtn = find.text('Paste authenticator link');
     await tester.ensureVisible(pasteBtn);
     await tester.tap(pasteBtn);
     await tester.pump();

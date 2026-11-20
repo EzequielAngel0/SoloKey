@@ -17,13 +17,22 @@
   "unlockMasterPasswordHint": "Contraseña maestra",
   "unlockButton": "Desbloquear",
   "unlockLockedFor": "Bloqueado ({time})",
+  "@unlockLockedFor": {
+    "placeholders": { "time": { "type": "String" } }
+  },
   "unlockUseBiometrics": "Usar biometría",
-  "unlockWifiAvailable": "Desbloqueo WiFi disponible",
+  "unlockWifiAvailable": "Puedes desbloquear desde tu celular",
   "unlockForgotPassword": "¿Olvidaste tu contraseña maestra?",
   "unlockFromMobile": "Desbloqueando desde dispositivo móvil…",
   "unlockTooManyAttempts": "Demasiados intentos. Reintenta en {time}.",
+  "@unlockTooManyAttempts": {
+    "placeholders": { "time": { "type": "String" } }
+  },
   "unlockTapToEnter": "Toca para ingresar tu contraseña",
   "unlockRemoteFailed": "Desbloqueo remoto fallido: {msg}",
+  "@unlockRemoteFailed": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
   "unlockRemoteError": "Error en desbloqueo remoto",
   "unlockBiometricReason": "Desbloquea tu bóveda",
   "unlockWrongPassword": "Contraseña maestra incorrecta",
@@ -55,8 +64,14 @@
 
   "settingsAutoLockLabel": "Bloqueo por inactividad",
   "settingsAutoLockValue": "{minutes} min",
+  "@settingsAutoLockValue": {
+    "placeholders": { "minutes": { "type": "int" } }
+  },
   "settingsClearClipboardLabel": "Limpiar portapapeles",
   "settingsClearClipboardValue": "{seconds}s",
+  "@settingsClearClipboardValue": {
+    "placeholders": { "seconds": { "type": "int" } }
+  },
   "settingsBiometricLabel": "Desbloqueo biométrico",
   "settingsBiometricSubtitle": "Usa huella dactilar o rostro",
   "settingsObscureLabel": "Ocultar en segundo plano",
@@ -81,25 +96,28 @@
   "themeDim": "Tenue",
   "themeOled": "OLED",
   "settingsWipeTitle": "Borrar bóveda tras intentos fallidos",
-  "settingsWipeSubtitle": "Protección anti fuerza bruta (irreversible)",
+  "settingsWipeSubtitle": "Si alguien prueba muchas contraseñas, se borra todo (no se deshace)",
   "settingsSyncComputerTitle": "Sincronizar computadora",
   "settingsSyncComputerSubtitle": "Vincula con SoloKey de escritorio",
   "settingsExportImportTitle": "Exportar / Importar",
-  "settingsExportImportSubtitle": "Haz backups cifrados de tu bóveda",
+  "settingsExportImportSubtitle": "Haz copias de respaldo cifradas de tu bóveda",
   "settingsAutofillTitle": "Autocompletado del sistema",
   "settingsAutofillSubtitle": "Completa contraseñas en otras apps",
   "settingsPasskeysTitle": "Respaldo de Passkeys",
   "settingsPasskeysSubtitle": "Guarda tus respaldos de passkey",
-  "settingsBackupTitle": "Backup automático",
+  "settingsBackupTitle": "Respaldo automático",
   "settingsBackupDaily": "Diario",
   "settingsBackupWeekly": "Semanal",
   "settingsBackupMonthly": "Mensual",
   "settingsBackupEveryNDays": "Cada {days} días",
+  "@settingsBackupEveryNDays": {
+    "placeholders": { "days": { "type": "int" } }
+  },
   "settingsBackupNoFolder": "sin carpeta",
   "settingsBackupFrequency": "Frecuencia",
   "settingsBackupChooseFolder": "Elegir carpeta destino",
-  "settingsBackupPassword": "Contraseña del backup",
-  "settingsBackupPasswordKeep": "Contraseña del backup (dejar vacío = mantener)",
+  "settingsBackupPassword": "Contraseña del respaldo",
+  "settingsBackupPasswordKeep": "Contraseña del respaldo (vacía para no cambiarla)",
   "settingsLockNowTitle": "Bloquear ahora",
   "settingsLockNowSubtitle": "Cierra la sesión inmediatamente",
   "settingsVersionLabel": "Versión",
@@ -165,7 +183,7 @@
   "commandHintSelect": "Abrir",
   "commandHintClose": "Cerrar",
   "detailAdvanced": "Avanzado",
-  "detailTotpSecret": "Secreto (semilla)",
+  "detailTotpSecret": "Clave secreta",
   "detailCopyCode": "Copiar código",
   "healthReused": "Repetida",
   "auditScoreTitle": "Salud de la bóveda",
@@ -177,13 +195,18 @@
   "homeFabNew": "Nueva",
   "homeFabFolder": "Carpeta",
   "homeLoadError": "Error: {msg}",
+  "@homeLoadError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
   "homeEmptyVault": "Tu bóveda está vacía",
   "homeCredentialCount": "{count, plural, =0{Sin credenciales} =1{1 credencial} other{{count} credenciales}}",
+  "@homeCredentialCount": { "placeholders": { "count": { "type": "int" } } },
   "homeIssuesChip": "{count, plural, =1{1 aviso} other{{count} avisos}}",
+  "@homeIssuesChip": { "placeholders": { "count": { "type": "int" } } },
   "homeGreetingMorning": "Buenos dias",
   "homeGreetingAfternoon": "Buenas tardes",
   "homeGreetingEvening": "Buenas noches",
-  "homeHealthTooltip": "Salud de la boveda: toca para ver detalles",
+  "homeHealthTooltip": "Salud de la bóveda: toca para ver detalles",
   "homeSortTooltip": "Ordenar",
   "sortManual": "Orden manual",
   "sortTitleAsc": "Nombre (A–Z)",
@@ -201,6 +224,9 @@
 
   "commonAccept": "Aceptar",
   "commonErrorDetail": "Error: {msg}",
+  "@commonErrorDetail": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
 
   "detailNotFound": "Credencial no encontrada",
   "detailRemoveFavorite": "Quitar de favoritas",
@@ -208,6 +234,9 @@
   "detailViewHistory": "Ver historial de contraseñas",
   "detailDeleteTitle": "Eliminar credencial",
   "detailDeleteBody": "¿Eliminar \"{title}\"? Esta acción no se puede deshacer.",
+  "@detailDeleteBody": {
+    "placeholders": { "title": { "type": "String" } }
+  },
   "detailDeleteAuthReason": "Verifica para eliminar esta credencial",
   "detailRevealAuthReason": "Autentifícate para revelar este secreto",
   "detailRevealSecret": "Revelar secreto",
@@ -224,7 +253,7 @@
   "detailOpenSiteError": "No se pudo abrir el sitio",
   "detailPasskeyHandleNote": "El identificador de la clave privada permanece cifrado en tu bóveda.",
   "detailTotpExportQr": "Exportar como QR",
-  "detailTotpExportQrAuthReason": "Autentifícate para mostrar el QR del TOTP",
+  "detailTotpExportQrAuthReason": "Confirma que eres tú para mostrar el QR del autenticador",
   "detailTotpExportQrTitle": "Escanea en otro dispositivo",
   "detailTotpExportQrWarning": "Quien escanee esto podrá generar tus códigos. Manténlo privado.",
 
@@ -238,9 +267,9 @@
   "fieldKeyPassphrase": "Passphrase de la llave",
 
   "typePassword": "Contraseña",
-  "typeApiKey": "API Key",
+  "typeApiKey": "Clave de API",
   "typeSecureNote": "Nota segura",
-  "typeTotp": "TOTP / 2FA",
+  "typeTotp": "Autenticador (2FA)",
   "typePasskey": "Respaldo de Passkey",
   "typeSshKey": "Llave SSH",
 
@@ -248,20 +277,35 @@
   "rotationQuarterly": "Cada 3 meses",
   "rotationSemiAnnually": "Cada 6 meses",
   "rotationCustom": "Personalizado ({days} días)",
+  "@rotationCustom": {
+    "placeholders": { "days": { "type": "int" } }
+  },
   "rotationNone": "Ninguno",
   "rotationOverdueTitle": "ROTACIÓN DE CONTRASEÑA VENCIDA",
   "rotationReminderTitle": "RECORDATORIO DE ROTACIÓN",
   "rotationOverdueBody": "Debes cambiar esta contraseña. Han pasado más de {days} días desde la última actualización.",
+  "@rotationOverdueBody": {
+    "placeholders": { "days": { "type": "int" } }
+  },
   "rotationReminderBody": "Próximo cambio requerido en {days} días ({interval}).",
+  "@rotationReminderBody": {
+    "placeholders": {
+      "days": { "type": "int" },
+      "interval": { "type": "String" }
+    }
+  },
 
   "secretDecrypting": "Descifrando…",
   "secretDecryptAuthReason": "Autentícate para descifrar este secreto",
   "secretDecryptError": "Error al descifrar: {msg}",
+  "@secretDecryptError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
   "pinDialogTitle": "Ingresa PIN secundario",
-  "pinDialogLabel": "PIN de sobre cifrado",
+  "pinDialogLabel": "PIN secundario",
 
   "totpTitle": "Código de verificación (2FA)",
-  "totpClipboardLabel": "Código TOTP",
+  "totpClipboardLabel": "Código de verificación",
   "totpInvalid": "Inválido",
 
   "a11yFavorite": "Favorito",
@@ -277,6 +321,9 @@
   "historyRestoreConfirm": "Restaurar",
   "historyRestoreSuccess": "Contraseña restaurada con éxito",
   "historyRestoreError": "Error al restaurar la contraseña: {msg}",
+  "@historyRestoreError": {
+    "placeholders": { "msg": { "type": "String" } }
+  },
 
   "recoveryTitle": "Recuperar acceso",
   "recoveryCodeTitle": "Código de recuperación",
@@ -312,7 +359,7 @@
   "autofillEnableDesc": "Permite que SoloKey complete tus contraseñas automáticamente en apps y navegadores.",
   "autofillOpenSettings": "Abrir ajustes de Autocompletado",
   "autofillVerifyStatus": "Ya lo activé, verificar estado",
-  "autofillFeatureDetection": "Detección automática de formularios de login",
+  "autofillFeatureDetection": "Detecta solo los formularios de inicio de sesión",
   "autofillFeatureBiometric": "Pide tu huella antes de rellenar (biometría)",
   "autofillFeatureNeverExposed": "Credenciales nunca expuestas al SO",
   "autofillStatusActive": "Activo",
@@ -340,7 +387,7 @@
   "auditAnalysisDesc": "SoloKey analiza tus credenciales localmente para identificar contraseñas débiles, cortas, reutilizadas o antiguas.",
   "auditBreachCheck": "Verificar filtraciones (online)",
   "auditPrivateBadge": "PRIVADO",
-  "auditBreachDesc": "Usa k-Anonymity (HaveIBeenPwned) para buscar contraseñas expuestas sin revelar tu contraseña real.",
+  "auditBreachDesc": "Revisa en HaveIBeenPwned si tus contraseñas aparecen en filtraciones, sin enviar nunca tu contraseña.",
   "auditAllGoodTitle": "¡Todo en orden!",
   "auditAllGoodDesc": "No se encontraron problemas en tu bóveda.",
   "auditSeverityCritical": "Crítico",
@@ -355,6 +402,9 @@
   "passkeysEmptyDesc": "Las Passkeys son el futuro de la autenticación: sin contraseñas, más seguras y más rápidas. Regístralas en tus servicios favoritos y SoloKey guardará aquí un respaldo cifrado.",
   "passkeysEncryptedBadge": "Respaldo cifrado en tu bóveda",
   "passkeysUpdated": "Actualizado: {date}",
+  "@passkeysUpdated": {
+    "placeholders": { "date": { "type": "String" } }
+  },
   "passkeysViewDetails": "Ver detalles",
   "passkeyDomain": "Dominio (RP ID)",
   "passkeyService": "Servicio",
@@ -368,6 +418,12 @@
   "passkeyPrivateKeyNote": "La clave privada nunca sale del dispositivo. Solo la información de identificación está almacenada.",
   "passkeysDeleteTitle": "Eliminar Passkey",
   "passkeysDeleteBody": "¿Eliminar la passkey \"{title}\"?\n\nNota: también deberás eliminarla del servicio web correspondiente ({service}).",
+  "@passkeysDeleteBody": {
+    "placeholders": {
+      "title": { "type": "String" },
+      "service": { "type": "String" }
+    }
+  },
   "passkeysSiteFallback": "el sitio",
   "passkeysDeleteAuthReason": "Verifica para eliminar esta passkey",
 
@@ -380,11 +436,11 @@
   "formFieldRequired": "Campo requerido",
   "formErrPinRequiredEnable": "Debes ingresar un PIN secundario para el cifrado doble",
   "formErrPinRequiredDisable": "Ingresa el PIN secundario para desactivar el cifrado doble",
-  "formQrNotTotp": "El código QR no es un TOTP válido.",
+  "formQrNotTotp": "El código QR no es de un autenticador.",
   "formQrScanned": "Código QR escaneado con éxito",
   "formQrNoSecret": "No se encontró una clave secreta en el QR.",
   "formQrReadError": "Error al leer el código QR.",
-  "formSshGenerated": "Par de llaves Ed25519 generado",
+  "formSshGenerated": "Llaves SSH generadas (Ed25519)",
   "formSshGenError": "Error al generar la llave SSH.",
   "formCustomFieldsTitle": "Campos Personalizados",
   "formNoCustomFields": "No hay campos personalizados.",
@@ -415,10 +471,10 @@
   "formMainVault": "Bóveda principal",
   "formHintPassword": "ej. Netflix, GitHub, Gmail",
   "formHintApiKey": "ej. OpenAI, Stripe, AWS",
-  "formHintSecureNote": "ej. Llaves del servidor, Seeds",
+  "formHintSecureNote": "ej. Llaves del servidor, frase de recuperación",
   "formHintTotp": "ej. GitHub 2FA, Google",
   "formHintPasskey": "ej. google.com Passkey",
-  "formHintSshKey": "ej. Servidor Produccion, GitHub SSH Key",
+  "formHintSshKey": "ej. Servidor de producción, GitHub",
   "formSectionLogin": "Credenciales de acceso",
   "formUserEmailLabel": "Usuario / Email",
   "formUserEmailHint": "usuario@ejemplo.com",
@@ -427,36 +483,36 @@
   "formSectionApi": "Detalles de la API",
   "formServiceNameLabel": "Nombre del servicio",
   "formServiceNameHint": "ej. OpenAI, Stripe, Supabase",
-  "formApiKeyLabel": "API Key / Token",
-  "formEndpointLabel": "Endpoint URL",
+  "formApiKeyLabel": "Clave de API",
+  "formEndpointLabel": "Dirección del servicio (URL)",
   "formScopesLabel": "Permisos / Scopes",
   "formSection2fa": "Configuración 2FA",
-  "formTotpDesc": "Ingresa la clave secreta TOTP (Base32) de tu cuenta. La encontrarás al activar 2FA en el sitio web, o puedes escanear el código QR directamente.",
+  "formTotpDesc": "Escribe la clave secreta que te da el sitio al activar la verificación en dos pasos, o escanea su código QR.",
   "formScanQr": "Escanear código QR",
   "formScanQrScreen": "Escanear QR de la pantalla",
   "formQrScreenNoQr": "No se encontró un código QR en la captura.",
   "formQrScreenError": "No se pudo capturar la pantalla.",
-  "formTotpNonStandard": "TOTP detectado, pero con parámetros no estándar (SoloKey genera SHA1, 6 dígitos, 30s); el código podría no coincidir.",
+  "formTotpNonStandard": "Este autenticador usa una configuración poco común; el código que muestre SoloKey podría no coincidir.",
   "formOrManually": "o ingresa manualmente",
   "formAccountIssuerLabel": "Cuenta / Emisor",
   "formAccountIssuerHint": "ej. GitHub, Google, AWS",
-  "formTotpSecretLabel": "Clave secreta TOTP (Base32)",
-  "formSectionPasskey": "Passkey (FIDO2)",
-  "formPasskeyDesc": "Las Passkeys se registran directamente con la plataforma FIDO2 del dispositivo.",
+  "formTotpSecretLabel": "Clave secreta",
+  "formSectionPasskey": "Passkey",
+  "formPasskeyDesc": "Las passkeys se crean en cada sitio web, desde tu celular o tu computadora.",
   "formPasskeyHint": "Usa la pantalla de Passkeys en Ajustes para registrar o gestionar tus passkeys.",
-  "formSectionSsh": "Configuracion de Llave SSH",
-  "formGenerateSsh": "Generar par de llaves Ed25519",
+  "formSectionSsh": "Llave SSH",
+  "formGenerateSsh": "Generar llaves SSH (Ed25519)",
   "formPrivateKeyRequired": "La llave privada es requerida",
   "formPublicKeyOptional": "Llave Publica (Opcional)",
   "formKeyPassphraseOptional": "Passphrase de la Llave (Opcional)",
-  "formSectionDoubleEnc": "Cifrado de Sobre Doble",
-  "formEnableDoubleEnc": "Activar Cifrado Doble",
-  "formDoubleEncDesc": "Protege los secretos de este registro con un PIN secundario. Se cifraran adicionalmente.",
-  "formPinSecondaryEditLabel": "PIN Secundario (Dejar vacio para mantener actual o ingresar para cambiar)",
+  "formSectionDoubleEnc": "Cifrado doble",
+  "formEnableDoubleEnc": "Activar cifrado doble",
+  "formDoubleEncDesc": "Pide un PIN extra para ver los secretos de este registro.",
+  "formPinSecondaryEditLabel": "PIN secundario (vacío para no cambiarlo)",
   "formPinSecondaryLabel": "PIN Secundario",
   "formPinSecondaryRequired": "El PIN secundario es requerido",
-  "formBiometricUnlock": "Desbloqueo biometrico",
-  "formBiometricUnlockSub": "Guardar el PIN cifrado para desbloquear rapidamente con huella/rostro.",
+  "formBiometricUnlock": "Desbloqueo con huella o rostro",
+  "formBiometricUnlockSub": "Guarda el PIN cifrado para abrirlo rápido con tu huella o tu rostro.",
   "formSectionRotation": "Recordatorio de Rotación",
   "formRotationLabel": "Recordar cambiar contraseña",
   "formRotNone": "No recordar",
@@ -469,13 +525,16 @@
   "formDiscardMessage": "Tienes cambios sin guardar. Si sales ahora se perderan.",
   "formDiscardKeep": "Seguir editando",
   "formDiscardLeave": "Descartar",
-  "formErrInvalidUrl": "Ingresa una URL valida",
-  "formErrInvalidTotp": "Secreto Base32 invalido (solo A-Z y 2-7)",
-  "formPasteTotp": "Pegar enlace otpauth",
-  "formPasteApplied": "TOTP rellenado desde el portapapeles",
-  "formPasteNoOtpauth": "No hay un enlace otpauth:// valido en el portapapeles",
+  "formErrInvalidUrl": "Escribe una dirección web válida",
+  "formErrInvalidTotp": "Clave secreta no válida: solo letras de la A a la Z y números del 2 al 7",
+  "formPasteTotp": "Pegar enlace del autenticador",
+  "formPasteApplied": "Autenticador rellenado desde el portapapeles",
+  "formPasteNoOtpauth": "El portapapeles no tiene un enlace de autenticador (otpauth://)",
   "formDupTitle": "Posible duplicado",
   "formDupMessage": "\"{title}\" ya usa este usuario. ¿Guardar de todos modos?",
+  "@formDupMessage": {
+    "placeholders": { "title": { "type": "String" } }
+  },
   "formDupReview": "Revisar",
   "formDupSaveAnyway": "Guardar de todos modos",
 
@@ -483,6 +542,9 @@
   "folderNewSubfolder": "Nueva subcarpeta",
   "folderDeleteTitle": "Eliminar carpeta",
   "folderDeleteKeepBody": "¿Quitar \"{name}\"? Sus subcarpetas y credenciales se conservan: elige a dónde moverlas. No se elimina nada.",
+  "@folderDeleteKeepBody": {
+    "placeholders": { "name": { "type": "String" } }
+  },
   "folderDeleteMoveToParent": "Mover contenido a la carpeta padre",
   "folderDeleteMoveToVault": "Mover contenido a la raíz",
   "folderDeleted": "Carpeta eliminada",
@@ -500,6 +562,9 @@
   "folderNew": "Nueva carpeta",
   "folderAddSubfolder": "Añadir subcarpeta",
   "folderItemCount": "{count, plural, =0{Sin elementos} =1{1 elemento} other{{count} elementos}}",
+  "@folderItemCount": {
+    "placeholders": { "count": { "type": "int" } }
+  },
   "folderColorTitle": "Color",
   "folderEditTitle": "Editar carpeta",
   "folderTreeHint": "Usa las flechas para navegar por las carpetas; pulsa el botón de menú para acciones.",
@@ -521,11 +586,14 @@
   "cardMovedSuccess": "Credencial movida con éxito",
 
   "typeSelNote": "Nota",
-  "typeSelTotp": "TOTP",
+  "typeSelTotp": "Autenticador",
   "typeSelPasskey": "Passkey",
 
   "genRegenerate": "Regenerar",
   "genLength": "Longitud: {n}",
+  "@genLength": {
+    "placeholders": { "n": { "type": "int" } }
+  },
   "genGeneratedPassword": "Contraseña generada",
   "genUseAndCopy": "Usar y Copiar",
 
@@ -535,6 +603,12 @@
   "strengthStrong": "Fuerte",
 
   "clipboardCopiedClears": "{label} copiado · se limpia en {seconds}s",
+  "@clipboardCopiedClears": {
+    "placeholders": {
+      "label": { "type": "String" },
+      "seconds": { "type": "int" }
+    }
+  },
 
   "passwordRowGeneratorTooltip": "Generador de claves",
   "keyboardSpace": "Espacio",
@@ -544,44 +618,53 @@
   "transferTabImport": "Importar",
   "transferErrorTitle": "Error",
   "transferTypePasswords": "Contraseñas",
-  "transferTypeApiKeys": "API Keys",
+  "transferTypeApiKeys": "Claves de API",
   "transferTypeSecureNotes": "Notas seguras",
-  "transferTypeTotp": "Autenticadores (TOTP)",
+  "transferTypeTotp": "Autenticadores",
   "transferTypePasskeys": "Passkeys",
   "transferTypeSshKeys": "Llaves SSH",
   "transferExportPasswordRequired": "Ingresa una contraseña de exportación",
   "transferSelectAtLeastOneType": "Selecciona al menos un tipo de credencial",
   "transferExportedSummary": "Exportadas {creds} credenciales · {folders} carpetas",
+  "@transferExportedSummary": {
+    "placeholders": { "creds": { "type": "int" }, "folders": { "type": "int" } }
+  },
   "transferExportError": "Error al exportar: {msg}",
+  "@transferExportError": { "placeholders": { "msg": { "type": "String" } } },
   "transferImportError": "Error al importar: {msg}",
+  "@transferImportError": { "placeholders": { "msg": { "type": "String" } } },
   "transferImportCsvError": "Error al importar CSV: {msg}",
+  "@transferImportCsvError": { "placeholders": { "msg": { "type": "String" } } },
   "transferOverwriteTitle": "¿Sobrescribir bóveda?",
   "transferOverwriteBody": "Esta acción eliminará TODAS las credenciales actuales y las reemplazará con las del archivo. Esta operación no se puede deshacer.",
   "transferOverwriteConfirm": "Sobrescribir",
   "transferExportPasswordLabel": "Contraseña de exportación",
-  "transferExportPasswordInfo": "Crea una contraseña para proteger este backup. Necesitarás ingresarla al importar en cualquier dispositivo.",
-  "transferExportPasswordHint": "Ej: \"mi-clave-backup-2025\"",
+  "transferExportPasswordInfo": "Crea una contraseña para proteger este respaldo. La necesitarás al importarlo en cualquier equipo.",
+  "transferExportPasswordHint": "Ej: \"mi-clave-de-respaldo\"",
   "transferSelectWhatToExport": "Selecciona qué exportar",
-  "transferEncryptionInfo": "El archivo se cifra con AES-256-GCM + Argon2id. Solo quién conozca la contraseña de exportación puede abrirlo.",
+  "transferEncryptionInfo": "El archivo va cifrado: solo quien conozca la contraseña de exportación puede abrirlo.",
   "transferExportButton": "Exportar bóveda",
   "transferExportDone": "Exportación completada",
   "transferBackupReminder": "Hace tiempo que no haces un respaldo. Exporta una copia cifrada y guárdala en un lugar seguro.",
   "transferSavedTo": "Guardado en: {path}",
   "@transferSavedTo": { "placeholders": { "path": { "type": "String" } } },
   "transferSummary": "{creds} credenciales · {folders} carpetas",
-  "transferBackupPasswordLabel": "Contraseña del backup",
-  "transferImportPasswordInfo": "Ingresa la contraseña que usaste al exportar el backup. Si importas un backup tuyo del mismo dispositivo puedes dejar este campo vacío.",
-  "transferImportPasswordHint": "Déjala vacía para backups del mismo dispositivo",
+  "@transferSummary": {
+    "placeholders": { "creds": { "type": "int" }, "folders": { "type": "int" } }
+  },
+  "transferBackupPasswordLabel": "Contraseña del respaldo",
+  "transferImportPasswordInfo": "Escribe la contraseña que usaste al exportar. Si el respaldo es de este mismo equipo, puedes dejarla vacía.",
+  "transferImportPasswordHint": "Vacía si el respaldo es de este equipo",
   "transferImportModeLabel": "Modo de importación",
   "transferModeMerge": "Combinar",
   "transferModeMergeSub": "Añadir sin borrar tus credenciales actuales",
   "transferModeOverwrite": "Sobrescribir",
   "transferModeOverwriteSub": "Borrará todo y reemplazará con el archivo",
   "transferSelectFile": "Seleccionar archivo (.skvault)",
-  "transferImportCsv": "Importar desde CSV (Bitwarden/Chrome/1Pass)",
-  "transferImportOtpauth": "Importar autenticadores (otpauth)",
-  "transferOtpauthNone": "No se encontraron enlaces otpauth:// en ese archivo",
-  "transferOtpauthMigrationUnsupported": "Los QR de exportación de Google Authenticator no son compatibles. Exporta enlaces otpauth:// individuales.",
+  "transferImportCsv": "Importar desde CSV (Bitwarden, Chrome, 1Password)",
+  "transferImportOtpauth": "Importar autenticadores",
+  "transferOtpauthNone": "Ese archivo no tiene autenticadores (enlaces otpauth://)",
+  "transferOtpauthMigrationUnsupported": "Los QR de exportación de Google Authenticator no son compatibles. Exporta cada cuenta por separado.",
   "transferDuplicatesWarning": "{count, plural, =1{1 elemento seleccionado ya existe en tu bóveda} other{{count} elementos seleccionados ya existen en tu bóveda}}",
   "@transferDuplicatesWarning": { "placeholders": { "count": { "type": "int" } } },
   "transferImportDone": "Importación completada",
@@ -615,13 +698,18 @@
   "desktopCollapseSidebar": "Colapsar barra lateral",
   "desktopExpandSidebar": "Expandir barra lateral",
   "desktopWatchtowerBadge": "{count, plural, one{{count} elemento requiere atención} other{{count} elementos requieren atención}}",
+  "@desktopWatchtowerBadge": {
+    "placeholders": {
+      "count": { "type": "int" }
+    }
+  },
   "trayShowVault": "Mostrar bóveda",
   "trayExit": "Salir",
 
   "navSecureFiles": "Archivos seguros",
   "secureFilesTitle": "Archivos seguros",
   "secureFilesEmptyTitle": "Sin archivos",
-  "secureFilesEmptyDesc": "Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu clave maestra.",
+  "secureFilesEmptyDesc": "Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu contraseña maestra.",
   "secureFilesAdd": "Añadir archivo",
   "secureFilesExport": "Exportar / Guardar",
   "secureFilesDelete": "Eliminar",
@@ -652,7 +740,7 @@
   "secureFilesDropHint": "Suelta archivos aqui para agregarlos",
   "secureFilesAddedCount": "Agregados {count} archivo(s)",
   "@secureFilesAddedCount": { "placeholders": { "count": { "type": "int" } } },
-  "secureFilesTooLarge": "\"{name}\" supera el limite de {limit} y se omitio",
+  "secureFilesTooLarge": "\"{name}\" supera el límite de {limit} y se omitió",
   "@secureFilesTooLarge": { "placeholders": { "name": { "type": "String" }, "limit": { "type": "String" } } },
   "secureFilesSkippedLarge": "{count, plural, =1{1 archivo omitido (muy grande)} other{{count} archivos omitidos (muy grandes)}}",
   "@secureFilesSkippedLarge": { "placeholders": { "count": { "type": "int" } } },
@@ -692,7 +780,7 @@
   "syncClientDisconnected": "Celular desconectado. Servidor en espera...",
   "syncPairedOk": "¡Vinculación completada con éxito!",
   "syncComparing": "Comparando datos locales con celular...",
-  "syncBidirOk": "¡Sincronización bidireccional exitosa!",
+  "syncBidirOk": "¡Listo! Los dos equipos quedaron sincronizados",
   "syncErrorGeneric": "Error durante la sincronización.",
   "syncRemoteUnlockReceived": "Recibida solicitud de desbloqueo remoto.",
   "syncPairTitle": "Vincular con App Móvil",
@@ -710,7 +798,7 @@
   "syncRetry": "Reintentar",
   "syncComputerLinked": "Computadora Vinculada",
   "syncComputerLinkedSub": "Esta computadora está emparejada de forma segura. Puedes conectar varios dispositivos a la vez escaneando el mismo QR.",
-  "syncServerE2eeActive": "Servidor local E2EE Activo",
+  "syncServerE2eeActive": "Conexión cifrada activa",
   "syncRemoveLink": "Eliminar Vínculo",
   "syncShowQr": "Mostrar QR",
   "syncNowButton": "Sincronizar ahora",
@@ -729,12 +817,12 @@
   "syncLinkComputer": "Vincular Computadora",
   "syncLinkComputerSub": "Escanea el código QR generado por la aplicación SoloKey en tu computadora para sincronizar los datos locales.",
   "syncScanQrButton": "Escanear Código QR",
-  "syncNegotiating": "Negociando claves de encriptación...",
+  "syncNegotiating": "Conectando de forma segura…",
   "syncComputerLinkedExcl": "¡Computadora Vinculada!",
   "syncComputerLinkedExclSub": "Los datos ahora se sincronizarán de forma segura entre dispositivos.",
   "syncBack": "Volver",
   "syncCouldNotConnect": "No se pudo conectar con la computadora.",
-  "syncRetryButton": "Volver a Intentar",
+  "syncRetryButton": "Volver a intentar",
   "syncRemoteUnlockTitle": "Desbloqueo Remoto",
   "syncRemoteUnlockSub": "Desbloquea la bóveda de tu computadora usando la biometría de este dispositivo.",
   "syncSending": "Enviando...",
@@ -744,7 +832,7 @@
   "syncNoToken": "Vincula de nuevo con el escritorio DESBLOQUEADO para habilitar el desbloqueo remoto.",
   "syncVaultTitle": "Sincronizar Bóveda",
   "syncVaultSub": "Intercambia y actualiza tus credenciales bidireccionalmente en red local.",
-  "syncNotPairedYet": "Aun no has vinculado. Escanea el QR del escritorio.",
+  "syncNotPairedYet": "Aún no has vinculado. Escanea el QR de la computadora.",
   "syncConnectingComputer": "Conectando con la computadora...",
   "syncConnectFailCheck": "No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.",
 
