@@ -9,6 +9,18 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Kit de componentes de Tinta y papel (DIS-2, 2026-11-20)**: `lib/shared/widgets/kit/` con un solo import (`kit.dart`, que
+  también exporta los tokens). `PaperButton` (principal de tinta, secundario con borde, discreto e irreversible en rojo; 48 de
+  alto, texto que baja de renglón), `SecretField` y `SecretText` (Mono; al revelar, números en 700 y símbolos en 500, mismo
+  color; oculto muestra 10 puntos fijos) con `SecretTextController` y `secretSpans`, `CredentialRow` (icono por tipo con
+  `credentialTypeIcon`, copiar en un toque a la vista con `QuickCopy`; con letra ≥ 150 % o menos de 360 de ancho los botones
+  bajan a otro renglón), `CopyButton` (palomita 1.5 s, sin vibrar), `PaperCard`, `Notice` y `StatePill` sobre `SafetyTone`
+  (comprometida, débil, sana, neutral, con icono además del color), `SearchField` con `KeyHint`, `FilterPill`, `SectionLabel`,
+  `EmptyNote`, `PaperTopBar` (crece con la letra y su título no se topa al 134 % de Material), `PaperBottomBar` (etiquetas
+  topadas al 130 %, como Android), `DesktopPanes` con `NavItem` y `TotpCode` (anillo de 30 s que crece con la letra, baja de
+  renglón si no cabe y pasa a débil en los últimos 5). Los textos llegan como parámetros; ningún color fijo. El tema ya no fuerza
+  la barra de desplazamiento visible en escritorio (fallaba en listas sin `ScrollController` propio); quien la quiera la pide.
+
 - **Firma de release de Android con rotación de llave (PLA-1, 2026-11-20)**: llave propia (RSA 4096) fuera del repo, en
   `%USERPROFILE%\SoloKey-firma`, creada una sola vez con `tool\build.ps1 -GenerarLlave` en Podman. Gradle firma release con
   ella si `SOLOKEY_KEY_PROPERTIES` apunta a su `key.properties` (si no, sigue la debug) y `firmar` re-firma cada APK con la debug
