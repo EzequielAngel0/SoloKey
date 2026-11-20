@@ -9,6 +9,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Firma de release de Android con rotación de llave (PLA-1, 2026-11-20)**: llave propia (RSA 4096) fuera del repo, en
+  `%USERPROFILE%\SoloKey-firma`, creada una sola vez con `tool\build.ps1 -GenerarLlave` en Podman. Gradle firma release con
+  ella si `SOLOKEY_KEY_PROPERTIES` apunta a su `key.properties` (si no, sigue la debug) y `firmar` re-firma cada APK con la debug
+  (v1/v2) y la de release con el linaje (v3, Android 9+): se instala encima de la v1 firmada con la debug sin desinstalar.
+  `build_release.ps1 -Target android` exige la llave. Detalle en `docs/publicacion/PUBLICAR.md`.
 - **Build y E2E de Android en Podman (PLA-3, 2026-11-19)**: `tool/build/Containerfile` con etapas independientes (Rust 1.91.1
   con `cargo-ndk`, `cargo-xwin` y `flutter_rust_bridge_codegen`; Flutter de `tests.yml`; SDK y NDK de Android) que `podman build
   --jobs` construye a la vez, juntas en `localhost/solokey-build` y, con el emulador y Android 14, en `localhost/solokey-e2e`.

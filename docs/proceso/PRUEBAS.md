@@ -119,7 +119,8 @@ Windows que baja `cargo-xwin`) y `solokey-build-target`.
 
 Firma: `tool/build.ps1` monta en solo lectura la llave debug del host (`%USERPROFILE%\.android\debug.keystore`). Sin ella
 cada contenedor crea una llave nueva y el APK no se instala encima del que ya está en el celular (habría que desinstalar, y eso
-borra la bóveda). Para comprobarlo: `apksigner verify --print-certs` dentro de la imagen y `keytool -list -v` sobre la llave.
+borra la bóveda). Para comprobarlo: `apksigner verify --print-certs` dentro de la imagen y `keytool -list -v` sobre la llave. La llave de
+release (PLA-1) y la rotación desde la debug: [`publicacion/PUBLICAR.md`](../publicacion/PUBLICAR.md) §"Firma de Android".
 
 | Escaneo | Imagen | Comando | Borrarlo |
 |---|---|---|---|

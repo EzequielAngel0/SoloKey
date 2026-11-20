@@ -8,6 +8,7 @@ Cuando cierres algo, la sesión general lo quita de aquí. **Actualizado: 2026-1
 
 | ID | Qué | Para qué | Cómo |
 |---|---|---|---|
+| DUE-3 | Respaldar la carpeta `%USERPROFILE%\SoloKey-firma` (llave de firma de Android, generada por D el 2026-11-20) fuera del equipo y del repo, con su contenido completo (los cuatro archivos) | Sin ella ningún celular puede actualizar SoloKey sin desinstalar (y desinstalar borra la bóveda), ni se puede publicar en la tienda | Cópiala a una memoria USB o a tu gestor de respaldos cifrado; `key.properties` lleva la contraseña de la llave en claro, guárdala como un secreto. Detalle: [`publicacion/PUBLICAR.md`](publicacion/PUBLICAR.md) §"Firma de Android" |
 | DUE-7 | Exportar la bóveda desde la app, en Windows **y** en el celular, y guardar los `.skvault` fuera del equipo | El respaldo de archivos del 2026-11-15 solo se restaura en esta PC con tu usuario de Windows (DPAPI) y no incluye el celular. El export se abre en cualquier equipo con tu contraseña | En la app: Ajustes, Exportar. Respaldo de archivos ya hecho: `%USERPROFILE%\SoloKey-respaldo-20261114-235706` (con `LEEME.txt` y huellas) |
 | DUE-8 | Abrir la sesión **D** (fase 1) y, en paralelo, la **E** | Arranca la v2 | Prompts en [`PENDIENTES_AGENTE.md`](PENDIENTES_AGENTE.md) ▶ |
 
@@ -15,7 +16,6 @@ Cuando cierres algo, la sesión general lo quita de aquí. **Actualizado: 2026-1
 
 | ID | Qué | Para qué | Cómo |
 |---|---|---|---|
-| DUE-3 | Guardar el respaldo de la llave de firma de Android cuando D la genere (PLA-1, aprobado) | Sin esa llave no se puede actualizar la app en la tienda ni en tu celular sin desinstalar | La sesión D te avisa; guárdala fuera del equipo y del repo |
 | DUE-4 | Revisar las plantillas legales antes de publicarlas | Llevan notas para ti y campos entre corchetes | [`legal/PRIVACIDAD.md`](legal/PRIVACIDAD.md) y [`legal/TERMINOS.md`](legal/TERMINOS.md); idealmente con asesoría legal |
 | DUE-2 | (Opcional) Probar la sync de la v1 con la PC y el celular (R1, M1, M3) | La v2 reescribe la sync (ADR-0010); sirve solo si quieres confiar en la v1 mientras tanto | [`proceso/PRUEBAS_EN_DISPOSITIVOS.md`](proceso/PRUEBAS_EN_DISPOSITIVOS.md) |
 

@@ -125,12 +125,17 @@ function Find-Iscc {
 function Build-Android {
     # Android se compila en Podman (PLA-3): el SDK y el NDK no van al host. tool\build.ps1
     # copia el arbol al contenedor y deja los APK (y el .aab y los simbolos) en build\podman.
+    # Firma (PLA-1): el entregable exige la llave de release; tool\build.ps1 la monta y `firmar`
+    # agrega la rotacion desde la debug para instalar encima de la app ya instalada.
+    $firma = Join-Path $env:USERPROFILE 'SoloKey-firma\key.properties'
+    if (-not (Test-Path $firma)) { throw "Falta la llave de release ($firma). Se crea una sola vez con .\tool\build.ps1 -GenerarLlave; si la tienes respaldada, restaura la carpeta SoloKey-firma." }
     $apkSrc = Join-Path $Root 'build\podman'
     if (Test-Path $apkSrc) { Remove-Item $apkSrc -Recurse -Force -ErrorAction Stop }
     $flags = ''
     if ($Obfuscate) { $flags = ' --obfuscate --split-debug-info=$SALIDA/debug-symbols' }
     $cmd = "flutter build apk --release$flags && cp build/app/outputs/flutter-apk/app-release.apk `$SALIDA/ && " +
-           "flutter build apk --release --split-per-abi$flags && cp build/app/outputs/flutter-apk/app-*-release.apk `$SALIDA/"
+           "flutter build apk --release --split-per-abi$flags && cp build/app/outputs/flutter-apk/app-*-release.apk `$SALIDA/ && " +
+           "for a in `$SALIDA/*.apk; do firmar `"`$a`"; done"
     if ($Aab) { $cmd += " && flutter build appbundle --release$flags && cp build/app/outputs/bundle/release/app-release.aab `$SALIDA/" }
     Write-Step 'Compilando Android en Podman (APK universal, split-per-abi y .aab con -Aab)'
     & (Join-Path $Root 'tool\build.ps1') -Comando $cmd -Salida $apkSrc

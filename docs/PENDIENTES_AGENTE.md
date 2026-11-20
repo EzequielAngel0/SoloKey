@@ -16,7 +16,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 | 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ◐ PLA-6 y PLA-3 hechos (2026-11-19); falta DIS de B |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ☐ puede arrancar: imagen `solokey-build` lista (PLA-3, 2026-11-19) |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5 ◐: CI de Windows ✓; CAL-3 ✓) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
-| 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (de A) |
+| 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1 ✓ 2026-11-20), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (de A) |
 | 6 | v2.0.0 a `main`, con el permiso del dueño | General | ⊘ espera a 5 |
 
 **Como mucho dos sesiones pesadas a la vez** (build de Flutter, Rust, Podman o emulador) y una ligera. Abrir una sesión por
@@ -168,5 +168,5 @@ Resumen AL FINAL, con el CI terminado (gh run watch).
 | A · Núcleo | [`sesiones/A.md`](sesiones/A.md) | NUC-1, NUC-2, NUC-3, NUC-6; NUC-5 después de la v2.0.0 |
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1, DIS-2, DIS-3, DIS-5, DIS-4 |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-10, PAN-1 a PAN-9 |
-| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-1; PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |
+| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | Nada (PLA-1 ✓ 2026-11-20); PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |
 | E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-5 ◐, CAL-1, SEG-2 ◐ (CAL-4, CAL-3, CAL-2 y SEG-1 ✓); SEC-003 y SEC-008 los cierra la v2; SEC-012 lo arregla A |
