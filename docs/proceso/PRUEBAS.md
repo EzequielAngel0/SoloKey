@@ -19,7 +19,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
 | Núcleo Rust | `rust/solokey-core/` (`src/**` y `tests/**`) | `.\rust\cargo.ps1 test` | En Podman; las pruebas de la v1 leen `vectores/v1/`. Clippy: `.\rust\cargo.ps1 clippy --all-targets -- -D warnings` |
-| Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.\rust\fuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir`. `cabecera_kdf` sigue en rojo hasta SEC-012 |
+| Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.\rust\fuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir` |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
@@ -30,7 +30,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 | `pre-push` | `flutter test --coverage` sobre el piso de `tool/coverage_min.txt` | `.githooks/` + `tool/check_coverage.dart` |
 | CI | analyze + test + cobertura; `cargo test` + clippy del núcleo (`rust`); `integration_test/` en Windows (`e2e-windows`) y en un emulador de Android 14 (`e2e-android`). En `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
 
-El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio.
+El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio. Única excepción (dueño, 2026-11-20): la rama que mueve código a Rust y borra sus pruebas Dart (ADR-0011) fija el piso en lo medido, redondeado hacia abajo a un decimal, y lo dice en su CHANGELOG (NUC-1: de 63,4 a 63,2).
 
 **Runners**: el CI corre en máquinas de GitHub (`ubuntu-latest`), gratis por ser un repo público. **No hay runners propios**: nada
 que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-0007](../adr/0007-red-de-calidad-y-ci.md).
@@ -94,7 +94,8 @@ Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al h
 |---|---|---|---|
 | `cargo test` | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 test` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
 | Clippy (la imagen `slim` no lo trae) | `localhost/solokey-build` | `.\tool\build.ps1 -Comando 'cd rust && cargo clippy --locked --all-targets -- -D warnings'` | ver abajo |
-| `.so` por ABI y `solokey_core.dll` | `localhost/solokey-build` | `.\tool\build.ps1 -Nucleo` → `build\podman\jniLibs\` y `build\podman\solokey_core.dll` (sin símbolos exportados hasta que exista el puente de `flutter_rust_bridge`) | ver abajo |
+| `.so` por ABI y `solokey_core.dll` | `localhost/solokey-build` | `.\tool\build.ps1 -Nucleo -Salida rust\dist` → `rust\dist\jniLibs\<abi>\` y `rust\dist\solokey_core.dll`. **Hace falta antes de `flutter test`, `run` o `build`** (NUC-1): la app carga el núcleo desde ahí | ver abajo |
+| Puente `flutter_rust_bridge` | `localhost/solokey-build` | `.\rust\puente.ps1` regenera `lib/core/infrastructure/rust/` y `src/frb_generated.rs` tras cambiar `src/api/` | ver abajo |
 | Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.\rust\fuzz.ps1` | `podman rmi localhost/solokey-fuzz:<nightly>; podman volume rm solokey-fuzz-corpus solokey-fuzz-target` |
 
 ## Build y E2E de Android en Podman (PLA-3)

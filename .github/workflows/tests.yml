@@ -19,6 +19,21 @@ jobs:
       - name: Dependencies
         run: flutter pub get
 
+      # Nucleo Rust (NUC-1): las pruebas que usan la cripto real lo cargan de rust/dist/.
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.91.1'
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Nucleo Rust (.so de Linux)
+        working-directory: rust
+        run: |
+          cargo build --release --locked -p solokey-core
+          mkdir -p dist && cp target/release/libsolokey_core.so dist/
+
       # Los archivos generados (.g.dart/.freezed.dart/l10n) estan versionados,
       # asi que no hace falta build_runner/gen-l10n en CI.
       - name: Analyze
@@ -52,6 +67,23 @@ jobs:
 
       - name: Dependencies
         run: flutter pub get
+
+      # Nucleo Rust (NUC-1): CMake empaqueta rust/dist/solokey_core.dll junto al .exe. En el runner se
+      # compila nativo; en el equipo del duenio sale cruzada en Podman (tool\build.ps1 -Nucleo).
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.91.1'
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Nucleo Rust (DLL)
+        working-directory: rust
+        shell: bash
+        run: |
+          cargo build --release --locked -p solokey-core
+          mkdir -p dist && cp target/release/solokey_core.dll dist/
 
       - name: E2E app_boot_test (no destructivo)
         run: flutter test integration_test/app_boot_test.dart -d windows
@@ -112,6 +144,22 @@ jobs:
 
       - name: Dependencies
         run: flutter pub get
+
+      # Nucleo Rust (NUC-1): Gradle toma rust/dist/jniLibs/<abi>/libsolokey_core.so. Solo x86_64 (el emulador).
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.91.1'
+          targets: x86_64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Nucleo Rust (.so de Android)
+        working-directory: rust
+        run: |
+          cargo install --locked cargo-ndk
+          cargo ndk -t x86_64 -o dist/jniLibs build --release --locked -p solokey-core
 
       - name: E2E
         uses: reactivecircus/android-emulator-runner@v2

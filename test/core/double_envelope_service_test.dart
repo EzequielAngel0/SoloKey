@@ -1,6 +1,7 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:solokey/core/infrastructure/security/double_envelope_service.dart';
+import 'package:solokey/core/infrastructure/rust_core.dart';
 import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 
 class FakeSecureStorage extends Fake implements FlutterSecureStorage {
@@ -55,6 +56,9 @@ void main() {
   late SecurityServiceImpl securityService;
   late FakeSecureStorage secureStorage;
   late DoubleEnvelopeService sut;
+
+  // Cripto real del nucleo Rust: carga rust/dist/ (lo deja tool/build.ps1 -Nucleo -Salida rust/dist).
+  setUpAll(initRustCore);
 
   setUp(() {
     securityService = SecurityServiceImpl();

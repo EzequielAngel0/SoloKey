@@ -1,6 +1,7 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 
+import '../../core/infrastructure/rust_core.dart';
 import 'injection.config.dart';
 
 final GetIt getIt = GetIt.instance;
@@ -10,4 +11,8 @@ final GetIt getIt = GetIt.instance;
   preferRelativeImports: true,
   asExtension: true,
 )
-Future<void> configureDependencies() async => getIt.init();
+Future<void> configureDependencies() async {
+  // El nucleo Rust va antes que todo: SecurityService lo usa (NUC-1).
+  await initRustCore();
+  getIt.init();
+}

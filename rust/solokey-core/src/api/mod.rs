@@ -5,3 +5,6 @@
 //! derivada, un texto descifrado) lo borra quien lo recibe (`SessionManager`, `zeroBuffer`).
 
 pub mod crypto;
+pub mod error;
+pub mod sync;
+pub mod vault;

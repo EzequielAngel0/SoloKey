@@ -9,18 +9,17 @@ Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`]
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | NUC-1 | Crate `solokey-core` con la cripto (Argon2id, AES-256-GCM, `zeroize`) detrás de `ISecurityService`, vía `flutter_rust_bridge` 2; corre en Android y Windows | L | ◐ Rust hecho; falta el puente Dart | [ver](#nuc-1) |
-| 2 | NUC-2 | Formato de bóveda v2 (SQLite con `rusqlite`, cabecera versionada, metadatos cifrados) y migración única desde la v1 con copia previa | XL | ◐ Rust hecho (formato, migración con vectores); falta Dart | [ver](#nuc-2) |
-| 3 | NUC-3 | Sync v2 en el núcleo: canal Noise con llaves fijadas en el QR, protocolo versionado, LWW, aviso claro entre v1 y v2 | XL | ◐ Rust hecho (canal IK, delta LWW); falta Dart | [ver](#nuc-3) |
-| 4 | NUC-6 | Directorio de datos configurable (bóveda aislada para E2E); la ruta real solo sin la bandera de prueba | S | ☐ | Lo pide E (CAL-5); va con NUC-2 |
-| 5 | NUC-5 | Passkeys reales (WebAuthn, proveedor de Credential Manager en Android) | XL | ⊘ después de la v2.0.0 | [`../seguridad/WEBAUTHN.md`](../seguridad/WEBAUTHN.md) |
+| 1 | NUC-2 | Formato de bóveda v2 (SQLite con `rusqlite`, cabecera versionada, metadatos cifrados) y migración única desde la v1 con copia previa | XL | ◐ Rust hecho (formato, migración con vectores); falta Dart | [ver](#nuc-2) |
+| 2 | NUC-3 | Sync v2 en el núcleo: canal Noise con llaves fijadas en el QR, protocolo versionado, LWW, aviso claro entre v1 y v2 | XL | ◐ Rust hecho (canal IK, delta LWW); falta Dart | [ver](#nuc-3) |
+| 3 | NUC-6 | Directorio de datos configurable (bóveda aislada para E2E); la ruta real solo sin la bandera de prueba | S | ☐ | Lo pide E (CAL-5); va con NUC-2 |
+| 4 | NUC-5 | Passkeys reales (WebAuthn, proveedor de Credential Manager en Android) | XL | ⊘ después de la v2.0.0 | [`../seguridad/WEBAUTHN.md`](../seguridad/WEBAUTHN.md) |
 
 ## Necesita de otros carriles
 
 | De | Qué | Para |
 |---|---|---|
-| D | Imagen `solokey-build` en Podman (Rust, `cargo-ndk`, `cargo-xwin`, SDK y NDK de Android) y paso de Rust en CI (PLA-3) | NUC-1 en Android y Windows |
-| E | Vectores de prueba de la v1 (CAL-2) | NUC-2 (la migración) |
+| D | `cargo-expand` en la etapa Rust de `solokey-build`: `rust/puente.ps1` lo instala en cada corrida | Regenerar el puente rápido |
+| E | `tool/vectores_v1/generar_vectores.dart` ya usa el núcleo (no queda cripto Dart): la verdad de la v1 se regenera desde `main` | Saberlo si se rehacen los vectores |
 
 ## No reabre
 
@@ -32,16 +31,6 @@ Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`]
 | `rustup` en el host | Todo Rust en Podman (ADR-0012) |
 
 ## Detalle
-
-### NUC-1
-
-1. `rust/solokey-core` (workspace en `rust/`). Crates de RustCrypto: `argon2`, `aes-gcm`, `zeroize`; nada de cripto propia.
-2. Mismos parámetros que la v1 (ADR-0003): Argon2id 64 MiB, 3, 4, 32 bytes; `nonce‖ciphertext‖tag`.
-3. Pruebas unitarias **solo aquí**, en Rust (`cargo test` en Podman), con los vectores de CAL-2 cuando estén.
-4. Puente con `flutter_rust_bridge` 2; la implementación Dart de `ISecurityService` pasa a llamar al núcleo. La cripto en Dart y
-   sus pruebas se borran en la misma rama (ADR-0011).
-5. Android: `.so` por ABI con `cargo-ndk` en la imagen de D. Windows: `solokey_core.dll` cruzada con `cargo-xwin`, que el build
-   de Flutter del host empaqueta.
 
 ### NUC-2
 

@@ -251,6 +251,11 @@ try {
     if ($Clean) { Invoke-Flutter @('clean') 'flutter clean' }
     if (-not $SkipPubGet) { Invoke-Flutter @('pub', 'get') 'flutter pub get' }
 
+    # Nucleo Rust (NUC-1): DLL y .so frescos en rust\dist, de donde los toman CMake y Gradle.
+    Write-Step 'Nucleo Rust en Podman (tool\build.ps1 -Nucleo)'
+    & (Join-Path $Root 'tool\build.ps1') -Nucleo -Salida (Join-Path $Root 'rust\dist')
+    if ($LASTEXITCODE -ne 0) { throw 'Fallo el build del nucleo Rust' }
+
     switch ($Target) {
         'android' { Build-Android }
         'windows' { [void] (Build-Windows) }

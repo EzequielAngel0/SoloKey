@@ -2,6 +2,7 @@ import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:solokey/core/infrastructure/rust_core.dart';
 import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 import 'package:solokey/core/infrastructure/security/session_manager.dart';
 import 'package:solokey/core/services/recovery_service.dart';
@@ -109,6 +110,9 @@ void main() {
   late SessionManager session;
   late FakeVaultRepository vaultRepo;
   late RecoveryService recoveryService;
+
+  // Cripto real del nucleo Rust: carga rust/dist/ (lo deja tool/build.ps1 -Nucleo -Salida rust/dist).
+  setUpAll(initRustCore);
 
   setUp(() {
     storage = FakeSecureStorage();

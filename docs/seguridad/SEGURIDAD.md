@@ -25,7 +25,7 @@ Qué protege la app, contra qué, y lo que sigue abierto. Los controles técnico
 |---|---|---|
 | SEC-001 | El código de recuperación iba al portapapeles sin limpieza | ✓ Arreglado: ya no hay `Clipboard.setData` fuera de `ClipboardService` |
 | SEC-002 | El archivo temporal del export quedaba tras compartirlo | ✓ Arreglado: se borra tras el share (`vault_export_service.dart`) |
-| SEC-003 | La contraseña maestra viaja como `String` (inmutable, no se puede poner a cero) | ◐ Abierto en la v1: límite de Dart; se mitiga acortando su vida. Lo cierra el núcleo Rust de la v2 ([ADR-0008](../adr/0008-nucleo-en-rust.md), NUC-1) |
+| SEC-003 | La contraseña maestra viaja como `String` (inmutable, no se puede poner a cero) | ◐ Abierto: límite de Dart; se mitiga acortando su vida. Desde NUC-1 (2026-11-20) Argon2id y AES-GCM corren en el núcleo Rust y ponen a cero lo que reciben, pero la maestra aún cruza como `String` de Dart (`utf8.encode` en `SecurityServiceImpl`). Lo cierra NUC-2, cuando la bóveda se abra en el núcleo ([ADR-0008](../adr/0008-nucleo-en-rust.md)) |
 | SEC-004 | Ocultar en segundo plano venía apagado | ✓ Arreglado: `obscureOnBackground` en `true` por defecto |
 | SEC-005 | El `android:label` no decía SoloKey | ✓ Arreglado |
 | SEC-006 | Faltaba `allowBackup="false"` | ✓ Arreglado (también `fullBackupContent="false"`) |

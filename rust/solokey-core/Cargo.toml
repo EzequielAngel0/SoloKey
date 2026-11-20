@@ -12,7 +12,7 @@ name = "solokey_core"
 crate-type = ["rlib", "cdylib", "staticlib"]
 
 [dependencies]
-anyhow = "1"
+flutter_rust_bridge = "=2.11.1"
 aes-gcm = { version = "0.10", features = ["zeroize"] }
 base64 = "0.22"
 argon2 = { version = "0.5", features = ["zeroize"] }
@@ -28,3 +28,6 @@ x25519-dalek = { version = "2", features = ["static_secrets"] }
 [dev-dependencies]
 hex = "0.4"
 tempfile = "3"
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ["cfg(frb_expand)"] }

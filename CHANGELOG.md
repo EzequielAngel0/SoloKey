@@ -14,6 +14,13 @@ versión viven en la página de Releases de GitHub.
   ella si `SOLOKEY_KEY_PROPERTIES` apunta a su `key.properties` (si no, sigue la debug) y `firmar` re-firma cada APK con la debug
   (v1/v2) y la de release con el linaje (v3, Android 9+): se instala encima de la v1 firmada con la debug sin desinstalar.
   `build_release.ps1 -Target android` exige la llave. Detalle en `docs/publicacion/PUBLICAR.md`.
+- **Puente al núcleo Rust (NUC-1, 2026-11-20)**: `flutter_rust_bridge` 2.11.1 (`flutter_rust_bridge.yaml`, código generado en
+  `lib/core/infrastructure/rust/` y `src/frb_generated.rs`, se regenera con `rust/puente.ps1`). `SecurityServiceImpl` llama al
+  núcleo para Argon2id, AES-256-GCM, sal, verificación y SHA-256; `initRustCore()` carga la librería desde `configureDependencies`.
+  Las librerías salen de `tool\build.ps1 -Nucleo -Salida rust\dist` (sin versionar); `windows/CMakeLists.txt` copia la DLL junto
+  al `.exe`, Gradle toma `rust/dist/jniLibs` y los dos fallan con un aviso si faltan; `build_release.ps1` las compila antes.
+  CI: los jobs de Flutter compilan el núcleo para su plataforma. Se borran `crypto_isolate.dart` y `security_service_test.dart`
+  (ADR-0011); por el puente salen las mismas claves que en la v1 (vectores de CAL-2).
 - **Build y E2E de Android en Podman (PLA-3, 2026-11-19)**: `tool/build/Containerfile` con etapas independientes (Rust 1.91.1
   con `cargo-ndk`, `cargo-xwin` y `flutter_rust_bridge_codegen`; Flutter de `tests.yml`; SDK y NDK de Android) que `podman build
   --jobs` construye a la vez, juntas en `localhost/solokey-build` y, con el emulador y Android 14, en `localhost/solokey-e2e`.
@@ -96,7 +103,8 @@ versión viven en la página de Releases de GitHub.
   600 y 700; Mono 400, 500 y 700) con fontTools 4.55.3 en Podman; fuera Inter y JetBrains Mono. Fuera `app_colors.dart`, las
   paletas dim y OLED y los 6 colores de tipo; los nombres de la v1 (`primary`, `accent`, `typeX`...) quedan como alias de los
   tokens nuevos hasta que C rehaga cada pantalla. Borrada `test/theme/theme_smoke_test.dart` (ADR-0011).
-
+- **Piso de cobertura de 63,4 a 63,2 (NUC-1, 2026-11-20)**: al mover la cripto a Rust y borrar sus pruebas Dart; el puente
+  generado no cuenta (`tool/check_coverage.dart`). Regla de esta excepción en `docs/proceso/PRUEBAS.md`.
 - **PLA-4 (2026-11-19)**: dependencias mayores, una por commit. go_router 18; local_auth 3 (parámetros sueltos y
   `LocalAuthException`); flutter_secure_storage 10 con `migrateOnAlgorithmChange` y `resetOnError: false` (migra sola lo que la v9
   guardó con EncryptedSharedPreferences; `migrateWithBackup` se salta esa migración en 10.3.4); Riverpod 3 con riverpod_generator 4

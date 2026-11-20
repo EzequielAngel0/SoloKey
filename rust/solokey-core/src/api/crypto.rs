@@ -2,6 +2,7 @@
 
 use zeroize::Zeroizing;
 
+use crate::api::error::CoreFailure;
 use crate::crypto::{self as c, KdfParams};
 
 /// Argon2id. `password` son los bytes exactos de entrada al KDF (Dart pasa `utf8.encode(password)`, lo mismo que
@@ -12,7 +13,7 @@ pub fn derive_key(
     memory_kib: u32,
     iterations: u32,
     parallelism: u32,
-) -> anyhow::Result<Vec<u8>> {
+) -> Result<Vec<u8>, CoreFailure> {
     let password = Zeroizing::new(password);
     let key = c::derive_key(
         &password,
@@ -27,13 +28,13 @@ pub fn derive_key(
 }
 
 /// AES-256-GCM; devuelve `nonce || ciphertext || tag`.
-pub fn encrypt(plaintext: Vec<u8>, key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+pub fn encrypt(plaintext: Vec<u8>, key: Vec<u8>) -> Result<Vec<u8>, CoreFailure> {
     let (plaintext, key) = (Zeroizing::new(plaintext), Zeroizing::new(key));
     Ok(c::encrypt(&plaintext, &key)?)
 }
 
 /// Descifra un blob de [`encrypt`].
-pub fn decrypt(blob: Vec<u8>, key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+pub fn decrypt(blob: Vec<u8>, key: Vec<u8>) -> Result<Vec<u8>, CoreFailure> {
     let key = Zeroizing::new(key);
     let pt = c::decrypt(&blob, &key)?;
     Ok(pt.to_vec())
@@ -45,7 +46,7 @@ pub fn generate_salt() -> Vec<u8> {
 }
 
 /// Blob de verificacion de la clave (`MasterKeyConfig.verificationData`).
-pub fn create_verification_data(key: Vec<u8>) -> anyhow::Result<Vec<u8>> {
+pub fn create_verification_data(key: Vec<u8>) -> Result<Vec<u8>, CoreFailure> {
     let key = Zeroizing::new(key);
     Ok(c::create_verification_data(&key)?)
 }

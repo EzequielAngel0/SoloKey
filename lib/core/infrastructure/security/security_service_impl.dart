@@ -1,12 +1,13 @@
 import 'dart:convert';
-import 'dart:isolate';
 import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
-import 'crypto_isolate.dart';
+import '../rust/api/crypto.dart' as core;
 import 'i_security_service.dart';
 
+/// Cripto de la boveda en el nucleo Rust (NUC-1, ADR-0008): Argon2id y AES-256-GCM de RustCrypto, mismo formato
+/// que la v1. Corre en el pool de hilos del puente, asi que no bloquea la interfaz.
 @LazySingleton(as: ISecurityService)
 class SecurityServiceImpl implements ISecurityService {
   @override
@@ -16,50 +17,43 @@ class SecurityServiceImpl implements ISecurityService {
     required int memory,
     required int iterations,
     required int parallelism,
-  }) async {
-    final saltBytes = Uint8List.fromList(base64Decode(saltBase64));
-    return Isolate.run(
-      () => deriveKeyIsolate(
-        DeriveKeyParams(
-          password: password,
-          saltBytes: saltBytes,
-          memory: memory,
-          iterations: iterations,
-          parallelism: parallelism,
-        ),
-      ),
-    );
-  }
+  }) =>
+      // utf8.encode: los mismos bytes que pasaba la libreria `cryptography` de la v1.
+      core.deriveKey(
+        password: utf8.encode(password),
+        salt: base64Decode(saltBase64),
+        memoryKib: memory,
+        iterations: iterations,
+        parallelism: parallelism,
+      );
 
   @override
   Future<Uint8List> encrypt(Uint8List plaintext, Uint8List keyBytes) =>
-      Isolate.run(
-        () => encryptIsolate(EncryptParams(plaintext: plaintext, keyBytes: keyBytes)),
-      );
+      core.encrypt(plaintext: plaintext, key: keyBytes);
 
   @override
   Future<Uint8List> decrypt(Uint8List cipherBlob, Uint8List keyBytes) =>
-      Isolate.run(
-        () => decryptIsolate(DecryptParams(cipherBlob: cipherBlob, keyBytes: keyBytes)),
-      );
+      core.decrypt(blob: cipherBlob, key: keyBytes);
 
   @override
-  Future<String> generateSaltBase64() =>
-      Isolate.run(() => generateSaltBase64Isolate(null));
+  Future<String> generateSaltBase64() async =>
+      base64Encode(await core.generateSalt());
 
   @override
-  Future<String> createVerificationData(Uint8List keyBytes) =>
-      Isolate.run(() => createVerificationDataIsolate(keyBytes));
+  Future<String> createVerificationData(Uint8List keyBytes) async =>
+      base64Encode(await core.createVerificationData(key: keyBytes));
 
   @override
-  Future<bool> verifyKey(Uint8List keyBytes, String verificationData) =>
-      Isolate.run(
-        () => verifyKeyIsolate(
-          (keyBytes: keyBytes, verificationDataBase64: verificationData),
-        ),
-      );
+  Future<bool> verifyKey(Uint8List keyBytes, String verificationData) async {
+    final Uint8List blob;
+    try {
+      blob = base64Decode(verificationData);
+    } on FormatException {
+      return false;
+    }
+    return core.verifyKey(key: keyBytes, verification: blob);
+  }
 
   @override
-  Future<Uint8List> sha256(Uint8List data) =>
-      Isolate.run(() => sha256Isolate(data));
+  Future<Uint8List> sha256(Uint8List data) => core.sha256(data: data);
 }
