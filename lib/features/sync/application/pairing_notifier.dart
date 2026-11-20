@@ -83,6 +83,9 @@ class PairingNotifier extends StateNotifier<PairingState> {
       } else {
         state = PairingState.failed('Fallo al acordar la clave de encriptación.');
       }
+    } on PeerVersionException catch (e) {
+      // QR de otra version (la v1 no trae `v`): una v1 y una v2 no se mezclan.
+      state = PairingState.failed(e.toString());
     } catch (e) {
       state = PairingState.failed('Formato de código QR no válido: $e');
     }

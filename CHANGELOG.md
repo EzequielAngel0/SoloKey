@@ -9,6 +9,17 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Sync v2 con el canal Noise del núcleo (NUC-3, 2026-11-20)**: `SyncService` (`lib/features/sync/infrastructure/`) se
+  reescribe sobre `rust/solokey-core` (`api/sync.rs`): canal `Noise_IK_25519_ChaChaPoly_SHA256` (celular inicia, escritorio
+  responde) y delta LWW del núcleo. QR v2 `{v:2, ip, port, token, pub}`: el celular conoce la llave estática del escritorio y
+  manda `{id, name, token}` cifrado en el primer mensaje; el escritorio fija la llave del celular (`solokey_sync2_peers`) y el
+  celular la del escritorio (`solokey_sync2_desktop`). El token del QR es de **un solo uso y caduca a los 10 minutos** (otro
+  celular necesita un QR nuevo); reconectar no lo pide. Dentro del canal, byte 0 = mensaje del delta y 1 = control JSON
+  (`remote_unlock_token`, `approval_request`, `sync_request`, `wifi_unlock`, `ping`...); cualquiera de los dos arranca una ronda
+  (`SyncSession.start`) y el otro contesta solo (`onFrame` sin bóveda + `process`). Un par con la v1 (QR sin `v` o JSON en texto)
+  se rechaza con un aviso claro (`PeerVersionException`, `kPeerV1Message`, `kPeerV2Message`). E2E nueva
+  `integration_test/sync_v2_test.dart` (escritorio real contra un celular hecho con el núcleo y al revés, en loopback) en el
+  runner y en `tests.yml`; núcleo: `SyncInbound`, `SyncStep`, `protocol::is_summary` y tres pruebas nuevas.
 - **Galería del kit (DIS-3, 2026-11-20)**: `lib/main_galeria.dart` (solo debug; en release lanza `StateError`) abre
   `KitGalleryApp` (`lib/shared/gallery/kit_gallery.dart`) con todo el kit y la paleta con sus hex, y controles de tema (claro,
   oscuro, sistema), letra (100, 150, 200 %) y celular o escritorio; arranca en oscuro, 200 % y escritorio. Es un punto de entrada
@@ -124,6 +135,10 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **Fuera la sync de Dart (NUC-3, 2026-11-20)**: se borran `DeltaSyncManager` y el canal X25519 + AES-GCM de `SyncService`
+  (claves `solokey_sync_key`, `solokey_sync_devices`, `solokey_server_device_keys` y `solokey_desktop_endpoint`, que
+  `removePairingKey` también borra). Pruebas Dart borradas (ADR-0011): `delta_sync_manager_test` y `pairing_payload_test`. Una
+  v1 y una v2 no sincronizan entre sí: hay que actualizar los dos equipos y volver a emparejar.
 - **Logo plano (DIS-4, 2026-11-20)**: el dueño eligió en la galería la S con cerradura de siempre, sin degradado ni azul: ficha de
   tinta (`#15171A`) con la S en papel. `SoloKeyMark` (la marca en un color, por defecto la tinta del tema; usa
   `solokey_mark.png` como máscara) y `SoloKeyAppIcon` en el kit. `tool/logo/generar_iconos.dart` (`flutter test` como motor de

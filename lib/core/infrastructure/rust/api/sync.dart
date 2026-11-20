@@ -8,8 +8,10 @@ import 'error.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'vault.dart';
 
-// These functions are ignored because they are not marked as `pub`: `seal_all`, `session`, `used`
+// These functions are ignored because they are not marked as `pub`: `envelope`, `lock_failed`, `seal_all`, `session`, `used`
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `Round`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `assert_receiver_is_total_eq`, `clone`, `eq`, `fmt`
+// These functions are ignored (category: IgnoreBecauseOwnerTyShouldIgnore): `default`
 
 /// Genera la identidad del equipo (una vez).
 Future<SyncIdentity> syncGenerateIdentity() =>
@@ -67,17 +69,26 @@ abstract class SyncResponder implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SyncSession>>
 abstract class SyncSession implements RustOpaqueInterface {
+  /// La ronda en curso ya mando y recibio todo.
   Future<bool> isComplete();
 
-  /// Procesa una trama del otro y devuelve las tramas a mandar (puede ser ninguna).
-  Future<List<Uint8List>> onFrame({
-    required VaultHandle vault,
-    required List<int> frame,
-  });
+  /// Descifra una trama del otro. No necesita la boveda (el escritorio bloqueado recibe el desbloqueo por WiFi).
+  Future<SyncInbound> onFrame({required List<int> frame});
 
+  /// Procesa los mensajes de la sync pendientes. Si el otro arranco la ronda, contesta primero con el resumen
+  /// de esta boveda.
+  Future<SyncStep> process({required VaultHandle vault});
+
+  /// Lo que cambio en la ultima ronda.
   Future<SyncRoundReport> report();
 
-  /// Primeras tramas de la ronda (el resumen de esta boveda).
+  /// Descarta la ronda en curso y lo pendiente (la boveda esta bloqueada o algo fallo).
+  Future<void> resetRound();
+
+  /// Tramas con un mensaje de control de la app.
+  Future<List<Uint8List>> sendControl({required List<int> msg});
+
+  /// Arranca una ronda nueva: las tramas con el resumen de esta boveda.
   Future<List<Uint8List>> start({required VaultHandle vault});
 }
 
@@ -157,6 +168,28 @@ class SyncIdentity {
           secretKey == other.secretKey;
 }
 
+/// Lo que trajo una trama.
+class SyncInbound {
+  /// Mensaje de control completo (JSON de la app), si lo hubo.
+  final Uint8List? control;
+
+  /// Llego un mensaje de la sync: llamar a `process` con la boveda abierta (o `reset_round` si esta bloqueada).
+  final bool syncPending;
+
+  const SyncInbound({this.control, required this.syncPending});
+
+  @override
+  int get hashCode => control.hashCode ^ syncPending.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncInbound &&
+          runtimeType == other.runtimeType &&
+          control == other.control &&
+          syncPending == other.syncPending;
+}
+
 /// Version del otro segun su primera trama.
 enum SyncPeerVersion { v2, v1, other, unknown }
 
@@ -177,4 +210,25 @@ class SyncRoundReport {
           runtimeType == other.runtimeType &&
           received == other.received &&
           sent == other.sent;
+}
+
+/// Lo que hay que mandar tras procesar la sync.
+class SyncStep {
+  final List<Uint8List> frames;
+
+  /// La ronda termino: mando y recibio todo.
+  final bool roundDone;
+
+  const SyncStep({required this.frames, required this.roundDone});
+
+  @override
+  int get hashCode => frames.hashCode ^ roundDone.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SyncStep &&
+          runtimeType == other.runtimeType &&
+          frames == other.frames &&
+          roundDone == other.roundDone;
 }

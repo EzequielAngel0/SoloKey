@@ -16,7 +16,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 | 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ✓ PLA-6 y PLA-3 (2026-11-19); DIS-1, 2, 3 y 5 (2026-11-20; galería: `flutter run -d windows -t lib/main_galeria.dart`) |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ✓ 2026-11-20: la app usa la cripto del núcleo; antes de `flutter test`, `run` o `build`, `.\tool\build.ps1 -Nucleo -Salida rust\dist` |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5 ◐: CI de Windows ✓; CAL-3 ✓) | C, A y E | ◐ PAN-10 ✓ (2026-11-20); NUC-2 y NUC-6 ✓ (2026-11-20: la app usa la bóveda v2 y migra la v1 al desbloquear; **no abrir un build de develop con una bóveda real**; las E2E van con `SOLOKEY_DATA_DIR`); PAN-1 a 9 (C, con el kit de DIS-2 en `lib/shared/widgets/kit/`) |
-| 5 | Sync v2 (NUC-3), logo (DIS-4 ✓ 2026-11-20), firma (PLA-1 ✓ 2026-11-20), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (✓ arreglado por A, 2026-11-20) |
+| 5 | Sync v2 (NUC-3 ✓ 2026-11-20), logo (DIS-4 ✓ 2026-11-20), firma (PLA-1 ✓ 2026-11-20), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ◐ NUC-3 ✓ (2026-11-20: canal Noise del núcleo; v1 y v2 no sincronizan, hay que volver a emparejar); SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (✓ arreglado por A, 2026-11-20) |
 | 6 | v2.0.0 a `main`, con el permiso del dueño | General | ⊘ espera a 5 |
 
 **Como mucho dos sesiones pesadas a la vez** (build de Flutter, Rust, Podman o emulador) y una ligera. Abrir una sesión por
@@ -60,8 +60,8 @@ SESION A de SoloKey (Nucleo: cripto, boveda, BD y sync en Rust). Desarrollas COM
 Worktree: git worktree add ..\SoloKey-A -b feat/a-nucleo-cripto origin/develop.
 Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/A.md, docs/adr/0003, 0008, 0009, 0010, 0011 y 0012,
 docs/arquitectura/ARQUITECTURA.md y docs/seguridad/SEGURIDAD.md. ListAgents y avisa que eres el carril A.
-AL EMPEZAR, confirma con el dueno (AskUserQuestion) el orden de docs/sesiones/A.md: NUC-2 (con NUC-6), NUC-3; NUC-5
-despues de la v2.0.0.
+AL EMPEZAR, confirma con el dueno (AskUserQuestion) que hacer: NUC-2, NUC-3 y NUC-6 estan hechos (2026-11-20) y NUC-5 es
+despues de la v2.0.0; si no hay nada aprobado, propone mejoras del nucleo (3 a 5) y no construyas.
 - Rust NO se instala en el host: cargo test, fuzz y builds en Podman (rust\cargo.ps1 para cargo test; clippy, .so y DLL
   con tool\build.ps1 y la imagen solokey-build de PLA-3). La DLL de Windows sale cruzada con cargo-xwin (tool\build.ps1 -Nucleo).
 - Solo crates auditados (RustCrypto, zeroize, snow); nada de cripto propia. Las pruebas unitarias viven SOLO en Rust; al
@@ -165,7 +165,7 @@ Resumen AL FINAL, con el CI terminado (gh run watch).
 
 | Carril | Doc | Aprobado, en orden |
 |---|---|---|
-| A · Núcleo | [`sesiones/A.md`](sesiones/A.md) | NUC-2 con NUC-6, NUC-3 (NUC-1 ✓); NUC-5 después de la v2.0.0 |
+| A · Núcleo | [`sesiones/A.md`](sesiones/A.md) | NUC-1, 2, 3 y 6 ✓; NUC-5 después de la v2.0.0 |
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1, DIS-2, DIS-3, DIS-5, DIS-4 |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-1 a PAN-9 (PAN-10 ✓) |
 | D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | Nada (PLA-1 ✓ 2026-11-20); PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |

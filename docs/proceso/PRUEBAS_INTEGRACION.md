@@ -265,11 +265,10 @@ No hay nada remoto que tocar.
   un QR real → cubre esa rama con **widget test** + entrada manual de la semilla en el E2E.
 - **`FLAG_SECURE` / screen protection**: no bloquea la automatización, pero **impide
   screenshots** (tenlo presente si capturas en Android).
-- **Sync P2P de 2 dispositivos**: emparejar y sincronizar dispositivo↔dispositivo en una
-  sola máquina es frágil (dos instancias en la misma LAN/loopback). Cubre la **lógica** de
-  sync con los tests que ya existen (`delta_sync_manager_test`,
-  `delta_sync_integration_test`, `pairing_payload_test`) y deja el 2-device E2E como
-  manual/avanzado.
+- **Sync P2P de 2 dispositivos**: dos instancias de la app en una máquina es frágil. Desde
+  NUC-3, `sync_v2_test.dart` corre el `SyncService` real contra un par hecho con la API del
+  núcleo en loopback (los dos papeles: escritorio y celular); la lógica del canal y del delta
+  la cubre `cargo test`. Celular contra PC de verdad queda manual.
 
 ## Anti-flaky (regla del repo)
 

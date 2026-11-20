@@ -162,6 +162,11 @@ impl SyncEngine {
         }
     }
 
+    /// Si el mensaje es un resumen (el que abre una ronda).
+    pub fn is_summary(msg: &[u8]) -> bool {
+        matches!(serde_json::from_slice::<Msg>(msg), Ok(Msg::Summary { .. }))
+    }
+
     /// Ya mando y recibio todo.
     pub fn is_complete(&self) -> bool {
         self.sent_push && self.got_push

@@ -102,17 +102,17 @@ vectores de CAL-2.
 
 | Paso | Cómo |
 |---|---|
-| Emparejar | El escritorio levanta un servidor WebSocket (Shelf) desde el puerto 8283 y muestra un QR con IP, puerto, token de un uso y su llave pública X25519 |
-| Acordar la llave | ECDH X25519 autenticado con HMAC-SHA256 sobre el token: `K_sync` por dispositivo, guardada en el almacén seguro |
-| Transporte | `ws://` en la LAN; **cada mensaje va cifrado con AES-256-GCM y `K_sync`** (el canal en sí no tiene TLS) |
-| Reconectar | Sin QR: reto HMAC con la `K_sync` guardada; latido y reconexión automática |
-| Delta | Manifiesto por carril (credenciales, carpetas, archivos) con id, fecha y lápida; gana la última escritura (fecha, desempate por UUID). Desde NUC-2 viajan los registros v2 tal cual (`{data}` y el contenido de los archivos) con su fecha, y cada equipo los guarda con su DEK; lo de una v1 se ignora (`delta_sync_manager.dart`) |
-| Desbloqueo remoto | El escritorio guarda su clave envuelta con un token (DUK) que tiene el celular; el celular lo manda por el canal y el escritorio abre con `vaultOpenWithKey`. La contraseña nunca viaja |
+| Emparejar | El escritorio levanta un servidor WebSocket (Shelf) desde el puerto 8283 y muestra el QR v2 `{v:2, ip, port, token, pub}`: su llave estática Noise y un token de **un uso que caduca a los 10 min** (otro celular, QR nuevo) |
+| Canal | Noise IK del núcleo (§5.1): el celular manda `{id, name, token}` cifrado en el primer mensaje; el escritorio fija la llave del celular (`solokey_sync2_peers`) y el celular la del escritorio (`solokey_sync2_desktop`). La identidad de cada equipo vive en `solokey_sync2_identity` |
+| Transporte | `ws://` binario en la LAN con **todo el canal cifrado**; en claro solo el saludo `SKS2` y el descubrimiento. Por conexión, una cola (`_Link.serial`) mantiene el orden de las tramas |
+| Reconectar | Sin QR: el mismo IK con la llave ya fijada; latido de 20 s y reconexión automática |
+| Mensajes | Byte 0 = delta del núcleo, 1 = control JSON (`remote_unlock_token`, `approval_request`, `sync_request`, `wifi_unlock`, `ping`...). Cualquiera arranca una ronda (`SyncSession.start`); el otro contesta solo (`onFrame` + `process`). Un par v1 recibe el aviso y no se mezcla nada |
+| Desbloqueo remoto | El escritorio guarda su clave envuelta con un token (DUK) que tiene el celular; el celular lo manda por el canal (`wifi_unlock`) y el escritorio abre con `vaultOpenWithKey`. La contraseña nunca viaja |
 
-Diseño original con diagramas: [`SYNC_P2P.md`](SYNC_P2P.md) (plan de junio; donde difiera, por ejemplo el TLS con certificado
-fijado que no se construyó, manda esta tabla). Por qué así: [ADR-0006](../adr/0006-sync-p2p-en-la-lan.md).
+Diseño original con diagramas: [`SYNC_P2P.md`](SYNC_P2P.md) (plan de junio de la v1; donde difiera, manda esta tabla).
+Una v1 y una v2 no sincronizan: hay que actualizar los dos y volver a emparejar. Por qué así: [ADR-0006](../adr/0006-sync-p2p-en-la-lan.md).
 
-### 5.1 Sync v2 (núcleo Rust, NUC-3)
+### 5.1 Núcleo de la sync (Rust, NUC-3)
 
 `rust/solokey-core/src/sync/` ([ADR-0010](../adr/0010-sync-v2-canal-cifrado.md)), **sin E/S**: Flutter mueve los bytes (WebSocket
 binario, descubrimiento, QR) y guarda la identidad del equipo y las llaves fijadas de sus pares en el almacén seguro.

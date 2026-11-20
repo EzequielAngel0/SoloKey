@@ -26,3 +26,4 @@ Cuando cierres algo, la sesión general lo quita de aquí. **Actualizado: 2026-1
 |---|---|---|
 | DUE-5 | Cuentas de tienda (Google Play 25 USD una vez; Apple 99 USD al año) | Decidir publicar en tiendas ([`publicacion/PUBLICAR.md`](publicacion/PUBLICAR.md)) |
 | DUE-6 | Mac o iPhone para empaquetar macOS e iOS | Tener el hardware (PLA-2) |
+| DUE-10 | Al instalar la v2.0.0: actualizar la PC **y** el celular y volver a emparejarlos con un QR nuevo (el QR sirve una vez y 10 min) | Que salga la v2.0.0 (una v1 y una v2 no sincronizan; NUC-3) |

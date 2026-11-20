@@ -35,7 +35,7 @@ void main() {
     ip: '192.168.1.9',
     port: 8283,
     pairingToken: 'tok',
-    desktopPublicKeyHex: 'QQ==',
+    desktopPublicKey: 'QQ==',
   );
 
   test('starts idle', () {

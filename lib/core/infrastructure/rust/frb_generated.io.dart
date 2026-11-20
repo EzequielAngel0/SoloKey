@@ -185,10 +185,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SyncIdentity dco_decode_sync_identity(dynamic raw);
 
   @protected
+  SyncInbound dco_decode_sync_inbound(dynamic raw);
+
+  @protected
   SyncPeerVersion dco_decode_sync_peer_version(dynamic raw);
 
   @protected
   SyncRoundReport dco_decode_sync_round_report(dynamic raw);
+
+  @protected
+  SyncStep dco_decode_sync_step(dynamic raw);
 
   @protected
   int dco_decode_u_32(dynamic raw);
@@ -364,10 +370,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   SyncIdentity sse_decode_sync_identity(SseDeserializer deserializer);
 
   @protected
+  SyncInbound sse_decode_sync_inbound(SseDeserializer deserializer);
+
+  @protected
   SyncPeerVersion sse_decode_sync_peer_version(SseDeserializer deserializer);
 
   @protected
   SyncRoundReport sse_decode_sync_round_report(SseDeserializer deserializer);
+
+  @protected
+  SyncStep sse_decode_sync_step(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
@@ -580,6 +592,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_sync_identity(SyncIdentity self, SseSerializer serializer);
 
   @protected
+  void sse_encode_sync_inbound(SyncInbound self, SseSerializer serializer);
+
+  @protected
   void sse_encode_sync_peer_version(
     SyncPeerVersion self,
     SseSerializer serializer,
@@ -590,6 +605,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     SyncRoundReport self,
     SseSerializer serializer,
   );
+
+  @protected
+  void sse_encode_sync_step(SyncStep self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);

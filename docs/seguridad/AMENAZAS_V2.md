@@ -60,12 +60,12 @@ Estado de la v1: ✓ cubierto · ◐ en parte · ✗ no. La columna *Requisito v
 
 | Amenaza | v1 | Requisito v2 | Carril |
 |---|---|---|---|
-| Ver tamaños, horas y forma del intercambio | ✗ `ws://` (SEC-008) | Canal Noise entero; solo el descubrimiento en claro (ADR-0010) | A (NUC-3) |
-| Suplantar a un par ya emparejado | ✓ reto HMAC con `K_sync` | Patrón con las dos llaves estáticas fijadas (KK o IK tras el emparejamiento); llave del par mal = se corta y se dice | A (NUC-3) |
-| Emparejamiento interceptado | ◐ token de un uso en el QR | El QR lleva la llave estática y un secreto de un uso que entra al handshake (PSK); caduca en minutos | A (NUC-3) |
-| Repetir o reordenar mensajes viejos | ◐ LWW por fecha | Contador por sesión en el canal y versión por registro; un registro con versión vieja no pisa uno nuevo | A (NUC-3) |
-| Mezclar v1 y v2 | n/a | Versión en el primer mensaje; v1 con v2 se rechaza con un mensaje claro (ADR-0010) | A (NUC-3) |
-| Desbloqueo remoto: la clave viaja | ◐ envuelta con la llave del par | Igual, dentro de Noise, con confirmación en el celular que muestre qué equipo pide | A + C |
+| Ver tamaños, horas y forma del intercambio | ✗ `ws://` (SEC-008) | Canal Noise entero; solo el descubrimiento en claro (ADR-0010) | A (NUC-3) ✓ 2026-11-20 |
+| Suplantar a un par ya emparejado | ✓ reto HMAC con `K_sync` | Patrón con las dos llaves estáticas fijadas (KK o IK tras el emparejamiento); llave del par mal = se corta y se dice | A (NUC-3) ✓ 2026-11-20: IK con las dos fijadas |
+| Emparejamiento interceptado | ◐ token de un uso en el QR | El QR lleva la llave estática y un secreto de un uso que entra al handshake (PSK); caduca en minutos | A (NUC-3) ✓ 2026-11-20: el token va cifrado a la llave del QR en el primer mensaje IK (no PSK: quien no tiene la llave privada del escritorio no lo lee), un uso y 10 min |
+| Repetir o reordenar mensajes viejos | ◐ LWW por fecha | Contador por sesión en el canal y versión por registro; un registro con versión vieja no pisa uno nuevo | A (NUC-3) ✓ 2026-11-20: contador de Noise por sesión; LWW por fecha (empate: lápida y hash), sin versión aparte |
+| Mezclar v1 y v2 | n/a | Versión en el primer mensaje; v1 con v2 se rechaza con un mensaje claro (ADR-0010) | A (NUC-3) ✓ 2026-11-20 (textos a l10n: C) |
+| Desbloqueo remoto: la clave viaja | ◐ envuelta con la llave del par | Igual, dentro de Noise, con confirmación en el celular que muestre qué equipo pide | A + C (A ✓ dentro de Noise; falta la confirmación, C) |
 | Mensaje enorme o malformado tumba al otro | ✗ sin límites | Tamaño máximo por mensaje y por registro antes de descifrar; parser cubierto por fuzz (◐ `sync_trama` y `sync_mensaje`, verdes) | A + E (SEG-2) |
 
 ### Migración v1 a v2

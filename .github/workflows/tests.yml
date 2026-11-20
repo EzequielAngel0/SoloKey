@@ -89,6 +89,9 @@ jobs:
       - name: E2E app_boot_test (no destructivo)
         run: flutter test integration_test/app_boot_test.dart -d windows --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e
 
+      - name: E2E sync_v2_test (sync v2 contra un par del nucleo, loopback)
+        run: flutter test integration_test/sync_v2_test.dart -d windows --dart-define=E2E_ALLOW_WIPE=1 --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e
+
       - name: E2E migracion_v1_test (boveda de prueba de vectores/v1)
         run: flutter test integration_test/migracion_v1_test.dart -d windows --dart-define=E2E_ALLOW_WIPE=1 --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e --dart-define=SOLOKEY_V1_VECTORS=${{ github.workspace }}\vectores\v1
 

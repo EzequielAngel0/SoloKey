@@ -27,7 +27,7 @@ class FakeSyncService implements ISyncService {
     ip: '192.168.1.50',
     port: 8283,
     pairingToken: 'test-token',
-    desktopPublicKeyHex: 'QUJDRA==',
+    desktopPublicKey: 'QUJDRA==',
   );
 
   /// When non-null, [startServer] throws this (drives the desktop error state).

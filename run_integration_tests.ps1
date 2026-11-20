@@ -23,7 +23,8 @@
        archivos seguros), en %USERPROFILE%. Si no puede leer la identidad de
        windows/runner/Runner.rc, no corre nada (ver tool/respaldo-boveda.psm1).
     3) Corre app_boot_test.dart (NO destructivo), migracion_v1_test.dart (migra la
-       boveda de prueba de vectores/v1 dentro de la carpeta aislada) y, salvo
+       boveda de prueba de vectores/v1 dentro de la carpeta aislada), sync_v2_test.dart
+       (sync v2 contra un par hecho con el nucleo, en loopback) y, salvo
        -SkipDestructive, vault_e2e_test.dart dos veces (regla anti-flaky: dos
        verdes seguidas).
        En Windows se corre UN archivo por invocacion (instancia unica).
@@ -96,6 +97,12 @@ try {
   & flutter test integration_test/migracion_v1_test.dart -d windows `
       --dart-define=E2E_ALLOW_WIPE=1 "--dart-define=SOLOKEY_DATA_DIR=$iso" `
       "--dart-define=SOLOKEY_V1_VECTORS=$(Join-Path $repo 'vectores\v1')"
+  if ($LASTEXITCODE -ne 0) { $failed = $true }
+
+  Stop-SoloKey
+  Write-Host "[test] sync_v2_test.dart (solo la carpeta aislada y loopback)" -ForegroundColor Cyan
+  & flutter test integration_test/sync_v2_test.dart -d windows `
+      --dart-define=E2E_ALLOW_WIPE=1 "--dart-define=SOLOKEY_DATA_DIR=$iso"
   if ($LASTEXITCODE -ne 0) { $failed = $true }
 
   if (-not $SkipDestructive) {
