@@ -13,16 +13,14 @@ thread_local! {
     static BOVEDA: RefCell<Option<(tempfile::TempDir, Vault)>> = const { RefCell::new(None) };
 }
 
-fn rapida() -> KdfParams {
-    KdfParams { memory_kib: 64, iterations: 1, parallelism: 1 }
-}
-
 fuzz_target!(|msg: &[u8]| {
     BOVEDA.with(|b| {
         let mut b = b.borrow_mut();
         if b.is_none() {
+            // Una sola vez por proceso: con los parametros reales (SEC-012 no deja crear con menos).
             let dir = tempfile::tempdir().expect("tempdir");
-            let (v, _code) = Vault::create(&vault_path(dir.path()), b"fuzz", rapida()).expect("crear");
+            let (v, _code) =
+                Vault::create(&vault_path(dir.path()), b"fuzz", KdfParams::VAULT).expect("crear");
             *b = Some((dir, v));
         }
         let (_, vault) = b.as_mut().unwrap();
