@@ -17,7 +17,8 @@ versión viven en la página de Releases de GitHub.
   sin animación ni espera fija de 1.8 s. Todo con `AccessLayout` (ancho completo en el celular, hoja centrada de 460 en
   escritorio, desplazable a 200 %) y sin colores fijos. E2E: `vault_e2e_test` recorre los tres pasos (grupo mal y bien), entra,
   bloquea y desbloquea con el campo; cierra el teclado antes de cada toque para que no tape el botón en Android. Se borran las
-  pruebas de widgets de setup, unlock, recuperación y `RecoveryCodeDisplay` (ADR-0011) y los textos que ya nadie usaba.
+  pruebas de widgets de setup, unlock, recuperación y `RecoveryCodeDisplay` (ADR-0011) y los textos que ya nadie usaba; el
+  piso de cobertura Dart baja de 60,4 a 55,6, lo medido (excepción del dueño en `docs/proceso/PRUEBAS.md`).
 
 - **Galería del kit (DIS-3, 2026-11-20)**: `lib/main_galeria.dart` (solo debug; en release lanza `StateError`) abre
   `KitGalleryApp` (`lib/shared/gallery/kit_gallery.dart`) con todo el kit y la paleta con sus hex, y controles de tema (claro,
