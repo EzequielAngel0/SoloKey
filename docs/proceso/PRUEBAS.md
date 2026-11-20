@@ -15,10 +15,11 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|---|
 | Unit | `test/**` (espeja `lib/**`) | `flutter test` | Cripto, servicios, use cases, providers, lógica pura con tiempo inyectado. |
 | Widget | `test/**` con `test/support/widget_harness.dart` | `flutter test` | Behavioral: interactúa (tocar, escribir, revelar), no solo "renderiza". Fakes en `test/support/`. |
-| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). |
+| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). En CI, el job `e2e-windows` (`windows-2022`, sin bóveda real) corre lo mismo en cada push. |
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
 | Núcleo Rust | `rust/solokey-core/` (`src/**` y `tests/**`) | `.\rust\cargo.ps1 test` | En Podman; las pruebas de la v1 leen `vectores/v1/`. Clippy: `.\rust\cargo.ps1 clippy --all-targets -- -D warnings` |
+| Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.ustuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir`. `cabecera_kdf` sigue en rojo hasta SEC-012 |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
@@ -27,7 +28,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|
 | `pre-commit` | `flutter analyze` en 0 y `flutter test` verde (solo si el commit toca `.dart`) | `.githooks/` (activar: `git config core.hooksPath .githooks`) |
 | `pre-push` | `flutter test --coverage` sobre el piso de `tool/coverage_min.txt` | `.githooks/` + `tool/check_coverage.dart` |
-| CI | analyze + test + cobertura; `cargo test` + clippy del núcleo (`rust`); `integration_test/` en un emulador de Android 14 (`e2e-android`). En `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
+| CI | analyze + test + cobertura; `cargo test` + clippy del núcleo (`rust`); `integration_test/` en Windows (`e2e-windows`) y en un emulador de Android 14 (`e2e-android`). En `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
 
 El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio.
 
@@ -94,7 +95,7 @@ Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al h
 | `cargo test` | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 test` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
 | Clippy (la imagen `slim` no lo trae) | `localhost/solokey-build` | `.\tool\build.ps1 -Comando 'cd rust && cargo clippy --locked --all-targets -- -D warnings'` | ver abajo |
 | `.so` por ABI y `solokey_core.dll` | `localhost/solokey-build` | `.\tool\build.ps1 -Nucleo` → `build\podman\jniLibs\` y `build\podman\solokey_core.dll` (sin símbolos exportados hasta que exista el puente de `flutter_rust_bridge`) | ver abajo |
-
+| Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.
 ## Build y E2E de Android en Podman (PLA-3)
 
 Ni el SDK ni el NDK de Android ni Rust van al host ([ADR-0012](../adr/0012-todo-en-podman.md)). `tool/build.ps1` construye la

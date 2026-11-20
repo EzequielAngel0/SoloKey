@@ -15,8 +15,8 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 | 1 | Cimientos: renombrar el paquete (PLA-5) y subir dependencias (PLA-4), **sin otro carril tocando código**. En paralelo, ligera: CAL-4 ✓ y CAL-2 ✓ | D, y E | ✓ PLA-5 (2026-11-15) y PLA-4 (2026-11-19): **la fase 2 puede arrancar** |
 | 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ◐ PLA-6 y PLA-3 hechos (2026-11-19); falta DIS de B |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ☐ puede arrancar: imagen `solokey-build` lista (PLA-3, 2026-11-19) |
-| 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5; CAL-3 ✓) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
-| 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1), 200% y fuzz (CAL-1, SEG-2; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4 |
+| 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5 ◐: CI de Windows ✓; CAL-3 ✓) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
+| 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (de A) |
 | 6 | v2.0.0 a `main`, con el permiso del dueño | General | ⊘ espera a 5 |
 
 **Como mucho dos sesiones pesadas a la vez** (build de Flutter, Rust, Podman o emulador) y una ligera. Abrir una sesión por
@@ -141,19 +141,19 @@ doc de docs/ que describa lo que cambiaste. Al terminar PLA-5 y PLA-4 avisa en e
 Quita tu worktree con .\tool\quitar-worktree.ps1 cuando todo este mergeado. Resumen AL FINAL, con el CI terminado.
 ```
 
-### E · Calidad y seguridad (fase 1 en paralelo, ligera; luego fases 4 y 5)
+### E · Calidad y seguridad (fases 4 y 5; la fase 1 ya está: CAL-4, CAL-3, CAL-2, SEG-1)
 
 ```text
 SESION E de SoloKey (Calidad y seguridad). Desarrollas COMPLETO lo aprobado de tu carril y nada de otro.
-Worktree: git worktree add ..\SoloKey-E -b test/e-respaldo-archivos-seguros origin/develop.
-Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/E.md, docs/adr/0009, 0011 y 0012, docs/proceso/PRUEBAS.md
-y PRUEBAS_INTEGRACION.md. ListAgents y avisa que eres el carril E.
-AL EMPEZAR, confirma con el dueno (AskUserQuestion) que se hace hoy, en el orden de docs/sesiones/E.md: CAL-4, CAL-2, CAL-5,
-CAL-3, CAL-1, SEG-1, SEG-2 (CAL-5 en adelante esperan a NUC-6 de A y a PLA-3 de D: mira el ▶).
-- CAL-4 primero: que run_integration_tests.ps1 respalde y restaure secure_files/ con hash; verlo fallar antes del arreglo.
-- CAL-2: vectores generados con la app v1 en un entorno de prueba, NUNCA con la boveda real del dueno.
+Worktree: git worktree add ..\SoloKey-E -b test/e-<id> origin/develop.
+Carga la skill solokey. Lee docs/sesiones/README.md, docs/sesiones/E.md, docs/seguridad/AMENAZAS_V2.md, docs/adr/0011 y 0012,
+docs/proceso/PRUEBAS.md y PRUEBAS_INTEGRACION.md. ListAgents y avisa que eres el carril E.
+AL EMPEZAR, confirma con el dueno (AskUserQuestion) que se hace hoy, en el orden de docs/sesiones/E.md: CAL-5 (resto),
+CAL-1, SEG-2. Mira el ▶ antes: Android de CAL-5 espera a PLA-3 de D, Windows local a NUC-6 de A, CAL-1 a las PAN de C,
+el resto de SEG-2 a los parsers de A en el nucleo (CSV, otpauth, .skvault). Si nada esta desbloqueado, propon (3 a 5) y no construyas.
+- Reproducir el CI de Linux: .\tool\ci-linux.ps1. Vectores de la v1: vectores/v1 (no regenerar sin motivo).
 - La boveda real vive en este equipo: nada de vault_e2e_test a mano. Sin pruebas unitarias ni de widgets nuevas en Dart: la
-  red de la v2 son E2E (Android en Podman, Windows en local con boveda aislada y en windows-latest) y cargo test en Podman.
+  red de la v2 son E2E (Android en Podman, Windows en local con boveda aislada y en windows-2022 en CI) y cargo test en Podman.
 Rama corta por ID, commit de una linea sin acentos ni firma, merge --no-ff a develop y push; luego
 git -C C:\Proyectos\Flutter\SoloKey pull --ff-only origin develop (si esta en develop y limpia).
 Al cerrar cada ID: CHANGELOG [Unreleased], lo hecho a docs/archive/sesiones/E_HECHO.md, el ▶ de docs/PENDIENTES_AGENTE.md y
@@ -169,4 +169,4 @@ Resumen AL FINAL, con el CI terminado (gh run watch).
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1, DIS-2, DIS-3, DIS-5, DIS-4 |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-10, PAN-1 a PAN-9 |
 | D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-1; PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |
-| E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-5, CAL-1, SEG-2 (CAL-4, CAL-3, CAL-2 y SEG-1 ✓); SEC-003 y SEC-008 los cierra la v2 |
+| E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-5 ◐, CAL-1, SEG-2 ◐ (CAL-4, CAL-3, CAL-2 y SEG-1 ✓); SEC-003 y SEC-008 los cierra la v2; SEC-012 lo arregla A |

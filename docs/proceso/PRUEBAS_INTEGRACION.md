@@ -285,12 +285,11 @@ que la hace estable:
   (`flutter test integration_test/vault_e2e_test.dart -d windows ...`) y mata
   cualquier `SoloKey.exe` colgado entre corridas.
 
-## Si algún día se quiere en CI
+## En CI
 
-Hoy la regla es **a demanda en local**: `-d windows` necesita Visual Studio con C++, y
-Android necesita un emulador. Para meterlo a CI haría falta un **emulador en el runner**
-(p. ej. `reactivecircus/android-emulator-runner`) o un runner Windows con el toolchain de
-escritorio. Es viable pero lento; por eso, a lo sumo, un **nightly** —nunca en cada push—.
+Desde CAL-5 (2026-11-15) las E2E son la red principal ([ADR-0011](../adr/0011-pruebas-e2e-principal.md)) y Windows corre en
+cada push: job `e2e-windows` de `tests.yml` en `windows-2022`, que trae Visual Studio 2022 (el del release; con el 18 de `windows-latest` dos plugins no compilan) y no tiene bóveda real que
+borrar. Android en CI espera a la imagen con emulador de D (PLA-3); mientras, va a demanda en local.
 
 ## Referencias
 

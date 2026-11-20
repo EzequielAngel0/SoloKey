@@ -56,7 +56,8 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 
 Hecho el 2026-11-19 ([`../archive/sesiones/D_HECHO.md`](../archive/sesiones/D_HECHO.md)); cómo se usa, en
 [`proceso/PRUEBAS.md`](../proceso/PRUEBAS.md) §"Build y E2E de Android en Podman".
-- El job de `windows-latest` es el `e2e-windows` del PR #1 de E (CAL-5, verde): lo mergea E; aquí no se duplicó.
+- El E2E de Windows en el CI es el job `e2e-windows` de E (CAL-5), en `windows-2022` porque el VS 18 de `windows-latest` no
+  compila dos plugins: aquí no se duplicó.
 - Las librerías del núcleo salen sin símbolos exportados hasta que A genere el puente de `flutter_rust_bridge`: hoy prueban la
   cadena (NDK, tres ABI y `cargo-xwin`), no se cargan desde la app.
 - Hallazgo para la v2: la app espera el permiso de notificaciones **antes** de `runApp` (`main.dart`, `notifications.initialize()`);
