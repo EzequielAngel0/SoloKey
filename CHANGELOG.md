@@ -9,6 +9,13 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Build y E2E de Android en Podman (PLA-3, 2026-11-19)**: `tool/build/Containerfile` con etapas independientes (Rust 1.91.1
+  con `cargo-ndk`, `cargo-xwin` y `flutter_rust_bridge_codegen`; Flutter de `tests.yml`; SDK y NDK de Android) que `podman build
+  --jobs` construye a la vez, juntas en `localhost/solokey-build` y, con el emulador y Android 14, en `localhost/solokey-e2e`.
+  `tool/build.ps1` copia el árbol al contenedor y saca el APK, el núcleo (`-Nucleo`: `.so` de tres ABI y `solokey_core.dll`) o
+  corre `integration_test/` en un emulador desechable dentro del contenedor (`-E2e`, KVM de la VM). `build_release.ps1 -Target
+  android` compila por ahí; Windows e Inno siguen en el host. CI: jobs `rust` (`cargo test` + clippy) y `e2e-android` (emulador
+  de GitHub). Absorbe y borra `rust/Containerfile`. Limpieza en `docs/proceso/PRUEBAS.md`.
 - **Escaneo diario de dependencias (PLA-6, 2026-11-19)**: `tool/escaneo-deps.ps1` junta OSV-Scanner en Podman (v2.7.0 fijada por
   digest, `pubspec.lock` y `rust/Cargo.lock` montados de solo lectura), `flutter pub outdated` y las alertas abiertas de
   Dependabot. Hallazgo = CVSS ≥ 7 con arreglo; sale 0 limpio, 2 si hay algo que contarle al dueño y 1 si un paso falla; el

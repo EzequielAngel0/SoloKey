@@ -8,8 +8,7 @@ el host).
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
-| 2 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
+| 1 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
 
 ## Aprobado, sin desarrollar (el dueño dice cuándo)
 
@@ -55,10 +54,13 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 
 ### PLA-3
 
-- La VM de Podman tiene `/dev/kvm`: el emulador de Android corre sin pantalla dentro del contenedor.
-- Volúmenes con nombre para el caché de Pub, Gradle, Cargo y el SDK (`solokey-pub`, `solokey-gradle`, `solokey-cargo`,
-  `solokey-android-sdk`), y el comando de limpieza en `proceso/PRUEBAS.md`.
-- `build_release.ps1 -Target android` usa la imagen; `-Target windows|inno` sigue en el host con la DLL que dejó el contenedor.
+Hecho el 2026-11-19 ([`../archive/sesiones/D_HECHO.md`](../archive/sesiones/D_HECHO.md)); cómo se usa, en
+[`proceso/PRUEBAS.md`](../proceso/PRUEBAS.md) §"Build y E2E de Android en Podman".
+- El job de `windows-latest` es el `e2e-windows` del PR #1 de E (CAL-5, verde): lo mergea E; aquí no se duplicó.
+- Las librerías del núcleo salen sin símbolos exportados hasta que A genere el puente de `flutter_rust_bridge`: hoy prueban la
+  cadena (NDK, tres ABI y `cargo-xwin`), no se cargan desde la app.
+- Hallazgo para la v2: la app espera el permiso de notificaciones **antes** de `runApp` (`main.dart`, `notifications.initialize()`);
+  en Android 13+ la primera apertura se queda en el splash hasta contestar el diálogo. El E2E lo esquiva instalando con `-g`.
 
 ## Detalle: escaneos (PLA-6 a 8)
 

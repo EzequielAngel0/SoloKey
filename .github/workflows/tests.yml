@@ -24,10 +24,75 @@ jobs:
       - name: Analyze
         run: flutter analyze
 
-      # Solo unit/widget (test/**). Los integration_test/** necesitan dispositivo
-      # y se corren a demanda en local (ver docs/proceso/PRUEBAS_INTEGRACION.md).
+      # Solo unit/widget (test/**). Los integration_test/** van en el job
+      # e2e-android (emulador) y en local con run_integration_tests.ps1.
       - name: Test + coverage
         run: flutter test --coverage
 
       - name: Coverage gate
         run: dart run tool/check_coverage.dart "$(cat tool/coverage_min.txt)"
+
+  # Nucleo Rust (ADR-0008): pruebas y clippy. La misma toolchain que tool/build/Containerfile.
+  rust:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: rust
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@master
+        with:
+          toolchain: '1.91.1'
+          components: clippy
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust
+
+      - name: Test
+        run: cargo test --locked
+
+      - name: Clippy
+        run: cargo clippy --locked --all-targets -- -D warnings
+
+  # E2E en un emulador de Android desechable (PLA-3, ADR-0011). Aqui SI se permite borrar
+  # la boveda: el emulador nace vacio y muere con el job.
+  e2e-android:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: KVM para el emulador
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.44.4'
+          channel: stable
+
+      - name: Dependencies
+        run: flutter pub get
+
+      - name: E2E
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 34
+          arch: x86_64
+          target: google_apis
+          disable-animations: true
+          # La app pide el permiso de notificaciones antes de runApp y flutter test la desinstala al
+          # acabar cada archivo: uno por uno, instalando antes con -g (permisos concedidos).
+          # El runner corre cada linea por separado, por eso el bucle va en una sola.
+          script: |
+            flutter build apk --debug
+            set -e; for f in integration_test/*_test.dart; do adb install -g build/app/outputs/flutter-apk/app-debug.apk; timeout 900 flutter test "$f" -d emulator-5554 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=TEST_DISABLE_BIOMETRIC=1; done
