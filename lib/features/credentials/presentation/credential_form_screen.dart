@@ -561,7 +561,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
             .read(credentialsNotifierProvider.notifier)
             .updateCredential(credential);
       }
-      HapticFeedback.mediumImpact();
       _captureBaseline(); // nothing left unsaved → exit guard won't fire
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -598,7 +597,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         }
       }
     } catch (e) {
-      HapticFeedback.heavyImpact();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -636,7 +634,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   }
 
   void _showTotpAppliedSnackBar(String message) {
-    HapticFeedback.mediumImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -734,7 +731,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   void _showError(String msg) {
     if (!mounted) return;
-    HapticFeedback.heavyImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(msg),
@@ -746,7 +742,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
 
   void _showWarn(String msg) {
     if (!mounted) return;
-    HapticFeedback.mediumImpact();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Row(
@@ -874,7 +869,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
   Future<void> _generateSshKey() async {
     final l10n = AppLocalizations.of(context);
     setState(() => _isGeneratingSshKey = true);
-    HapticFeedback.mediumImpact();
     try {
       final generator = getIt<SshKeyGeneratorService>();
       final result = await generator.generateEd25519KeyPair(
@@ -1017,7 +1011,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   ),
                   tooltip: l10n.formDeleteField,
                   onPressed: () {
-                    HapticFeedback.selectionClick();
                     setState(() {
                       _customFields.removeAt(index);
                     });
@@ -1146,7 +1139,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                         ),
                       ),
                       onChanged: (v) {
-                        HapticFeedback.selectionClick();
                         setDialogState(() => isSecret = v);
                       },
                     ),
@@ -1186,7 +1178,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                       }
                     });
 
-                    HapticFeedback.mediumImpact();
                     Navigator.pop(context);
                   },
                   child: Text(isEditing ? l10n.commonSave : l10n.formAdd),
@@ -1290,7 +1281,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
                   FavoriteToggle(
                     value: _isFavorite,
                     onChanged: (v) {
-                      HapticFeedback.selectionClick();
                       setState(() => _isFavorite = v);
                     },
                   ),
@@ -1730,7 +1720,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
         SwitchListTile(
           value: _isDoubleEncrypted,
           onChanged: (v) {
-            HapticFeedback.selectionClick();
             setState(() {
               _isDoubleEncrypted = v;
               if (!v) {
@@ -1776,7 +1765,6 @@ class _CredentialFormScreenState extends ConsumerState<CredentialFormScreen>
           SwitchListTile(
             value: _savePinBiometrically,
             onChanged: (v) {
-              HapticFeedback.selectionClick();
               setState(() => _savePinBiometrically = v);
             },
             title: Text(

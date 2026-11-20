@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../shared/widgets/secure_text_field.dart';
@@ -66,7 +65,6 @@ class PasswordRowWidget extends StatelessWidget {
                     color: showGenerator ? palette.accent : palette.textMuted,
                   ),
                   onPressed: () {
-                    HapticFeedback.selectionClick();
                     FocusScope.of(context).unfocus();
                     onToggleGenerator(!showGenerator);
                   },
@@ -87,7 +85,6 @@ class PasswordRowWidget extends StatelessWidget {
               ? PasswordGeneratorWidget(
                   onApplyPassword: (pass) {
                     ctrl.text = pass;
-                    HapticFeedback.mediumImpact();
                     onToggleGenerator(false);
                   },
                 )

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import '../../../../l10n/app_localizations.dart';
 import '../../../../theme/app_palette.dart';
 import '../../domain/entities/credential.dart';
@@ -70,7 +69,6 @@ class TypeSelectorPremium extends StatelessWidget {
               onTap: isDisabled
                   ? null
                   : () {
-                      HapticFeedback.selectionClick();
                       onChanged(item.type);
                     },
               child: AnimatedContainer(

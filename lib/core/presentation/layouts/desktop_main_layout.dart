@@ -1,13 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../../router/app_router.dart';
 import '../shortcuts/app_shortcuts.dart';
-import '../../../../shared/widgets/shimmer_loader.dart';
 import '../../../../theme/app_palette.dart';
 import '../../../../theme/app_theme.dart';
 import '../../../../features/credentials/application/credential_health_provider.dart';
@@ -183,14 +181,9 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                 // Column 1: Sidebar Navigation
                 const _DesktopSidebar(),
                 // Vertical divider
-                Container(
-                  width: 1,
-                  color: palette.divider,
-                ),
+                Container(width: 1, color: palette.divider),
                 // Content Area (Middle Column + Right Column)
-                Expanded(
-                  child: _buildContentArea(activeTab),
-                ),
+                Expanded(child: _buildContentArea(activeTab)),
               ],
             ),
           ),
@@ -235,7 +228,8 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         if (w < _kTwoPaneMinWidth) {
           final mode = ref.watch(desktopRightPaneModeProvider);
           final selectedId = ref.watch(desktopSelectedCredentialIdProvider);
-          final showDetail = mode == RightPaneMode.create ||
+          final showDetail =
+              mode == RightPaneMode.create ||
               mode == RightPaneMode.edit ||
               selectedId != null;
           return showDetail
@@ -247,19 +241,11 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
         return Row(
           children: [
             // Column 2: Middle List Pane
-            SizedBox(
-              width: listWidth,
-              child: _buildMiddleListPane(tabIndex),
-            ),
+            SizedBox(width: listWidth, child: _buildMiddleListPane(tabIndex)),
             // Vertical divider
-            Container(
-              width: 1,
-              color: palette.divider,
-            ),
+            Container(width: 1, color: palette.divider),
             // Column 3: Right Details/Form Pane
-            Expanded(
-              child: _buildRightPane(tabIndex),
-            ),
+            Expanded(child: _buildRightPane(tabIndex)),
           ],
         );
       },
@@ -280,15 +266,18 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
           tabIndex == 0
               ? l10n.navVault
               : tabIndex == 1
-                  ? l10n.navFolders
-                  : l10n.navFavorites,
+              ? l10n.navFolders
+              : l10n.navFavorites,
           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
         ),
         centerTitle: false,
         actions: [
           if (tabIndex == 1)
             IconButton(
-              icon: Icon(Icons.create_new_folder_rounded, color: palette.primary),
+              icon: Icon(
+                Icons.create_new_folder_rounded,
+                color: palette.primary,
+              ),
               tooltip: l10n.desktopNewFolderTooltip,
               onPressed: () => _createRootFolder(context, ref),
             )
@@ -297,8 +286,10 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
               icon: Icon(Icons.add_rounded, color: palette.primary),
               tooltip: l10n.desktopNewCredentialTooltip,
               onPressed: () {
-                ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
-                ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
+                ref.read(desktopRightPaneModeProvider.notifier).state =
+                    RightPaneMode.create;
+                ref.read(desktopSelectedCredentialIdProvider.notifier).state =
+                    null;
               },
             ),
           const SizedBox(width: 8),
@@ -315,10 +306,18 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                     style: TextStyle(color: palette.textPrimary, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: l10n.commonSearch,
-                      prefixIcon: Icon(Icons.search_rounded, color: palette.textMuted, size: 20),
+                      prefixIcon: Icon(
+                        Icons.search_rounded,
+                        color: palette.textMuted,
+                        size: 20,
+                      ),
                       suffixIcon: _searchCtrl.text.isNotEmpty
                           ? IconButton(
-                              icon: Icon(Icons.close_rounded, color: palette.textMuted, size: 18),
+                              icon: Icon(
+                                Icons.close_rounded,
+                                color: palette.textMuted,
+                                size: 18,
+                              ),
                               tooltip: l10n.commonClear,
                               onPressed: _clearSearch,
                             )
@@ -335,7 +334,10 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide(color: palette.primary, width: 1.5),
+                        borderSide: BorderSide(
+                          color: palette.primary,
+                          width: 1.5,
+                        ),
                       ),
                       contentPadding: const EdgeInsets.symmetric(vertical: 8),
                     ),
@@ -344,7 +346,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
               ),
       ),
       body: credentialsAsync.when(
-        loading: () => const ShimmerLoader(),
+        loading: () => const Center(child: CircularProgressIndicator()),
         error: (e, _) => Center(
           child: Text(
             l10n.commonErrorDetail('$e'),
@@ -376,8 +378,11 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                       ref.read(desktopSelectedFolderIdProvider.notifier).state =
                           id;
                       ref
-                          .read(desktopSelectedCredentialIdProvider.notifier)
-                          .state = null;
+                              .read(
+                                desktopSelectedCredentialIdProvider.notifier,
+                              )
+                              .state =
+                          null;
                       ref.read(desktopRightPaneModeProvider.notifier).state =
                           RightPaneMode.none;
                     },
@@ -408,11 +413,15 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
                                 ),
                               ),
                             ),
-                            ...folderCreds.map((c) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: CredentialCard(
-                                      credential: c, enableFolderDrag: true),
-                                )),
+                            ...folderCreds.map(
+                              (c) => Padding(
+                                padding: const EdgeInsets.only(bottom: 8),
+                                child: CredentialCard(
+                                  credential: c,
+                                  enableFolderDrag: true,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                 ),
@@ -433,25 +442,27 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
           if (list.isEmpty) {
             return EmptyStateWidget(
-              message:
-                  tabIndex == 0 ? l10n.desktopNoCredentials : l10n.desktopNoFavorites,
+              message: tabIndex == 0
+                  ? l10n.desktopNoCredentials
+                  : l10n.desktopNoFavorites,
               onAdd: () {
-                ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.create;
+                ref.read(desktopRightPaneModeProvider.notifier).state =
+                    RightPaneMode.create;
               },
             );
           }
 
           // Reorden por drag solo en la lista principal, sin busqueda y con el
           // orden manual (reordenar un orden calculado no aplica).
-          final canReorder = tabIndex == 0 &&
+          final canReorder =
+              tabIndex == 0 &&
               _searchCtrl.text.isEmpty &&
               sort == VaultSort.manual;
           return CredentialListWidget(
             credentials: list,
             reorderMode: canReorder,
             sectioned: sort == VaultSort.titleAsc,
-            onReorder:
-                canReorder ? (o, n) => _onReorder(list, o, n) : null,
+            onReorder: canReorder ? (o, n) => _onReorder(list, o, n) : null,
           );
         },
       ),
@@ -503,7 +514,10 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text(l10n.folderDialogTitle, style: TextStyle(color: palette.textPrimary)),
+        title: Text(
+          l10n.folderDialogTitle,
+          style: TextStyle(color: palette.textPrimary),
+        ),
         content: TextField(
           controller: ctrl,
           autofocus: true,
@@ -514,13 +528,21 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
           ),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: Text(l10n.commonCancel)),
-          TextButton(onPressed: () => Navigator.pop(context, ctrl.text.trim()), child: Text(l10n.commonCreate)),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+            child: Text(l10n.commonCreate),
+          ),
         ],
       ),
     );
     if (name != null && name.isNotEmpty) {
-      await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: null);
+      await ref
+          .read(foldersNotifierProvider.notifier)
+          .createFolder(name: name, parentId: null);
     }
   }
 }
@@ -548,11 +570,20 @@ class _DesktopSidebar extends ConsumerWidget {
         title: l10n.desktopSectionVault,
         items: [
           _SidebarItemData(
-              icon: Icons.inventory_2_rounded, label: l10n.navVault, index: 0),
+            icon: Icons.inventory_2_rounded,
+            label: l10n.navVault,
+            index: 0,
+          ),
           _SidebarItemData(
-              icon: Icons.folder_rounded, label: l10n.navFolders, index: 1),
+            icon: Icons.folder_rounded,
+            label: l10n.navFolders,
+            index: 1,
+          ),
           _SidebarItemData(
-              icon: Icons.star_rounded, label: l10n.navFavorites, index: 2),
+            icon: Icons.star_rounded,
+            label: l10n.navFavorites,
+            index: 2,
+          ),
         ],
       ),
       _SidebarSection(
@@ -563,23 +594,26 @@ class _DesktopSidebar extends ConsumerWidget {
             label: l10n.navAudit,
             index: 3,
             badge: auditIssues > 0 ? _CountBadge(count: auditIssues) : null,
-            badgeSemantics:
-                auditIssues > 0 ? l10n.desktopWatchtowerBadge(auditIssues) : null,
+            badgeSemantics: auditIssues > 0
+                ? l10n.desktopWatchtowerBadge(auditIssues)
+                : null,
           ),
           _SidebarItemData(
-              icon: Icons.folder_shared_rounded,
-              label: l10n.navSecureFiles,
-              index: 6),
+            icon: Icons.folder_shared_rounded,
+            label: l10n.navSecureFiles,
+            index: 6,
+          ),
         ],
       ),
       _SidebarSection(
         title: l10n.desktopSectionDevices,
         items: [
           _SidebarItemData(
-              icon: Icons.sync_rounded,
-              label: l10n.navSync,
-              index: 5,
-              badge: syncBadge),
+            icon: Icons.sync_rounded,
+            label: l10n.navSync,
+            index: 5,
+            badge: syncBadge,
+          ),
         ],
       ),
     ];
@@ -589,18 +623,19 @@ class _DesktopSidebar extends ConsumerWidget {
       // Reset details state on tab switch
       ref.read(desktopSelectedCredentialIdProvider.notifier).state = null;
       ref.read(desktopSelectedFolderIdProvider.notifier).state = null;
-      ref.read(desktopRightPaneModeProvider.notifier).state = RightPaneMode.none;
+      ref.read(desktopRightPaneModeProvider.notifier).state =
+          RightPaneMode.none;
     }
 
     _SidebarItem buildItem(_SidebarItemData item) => _SidebarItem(
-          icon: item.icon,
-          label: item.label,
-          isSelected: selectedIndex == item.index,
-          collapsed: collapsed,
-          badge: item.badge,
-          badgeSemantics: item.badgeSemantics,
-          onTap: () => select(item.index),
-        );
+      icon: item.icon,
+      label: item.label,
+      isSelected: selectedIndex == item.index,
+      collapsed: collapsed,
+      badge: item.badge,
+      badgeSemantics: item.badgeSemantics,
+      onTap: () => select(item.index),
+    );
 
     // Flatten sections into the scrollable nav column: a header (or a hairline
     // when collapsed) before each group, then its items.
@@ -609,10 +644,12 @@ class _DesktopSidebar extends ConsumerWidget {
       if (!collapsed) {
         navChildren.add(_SidebarSectionHeader(title: section.title));
       } else if (navChildren.isNotEmpty) {
-        navChildren.add(Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
-          child: Divider(height: 1, color: palette.divider),
-        ));
+        navChildren.add(
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 6),
+            child: Divider(height: 1, color: palette.divider),
+          ),
+        );
       }
       navChildren.addAll(section.items.map(buildItem));
     }
@@ -626,10 +663,16 @@ class _DesktopSidebar extends ConsumerWidget {
         children: [
           // Sidebar Header: brand + collapse toggle
           Padding(
-            padding: EdgeInsets.fromLTRB(collapsed ? 0 : 16, 20, collapsed ? 0 : 8, 12),
+            padding: EdgeInsets.fromLTRB(
+              collapsed ? 0 : 16,
+              20,
+              collapsed ? 0 : 8,
+              12,
+            ),
             child: Row(
-              mainAxisAlignment:
-                  collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+              mainAxisAlignment: collapsed
+                  ? MainAxisAlignment.center
+                  : MainAxisAlignment.start,
               children: [
                 Container(
                   width: 34,
@@ -641,8 +684,11 @@ class _DesktopSidebar extends ConsumerWidget {
                   ),
                   child: Image.asset(
                     'assets/logo/solokey_mark.png',
-                    errorBuilder: (_, _, _) =>
-                        Icon(Icons.shield_rounded, color: palette.primary, size: 20),
+                    errorBuilder: (_, _, _) => Icon(
+                      Icons.shield_rounded,
+                      color: palette.primary,
+                      size: 20,
+                    ),
                   ),
                 ),
                 if (!collapsed) ...[
@@ -659,11 +705,17 @@ class _DesktopSidebar extends ConsumerWidget {
                     ),
                   ),
                   IconButton(
-                    icon: Icon(Icons.menu_open_rounded, color: palette.textMuted, size: 20),
+                    icon: Icon(
+                      Icons.menu_open_rounded,
+                      color: palette.textMuted,
+                      size: 20,
+                    ),
                     tooltip: l10n.desktopCollapseSidebar,
-                    onPressed: () => ref
-                        .read(desktopSidebarCollapsedProvider.notifier)
-                        .state = true,
+                    onPressed: () =>
+                        ref
+                                .read(desktopSidebarCollapsedProvider.notifier)
+                                .state =
+                            true,
                   ),
                 ],
               ],
@@ -671,11 +723,15 @@ class _DesktopSidebar extends ConsumerWidget {
           ),
           if (collapsed)
             IconButton(
-              icon: Icon(Icons.menu_rounded, color: palette.textMuted, size: 20),
+              icon: Icon(
+                Icons.menu_rounded,
+                color: palette.textMuted,
+                size: 20,
+              ),
               tooltip: l10n.desktopExpandSidebar,
-              onPressed: () => ref
-                  .read(desktopSidebarCollapsedProvider.notifier)
-                  .state = false,
+              onPressed: () =>
+                  ref.read(desktopSidebarCollapsedProvider.notifier).state =
+                      false,
             ),
           // Global search / command palette (Ctrl+K)
           Padding(
@@ -685,20 +741,20 @@ class _DesktopSidebar extends ConsumerWidget {
           const SizedBox(height: 8),
           // Grouped nav items
           Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: navChildren,
-            ),
+            child: ListView(padding: EdgeInsets.zero, children: navChildren),
           ),
           // Sidebar Footer: Settings sits next to the Lock action, separated from
           // the nav groups by a hairline.
           Divider(height: 1, color: palette.divider),
           Padding(
             padding: const EdgeInsets.only(top: 8),
-            child: buildItem(_SidebarItemData(
+            child: buildItem(
+              _SidebarItemData(
                 icon: Icons.settings_rounded,
                 label: l10n.navSettings,
-                index: 4)),
+                index: 4,
+              ),
+            ),
           ),
           Padding(
             padding: const EdgeInsets.all(12.0),
@@ -709,39 +765,44 @@ class _DesktopSidebar extends ConsumerWidget {
                 button: true,
                 label: l10n.homeLockTooltip,
                 onTap: () {
-                  HapticFeedback.heavyImpact();
                   ref.read(vaultNotifierProvider.notifier).lock();
                   context.go(AppRoutes.unlock);
                 },
                 child: ExcludeSemantics(
                   child: InkWell(
                     onTap: () {
-                      HapticFeedback.heavyImpact();
                       ref.read(vaultNotifierProvider.notifier).lock();
                       context.go(AppRoutes.unlock);
                     },
                     borderRadius: BorderRadius.circular(12),
                     child: Container(
                       padding: EdgeInsets.symmetric(
-                          vertical: 12, horizontal: collapsed ? 0 : 16),
+                        vertical: 12,
+                        horizontal: collapsed ? 0 : 16,
+                      ),
                       decoration: BoxDecoration(
                         border: Border.all(
-                            color: palette.error.withValues(alpha: 0.25)),
+                          color: palette.error.withValues(alpha: 0.25),
+                        ),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.lock_outline_rounded,
-                              color: palette.error, size: 18),
+                          Icon(
+                            Icons.lock_outline_rounded,
+                            color: palette.error,
+                            size: 18,
+                          ),
                           if (!collapsed) ...[
                             const SizedBox(width: 10),
                             Text(
                               l10n.homeLockTooltip,
                               style: TextStyle(
-                                  color: palette.error,
-                                  fontWeight: FontWeight.w600,
-                                  fontSize: 13),
+                                color: palette.error,
+                                fontWeight: FontWeight.w600,
+                                fontSize: 13,
+                              ),
                             ),
                           ],
                         ],
@@ -778,10 +839,13 @@ class _SidebarSearchButton extends StatelessWidget {
         onTap: () => CommandPalette.show(context),
         child: Padding(
           padding: EdgeInsets.symmetric(
-              horizontal: collapsed ? 0 : 12, vertical: 9),
+            horizontal: collapsed ? 0 : 12,
+            vertical: 9,
+          ),
           child: Row(
-            mainAxisAlignment:
-                collapsed ? MainAxisAlignment.center : MainAxisAlignment.start,
+            mainAxisAlignment: collapsed
+                ? MainAxisAlignment.center
+                : MainAxisAlignment.start,
             children: [
               Icon(Icons.search_rounded, color: p.textMuted, size: 18),
               if (!collapsed) ...[
@@ -793,8 +857,10 @@ class _SidebarSearchButton extends StatelessWidget {
                   ),
                 ),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 2,
+                  ),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(6),
                     border: Border.all(color: p.divider),
@@ -822,10 +888,10 @@ class _SidebarSearchButton extends StatelessWidget {
 Widget? _syncBadge(BuildContext context, SyncStatusState s) {
   final p = context.palette;
   Widget dot(Color c) => Container(
-        width: 8,
-        height: 8,
-        decoration: BoxDecoration(color: c, shape: BoxShape.circle),
-      );
+    width: 8,
+    height: 8,
+    decoration: BoxDecoration(color: c, shape: BoxShape.circle),
+  );
   switch (s.phase) {
     case SyncPhase.connecting:
     case SyncPhase.syncing:
@@ -975,8 +1041,8 @@ class _SidebarItemState extends State<_SidebarItem> {
     final iconColor = isSelected
         ? activeColor
         : _isHovered
-            ? palette.textPrimary
-            : palette.textMuted;
+        ? palette.textPrimary
+        : palette.textMuted;
 
     final item = MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
@@ -987,15 +1053,19 @@ class _SidebarItemState extends State<_SidebarItem> {
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 150),
           margin: EdgeInsets.symmetric(
-              horizontal: collapsed ? 10 : 12, vertical: 4),
+            horizontal: collapsed ? 10 : 12,
+            vertical: 4,
+          ),
           padding: EdgeInsets.symmetric(
-              horizontal: collapsed ? 0 : 16, vertical: 12),
+            horizontal: collapsed ? 0 : 16,
+            vertical: 12,
+          ),
           decoration: BoxDecoration(
             color: isSelected
                 ? activeColor.withValues(alpha: 0.12)
                 : _isHovered
-                    ? palette.textPrimary.withValues(alpha: 0.04)
-                    : Colors.transparent,
+                ? palette.textPrimary.withValues(alpha: 0.04)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
           ),
           child: collapsed
@@ -1022,10 +1092,11 @@ class _SidebarItemState extends State<_SidebarItem> {
                           color: isSelected
                               ? palette.textPrimary
                               : _isHovered
-                                  ? palette.textPrimary
-                                  : palette.textMuted,
-                          fontWeight:
-                              isSelected ? FontWeight.w600 : FontWeight.normal,
+                              ? palette.textPrimary
+                              : palette.textMuted,
+                          fontWeight: isSelected
+                              ? FontWeight.w600
+                              : FontWeight.normal,
                           fontSize: 13.5,
                         ),
                       ),
