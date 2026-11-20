@@ -32,8 +32,20 @@
   de Podman). El emulador nace vacio y muere con el contenedor: aqui si se permite borrar la
   boveda (E2E_ALLOW_WIPE). No toca el emulador ni el celular del host.
 
+.PARAMETER GenerarLlave
+  Crea la llave de release de Android UNA vez (PLA-1) en %USERPROFILE%\SoloKey-firma: el .jks, su
+  key.properties con una contrasena al azar (no se imprime), una copia de la llave debug y la prueba
+  de rotacion debug -> release (solokey.lineage). Si ya existe, no hace nada: regenerarla dejaria los
+  celulares sin poder actualizar. El duenio respalda la carpeta entera, fuera del equipo y del repo.
+
 .PARAMETER Salida
   Carpeta del host montada con escritura en /out. Por defecto build\podman del repo.
+
+.NOTES
+  Firma (PLA-1): si existe %USERPROFILE%\SoloKey-firma se monta en /firma (solo lectura) y Gradle
+  firma release con esa llave; la funcion de bash `firmar <apk>` re-firma un APK con la debug (v1 y
+  v2, Android 8 o menos) y la de release con la rotacion (v3, Android 9+), asi se instala encima de
+  la app firmada con la debug sin desinstalar. Sin la carpeta, release sale con la debug y avisa.
 
 .PARAMETER Reconstruir
   Reconstruye la imagen aunque exista.
@@ -49,6 +61,7 @@ param(
   [string]$Comando = '',
   [switch]$Nucleo,
   [switch]$E2e,
+  [switch]$GenerarLlave,
   [string]$Salida = '',
   [switch]$Reconstruir
 )
@@ -72,7 +85,33 @@ if ($Reconstruir -or $LASTEXITCODE -ne 0) {
   if ($LASTEXITCODE -ne 0) { Write-Host 'FALLO la construccion de la imagen' -ForegroundColor Red; exit 1 }
 }
 
-if ($Nucleo) {
+$firma = Join-Path $env:USERPROFILE 'SoloKey-firma'
+$debugKs = Join-Path $env:USERPROFILE '.android\debug.keystore'
+
+if ($GenerarLlave) {
+  if (Test-Path (Join-Path $firma 'solokey-release.jks')) {
+    Write-Host "Ya existe $firma\solokey-release.jks: no se regenera nunca (los celulares dejarian de poder actualizar)." -ForegroundColor Red
+    exit 1
+  }
+  if (-not (Test-Path $debugKs)) { throw "No existe $debugKs`: la rotacion parte de la llave debug con la que esta firmada la app instalada." }
+  New-Item -ItemType Directory -Force -Path $firma | Out-Null
+  Copy-Item -LiteralPath $debugKs -Destination (Join-Path $firma 'debug.keystore') -ErrorAction Stop
+  $Comando = @'
+cd /firma
+pass=$(head -c 48 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 32)
+export SOLOKEY_KS_PASS="$pass"
+keytool -genkeypair -keystore solokey-release.jks -storetype PKCS12 -storepass:env SOLOKEY_KS_PASS \
+  -alias solokey -keyalg RSA -keysize 4096 -validity 36500 -dname 'CN=SoloKey, O=SoloKey' 2>&1 | grep -v '^Generating' || true
+test -s solokey-release.jks
+printf 'storePassword=%s\nkeyPassword=%s\nkeyAlias=solokey\nstoreFile=solokey-release.jks\n' "$pass" "$pass" > key.properties
+# La debug conserva installed-data (la app instalada acepta la actualizacion) y NO rollback: un APK
+# firmado solo con la debug ya no se instala encima de uno rotado.
+"$APKSIGNER" rotate --out solokey.lineage \
+  --old-signer --ks debug.keystore --ks-pass pass:android --ks-key-alias androiddebugkey --set-rollback false \
+  --new-signer --ks solokey-release.jks --ks-pass env:SOLOKEY_KS_PASS --ks-key-alias solokey
+"$APKSIGNER" lineage --in solokey.lineage --print-certs -v
+'@
+} elseif ($Nucleo) {
   $Comando = @'
 cd rust
 cargo ndk -t arm64-v8a -t armeabi-v7a -t x86_64 -o "$SALIDA/jniLibs" build --release -p solokey-core
@@ -102,10 +141,30 @@ done
 if [ "$fallo" -ne 0 ]; then adb logcat -d > "$SALIDA/logcat.txt"; echo "logcat del emulador en <Salida>/logcat.txt"; exit 1; fi
 '@
 } elseif (-not $Comando) {
-  $Comando = 'flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk "$SALIDA/"'
+  $Comando = 'flutter build apk --release && cp build/app/outputs/flutter-apk/app-release.apk "$SALIDA/" && firmar "$SALIDA/app-release.apk"'
 }
-$bash = @"
+
+$funciones = @'
+APKSIGNER="$(ls -d /opt/android-sdk/build-tools/*/ | sort -V | tail -1)apksigner"
+if [ -f /firma/key.properties ]; then export SOLOKEY_KEY_PROPERTIES=/firma/key.properties; fi
+# firmar <apk>: re-firma en su lugar con la debug (v1/v2) y la de release con su rotacion (v3).
+firmar() {
+  if [ ! -f /firma/key.properties ]; then echo "[firma] AVISO: sin llave de release, $(basename "$1") queda con la llave debug"; return 0; fi
+  SOLOKEY_KS_PASS="$(sed -n 's/^storePassword=//p' /firma/key.properties | tr -d '\r')" \
+  "$APKSIGNER" sign --ks /firma/debug.keystore --ks-pass pass:android --ks-key-alias androiddebugkey \
+    --next-signer --ks /firma/solokey-release.jks --ks-pass env:SOLOKEY_KS_PASS --ks-key-alias solokey \
+    --lineage /firma/solokey.lineage --rotation-min-sdk-version 28 "$1"
+  "$APKSIGNER" verify "$1"
+  echo "[firma] $(basename "$1"): debug para Android 8 o menos, release con rotacion para Android 9+"
+}
+'@
+
+if ($GenerarLlave) {
+  $bash = "set -eo pipefail`n$funciones`n$Comando`n"
+} else {
+  $bash = @"
 set -eo pipefail
+$funciones
 mkdir -p /work
 tar -C /src --exclude=./.git --exclude=./build --exclude=./.dart_tool --exclude=./coverage --exclude=./dist \
   --exclude=./android/.gradle --exclude=./android/local.properties --exclude=./rust/target --exclude=./.claude \
@@ -114,6 +173,7 @@ cd /work
 flutter pub get > /tmp/pub.log 2>&1 || { cat /tmp/pub.log; exit 1; }
 $Comando
 "@
+}
 
 # El script va en un archivo montado, no como argumento: PowerShell 5.1 rompe las comillas
 # dobles al pasarlas a un ejecutable nativo. LF y UTF-8 sin BOM para bash.
@@ -136,11 +196,16 @@ $runArgs = @('run', '--rm',
 if ($E2e) { $runArgs += @('--device', '/dev/kvm') }
 # La llave debug del host (solo lectura): sin ella cada contenedor crea una nueva y el APK no
 # se puede instalar encima del que ya tiene el celular (habria que desinstalar: borra la boveda).
-$debugKs = Join-Path $env:USERPROFILE '.android\debug.keystore'
 if (Test-Path $debugKs) {
   $runArgs += @('-v', "$(($debugKs -replace '\\', '/')):/root/.android/debug.keystore:ro")
 } elseif (-not $E2e) {
   Write-Warning "No existe $debugKs`: el APK sale firmado con una llave debug nueva y no se instala encima de otro build."
+}
+# La llave de release (PLA-1): solo lectura salvo al generarla.
+if ($GenerarLlave) {
+  $runArgs += @('-v', "$(($firma -replace '\\', '/')):/firma")
+} elseif ((Test-Path (Join-Path $firma 'key.properties')) -and -not $E2e) {
+  $runArgs += @('-v', "$(($firma -replace '\\', '/')):/firma:ro")
 }
 $runArgs += @($image, 'bash', '/build.sh')
 

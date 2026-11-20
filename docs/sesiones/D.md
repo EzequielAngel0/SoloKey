@@ -8,7 +8,7 @@ el host).
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
+| | | Nada: PLA-1 hecho el 2026-11-20 | | | |
 
 ## Aprobado, sin desarrollar (el dueño dice cuándo)
 
@@ -51,6 +51,13 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 - PLA-9: con la 10 instalada, la 11 solo cambia el plugin de Android; probar la subida 9 → 10 → 11 en el emulador antes de mergear.
 - PLA-10: el CI de Windows sigue en `windows-2022`: con Visual Studio 18 (`windows-latest`) `local_auth_windows` y
   `flutter_local_notifications_windows` no compilan (`<experimental/coroutine>`, aviso del carril E).
+
+### PLA-1
+
+Hecho el 2026-11-20 ([`../archive/sesiones/D_HECHO.md`](../archive/sesiones/D_HECHO.md)). Cómo funciona y qué respaldar:
+[`publicacion/PUBLICAR.md`](../publicacion/PUBLICAR.md) §"Firma de Android". El dueño eligió rotar la llave (no desinstalar).
+- La llave **no se regenera nunca**: `-GenerarLlave` se niega si existe. Sin la carpeta no hay entregable de Android.
+- Si algún día `minSdk` llega a 28, la debug deja de hacer falta para firmar (v1 y v2 solo sirven para Android 8 o menos).
 
 ### PLA-3
 

@@ -2,17 +2,42 @@
 
 Este documento detalla los pasos obligatorios y recomendados técnicos, legales y gráficos necesarios para publicar la aplicación en la Google Play Store (Android) y App Store Connect (iOS).
 
-> **Estado (2026-11-14).** Hoy se publica fuera de tiendas: `.uild_release.ps1` deja en `dist/` los APK y el **instalador de
+> **Estado (2026-11-14).** Hoy se publica fuera de tiendas: `.\build_release.ps1` deja en `dist/` los APK y el **instalador de
 > Windows** (Inno Setup) con `SHA256SUMS.txt`, y se suben a un release de GitHub. Ya resuelto: `applicationId`
-> `com.angelezequiel.solokey` y versión en `pubspec.yaml`. Falta para tiendas: la llave de release de Android (PLA-1, DUE-3), las
+> `com.angelezequiel.solokey`, versión en `pubspec.yaml` y la llave de release de Android (PLA-1, 2026-11-20; ver abajo). Falta para tiendas: las
 > cuentas (DUE-5), las plantillas legales revisadas (DUE-4) y, para iOS, el hardware (DUE-6). La checklist de abajo es para ese
 > momento.
+
+## Firma de Android (PLA-1)
+
+Desde el 2026-11-20 los APK y el `.aab` de `build_release.ps1` salen firmados con la llave de release, que **no está en el
+repo**: vive en `%USERPROFILE%\SoloKey-firma\` y el dueño guarda el respaldo de la carpeta entera (DUE-3).
+
+| Archivo | Qué es |
+|---|---|
+| `solokey-release.jks` | La llave de release: RSA 4096, PKCS12, alias `solokey`, `CN=SoloKey, O=SoloKey`. Certificado SHA-256 `fe207fbb1c3505147937b4c1413c7e15d83569dd22218af0aeda8df9169383c3` |
+| `key.properties` | Su contraseña (al azar; nunca se imprime) y el alias. Gradle lo lee por `SOLOKEY_KEY_PROPERTIES`, que solo exporta `tool/build.ps1` |
+| `debug.keystore` | Copia de la llave debug con la que se firmó la v1. Certificado SHA-256 `cc9e1130927323bc3a4e643b99c3a2b95a20313d55ff5279096f3146ccc92d80` |
+| `solokey.lineage` | La prueba de rotación debug → release, firmada por las dos |
+
+- **Rotación de llave** (Android 9+): la función `firmar` de `tool/build.ps1` firma cada APK con la debug (esquemas v1 y v2, los
+  que leen Android 7 y 8) y con la de release más el linaje (v3, `--rotation-min-sdk-version 28`). Así el APK se instala **encima**
+  de la app firmada con la debug, sin desinstalar y sin perder la bóveda. En el linaje la debug conserva `installed-data` y no
+  tiene `rollback`: un APK firmado solo con la debug ya no se instala encima de uno rotado.
+- **Se genera una sola vez**: `.\tool\build.ps1 -GenerarLlave` (en Podman) se niega si ya existe. Si se pierde la carpeta,
+  ningún celular puede actualizar sin desinstalar.
+- Sin la carpeta, `build_release.ps1 -Target android` falla en vez de sacar APK con la debug; `tool\build.ps1` a secas sale con la
+  debug y avisa. `flutter run --release` en el host sigue con la debug.
+- Mientras `minSdk` sea menor que 28 (hoy 24) la debug sigue haciendo falta para firmar: es parte del respaldo.
+- Play Store: el `.aab` lo firma Gradle con la de release. Si se usa Play App Signing, subir **esta** llave como llave de firma de
+  la app (no dejar que Play genere otra), para que los APK de fuera de la tienda y los de Play sigan siendo la misma app.
+- Comprobar un APK: `apksigner verify --print-certs -v` dentro de la imagen `solokey-build`: v3 con `fe207fbb…` y v2 con `cc9e1130…`.
 
 ## 🚀 1. Requisitos Técnicos y de Compilación (Release Builds)
 
 ### 🤖 Android (Google Play Console)
 - [ ] **Application ID Diferenciado**: Asegurar que el `applicationId` en `android/app/build.gradle` sea único (ej. `com.tunombre.appname`).
-- [ ] **Keystore de Producción**: Generar y aislar la llave `upload-keystore.jks`. Es vital guardarla fuera de GitHub y configurar el archivo `key.properties` para poder firmar el `.aab`. Si pierdes esta llave nunca podrás actualizar la app.
+- [x] **Keystore de Producción** (PLA-1, 2026-11-20, ver [Firma de Android](#firma-de-android-pla-1)): Generar y aislar la llave `upload-keystore.jks`. Es vital guardarla fuera de GitHub y configurar el archivo `key.properties` para poder firmar el `.aab`. Si pierdes esta llave nunca podrás actualizar la app.
 - [ ] **Configuración de R8 / ProGuard**: Activar la ofuscación de código y reducción de tamaño para la versión `--release`.
 - [ ] **Versionado**: Incrementar el `versionCode` sistemáticamente en el `pubspec.yaml`.
 - [ ] **Compilación del AAB**: Generar el paquete base final de instalación (`flutter build appbundle --release`).

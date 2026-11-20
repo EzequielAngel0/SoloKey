@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
@@ -31,11 +33,25 @@ android {
         versionName = flutter.versionName
     }
 
+    // Llave de release (PLA-1): vive fuera del repo (%USERPROFILE%\SoloKey-firma) y solo la monta
+    // tool/build.ps1, que exporta SOLOKEY_KEY_PROPERTIES. Sin ella, release se firma con la debug
+    // (flutter run --release en el host). Los APK los re-firma build.ps1 con la rotacion desde la debug.
+    val firma = System.getenv("SOLOKEY_KEY_PROPERTIES")?.let { file(it) }?.takeIf { it.exists() }
+    signingConfigs {
+        if (firma != null) {
+            val p = Properties().apply { firma.inputStream().use { load(it) } }
+            create("release") {
+                storeFile = File(firma.parentFile, p.getProperty("storeFile"))
+                storePassword = p.getProperty("storePassword")
+                keyAlias = p.getProperty("keyAlias")
+                keyPassword = p.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // TODO: Add your own signing config for the release build.
-            // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = signingConfigs.getByName(if (firma != null) "release" else "debug")
         }
     }
 }
