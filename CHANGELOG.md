@@ -62,6 +62,9 @@ versión viven en la página de Releases de GitHub.
 
 ### Arreglado
 
+- **Firma del APK hecho en Podman (PLA-3, 2026-11-20)**: cada contenedor firmaba con una llave debug nueva y el APK no se
+  podía instalar encima del del celular. `tool/build.ps1` monta la llave debug del host en solo lectura; comprobado que el
+  certificado del APK es el de esa llave.
 - **Respaldo del runner de integración (CAL-4, 2026-11-15)**: `run_integration_tests.ps1` no respaldaba `secure_files\` ni el
   `flutter_secure_storage.dat` de la identidad actual (la regex de `Runner.rc` no leía el formato `"valor" "\0"` y solo quedaba la
   ruta vieja `com.vaultguard`). El snapshot pasa a `tool/respaldo-boveda.psm1`: carpeta entera con hash por archivo, falla cerrado si

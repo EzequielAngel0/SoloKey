@@ -19,7 +19,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
 | Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
 | Núcleo Rust | `rust/solokey-core/` (`src/**` y `tests/**`) | `.\rust\cargo.ps1 test` | En Podman; las pruebas de la v1 leen `vectores/v1/`. Clippy: `.\rust\cargo.ps1 clippy --all-targets -- -D warnings` |
-| Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.ustuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir`. `cabecera_kdf` sigue en rojo hasta SEC-012 |
+| Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.\rust\fuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir`. `cabecera_kdf` sigue en rojo hasta SEC-012 |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
 
 ## Gates
@@ -95,7 +95,8 @@ Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al h
 | `cargo test` | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 test` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
 | Clippy (la imagen `slim` no lo trae) | `localhost/solokey-build` | `.\tool\build.ps1 -Comando 'cd rust && cargo clippy --locked --all-targets -- -D warnings'` | ver abajo |
 | `.so` por ABI y `solokey_core.dll` | `localhost/solokey-build` | `.\tool\build.ps1 -Nucleo` → `build\podman\jniLibs\` y `build\podman\solokey_core.dll` (sin símbolos exportados hasta que exista el puente de `flutter_rust_bridge`) | ver abajo |
-| Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.
+| Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.\rust\fuzz.ps1` | `podman rmi localhost/solokey-fuzz:<nightly>; podman volume rm solokey-fuzz-corpus solokey-fuzz-target` |
+
 ## Build y E2E de Android en Podman (PLA-3)
 
 Ni el SDK ni el NDK de Android ni Rust van al host ([ADR-0012](../adr/0012-todo-en-podman.md)). `tool/build.ps1` construye la
@@ -115,6 +116,10 @@ la imagen de sistema de Android 14). La etiqueta es `<flutter>-<hash de la recet
 imagen nueva y la vieja queda para `podman rmi`. Cachés en volúmenes con nombre: `solokey-pub-cache` (compartido con
 `ci-linux.ps1`), `solokey-gradle`, `solokey-cargo-registry` (compartido con `rust/cargo.ps1`), `solokey-xwin` (el CRT y el SDK de
 Windows que baja `cargo-xwin`) y `solokey-build-target`.
+
+Firma: `tool/build.ps1` monta en solo lectura la llave debug del host (`%USERPROFILE%\.android\debug.keystore`). Sin ella
+cada contenedor crea una llave nueva y el APK no se instala encima del que ya está en el celular (habría que desinstalar, y eso
+borra la bóveda). Para comprobarlo: `apksigner verify --print-certs` dentro de la imagen y `keytool -list -v` sobre la llave.
 
 | Escaneo | Imagen | Comando | Borrarlo |
 |---|---|---|---|
