@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart';
-import 'package:solokey/app/di/provider_overrides.dart';
+import 'package:solokey/app/di/provider_retry.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:solokey/l10n/app_localizations.dart';
 import 'package:solokey/theme/app_theme.dart';

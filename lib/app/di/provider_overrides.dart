@@ -13,11 +13,6 @@ import '../../features/vault_access/application/unlock_vault_use_case.dart';
 import '../../features/vault_access/application/vault_state_provider.dart';
 import 'injection.dart';
 
-/// Riverpod 3 reintenta solo un provider que falla; la v1 no lo hacía y una
-/// bóveda que no se descifra no mejora reintentando. Se pasa como `retry` a
-/// cada `ProviderScope` (la app y las pruebas) para conservar ese comportamiento.
-Duration? noProviderRetry(int retryCount, Object error) => null;
-
 /// Bridges get_it singletons into Riverpod providers.
 /// Called once at app startup after [configureDependencies].
 List<Override> buildProviderOverrides() => [
