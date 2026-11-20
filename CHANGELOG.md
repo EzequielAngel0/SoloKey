@@ -16,6 +16,9 @@ versión viven en la página de Releases de GitHub.
   (`libsqlite3-sys` 0.30.1, RUSTSEC-2026-0459, CVSS 6,8, arreglado en 0.39).
 - **Teclado seguro en orden para el emulador (2026-11-19)**: `--dart-define=SECURE_KEYBOARD_ORDERED=1` deja las teclas sin
   barajar para manejar la app por `adb`; un build release lo ignora y siempre baraja (`kReleaseMode`).
+- **E2E de Windows en CI (CAL-5, parte, 2026-11-15)**: job `e2e-windows` en `tests.yml` (`windows-2022`, runner desechable; `windows-latest` trae VS 18 y dos plugins no compilan):
+  `app_boot_test` y dos corridas de `vault_e2e_test`, cada una en su paso. Falta Android en Podman (espera a PLA-3) y la bóveda
+  aislada en local (espera a NUC-6).
 - **Modelo de amenazas de la v2 (SEG-1, 2026-11-15)**: `docs/seguridad/AMENAZAS_V2.md`, por superficie (RAM, disco,
   portapapeles y pantalla, sync Noise, migración, lo que entra de fuera, recuperación, pruebas), con el estado de la v1 y el
   requisito y carril de cada fila. Hallazgos nuevos en `SEGURIDAD.md`: SEC-009 (recuperar con el código deja la bóveda ilegible,
