@@ -212,6 +212,9 @@ class _SetupScreenState extends ConsumerState<SetupScreen> {
         enableSuggestions: false,
         style: AppTheme.mono(t.bodyLarge),
         textInputAction: TextInputAction.done,
+        // Si no coincide, el campo se queda con el foco y el teclado para
+        // corregir; _confirmCode lo suelta al acertar.
+        onEditingComplete: () {},
         onSubmitted: (_) => _confirmCode(),
         decoration: InputDecoration(
           labelText: l10n.setupCodeConfirmLabel(_group + 1),

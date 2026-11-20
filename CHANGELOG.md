@@ -11,7 +11,7 @@ versión viven en la página de Releases de GitHub.
 
 - **Pantallas de acceso con el kit (PAN-1, 2026-11-20)**: primer uso en tres pasos en una sola pantalla (`setup_screen.dart`):
   crear la maestra con sus reglas como pastillas que se van cumpliendo, ver el código de recuperación una vez y **confirmar un
-  grupo al azar** antes de seguir, e importar (opcional, abre Transferir). Desbloqueo: biometría o Windows Hello primero si hay,
+  grupo al azar** antes de seguir (si no coincide, el campo conserva el teclado para corregir), e importar (opcional, abre Transferir). Desbloqueo: biometría o Windows Hello primero si hay,
   debajo el campo normal de la maestra (teclado del sistema) y el teclado seguro como opción a la vista; errores, intentos y
   bloqueo en avisos dentro de la pantalla, no en snackbars. Recuperación en dos pasos con las mismas reglas que al crear. Splash
   sin animación ni espera fija de 1.8 s. Todo con `AccessLayout` (ancho completo en el celular, hoja centrada de 460 en
