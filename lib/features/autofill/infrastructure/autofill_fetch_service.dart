@@ -6,6 +6,7 @@ import 'package:injectable/injectable.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../../credentials/domain/repositories/i_credential_repository.dart';
 import '../application/autofill_matcher.dart';
 
@@ -24,10 +25,11 @@ import '../application/autofill_matcher.dart';
 ///    to enable biometric unlock first) — never derives from a typed password.
 @lazySingleton
 class AutofillFetchService {
-  AutofillFetchService(this._credRepo, this._session);
+  AutofillFetchService(this._credRepo, this._session, this._vault);
 
   final ICredentialRepository _credRepo;
   final SessionManager _session;
+  final VaultStore _vault;
 
   static const _bioKeyName = 'bio_master_key';
 
@@ -55,9 +57,8 @@ class AutofillFetchService {
         .toList();
   }
 
-  /// Loads `bio_master_key` into the session if absent. Returns whether a key
-  /// is now available. The decoded buffer is zeroed right after handing a copy
-  /// to the session.
+  /// Abre la boveda con `bio_master_key` si no esta abierta. Devuelve si quedo abierta. El buffer decodificado
+  /// se pone a cero al terminar.
   Future<bool> _ensureSessionKey() async {
     if (_session.hasActiveKey) return true;
     final keyB64 =
@@ -65,8 +66,13 @@ class AutofillFetchService {
     if (keyB64 == null || keyB64.isEmpty) return false;
 
     final bytes = Uint8List.fromList(base64Decode(keyB64));
-    _session.storeKey(bytes);
-    bytes.fillRange(0, bytes.length, 0);
-    return true;
+    try {
+      await _vault.openWithKey(bytes);
+      return true;
+    } catch (_) {
+      return false;
+    } finally {
+      bytes.fillRange(0, bytes.length, 0);
+    }
   }
 }

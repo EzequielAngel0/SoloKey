@@ -1,13 +1,11 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
-import 'package:drift/drift.dart';
 import 'package:uuid/uuid.dart';
 
-import '../../../core/infrastructure/database/app_database.dart';
 import '../domain/entities/credential.dart';
 
-/// Sensitive fields serialised to JSON before encryption.
-/// Only this payload gets AES-256-GCM encrypted.
+/// Campos sensibles de una credencial (los mismos nombres que el payload cifrado de la v1).
 class CredentialSensitivePayload {
   const CredentialSensitivePayload({
     this.username,
@@ -43,13 +41,15 @@ class CredentialSensitivePayload {
         password: json['password'] as String?,
         website: json['website'] as String?,
         notes: json['notes'] as String?,
-        customFields: (json['customFields'] as List<dynamic>)
+        customFields: ((json['customFields'] as List<dynamic>?) ?? const [])
             .cast<Map<String, dynamic>>(),
         passkeyMetadata: json['passkeyMetadata'] != null
-            ? PasskeyMetadata.fromJson(json['passkeyMetadata'] as Map<String, dynamic>)
+            ? PasskeyMetadata.fromJson(
+                json['passkeyMetadata'] as Map<String, dynamic>)
             : null,
         sshKeyMetadata: json['sshKeyMetadata'] != null
-            ? SshKeyMetadata.fromJson(json['sshKeyMetadata'] as Map<String, dynamic>)
+            ? SshKeyMetadata.fromJson(
+                json['sshKeyMetadata'] as Map<String, dynamic>)
             : null,
       );
 
@@ -61,67 +61,64 @@ class CredentialSensitivePayload {
       );
 }
 
-/// Maps between [Credential] domain entity and [CredentialEntriesCompanion] (Drift).
+/// [Credential] <-> registro `credential` de la boveda v2: un solo objeto JSON con el payload y los metadatos, con
+/// las claves que deja la migracion de la v1 (`migrate_v1.rs`). El nucleo lo cifra entero.
 abstract final class CredentialDto {
-  static CredentialEntriesCompanion toCompanion({
-    required Credential credential,
-    required Uint8List encryptedPayload,
-  }) =>
-      CredentialEntriesCompanion(
-        id: Value(credential.id),
-        title: Value(credential.title),
-        type: Value(credential.type.name),
-        categoryId: Value(credential.categoryId),
-        isFavorite: Value(credential.isFavorite),
-        isDoubleEncrypted: Value(credential.isDoubleEncrypted),
-        isHidden: Value(credential.isHidden),
-        sortOrder: Value(credential.sortOrder),
-        encryptedPayload: Value(encryptedPayload),
-        createdAt: Value(credential.createdAt.millisecondsSinceEpoch),
-        updatedAt: Value(credential.updatedAt.millisecondsSinceEpoch),
-        rotationInterval: Value(credential.rotationInterval),
-        customRotationDays: Value(credential.customRotationDays),
-        lastRotationPromptedAt: Value(
-          credential.lastRotationPromptedAt?.millisecondsSinceEpoch,
-        ),
-      );
+  static Map<String, dynamic> toRecord(Credential c) => {
+        ...toPayload(c).toJson(),
+        'id': c.id,
+        'type': c.type.name,
+        'title': c.title,
+        'categoryId': c.categoryId,
+        'folderId': c.folderId,
+        'isFavorite': c.isFavorite,
+        'isDoubleEncrypted': c.isDoubleEncrypted,
+        'isHidden': c.isHidden,
+        'sortOrder': c.sortOrder,
+        'createdAt': c.createdAt.millisecondsSinceEpoch,
+        'updatedAt': c.updatedAt.millisecondsSinceEpoch,
+        'rotationInterval': c.rotationInterval,
+        'customRotationDays': c.customRotationDays,
+        'lastRotationPromptedAt': c.lastRotationPromptedAt?.millisecondsSinceEpoch,
+      };
 
-  static Credential fromEntry({
-    required CredentialEntry entry,
-    required CredentialSensitivePayload payload,
-  }) =>
-      Credential(
-        id: entry.id,
-        type: CredentialType.values.byName(entry.type),
-        title: entry.title,
-        username: payload.username,
-        password: payload.password,
-        website: payload.website,
-        notes: payload.notes,
-        customFields: payload.customFields
-            .map(
-              (f) => CustomField(
-                label: f['label'] as String,
-                value: f['value'] as String,
-                isSecret: f['isSecret'] as bool? ?? false,
-              ),
-            )
-            .toList(),
-        categoryId: entry.categoryId,
-        isFavorite: entry.isFavorite,
-        isDoubleEncrypted: entry.isDoubleEncrypted,
-        isHidden: entry.isHidden,
-        sortOrder: entry.sortOrder,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(entry.createdAt),
-        updatedAt: DateTime.fromMillisecondsSinceEpoch(entry.updatedAt),
-        passkeyMetadata: payload.passkeyMetadata,
-        sshKeyMetadata: payload.sshKeyMetadata,
-        rotationInterval: entry.rotationInterval,
-        customRotationDays: entry.customRotationDays,
-        lastRotationPromptedAt: entry.lastRotationPromptedAt != null
-            ? DateTime.fromMillisecondsSinceEpoch(entry.lastRotationPromptedAt!)
-            : null,
-      );
+  static Credential fromRecord(Map<String, dynamic> m) {
+    final payload = CredentialSensitivePayload.fromJson(m);
+    DateTime? date(String k) => m[k] == null
+        ? null
+        : DateTime.fromMillisecondsSinceEpoch((m[k] as num).toInt());
+    return Credential(
+      id: m['id'] as String,
+      type: CredentialType.values.byName(m['type'] as String),
+      title: m['title'] as String? ?? '',
+      username: payload.username,
+      password: payload.password,
+      website: payload.website,
+      notes: payload.notes,
+      customFields: payload.customFields
+          .map(
+            (f) => CustomField(
+              label: f['label'] as String,
+              value: f['value'] as String,
+              isSecret: f['isSecret'] as bool? ?? false,
+            ),
+          )
+          .toList(),
+      categoryId: m['categoryId'] as String?,
+      folderId: m['folderId'] as String?,
+      isFavorite: m['isFavorite'] as bool? ?? false,
+      isDoubleEncrypted: m['isDoubleEncrypted'] as bool? ?? false,
+      isHidden: m['isHidden'] as bool? ?? false,
+      sortOrder: (m['sortOrder'] as num?)?.toInt() ?? 0,
+      createdAt: date('createdAt')!,
+      updatedAt: date('updatedAt')!,
+      passkeyMetadata: payload.passkeyMetadata,
+      sshKeyMetadata: payload.sshKeyMetadata,
+      rotationInterval: m['rotationInterval'] as String? ?? 'none',
+      customRotationDays: (m['customRotationDays'] as num?)?.toInt(),
+      lastRotationPromptedAt: date('lastRotationPromptedAt'),
+    );
+  }
 
   static CredentialSensitivePayload toPayload(Credential c) =>
       CredentialSensitivePayload(

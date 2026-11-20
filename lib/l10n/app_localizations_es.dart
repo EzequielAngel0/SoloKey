@@ -2341,6 +2341,18 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String notifRotationBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count contraseñas tocan cambiarse. Abre SoloKey para ver cuáles.',
+      one: 'Una contraseña toca cambiarse. Abre SoloKey para ver cuál.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get notifActionChangePassword => 'Cambiar contraseña';
 
   @override

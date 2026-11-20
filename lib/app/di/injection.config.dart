@@ -15,13 +15,6 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 
 import '../../core/infrastructure/clipboard/clipboard_service.dart' as _i885;
-import '../../core/infrastructure/database/app_database.dart' as _i1042;
-import '../../core/infrastructure/database/daos/category_dao.dart' as _i403;
-import '../../core/infrastructure/database/daos/credential_dao.dart' as _i753;
-import '../../core/infrastructure/database/daos/folder_dao.dart' as _i496;
-import '../../core/infrastructure/database/daos/password_history_dao.dart'
-    as _i386;
-import '../../core/infrastructure/database/daos/secure_file_dao.dart' as _i1070;
 import '../../core/infrastructure/security/app_lifecycle_observer.dart'
     as _i301;
 import '../../core/infrastructure/security/double_envelope_service.dart'
@@ -30,11 +23,13 @@ import '../../core/infrastructure/security/i_security_service.dart' as _i1023;
 import '../../core/infrastructure/security/security_service_impl.dart'
     as _i1063;
 import '../../core/infrastructure/security/session_manager.dart' as _i795;
+import '../../core/infrastructure/vault/vault_store.dart' as _i93;
 import '../../core/services/biometric_auth_service.dart' as _i455;
 import '../../core/services/brute_force_guard.dart' as _i714;
 import '../../core/services/csv_import_service.dart' as _i764;
 import '../../core/services/notification_service.dart' as _i4;
 import '../../core/services/recovery_service.dart' as _i323;
+import '../../core/services/rotation_schedule.dart' as _i781;
 import '../../core/services/scheduled_backup_service.dart' as _i1009;
 import '../../core/services/security_audit_service.dart' as _i400;
 import '../../core/services/ssh_key_generator_service.dart' as _i972;
@@ -69,10 +64,6 @@ import '../../features/vault_access/application/unlock_vault_use_case.dart'
     as _i155;
 import '../../features/vault_access/application/wipe_vault_use_case.dart'
     as _i1;
-import '../../features/vault_access/domain/repositories/i_vault_repository.dart'
-    as _i286;
-import '../../features/vault_access/infrastructure/vault_repository_impl.dart'
-    as _i939;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -83,7 +74,6 @@ extension GetItInjectableX on _i174.GetIt {
   }) {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
     final registerModule = _$RegisterModule();
-    gh.singleton<_i1042.AppDatabase>(() => _i1042.AppDatabase());
     gh.lazySingleton<_i558.FlutterSecureStorage>(
       () => registerModule.secureStorage,
     );
@@ -100,41 +90,20 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i714.BruteForceGuard>(
       () => _i714.BruteForceGuard(gh<_i558.FlutterSecureStorage>()),
     );
-    gh.lazySingleton<_i286.IVaultRepository>(
-      () => _i939.VaultRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
-    );
     gh.lazySingleton<_i1023.ISecurityService>(
       () => _i1063.SecurityServiceImpl(),
     );
     gh.lazySingleton<_i657.ISettingsRepository>(
       () => _i569.SettingsRepositoryImpl(gh<_i558.FlutterSecureStorage>()),
     );
-    gh.lazySingleton<_i229.SetupVaultUseCase>(
-      () => _i229.SetupVaultUseCase(
-        gh<_i286.IVaultRepository>(),
-        gh<_i657.ISettingsRepository>(),
-        gh<_i1023.ISecurityService>(),
+    gh.lazySingleton<_i93.VaultStore>(
+      () => _i93.VaultStore(
         gh<_i795.SessionManager>(),
+        gh<_i558.FlutterSecureStorage>(),
       ),
     );
-    gh.lazySingleton<_i4.NotificationService>(
-      () => _i4.NotificationService(gh<_i1042.AppDatabase>()),
-      dispose: (i) => i.dispose(),
-    );
-    gh.lazySingleton<_i753.CredentialDao>(
-      () => registerModule.credentialDao(gh<_i1042.AppDatabase>()),
-    );
-    gh.lazySingleton<_i403.CategoryDao>(
-      () => registerModule.categoryDao(gh<_i1042.AppDatabase>()),
-    );
-    gh.lazySingleton<_i496.FolderDao>(
-      () => _i496.FolderDao(gh<_i1042.AppDatabase>()),
-    );
-    gh.lazySingleton<_i386.PasswordHistoryDao>(
-      () => _i386.PasswordHistoryDao(gh<_i1042.AppDatabase>()),
-    );
-    gh.lazySingleton<_i1070.SecureFileDao>(
-      () => _i1070.SecureFileDao(gh<_i1042.AppDatabase>()),
+    gh.lazySingleton<_i1067.IFolderRepository>(
+      () => _i759.FolderRepositoryImpl(gh<_i93.VaultStore>()),
     );
     gh.lazySingleton<_i971.DoubleEnvelopeService>(
       () => _i971.DoubleEnvelopeService(
@@ -145,12 +114,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i885.ClipboardService>(
       () => _i885.ClipboardService(gh<_i657.ISettingsRepository>()),
     );
-    gh.lazySingleton<_i323.RecoveryService>(
-      () => _i323.RecoveryService(
+    gh.lazySingleton<_i706.SyncService>(
+      () => _i706.SyncService(
         gh<_i558.FlutterSecureStorage>(),
+        gh<_i93.VaultStore>(),
         gh<_i1023.ISecurityService>(),
         gh<_i795.SessionManager>(),
-        gh<_i286.IVaultRepository>(),
       ),
     );
     gh.lazySingleton<_i301.AppLifecycleObserver>(
@@ -159,41 +128,81 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i657.ISettingsRepository>(),
       ),
     );
-    gh.lazySingleton<_i1067.IFolderRepository>(
-      () => _i759.FolderRepositoryImpl(gh<_i496.FolderDao>()),
+    gh.lazySingleton<_i229.SetupVaultUseCase>(
+      () => _i229.SetupVaultUseCase(
+        gh<_i93.VaultStore>(),
+        gh<_i657.ISettingsRepository>(),
+        gh<_i795.SessionManager>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
+    );
+    gh.lazySingleton<_i781.RotationSchedule>(
+      () => _i781.RotationSchedule(gh<_i93.VaultStore>()),
+    );
+    gh.lazySingleton<_i1.WipeVaultUseCase>(
+      () => _i1.WipeVaultUseCase(
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i93.VaultStore>(),
+        gh<_i781.RotationSchedule>(),
+      ),
+    );
+    gh.lazySingleton<_i323.RecoveryService>(
+      () => _i323.RecoveryService(
+        gh<_i93.VaultStore>(),
+        gh<_i795.SessionManager>(),
+      ),
+    );
+    gh.lazySingleton<_i4.NotificationService>(
+      () => _i4.NotificationService(gh<_i781.RotationSchedule>()),
+      dispose: (i) => i.dispose(),
     );
     gh.lazySingleton<_i112.ISecureFileRepository>(
-      () => _i701.SecureFileRepositoryImpl(
-        gh<_i1070.SecureFileDao>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-      ),
-    );
-    gh.lazySingleton<_i706.SyncService>(
-      () => _i706.SyncService(
-        gh<_i558.FlutterSecureStorage>(),
-        gh<_i1042.AppDatabase>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-        gh<_i112.ISecureFileRepository>(),
-      ),
+      () => _i701.SecureFileRepositoryImpl(gh<_i93.VaultStore>()),
     );
     gh.lazySingleton<_i366.ICategoryRepository>(
-      () => _i316.CategoryRepositoryImpl(gh<_i403.CategoryDao>()),
+      () => _i316.CategoryRepositoryImpl(gh<_i93.VaultStore>()),
+    );
+    gh.lazySingleton<_i1055.ISyncService>(
+      () => registerModule.syncService(gh<_i706.SyncService>()),
     );
     gh.lazySingleton<_i366.ICredentialRepository>(
       () => _i316.CredentialRepositoryImpl(
-        gh<_i753.CredentialDao>(),
-        gh<_i386.PasswordHistoryDao>(),
-        gh<_i1023.ISecurityService>(),
+        gh<_i93.VaultStore>(),
+        gh<_i781.RotationSchedule>(),
+      ),
+    );
+    gh.lazySingleton<_i472.GetCredentialsUseCase>(
+      () => _i472.GetCredentialsUseCase(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i472.SaveCredentialUseCase>(
+      () => _i472.SaveCredentialUseCase(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i472.DeleteCredentialUseCase>(
+      () => _i472.DeleteCredentialUseCase(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i155.UnlockVaultUseCase>(
+      () => _i155.UnlockVaultUseCase(
+        gh<_i93.VaultStore>(),
+        gh<_i657.ISettingsRepository>(),
         gh<_i795.SessionManager>(),
+        gh<_i714.BruteForceGuard>(),
+        gh<_i1.WipeVaultUseCase>(),
+        gh<_i558.FlutterSecureStorage>(),
+        gh<_i781.RotationSchedule>(),
       ),
     );
     gh.lazySingleton<_i1059.AutofillFetchService>(
       () => _i1059.AutofillFetchService(
         gh<_i366.ICredentialRepository>(),
         gh<_i795.SessionManager>(),
+        gh<_i93.VaultStore>(),
       ),
+    );
+    gh.lazySingleton<_i764.CsvImportService>(
+      () => _i764.CsvImportService(gh<_i366.ICredentialRepository>()),
+    );
+    gh.lazySingleton<_i400.SecurityAuditService>(
+      () => _i400.SecurityAuditService(gh<_i366.ICredentialRepository>()),
     );
     gh.lazySingleton<_i332.VaultExportService>(
       () => _i332.VaultExportService(
@@ -209,42 +218,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i657.ISettingsRepository>(),
         gh<_i558.FlutterSecureStorage>(),
         gh<_i795.SessionManager>(),
-      ),
-    );
-    gh.lazySingleton<_i1055.ISyncService>(
-      () => registerModule.syncService(gh<_i706.SyncService>()),
-    );
-    gh.lazySingleton<_i1.WipeVaultUseCase>(
-      () => _i1.WipeVaultUseCase(
-        gh<_i558.FlutterSecureStorage>(),
-        gh<_i1042.AppDatabase>(),
-        gh<_i795.SessionManager>(),
-        gh<_i112.ISecureFileRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i472.GetCredentialsUseCase>(
-      () => _i472.GetCredentialsUseCase(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i472.SaveCredentialUseCase>(
-      () => _i472.SaveCredentialUseCase(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i472.DeleteCredentialUseCase>(
-      () => _i472.DeleteCredentialUseCase(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i764.CsvImportService>(
-      () => _i764.CsvImportService(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i400.SecurityAuditService>(
-      () => _i400.SecurityAuditService(gh<_i366.ICredentialRepository>()),
-    );
-    gh.lazySingleton<_i155.UnlockVaultUseCase>(
-      () => _i155.UnlockVaultUseCase(
-        gh<_i286.IVaultRepository>(),
-        gh<_i657.ISettingsRepository>(),
-        gh<_i1023.ISecurityService>(),
-        gh<_i795.SessionManager>(),
-        gh<_i714.BruteForceGuard>(),
-        gh<_i1.WipeVaultUseCase>(),
       ),
     );
     return this;

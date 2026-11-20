@@ -94,8 +94,8 @@ storage DPAPI), en una máquina con datos reales corre el runner que **siempre h
 backup antes y restaura después** (snapshot con hash → tests → restore en `finally`):
 
 ```powershell
-.\run_integration_tests.ps1                 # app_boot + vault_e2e ×2 (anti-flaky), con backup/restore
-.\run_integration_tests.ps1 -SkipDestructive # solo app_boot (no toca el vault)
+.\run_integration_tests.ps1                 # app_boot + migracion_v1 + vault_e2e ×2 (anti-flaky), con backup/restore
+.\run_integration_tests.ps1 -SkipDestructive # app_boot + migracion_v1 (solo la carpeta aislada)
 ```
 
 El script cierra cualquier `SoloKey.exe` abierto, snapshotea `vault_guard_db.sqlite`
@@ -239,6 +239,11 @@ La suite **escribe de verdad** (crea la bóveda, guarda credenciales cifradas en
 local), pero todo vive **en el dispositivo de prueba** y se borra al reiniciar el estado.
 No hay nada remoto que tocar.
 
+> **Desde NUC-6 (2026-11-20)** las corridas van con `--dart-define=SOLOKEY_DATA_DIR=<carpeta>`
+> (relativa = bajo el soporte de la app; un release la ignora): la bóveda, la v1 a migrar y
+> un almacén en archivo viven ahí, y `resetVault` solo borra esa carpeta (sin la bandera no
+> hace nada y las pruebas que borran se omiten). El aviso de abajo es de la v1.
+>
 > ⚠️ **`resetVault` es DESTRUCTIVO y apunta al MISMO almacenamiento que la app real
 > de escritorio** (secure storage + `Documents/vault_guard_db.sqlite`). En una
 > máquina con una bóveda real **borraría los datos del usuario**. Por eso el helper

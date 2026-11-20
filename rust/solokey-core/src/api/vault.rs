@@ -166,6 +166,12 @@ pub fn vault_recover(
     )?))
 }
 
+/// Comprueba el codigo de recuperacion sin cambiar nada; `wrongPassword` si no sirve, `noRecovery` si no hay.
+pub fn vault_check_recovery(data_dir: String, recovery_code: String) -> Result<(), CoreFailure> {
+    let code = Zeroizing::new(recovery_code);
+    Ok(Vault::check_recovery(&path(&data_dir), &code)?)
+}
+
 /// Borra la boveda del directorio (el archivo y sus diarios).
 pub fn vault_wipe(data_dir: String) -> Result<(), CoreFailure> {
     Ok(vault::wipe(&path(&data_dir))?)

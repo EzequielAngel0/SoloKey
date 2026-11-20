@@ -1,74 +1,54 @@
 import 'dart:convert';
 import 'dart:typed_data';
+
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../app/di/injection.dart';
-
-import '../../../core/infrastructure/security/i_security_service.dart';
+import '../../../core/infrastructure/rust/api/error.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../../../core/services/brute_force_guard.dart';
-import '../domain/entities/vault_session.dart';
-import '../domain/repositories/i_vault_repository.dart';
+import '../../../core/services/rotation_schedule.dart';
+import '../../credentials/infrastructure/credential_dto.dart';
 import '../../settings/domain/repositories/i_settings_repository.dart';
+import '../domain/entities/vault_session.dart';
+import 'setup_vault_use_case.dart';
 import 'vault_exceptions.dart';
 import 'wipe_vault_use_case.dart';
 
+/// Abre la boveda v2 del nucleo Rust (NUC-2). La primera vez con una v1 en el equipo, la migra antes.
 @lazySingleton
 class UnlockVaultUseCase {
   const UnlockVaultUseCase(
-    this._vaultRepo,
+    this._vault,
     this._settingsRepo,
-    this._security,
     this._session,
     this._guard,
     this._wipe,
+    this._storage,
+    this._rotation,
   );
 
-  final IVaultRepository _vaultRepo;
+  final VaultStore _vault;
   final ISettingsRepository _settingsRepo;
-  final ISecurityService _security;
   final SessionManager _session;
   final BruteForceGuard _guard;
   final WipeVaultUseCase _wipe;
+  final FlutterSecureStorage _storage;
+  final RotationSchedule _rotation;
 
   Future<VaultSession> execute(String masterPassword) async {
-    // Anti brute-force: reject attempts while in a lockout window.
+    // Anti fuerza bruta: rechazar mientras dura el bloqueo.
     final guardState = await _guard.currentState();
     if (guardState.isLockedOut) {
       throw VaultLockedOutException(guardState.lockoutRemaining);
     }
 
-    final config = await _vaultRepo.getMasterKeyConfig();
-    if (config == null) throw StateError('Vault not initialized');
-
-    // SEC-003: Convertir a bytes inmediatamente y borrar el buffer tras el KDF
-    // para minimizar el tiempo que la contraseña en texto plano ocupa el heap.
-    // Nota: el String original en el call-stack no se puede borrar por ser
-    // inmutable en Dart (limitación documentada del runtime).
-    final passwordBytes = Uint8List.fromList(utf8.encode(masterPassword));
-
-    late final Uint8List keyBytes;
-    try {
-      keyBytes = await _security.deriveKey(
-        password: String.fromCharCodes(passwordBytes), // KDF recibe String
-        saltBase64: config.salt,
-        memory: config.kdfParams.memory,
-        iterations: config.kdfParams.iterations,
-        parallelism: config.kdfParams.parallelism,
-      );
-    } finally {
-      // Borrar el buffer de bytes de la contraseña, aunque el String original
-      // puede seguir vivo hasta el próximo GC.
-      passwordBytes.fillRange(0, passwordBytes.length, 0);
-    }
-
-    final isValid = await _security.verifyKey(keyBytes, config.verificationData);
     final settings = await _settingsRepo.getSettings();
-
-    if (!isValid) {
-      // Zero the derived (wrong) key before bailing out.
-      keyBytes.fillRange(0, keyBytes.length, 0);
+    try {
+      await _vault.open(masterPassword);
+    } on CoreFailure catch (e) {
+      if (e.code != FailureCode.wrongPassword) rethrow;
       final state = await _guard.recordFailure();
       if (BruteForceGuard.shouldWipe(
           state.failedAttempts, settings.wipeAfterFailedAttempts)) {
@@ -78,20 +58,13 @@ class UnlockVaultUseCase {
       throw WrongMasterPasswordException(state.lockoutRemaining);
     }
 
-    // Correct password: clear the brute-force counter.
     await _guard.recordSuccess();
-    _session.storeKey(keyBytes);
-
     if (settings.biometricEnabled) {
-      await getIt<FlutterSecureStorage>()
-          .write(key: 'bio_master_key', value: base64Encode(keyBytes));
+      await storeBiometricKey(_session, _storage);
     } else {
-      await getIt<FlutterSecureStorage>().delete(key: 'bio_master_key');
+      await _storage.delete(key: 'bio_master_key');
     }
-    // El WiFi-unlock ya NO usa la contrasena en texto plano (usa un token DUK);
-    // limpiamos cualquier 'master_password' heredado de versiones anteriores.
-    await getIt<FlutterSecureStorage>().delete(key: 'master_password');
-
+    await _afterOpen();
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
   }
 
@@ -99,35 +72,45 @@ class UnlockVaultUseCase {
     final settings = await _settingsRepo.getSettings();
     if (!settings.biometricEnabled) throw StateError('Biometría desactivada');
 
-    final keyBase64 =
-        await getIt<FlutterSecureStorage>().read(key: 'bio_master_key');
+    final keyBase64 = await _storage.read(key: 'bio_master_key');
     if (keyBase64 == null) throw StateError('Llave biométrica no encontrada');
 
-    final keyBytes = base64Decode(keyBase64);
-    _session.storeKey(keyBytes);
-
+    final key = base64Decode(keyBase64);
+    try {
+      await _vault.openWithKey(key);
+    } finally {
+      key.fillRange(0, key.length, 0);
+    }
+    await _afterOpen();
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
   }
 
-  /// Unlocks the vault with a raw master key (e.g. from a WiFi remote-unlock DUK
-  /// that decrypted the locally-wrapped key). Verifies the key against the
-  /// stored verification data before storing it in the session.
+  /// Abre con la clave de la boveda en bruto (desbloqueo remoto por WiFi, que la desenvuelve con su token).
+  /// El nucleo la comprueba contra la cabecera.
   Future<VaultSession> executeWithRawKey(Uint8List keyBytes) async {
-    final config = await _vaultRepo.getMasterKeyConfig();
-    if (config == null) throw StateError('Vault not initialized');
-
-    final isValid = await _security.verifyKey(keyBytes, config.verificationData);
-    if (!isValid) {
-      keyBytes.fillRange(0, keyBytes.length, 0);
+    try {
+      await _vault.openWithKey(keyBytes);
+    } on CoreFailure {
       throw ArgumentError('Invalid master key');
+    } finally {
+      keyBytes.fillRange(0, keyBytes.length, 0);
     }
 
     await _guard.recordSuccess();
-    _session.storeKey(keyBytes);
-
+    await _afterOpen();
     final settings = await _settingsRepo.getSettings();
     return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
   }
 
-  void lock() => _session.lock();
+  /// Rehace la agenda de rotacion (sin secretos) que lee el aviso de segundo plano.
+  Future<void> _afterOpen() async {
+    try {
+      final rows = await _vault.list(RecordKind.credential);
+      await _rotation.rebuild([for (final r in rows) CredentialDto.fromRecord(r)]);
+    } catch (_) {
+      // La agenda es un aviso: si falla, el desbloqueo sigue.
+    }
+  }
+
+  void lock() => _vault.lock();
 }

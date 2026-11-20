@@ -10,6 +10,11 @@
   datos del usuario, por eso esta gateado tras --dart-define=E2E_ALLOW_WIPE=1
   (ver docs/proceso/PRUEBAS_INTEGRACION.md).
 
+  Desde NUC-6 (v2) todas las corridas van con datos AISLADOS
+  (--dart-define=SOLOKEY_DATA_DIR=<carpeta temporal>, que un release ignora): la
+  app y resetVault solo tocan esa carpeta, que se borra al final. El snapshot de la
+  boveda real se queda como segunda red.
+
   Este script:
     1) Cierra cualquier SoloKey.exe abierto (libera el lock de instancia unica y
        los archivos de la DB).
@@ -17,8 +22,10 @@
        .dat de secure storage de cada identidad y la carpeta secure_files con los
        archivos seguros), en %USERPROFILE%. Si no puede leer la identidad de
        windows/runner/Runner.rc, no corre nada (ver tool/respaldo-boveda.psm1).
-    3) Corre app_boot_test.dart (NO destructivo) y, salvo -SkipDestructive,
-       vault_e2e_test.dart dos veces (regla anti-flaky: dos verdes seguidas).
+    3) Corre app_boot_test.dart (NO destructivo), migracion_v1_test.dart (migra la
+       boveda de prueba de vectores/v1 dentro de la carpeta aislada) y, salvo
+       -SkipDestructive, vault_e2e_test.dart dos veces (regla anti-flaky: dos
+       verdes seguidas).
        En Windows se corre UN archivo por invocacion (instancia unica).
     4) En un bloque finally SIEMPRE restaura el snapshot (borra lo vivo, copia de
        vuelta lo que existia antes, verifica hash) y limpia los *.e2e-backup.
@@ -66,6 +73,8 @@ function Stop-SoloKey {
 Stop-SoloKey
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $backup = Join-Path $env:USERPROFILE "SoloKey-e2e-backup-$stamp"
+# Carpeta de datos aislada de las E2E (NUC-6); se borra al final.
+$iso = Join-Path $env:TEMP "solokey-e2e-$stamp"
 New-Item -ItemType Directory -Force -Path $backup | Out-Null
 
 $manifest = New-VaultSnapshot -Targets $targets -BackupDir $backup
@@ -79,7 +88,14 @@ $restoreErrors = @('no se llego a restaurar')
 try {
   Push-Location $repo
   Write-Host "[test] app_boot_test.dart (no destructivo)" -ForegroundColor Cyan
-  & flutter test integration_test/app_boot_test.dart -d windows
+  & flutter test integration_test/app_boot_test.dart -d windows "--dart-define=SOLOKEY_DATA_DIR=$iso"
+  if ($LASTEXITCODE -ne 0) { $failed = $true }
+
+  Stop-SoloKey
+  Write-Host "[test] migracion_v1_test.dart (solo la carpeta aislada)" -ForegroundColor Cyan
+  & flutter test integration_test/migracion_v1_test.dart -d windows `
+      --dart-define=E2E_ALLOW_WIPE=1 "--dart-define=SOLOKEY_DATA_DIR=$iso" `
+      "--dart-define=SOLOKEY_V1_VECTORS=$(Join-Path $repo 'vectores\v1')"
   if ($LASTEXITCODE -ne 0) { $failed = $true }
 
   if (-not $SkipDestructive) {
@@ -87,13 +103,14 @@ try {
       Stop-SoloKey
       Write-Host "[test] vault_e2e_test.dart (destructivo, corrida $run/2)" -ForegroundColor Cyan
       & flutter test integration_test/vault_e2e_test.dart -d windows `
-          --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1
+          --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1 "--dart-define=SOLOKEY_DATA_DIR=$iso"
       if ($LASTEXITCODE -ne 0) { $failed = $true; break }
     }
   }
 }
 finally {
   Pop-Location
+  if (Test-Path -LiteralPath $iso) { Remove-Item -LiteralPath $iso -Recurse -Force -ErrorAction SilentlyContinue }
   # --- 4) SIEMPRE restaurar --------------------------------------------------
   Stop-SoloKey
   Write-Host "[restore] devolviendo el vault al estado pre-corrida" -ForegroundColor Cyan

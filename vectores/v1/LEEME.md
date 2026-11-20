@@ -36,6 +36,8 @@ vacío y uno binario.
 
 ## Cómo se regeneran
 
+Desde `main` (la v1; en develop ya no está drift, NUC-2):
+
 ```powershell
 .\tool\vectores_v1\generar.ps1
 ```
@@ -52,4 +54,4 @@ Para comprobarlos sin Dart (Python en Podman, rederiva y descifra todo y lo comp
 ```
 
 No es una prueba de Dart ni entra en los gates ([ADR-0011](../../docs/adr/0011-pruebas-e2e-principal.md)): es la herramienta que
-produce los datos; las pruebas que los usan son las de Rust del núcleo.
+produce los datos; las pruebas que los usan son las de Rust del núcleo y la E2E `integration_test/migracion_v1_test.dart`.

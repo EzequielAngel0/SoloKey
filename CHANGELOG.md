@@ -14,6 +14,21 @@ versión viven en la página de Releases de GitHub.
   oscuro, sistema), letra (100, 150, 200 %) y celular o escritorio; arranca en oscuro, 200 % y escritorio. Es un punto de entrada
   aparte y no una ruta oculta: la build release (`lib/main.dart`) no la importa. Se abre con
   `flutter run -d windows -t lib/main_galeria.dart`; CAL-1 puede montar `KitGalleryApp` tal cual.
+- **La app usa la bóveda v2 del núcleo Rust (NUC-2 y NUC-6, 2026-11-20)**: `VaultStore` (`lib/core/infrastructure/vault/`)
+  crea, abre (maestra o clave de la biometría), recupera, borra y lee o escribe registros por el puente; el `VaultHandle` abierto
+  vive en `SessionManager` y la clave ya no pasa por Dart salvo `keyCopy()` para guardar la de la biometría. Al primer desbloqueo
+  con una v1 en el equipo la migra (`migrateFromV1`: copia previa `respaldo-v1-<fecha>`, verificación, y solo entonces borra los
+  originales); después borra del almacén seguro las claves de la v1 (config, metadatos, recuperación, biometría, desbloqueo por
+  WiFi) y deja `recovery_reset_needed` si la v1 tenía código. Repositorios de credenciales, categorías, carpetas y archivos
+  seguros sobre registros (`credential`, `category`, `folder`, `history`, `file`, archivos en `blobs`). Recuperación en dos pasos
+  (`vaultCheckRecovery`, nuevo en el núcleo, y `vaultRecover`); el código de la bóveda nueva sale de `vaultCreate`. La sync
+  conserva emparejamiento, canal y desbloqueo por WiFi; su delta (`DeltaSyncManager`) cruza los registros de la v2 conservando su
+  fecha (LWW) y lápidas, e ignora lo de una v1. Rotación: agenda sin secretos `rotacion.json` (id, vencimiento, último aviso) que
+  se rehace al desbloquear y al guardar; el aviso de fondo dice cuántas tocan, no cuáles (`notifRotationBodyCount`, decisión del
+  dueño). NUC-6: `--dart-define=SOLOKEY_DATA_DIR=<ruta>` (relativa = bajo el soporte de la app; un release lo ignora) manda la
+  bóveda, la v1 a migrar y un almacén en archivo (`FileSecureStorage`) a esa carpeta; `resetVault` de las E2E solo borra ahí.
+  E2E nueva `integration_test/migracion_v1_test.dart` (vectores de CAL-2, maestra con `ñ` y emoji); el runner, `tests.yml` y
+  `tool/build.ps1 -E2e` pasan la bandera.
 - **Kit de componentes de Tinta y papel (DIS-2, 2026-11-20)**: `lib/shared/widgets/kit/` con un solo import (`kit.dart`, que
   también exporta los tokens). `PaperButton` (principal de tinta, secundario con borde, discreto e irreversible en rojo; 48 de
   alto, texto que baja de renglón), `SecretField` y `SecretText` (Mono; al revelar, números en 700 y símbolos en 500, mismo
@@ -120,6 +135,12 @@ versión viven en la página de Releases de GitHub.
   la bóveda (ahora un `CircularProgressIndicator` quieto en `home_screen` y `desktop_main_layout`) y `StaggeredListItem`, que ya
   no se usaba. Se borran `shimmer_loader.dart`, `staggered_list_item.dart`, los alias `shimmerBase` y `shimmerHighlight` de
   `AppPalette` y la prueba del shimmer de `mobile_home_screen_test.dart` (ADR-0011).
+- **Fuera drift (NUC-2, 2026-11-20)**: se borran `lib/core/infrastructure/database/`, `IVaultRepository`, `MasterKeyConfig`,
+  `Vault` y los paquetes `drift`, `drift_flutter` y `drift_dev` (y con ellos `sqlite3_flutter_libs`). Pruebas Dart borradas
+  (ADR-0011): `credential_dto_test`, `recovery_service_test`, `vault_use_cases_test`, `notification_rotation_test` y
+  `delta_sync_integration_test`. `tool/vectores_v1/generar_vectores.dart` y `generar.ps1` salen de develop: corren solo con el
+  código de la v1 (en `main`). Piso de cobertura recalculado a 60,4 (lo borrado pasó a `cargo test`, aprobado por el dueño; medido 60,45 con lo de B).
+- **`rusqlite` 0.41.1 (2026-11-20)**: trae `libsqlite3-sys` 0.39.1 y cierra RUSTSEC-2026-0459; sin cambios de código.
 - **Tinta y papel (DIS-1, 2026-11-20)**: `AppPalette` reescrita con tokens por rol (papel, hoja, elevada, hundida; tinta en cuatro
   niveles; bordes estándar, suave, de control y foco; comprometida, débil y sana con su letra y su fondo de aviso; velo y sombra),
   clara y oscura, AA comprobado (débil `#94600F` y sana `#2A7449` en claro, más oscuros que REDISENO_V2 §3 para pasar 4.5:1).

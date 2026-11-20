@@ -56,5 +56,5 @@ void main() {
     expect(find.byType(SetupScreen), findsNothing);
   },
       // Never runs by accident: only on a disposable device with the opt-in.
-      skip: !e2eWipeAllowed);
+      skip: !e2eCanWipe);
 }

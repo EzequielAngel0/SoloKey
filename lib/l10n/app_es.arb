@@ -860,6 +860,8 @@
   "notifRotationTitle": "Rotación de contraseña requerida",
   "notifRotationBody": "Tu contraseña para \"{title}\" ha expirado. Cámbiala ahora por seguridad.",
   "@notifRotationBody": { "placeholders": { "title": { "type": "String" } } },
+  "notifRotationBodyCount": "{count, plural, =1{Una contraseña toca cambiarse. Abre SoloKey para ver cuál.} other{{count} contraseñas tocan cambiarse. Abre SoloKey para ver cuáles.}}",
+  "@notifRotationBodyCount": { "description": "Aviso de rotación en segundo plano: sin el nombre de la credencial, que va cifrado (NUC-2).", "placeholders": { "count": { "type": "int" } } },
   "notifActionChangePassword": "Cambiar contraseña",
   "notifActionSnooze3d": "Posponer 3 días",
   "notifApprovalTitle": "Aprobar inicio de sesión",

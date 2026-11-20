@@ -1,213 +1,194 @@
-import 'dart:typed_data';
-
 import 'package:injectable/injectable.dart';
-
 import 'package:uuid/uuid.dart';
 
-import '../../../core/infrastructure/database/app_database.dart';
-import '../../../core/infrastructure/database/daos/category_dao.dart';
-import '../../../core/infrastructure/database/daos/credential_dao.dart';
-import '../../../core/infrastructure/database/daos/password_history_dao.dart';
-import '../../../core/infrastructure/security/i_security_service.dart';
-import '../../../core/infrastructure/security/session_manager.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
+import '../../../core/services/rotation_schedule.dart';
 import '../domain/entities/category.dart';
 import '../domain/entities/credential.dart';
 import '../domain/entities/password_history.dart';
 import '../domain/repositories/i_credential_repository.dart';
 import 'credential_dto.dart';
 
+/// Credenciales en la boveda v2 (NUC-2): un registro `credential` por entrada y un `history` por version guardada.
+/// El nucleo cifra cada registro entero; aqui solo se arma y se lee el JSON.
 @LazySingleton(as: ICredentialRepository)
 class CredentialRepositoryImpl implements ICredentialRepository {
-  const CredentialRepositoryImpl(
-    this._credentialDao,
-    this._historyDao,
-    this._securityService,
-    this._sessionManager,
-  );
+  const CredentialRepositoryImpl(this._vault, this._rotation);
 
-  final CredentialDao _credentialDao;
-  final PasswordHistoryDao _historyDao;
-  final ISecurityService _securityService;
-  final SessionManager _sessionManager;
+  final VaultStore _vault;
+  final RotationSchedule _rotation;
 
-  Uint8List get _keyBytes {
-    final key = _sessionManager.getKeyCopy();
-    if (key == null) throw StateError('Vault is locked');
-    return key;
-  }
+  /// Ultimas versiones que se guardan por credencial (como la v1).
+  static const _historyKeep = 10;
 
-  Future<Credential> _decryptEntry(dynamic entry) async {
-    final key = _keyBytes;
-    final plainBytes = await _securityService.decrypt(
-      Uint8List.fromList(entry.encryptedPayload),
-      key,
-    );
-    final payload = CredentialSensitivePayload.fromBytes(plainBytes);
-    return CredentialDto.fromEntry(entry: entry, payload: payload);
-  }
-
-  /// Like [_decryptEntry] but returns null instead of throwing when a row
-  /// cannot be decrypted (e.g. it was encrypted under a different master key by
-  /// a past broken sync). This keeps a single corrupt row from blocking the
-  /// whole vault from loading — the user can still access their other entries.
-  Future<Credential?> _decryptEntryOrNull(dynamic entry) async {
-    try {
-      return await _decryptEntry(entry);
-    } catch (_) {
-      return null;
+  Future<List<Credential>> _all() async {
+    final list = <Credential>[];
+    for (final m in await _vault.list(RecordKind.credential)) {
+      try {
+        list.add(CredentialDto.fromRecord(m));
+      } catch (_) {
+        // Un registro que no se entiende no tumba la boveda entera.
+      }
     }
+    // Mismo orden que la v1: orden manual y, a igualdad, la mas nueva primero.
+    list.sort((a, b) {
+      final o = a.sortOrder.compareTo(b.sortOrder);
+      return o != 0 ? o : b.createdAt.compareTo(a.createdAt);
+    });
+    return list;
   }
 
-  Future<List<Credential>> _decryptAll(Iterable<dynamic> entries) async {
-    final results = await Future.wait(entries.map(_decryptEntryOrNull));
-    return results.whereType<Credential>().toList();
+  Future<void> _put(Iterable<Credential> credentials) async {
+    await _vault.put(RecordKind.credential, {
+      for (final c in credentials) c.id: CredentialDto.toRecord(c),
+    });
+    await _rotation.rebuild(await _all());
   }
 
   @override
-  Future<List<Credential>> getAll() async {
-    final entries = await _credentialDao.getAll();
-    return _decryptAll(entries);
-  }
+  Future<List<Credential>> getAll() => _all();
 
   @override
   Future<Credential?> getById(String id) async {
-    final entry = await _credentialDao.getById(id);
-    if (entry == null) return null;
-    return _decryptEntry(entry);
+    final m = await _vault.get(RecordKind.credential, id);
+    return m == null ? null : CredentialDto.fromRecord(m);
   }
 
   @override
   Future<void> save(Credential credential) async {
-    final key = _keyBytes;
-    final payload = CredentialDto.toPayload(credential);
-    final encrypted = await _securityService.encrypt(payload.toBytes(), key);
-    await _credentialDao.upsert(
-      CredentialDto.toCompanion(
-        credential: credential,
-        encryptedPayload: encrypted,
-      ),
-    );
-    await _historyDao.insert(
-      PasswordHistoryEntriesCompanion.insert(
-        id: const Uuid().v4(),
-        credentialId: credential.id,
-        encryptedPayload: encrypted,
-        createdAt: DateTime.now().millisecondsSinceEpoch,
-      ),
-    );
-    await _historyDao.pruneOld(credential.id, keep: 10);
+    await _put([credential]);
+    final historyId = const Uuid().v4();
+    await _vault.put(RecordKind.history, {
+      historyId: {
+        ...CredentialDto.toPayload(credential).toJson(),
+        'id': historyId,
+        'credentialId': credential.id,
+        'createdAt': DateTime.now().millisecondsSinceEpoch,
+      },
+    });
+    final old = (await _historyOf(credential.id)).skip(_historyKeep);
+    for (final h in old) {
+      await _vault.remove(h['id'] as String);
+    }
   }
 
   @override
   Future<void> update(Credential credential) => save(credential);
 
   @override
-  Future<void> delete(String id) => _credentialDao.deleteById(id);
-
-  @override
-  Future<List<Credential>> getByCategory(String categoryId) async {
-    final entries = await _credentialDao.getByCategory(categoryId);
-    return _decryptAll(entries);
+  Future<void> delete(String id) async {
+    await _vault.remove(id);
+    await _rotation.rebuild(await _all());
   }
 
   @override
-  Future<List<Credential>> getFavorites() async {
-    final entries = await _credentialDao.getFavorites();
-    return _decryptAll(entries);
-  }
+  Future<List<Credential>> getByCategory(String categoryId) async =>
+      (await _all()).where((c) => c.categoryId == categoryId).toList();
+
+  @override
+  Future<List<Credential>> getFavorites() async =>
+      (await _all()).where((c) => c.isFavorite).toList();
 
   @override
   Future<List<Credential>> search(String query) async {
-    final entries = await _credentialDao.searchByTitle(query);
-    return _decryptAll(entries);
+    final q = query.toLowerCase();
+    return (await _all())
+        .where((c) => c.title.toLowerCase().contains(q))
+        .toList();
   }
 
   @override
-  Future<void> setHidden(String id, bool hidden) =>
-      _credentialDao.setHidden(id, hidden);
+  Future<void> setHidden(String id, bool hidden) async {
+    final c = await getById(id);
+    if (c != null) await _put([c.copyWith(isHidden: hidden)]);
+  }
 
   @override
   Future<void> reorder(List<String> orderedIds) async {
-    for (var i = 0; i < orderedIds.length; i++) {
-      await _credentialDao.setSortOrder(orderedIds[i], i);
+    final byId = {for (final c in await _all()) c.id: c};
+    await _put([
+      for (var i = 0; i < orderedIds.length; i++)
+        if (byId[orderedIds[i]] != null)
+          byId[orderedIds[i]]!.copyWith(sortOrder: i),
+    ]);
+  }
+
+  @override
+  Future<void> moveToFolder(String id, String? folderId) async {
+    final c = await getById(id);
+    if (c != null) {
+      await _put([c.copyWith(categoryId: folderId, updatedAt: DateTime.now())]);
     }
   }
 
   @override
-  Future<void> moveToFolder(String id, String? folderId) =>
-      _credentialDao.setCategory(
-        id,
-        folderId,
-        DateTime.now().millisecondsSinceEpoch,
-      );
-
-  @override
-  Future<void> reassignFolder(String fromFolderId, String? toFolderId) =>
-      _credentialDao.reassignCategory(
-        fromFolderId,
-        toFolderId,
-        DateTime.now().millisecondsSinceEpoch,
-      );
-
-  @override
-  Future<List<PasswordHistory>> getPasswordHistory(String credentialId) async {
-    final entries = await _historyDao.getByCredential(credentialId);
-    final key = _keyBytes;
-    
-    final history = <PasswordHistory>[];
-    for (final e in entries) {
-      final plainBytes = await _securityService.decrypt(
-        Uint8List.fromList(e.encryptedPayload),
-        key,
-      );
-      final payload = CredentialSensitivePayload.fromBytes(plainBytes);
-      history.add(PasswordHistory(
-        id: e.id,
-        password: payload.password ?? '',
-        createdAt: DateTime.fromMillisecondsSinceEpoch(e.createdAt),
-      ));
-    }
-    return history;
+  Future<void> reassignFolder(String fromFolderId, String? toFolderId) async {
+    final now = DateTime.now();
+    await _put([
+      for (final c in await _all())
+        if (c.categoryId == fromFolderId)
+          c.copyWith(categoryId: toFolderId, updatedAt: now),
+    ]);
   }
+
+  /// Historial de [credentialId], el mas nuevo primero.
+  Future<List<Map<String, dynamic>>> _historyOf(String credentialId) async {
+    final list = (await _vault.list(RecordKind.history))
+        .where((h) => h['credentialId'] == credentialId)
+        .toList()
+      ..sort((a, b) =>
+          (b['createdAt'] as num).compareTo(a['createdAt'] as num));
+    return list;
+  }
+
+  @override
+  Future<List<PasswordHistory>> getPasswordHistory(String credentialId) async =>
+      [
+        for (final h in (await _historyOf(credentialId)).take(_historyKeep))
+          PasswordHistory(
+            id: h['id'] as String,
+            password: h['password'] as String? ?? '',
+            createdAt: DateTime.fromMillisecondsSinceEpoch(
+                (h['createdAt'] as num).toInt()),
+          ),
+      ];
 }
 
 @LazySingleton(as: ICategoryRepository)
 class CategoryRepositoryImpl implements ICategoryRepository {
-  const CategoryRepositoryImpl(this._categoryDao);
+  const CategoryRepositoryImpl(this._vault);
 
-  final CategoryDao _categoryDao;
+  final VaultStore _vault;
 
   @override
-  Future<List<Category>> getAll() async {
-    final entries = await _categoryDao.getAll();
-    return entries.map<Category>(_fromEntry).toList();
-  }
+  Future<List<Category>> getAll() async =>
+      [for (final m in await _vault.list(RecordKind.category)) _from(m)];
 
   @override
   Future<Category?> getById(String id) async {
-    final entry = await _categoryDao.getById(id);
-    return entry == null ? null : _fromEntry(entry);
+    final m = await _vault.get(RecordKind.category, id);
+    return m == null ? null : _from(m);
   }
 
   @override
   Future<void> save(Category category) =>
-      _categoryDao.upsert(_toCompanion(category));
+      _vault.put(RecordKind.category, {category.id: _to(category)});
 
   @override
-  Future<void> delete(String id) => _categoryDao.deleteById(id);
+  Future<void> delete(String id) => _vault.remove(id);
 
-  Category _fromEntry(CategoryEntry e) => Category(
-        id: e.id,
-        name: e.name,
-        icon: e.icon,
-        createdAt: DateTime.fromMillisecondsSinceEpoch(e.createdAt),
+  Category _from(Map<String, dynamic> m) => Category(
+        id: m['id'] as String,
+        name: m['name'] as String? ?? '',
+        icon: m['icon'] as String? ?? '',
+        createdAt:
+            DateTime.fromMillisecondsSinceEpoch((m['createdAt'] as num).toInt()),
       );
 
-  CategoryEntriesCompanion _toCompanion(Category c) =>
-      CategoryEntriesCompanion.insert(
-        id: c.id,
-        name: c.name,
-        icon: c.icon,
-        createdAt: c.createdAt.millisecondsSinceEpoch,
-      );
+  Map<String, dynamic> _to(Category c) => {
+        'id': c.id,
+        'name': c.name,
+        'icon': c.icon,
+        'createdAt': c.createdAt.millisecondsSinceEpoch,
+      };
 }
