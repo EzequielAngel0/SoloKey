@@ -6,4 +6,15 @@ part of 'password_history_dao.dart';
 mixin _$PasswordHistoryDaoMixin on DatabaseAccessor<AppDatabase> {
   $PasswordHistoryEntriesTable get passwordHistoryEntries =>
       attachedDatabase.passwordHistoryEntries;
+  PasswordHistoryDaoManager get managers => PasswordHistoryDaoManager(this);
+}
+
+class PasswordHistoryDaoManager {
+  final _$PasswordHistoryDaoMixin _db;
+  PasswordHistoryDaoManager(this._db);
+  $$PasswordHistoryEntriesTableTableManager get passwordHistoryEntries =>
+      $$PasswordHistoryEntriesTableTableManager(
+        _db.attachedDatabase,
+        _db.passwordHistoryEntries,
+      );
 }

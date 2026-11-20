@@ -3,7 +3,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'failures.freezed.dart';
 
 @freezed
-class Failure with _$Failure {
+sealed class Failure with _$Failure {
   const factory Failure.cryptographic({required String message}) =
       CryptographicFailure;
   const factory Failure.storage({required String message}) = StorageFailure;

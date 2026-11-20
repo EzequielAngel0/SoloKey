@@ -17,6 +17,7 @@ import 'package:workmanager/workmanager.dart';
 import 'app/app.dart';
 import 'app/di/injection.dart';
 import 'app/di/provider_overrides.dart';
+import 'app/di/provider_retry.dart';
 import 'core/services/notification_navigation.dart';
 import 'core/services/notification_service.dart';
 import 'features/autofill/infrastructure/autofill_fetch_service.dart';
@@ -232,6 +233,7 @@ Future<void> main(List<String> args) async {
 
       runApp(
         ProviderScope(
+          retry: noProviderRetry,
           overrides: buildProviderOverrides(),
           child: const App(),
         ),

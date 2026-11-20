@@ -4,7 +4,7 @@ part 'vault_session.freezed.dart';
 part 'vault_session.g.dart';
 
 @freezed
-class VaultSession with _$VaultSession {
+abstract class VaultSession with _$VaultSession {
   const factory VaultSession({
     required bool isUnlocked,
     required DateTime unlockedAt,

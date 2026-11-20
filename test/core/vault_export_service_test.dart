@@ -1,12 +1,10 @@
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter_test/flutter_test.dart';
 // plugin_platform_interface ships transitively with every Flutter plugin; it is
 // used here only to mock the FilePicker platform channel in tests.
 // ignore: depend_on_referenced_packages
-import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 import 'package:solokey/core/infrastructure/security/i_security_service.dart';
 import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 import 'package:solokey/core/infrastructure/security/session_manager.dart';
@@ -17,6 +15,7 @@ import 'package:solokey/features/credentials/domain/entities/password_history.da
 import 'package:solokey/features/credentials/domain/repositories/i_credential_repository.dart';
 import 'package:solokey/features/folders/domain/entities/folder.dart';
 
+import '../support/fake_file_picker.dart';
 import '../support/fake_folder_repository.dart';
 
 /// In-memory credential repo whose save/delete actually persist, so the
@@ -381,7 +380,7 @@ void main() {
     // Set (don't read first — the getter throws with no plugin registered) a
     // headless picker. This test file runs in its own isolate, so it won't leak.
     final savePath = '${tmp.path}/selective.skvault';
-    FilePicker.platform = _FakeFilePicker(savePath);
+    FilePickerPlatform.instance = FakeFilePicker(savePath: savePath);
 
     // Selecting only cred '1' must pull in f-child AND its ancestor f-root so it
     // re-imports into place, while excluding creds '2'/'3' and folders elsewhere.
@@ -449,21 +448,3 @@ void main() {
   });
 }
 
-/// Headless [FilePicker] whose `saveFile` returns a fixed path (and never opens
-/// a native dialog), so the desktop export path is exercisable in tests.
-class _FakeFilePicker extends FilePicker with MockPlatformInterfaceMixin {
-  _FakeFilePicker(this.savePath);
-  final String? savePath;
-
-  @override
-  Future<String?> saveFile({
-    String? dialogTitle,
-    String? fileName,
-    String? initialDirectory,
-    FileType type = FileType.any,
-    List<String>? allowedExtensions,
-    Uint8List? bytes,
-    bool lockParentWindow = false,
-  }) async =>
-      savePath;
-}

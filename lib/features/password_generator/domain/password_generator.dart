@@ -5,7 +5,7 @@ import 'package:freezed_annotation/freezed_annotation.dart';
 part 'password_generator.freezed.dart';
 
 @freezed
-class PasswordConfig with _$PasswordConfig {
+abstract class PasswordConfig with _$PasswordConfig {
   const factory PasswordConfig({
     @Default(16) int length,
     @Default(true) bool useUppercase,

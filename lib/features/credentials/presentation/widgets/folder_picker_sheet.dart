@@ -96,7 +96,7 @@ class FolderPickerSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+    final folders = ref.watch(foldersNotifierProvider).value ?? [];
     final roots = folders.where((f) => f.parentId == null).toList();
 
     return Container(

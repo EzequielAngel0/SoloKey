@@ -32,7 +32,7 @@ bool _isWeak(String pw) {
 /// Map of credentialId → health flags. Recomputes when the vault changes.
 final credentialHealthProvider =
     Provider<Map<String, Set<CredentialHealth>>>((ref) {
-  final creds = ref.watch(credentialsNotifierProvider).valueOrNull ?? const [];
+  final creds = ref.watch(credentialsNotifierProvider).value ?? const [];
 
   final counts = <String, int>{};
   for (final c in creds) {

@@ -42,7 +42,7 @@ class SettingsNotifier extends _$SettingsNotifier {
   }
 
   Future<void> save(AppSecuritySettings settings) async {
-    final previous = state.valueOrNull;
+    final previous = state.value;
     state = AsyncData(settings);
     await ref.read(settingsRepositoryProvider).saveSettings(settings);
 
@@ -1235,7 +1235,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final settings = ref.watch(settingsNotifierProvider).value;
     final interval = settings?.scheduledBackupIntervalDays ?? 0;
     final dir = settings?.backupDirectory;
     final subtitle = interval <= 0
@@ -1310,7 +1310,7 @@ class _ScheduledBackupTile extends ConsumerWidget {
                 OutlinedButton.icon(
                   onPressed: () async {
                     final picked =
-                        await FilePicker.platform.getDirectoryPath();
+                        await FilePicker.getDirectoryPath();
                     if (picked != null) setLocal(() => dir = picked);
                   },
                   icon: const Icon(Icons.folder_open_rounded, size: 18),

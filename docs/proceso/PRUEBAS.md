@@ -61,6 +61,8 @@ que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-
 | Ver qué hay conectado | `flutter devices` (Windows, el emulador y el celular por USB o `adb pair`) |
 | Emulador de Android | AVD `Pixel_9`: `C:\Android\Sdk\emulator\emulator.exe -avd Pixel_9` (Android Studio no hace falta) |
 | Correr en debug | `flutter run -d <id>`; en Windows, `flutter run -d windows` **abre la bóveda REAL** del dueño (comparte el almacenamiento): leer sí, nada destructivo |
+| APK para el emulador | `flutter build apk --debug --dart-define=SECURE_KEYBOARD_ORDERED=1` (o el mismo `--dart-define` en `flutter run`): teclado seguro en orden para manejarlo por `adb`. Un build release lo ignora y siempre baraja (dueño, 2026-11-19) |
+| Solo el emulador | El celular W555 **no** se usa en este proyecto (dueño, 2026-11-19): siempre `adb -s emulator-5554` |
 | Letra al 200% | `adb shell settings put system font_scale 2.0`; al terminar, de vuelta a `1.0` |
 | Modo oscuro | `adb shell cmd uimode night yes` (y `no` para volver) |
 | El celular del dueño | Es su teléfono con su bóveda: **nunca desinstalar la app** (borra la bóveda). Instalar encima con `adb install -r`; si la firma no coincide, parar y preguntarle |

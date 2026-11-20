@@ -6,150 +6,82 @@ part of 'password_history_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$passwordHistoryHash() => r'491464f5da831256f7733261835a60cd114745cb';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// Copied from Dart SDK
-class _SystemHash {
-  _SystemHash._();
-
-  static int combine(int hash, int value) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + value);
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
-    return hash ^ (hash >> 6);
-  }
-
-  static int finish(int hash) {
-    // ignore: parameter_assignments
-    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
-    // ignore: parameter_assignments
-    hash = hash ^ (hash >> 11);
-    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
-  }
-}
-
-/// See also [passwordHistory].
 @ProviderFor(passwordHistory)
-const passwordHistoryProvider = PasswordHistoryFamily();
+final passwordHistoryProvider = PasswordHistoryFamily._();
 
-/// See also [passwordHistory].
-class PasswordHistoryFamily extends Family<AsyncValue<List<PasswordHistory>>> {
-  /// See also [passwordHistory].
-  const PasswordHistoryFamily();
+final class PasswordHistoryProvider
+    extends
+        $FunctionalProvider<
+          AsyncValue<List<PasswordHistory>>,
+          List<PasswordHistory>,
+          FutureOr<List<PasswordHistory>>
+        >
+    with
+        $FutureModifier<List<PasswordHistory>>,
+        $FutureProvider<List<PasswordHistory>> {
+  PasswordHistoryProvider._({
+    required PasswordHistoryFamily super.from,
+    required String super.argument,
+  }) : super(
+         retry: null,
+         name: r'passwordHistoryProvider',
+         isAutoDispose: true,
+         dependencies: null,
+         $allTransitiveDependencies: null,
+       );
 
-  /// See also [passwordHistory].
-  PasswordHistoryProvider call(String credentialId) {
-    return PasswordHistoryProvider(credentialId);
+  @override
+  String debugGetCreateSourceHash() => _$passwordHistoryHash();
+
+  @override
+  String toString() {
+    return r'passwordHistoryProvider'
+        ''
+        '($argument)';
   }
 
+  @$internal
   @override
-  PasswordHistoryProvider getProviderOverride(
-    covariant PasswordHistoryProvider provider,
-  ) {
-    return call(provider.credentialId);
-  }
-
-  static const Iterable<ProviderOrFamily>? _dependencies = null;
+  $FutureProviderElement<List<PasswordHistory>> $createElement(
+    $ProviderPointer pointer,
+  ) => $FutureProviderElement(pointer);
 
   @override
-  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
-
-  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
-
-  @override
-  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
-      _allTransitiveDependencies;
-
-  @override
-  String? get name => r'passwordHistoryProvider';
-}
-
-/// See also [passwordHistory].
-class PasswordHistoryProvider
-    extends AutoDisposeFutureProvider<List<PasswordHistory>> {
-  /// See also [passwordHistory].
-  PasswordHistoryProvider(String credentialId)
-    : this._internal(
-        (ref) => passwordHistory(ref as PasswordHistoryRef, credentialId),
-        from: passwordHistoryProvider,
-        name: r'passwordHistoryProvider',
-        debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-            ? null
-            : _$passwordHistoryHash,
-        dependencies: PasswordHistoryFamily._dependencies,
-        allTransitiveDependencies:
-            PasswordHistoryFamily._allTransitiveDependencies,
-        credentialId: credentialId,
-      );
-
-  PasswordHistoryProvider._internal(
-    super._createNotifier, {
-    required super.name,
-    required super.dependencies,
-    required super.allTransitiveDependencies,
-    required super.debugGetCreateSourceHash,
-    required super.from,
-    required this.credentialId,
-  }) : super.internal();
-
-  final String credentialId;
-
-  @override
-  Override overrideWith(
-    FutureOr<List<PasswordHistory>> Function(PasswordHistoryRef provider)
-    create,
-  ) {
-    return ProviderOverride(
-      origin: this,
-      override: PasswordHistoryProvider._internal(
-        (ref) => create(ref as PasswordHistoryRef),
-        from: from,
-        name: null,
-        dependencies: null,
-        allTransitiveDependencies: null,
-        debugGetCreateSourceHash: null,
-        credentialId: credentialId,
-      ),
-    );
-  }
-
-  @override
-  AutoDisposeFutureProviderElement<List<PasswordHistory>> createElement() {
-    return _PasswordHistoryProviderElement(this);
+  FutureOr<List<PasswordHistory>> create(Ref ref) {
+    final argument = this.argument as String;
+    return passwordHistory(ref, argument);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is PasswordHistoryProvider &&
-        other.credentialId == credentialId;
+    return other is PasswordHistoryProvider && other.argument == argument;
   }
 
   @override
   int get hashCode {
-    var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, credentialId.hashCode);
-
-    return _SystemHash.finish(hash);
+    return argument.hashCode;
   }
 }
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-mixin PasswordHistoryRef
-    on AutoDisposeFutureProviderRef<List<PasswordHistory>> {
-  /// The parameter `credentialId` of this provider.
-  String get credentialId;
-}
+String _$passwordHistoryHash() => r'491464f5da831256f7733261835a60cd114745cb';
 
-class _PasswordHistoryProviderElement
-    extends AutoDisposeFutureProviderElement<List<PasswordHistory>>
-    with PasswordHistoryRef {
-  _PasswordHistoryProviderElement(super.provider);
+final class PasswordHistoryFamily extends $Family
+    with $FunctionalFamilyOverride<FutureOr<List<PasswordHistory>>, String> {
+  PasswordHistoryFamily._()
+    : super(
+        retry: null,
+        name: r'passwordHistoryProvider',
+        dependencies: null,
+        $allTransitiveDependencies: null,
+        isAutoDispose: true,
+      );
+
+  PasswordHistoryProvider call(String credentialId) =>
+      PasswordHistoryProvider._(argument: credentialId, from: this);
 
   @override
-  String get credentialId => (origin as PasswordHistoryProvider).credentialId;
+  String toString() => r'passwordHistoryProvider';
 }
-
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

@@ -139,7 +139,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
@@ -174,7 +174,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
@@ -208,7 +208,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
     });
     DecryptedBackup? backup;
     try {
-      final picked = await FilePicker.platform.pickFiles(
+      final picked = await FilePicker.pickFiles(
         type: FileType.any,
         withData: true,
       );
@@ -245,7 +245,7 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   /// of the chosen credential types and folders.
   Future<void> _runSelectiveImport(DecryptedBackup backup) async {
     final existing =
-        ref.read(credentialsNotifierProvider).valueOrNull ?? const [];
+        ref.read(credentialsNotifierProvider).value ?? const [];
     final selection = await showModalBottomSheet<_ImportSelection>(
       context: context,
       isScrollControlled: true,
@@ -340,9 +340,9 @@ class _TransferScreenState extends ConsumerState<TransferScreen>
   Widget build(BuildContext context) {
     final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final folders = ref.watch(foldersNotifierProvider).valueOrNull ?? [];
+    final folders = ref.watch(foldersNotifierProvider).value ?? [];
     final credentials =
-        ref.watch(credentialsNotifierProvider).valueOrNull ?? [];
+        ref.watch(credentialsNotifierProvider).value ?? [];
     return Scaffold(
       appBar: VaultAppBar(
         title: l10n.transferTitle,

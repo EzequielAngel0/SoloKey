@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -107,10 +108,18 @@ class _SecureKeyboardState extends State<SecureKeyboard>
   }
 
   /// Shuffles each character group independently.
+  ///
+  /// Test seam: `--dart-define=SECURE_KEYBOARD_ORDERED=1` keeps the keys in
+  /// order so the emulator can be driven by automation. Release builds always
+  /// shuffle, whatever the define says.
   Map<_Tab, List<String>> _buildLayouts() {
+    const orderedFlag = String.fromEnvironment('SECURE_KEYBOARD_ORDERED');
+    const ordered =
+        !kReleaseMode && (orderedFlag == '1' || orderedFlag == 'true');
+
     List<String> shuffle(String src) {
       final chars = src.split('');
-      chars.shuffle(Random.secure());
+      if (!ordered) chars.shuffle(Random.secure());
       return chars;
     }
 

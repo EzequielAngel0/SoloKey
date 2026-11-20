@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart';
 
 import '../../features/credentials/application/credential_use_cases.dart';
 import '../../features/credentials/application/credentials_provider.dart';

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
 import 'package:solokey/core/infrastructure/security/i_security_service.dart';
 import 'package:solokey/core/infrastructure/security/session_manager.dart';
@@ -210,7 +209,7 @@ void main() {
         ],
         folders: const [],
       );
-      FilePicker.platform = FakeFilePicker(
+      FilePickerPlatform.instance = FakeFilePicker(
           pickResult: pickedFile('backup.skvault', Uint8List(16)));
 
       await pumpTransfer(tester, creds: [_c('1')]);
@@ -234,7 +233,7 @@ void main() {
     });
 
     testWidgets('a cancelled file picker imports nothing', (tester) async {
-      FilePicker.platform = FakeFilePicker(pickResult: null); // user cancelled
+      FilePickerPlatform.instance = FakeFilePicker(pickResult: null); // user cancelled
 
       await pumpTransfer(tester, creds: [_c('1')]);
 

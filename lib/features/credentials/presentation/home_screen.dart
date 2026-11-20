@@ -255,8 +255,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       child: credentialsAsync.isLoading
           ? const ShimmerLoader()
           : FolderListView(
-              folders: foldersAsync.valueOrNull ?? [],
-              credentials: credentialsAsync.valueOrNull ?? [],
+              folders: foldersAsync.value ?? [],
+              credentials: credentialsAsync.value ?? [],
             ),
     );
   }
@@ -266,7 +266,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     final filter = ref.watch(vaultFilterProvider);
     final sort = ref.watch(vaultSortProvider);
     final reorderModePref = ref.watch(vaultReorderModeProvider);
-    final credentials = credentialsAsync.valueOrNull ?? [];
+    final credentials = credentialsAsync.value ?? [];
 
     final filtered = sortCredentials(
       credentials

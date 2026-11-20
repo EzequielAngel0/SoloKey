@@ -1,0 +1,9 @@
+targets:
+  $default:
+    builders:
+      riverpod_generator:
+        options:
+          # riverpod_generator 3+ quita "Notifier" del nombre del provider
+          # (VaultNotifier -> vaultProvider). Se conservan los nombres de la v1
+          # (vaultNotifierProvider) para no renombrar toda la app: PLA-4.
+          provider_name_strip_pattern: "^$"

@@ -2,7 +2,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:get_it/get_it.dart';
 import 'package:solokey/core/services/biometric_auth_service.dart';
 import 'package:solokey/features/folders/application/folders_provider.dart';
@@ -92,7 +91,7 @@ void main() {
 
   testWidgets('adding from the picker appends the encrypted file to the list',
       (tester) async {
-    FilePicker.platform =
+    FilePickerPlatform.instance =
         FakeFilePicker(pickResult: pickedFile('notes.txt', Uint8List(64)));
     final repo = await pumpFiles(tester);
 
@@ -147,7 +146,7 @@ void main() {
   group('reveal is gated behind auth', () {
     testWidgets('export decrypts only after a granted prompt', (tester) async {
       bio.result = true;
-      FilePicker.platform = FakeFilePicker(savePath: null); // user cancels save
+      FilePickerPlatform.instance = FakeFilePicker(savePath: null); // user cancels save
       final repo =
           await pumpFiles(tester, seed: [_file('1', 'creds.json', mime: 'json')]);
 

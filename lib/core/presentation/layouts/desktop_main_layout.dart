@@ -90,7 +90,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
     AppSecuritySettings Function(AppSecuritySettings s) mutate,
   ) {
     if (!_seededDesktopPrefs || !changed) return;
-    final s = ref.read(settingsNotifierProvider).valueOrNull;
+    final s = ref.read(settingsNotifierProvider).value;
     if (s == null) return;
     ref.read(settingsNotifierProvider.notifier).save(mutate(s));
   }
@@ -147,7 +147,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
 
     // Seed the ephemeral sidebar/tab providers from the persisted settings once
     // they've loaded (they reset on every launch).
-    final settings = ref.watch(settingsNotifierProvider).valueOrNull;
+    final settings = ref.watch(settingsNotifierProvider).value;
     if (settings != null) _seedDesktopPrefs(settings);
 
     // Write-through: persist collapse/tab changes so they survive a restart.
@@ -355,7 +355,7 @@ class _DesktopMainLayoutState extends ConsumerState<DesktopMainLayout> {
           if (tabIndex == 1) {
             // Folders: tree (navigate) on top + credentials of the selected
             // folder below. Clicking a credential opens it in the right pane.
-            final folders = foldersAsync.valueOrNull ?? [];
+            final folders = foldersAsync.value ?? [];
             final selFolderId = ref.watch(desktopSelectedFolderIdProvider);
             final folderCreds = creds
                 .where((c) => c.categoryId == selFolderId && !c.isHidden)

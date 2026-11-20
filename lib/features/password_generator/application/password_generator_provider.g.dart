@@ -6,60 +6,170 @@ part of 'password_generator_provider.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$passwordStrengthHash() => r'ccbdb71a8c844e1b2a253954020c9a49dc37c340';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
+/// Kept alive so the user's last generation preferences (length, charsets)
+/// persist across opening the generator again during the session, instead of
+/// resetting to defaults each time.
 
-/// See also [passwordStrength].
-@ProviderFor(passwordStrength)
-final passwordStrengthProvider = AutoDisposeProvider<PasswordStrength>.internal(
-  passwordStrength,
-  name: r'passwordStrengthProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$passwordStrengthHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+@ProviderFor(PasswordConfigNotifier)
+final passwordConfigNotifierProvider = PasswordConfigNotifierProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef PasswordStrengthRef = AutoDisposeProviderRef<PasswordStrength>;
+/// Kept alive so the user's last generation preferences (length, charsets)
+/// persist across opening the generator again during the session, instead of
+/// resetting to defaults each time.
+final class PasswordConfigNotifierProvider
+    extends $NotifierProvider<PasswordConfigNotifier, PasswordConfig> {
+  /// Kept alive so the user's last generation preferences (length, charsets)
+  /// persist across opening the generator again during the session, instead of
+  /// resetting to defaults each time.
+  PasswordConfigNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'passwordConfigNotifierProvider',
+        isAutoDispose: false,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$passwordConfigNotifierHash();
+
+  @$internal
+  @override
+  PasswordConfigNotifier create() => PasswordConfigNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PasswordConfig value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PasswordConfig>(value),
+    );
+  }
+}
+
 String _$passwordConfigNotifierHash() =>
     r'3d582f8b79f51715853499620537660ac8a965c0';
 
 /// Kept alive so the user's last generation preferences (length, charsets)
 /// persist across opening the generator again during the session, instead of
 /// resetting to defaults each time.
-///
-/// Copied from [PasswordConfigNotifier].
-@ProviderFor(PasswordConfigNotifier)
-final passwordConfigNotifierProvider =
-    NotifierProvider<PasswordConfigNotifier, PasswordConfig>.internal(
-      PasswordConfigNotifier.new,
-      name: r'passwordConfigNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$passwordConfigNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
 
-typedef _$PasswordConfigNotifier = Notifier<PasswordConfig>;
+abstract class _$PasswordConfigNotifier extends $Notifier<PasswordConfig> {
+  PasswordConfig build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<PasswordConfig, PasswordConfig>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<PasswordConfig, PasswordConfig>,
+              PasswordConfig,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
+
+@ProviderFor(GeneratedPasswordNotifier)
+final generatedPasswordNotifierProvider = GeneratedPasswordNotifierProvider._();
+
+final class GeneratedPasswordNotifierProvider
+    extends $NotifierProvider<GeneratedPasswordNotifier, String> {
+  GeneratedPasswordNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'generatedPasswordNotifierProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$generatedPasswordNotifierHash();
+
+  @$internal
+  @override
+  GeneratedPasswordNotifier create() => GeneratedPasswordNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(String value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<String>(value),
+    );
+  }
+}
+
 String _$generatedPasswordNotifierHash() =>
     r'87cd3199d2b8bc7313ef74d1f4d5f9103e8a88c5';
 
-/// See also [GeneratedPasswordNotifier].
-@ProviderFor(GeneratedPasswordNotifier)
-final generatedPasswordNotifierProvider =
-    AutoDisposeNotifierProvider<GeneratedPasswordNotifier, String>.internal(
-      GeneratedPasswordNotifier.new,
-      name: r'generatedPasswordNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$generatedPasswordNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
-    );
+abstract class _$GeneratedPasswordNotifier extends $Notifier<String> {
+  String build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<String, String>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<String, String>,
+              String,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}
 
-typedef _$GeneratedPasswordNotifier = AutoDisposeNotifier<String>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+@ProviderFor(passwordStrength)
+final passwordStrengthProvider = PasswordStrengthProvider._();
+
+final class PasswordStrengthProvider
+    extends
+        $FunctionalProvider<
+          PasswordStrength,
+          PasswordStrength,
+          PasswordStrength
+        >
+    with $Provider<PasswordStrength> {
+  PasswordStrengthProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'passwordStrengthProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$passwordStrengthHash();
+
+  @$internal
+  @override
+  $ProviderElement<PasswordStrength> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  PasswordStrength create(Ref ref) {
+    return passwordStrength(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(PasswordStrength value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<PasswordStrength>(value),
+    );
+  }
+}
+
+String _$passwordStrengthHash() => r'ccbdb71a8c844e1b2a253954020c9a49dc37c340';

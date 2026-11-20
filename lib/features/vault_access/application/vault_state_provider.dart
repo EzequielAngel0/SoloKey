@@ -1,6 +1,5 @@
 import 'dart:typed_data';
 
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -39,7 +38,7 @@ enum VaultErrorKind {
 }
 
 @freezed
-class VaultState with _$VaultState {
+abstract class VaultState with _$VaultState {
   const factory VaultState.initial() = _Initial;
   const factory VaultState.loading() = _Loading;
   const factory VaultState.unlocked(VaultSession session) = _Unlocked;

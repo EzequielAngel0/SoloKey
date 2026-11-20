@@ -4,7 +4,7 @@ part 'folder.freezed.dart';
 part 'folder.g.dart';
 
 @freezed
-class Folder with _$Folder {
+abstract class Folder with _$Folder {
   const factory Folder({
     required String id,
     String? parentId,

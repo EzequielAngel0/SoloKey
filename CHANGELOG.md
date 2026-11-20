@@ -9,6 +9,8 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Teclado seguro en orden para el emulador (2026-11-19)**: `--dart-define=SECURE_KEYBOARD_ORDERED=1` deja las teclas sin
+  barajar para manejar la app por `adb`; un build release lo ignora y siempre baraja (`kReleaseMode`).
 - **Modelo de amenazas de la v2 (SEG-1, 2026-11-15)**: `docs/seguridad/AMENAZAS_V2.md`, por superficie (RAM, disco,
   portapapeles y pantalla, sync Noise, migración, lo que entra de fuera, recuperación, pruebas), con el estado de la v1 y el
   requisito y carril de cada fila. Hallazgos nuevos en `SEGURIDAD.md`: SEC-009 (recuperar con el código deja la bóveda ilegible,
@@ -47,6 +49,14 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **PLA-4 (2026-11-19)**: dependencias mayores, una por commit. go_router 18; local_auth 3 (parámetros sueltos y
+  `LocalAuthException`); flutter_secure_storage 10 con `migrateOnAlgorithmChange` y `resetOnError: false` (migra sola lo que la v9
+  guardó con EncryptedSharedPreferences; `migrateWithBackup` se salta esa migración en 10.3.4); Riverpod 3 con riverpod_generator 4
+  (`build.yaml` conserva los nombres `xxxNotifierProvider` y `noProviderRetry` apaga el reintento automático); freezed 3.2
+  (modelos `abstract`/`sealed`, mismo JSON de la bóveda); file_picker 11 (API estática); get_it 9, equatable 3, workmanager 0.10,
+  flutter_local_notifications 22, drift 2.31 (mismo esquema), y window_manager 0.5, tray_manager 0.5 y desktop_drop 0.7, las
+  últimas que aceptan Flutter 3.44 y AGP 8. Se quitan `context_menus` y `screen_protector`, sin uso. Probado en el emulador:
+  bóveda de la v9 → v10 migrada y abierta, y la app final desbloquea y recorre sus pestañas; APK release limpio.
 - **PLA-5 (2026-11-15)**: el paquete Dart pasa de `password_manager` a `solokey` (`pubspec.yaml` e imports `package:solokey/`).
   Sin cambios en `Runner.rc`, `BINARY_NAME`, `applicationId` ni `project()` de CMake: la bóveda existente se sigue abriendo.
 - **Docs y proceso (2026-11-14)**: rama `develop` de integración (CI también en `develop`); método por sesiones

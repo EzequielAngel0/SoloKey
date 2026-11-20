@@ -234,7 +234,7 @@ class _CommandPaletteState extends ConsumerState<CommandPalette> {
   Widget build(BuildContext context) {
     final p = context.palette;
     final l10n = AppLocalizations.of(context);
-    final all = ref.watch(credentialsNotifierProvider).valueOrNull ?? [];
+    final all = ref.watch(credentialsNotifierProvider).value ?? [];
     final q = _query.trim().toLowerCase();
 
     final actions = _actions(l10n);
