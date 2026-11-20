@@ -517,7 +517,6 @@ abstract final class AppTheme {
       scrollbarTheme: ScrollbarThemeData(
         thumbColor: WidgetStatePropertyAll(p.ruleStrong),
         radius: const Radius.circular(AppRadius.pill),
-        thumbVisibility: WidgetStatePropertyAll(isDesktop),
       ),
       extensions: [p],
     );

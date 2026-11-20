@@ -6,3 +6,4 @@ Lo terminado del carril B ([`../../sesiones/B.md`](../../sesiones/B.md)), una o 
 | ID | Qué | Fecha | Verificado |
 |---|---|---|---|
 | DIS-1 | Tokens Tinta y papel por rol (claro y oscuro, AA), `AppTheme` reescrito, `app_tokens.dart`, claro + oscuro + sistema, Atkinson Hyperlegible Next y Mono a pesos fijos; fuera `app_colors.dart`, dim, OLED y colores de tipo (alias v1 hasta las PAN) | 2026-11-20 | analyze 0, 497 pruebas, cobertura 63.6 %; en la app, con la galería (DIS-3) |
+| DIS-2 | Kit liso en `lib/shared/widgets/kit/` (`kit.dart`): botones, campo y texto secreto, fila de credencial con copiar a la vista, tarjeta, aviso y pastilla de estado, búsqueda y filtros, barras del celular, tres paneles de escritorio, TOTP | 2026-11-20 | analyze 0, 480 pruebas; claro, oscuro, 100 y 200 %, celular y escritorio sin desbordes (capturas de prueba, no versionadas) |

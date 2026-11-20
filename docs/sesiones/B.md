@@ -8,10 +8,9 @@ de partida en [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §3. Antes 
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | DIS-2 | Kit de componentes en `lib/shared/widgets/` (botones, campo secreto, fila de credencial, tarjeta, aviso, chip de estado, barra superior, barra inferior, panel de escritorio), liso | L | ☐ | Que C solo ensamble piezas |
-| 2 | DIS-3 | Galería de componentes en la build debug (ruta oculta) con los dos temas y la letra al 200% | M | ☐ | Donde el dueño afina tonos en la app |
-| 3 | DIS-5 | Quitar las 22 vibraciones, el shimmer y la animación escalonada | S | ☐ | DEC-5 aprobado |
-| 4 | DIS-4 | Logo e iconos redibujados planos (app, bandeja, instalador, adaptativo de Android, `.ico` multi-tamaño) | M | ☐ | Skills `logo-design-guide` y `svg-logo-designer` |
+| 1 | DIS-3 | Galería de componentes en la build debug (ruta oculta) con los dos temas y la letra al 200% | M | ☐ | Donde el dueño afina tonos en la app |
+| 2 | DIS-5 | Quitar las 22 vibraciones, el shimmer y la animación escalonada | S | ☐ | DEC-5 aprobado |
+| 3 | DIS-4 | Logo e iconos redibujados planos (app, bandeja, instalador, adaptativo de Android, `.ico` multi-tamaño) | M | ☐ | Skills `logo-design-guide` y `svg-logo-designer` |
 
 ## Necesita de otros carriles
 
@@ -32,5 +31,5 @@ de partida en [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §3. Antes 
 
 ## Detalle
 
-Tokens vigentes: `lib/theme/app_palette.dart` (color) y `lib/theme/app_tokens.dart` (espacio, esquinas, sombra, movimiento). Lo
-hecho: [`../archive/sesiones/B_HECHO.md`](../archive/sesiones/B_HECHO.md).
+Tokens vigentes: `lib/theme/app_palette.dart` (color) y `lib/theme/app_tokens.dart` (espacio, esquinas, sombra, movimiento).
+Componentes: `lib/shared/widgets/kit/` (un import, `kit.dart`; textos por parámetro). Lo hecho: [`../archive/sesiones/B_HECHO.md`](../archive/sesiones/B_HECHO.md).
