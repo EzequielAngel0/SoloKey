@@ -9,6 +9,12 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Fuzz del núcleo Rust (SEG-2, parte, 2026-11-19)**: crate `rust/solokey-core/fuzz` con `cargo-fuzz` 0.12.0 sobre nightly fijado,
+  en Podman (`rust/fuzz.ps1`, imagen `localhost/solokey-fuzz:<nightly>`, corpus en el volumen `solokey-fuzz-corpus`). Objetivos:
+  `sync_trama` (saludo del canal Noise), `sync_mensaje` (`SyncEngine::handle`), `codigo_recuperacion`, `cabecera_boveda` y
+  `cabecera_kdf`. Los cuatro primeros, 30 s cada uno sin fallos; `cabecera_kdf` cae en 4 entradas por SEC-012 (los parámetros de
+  Argon2id de la cabecera no se acotan: memoria de 4 TiB aborta, pasadas sin límite cuelgan, 8 KiB y 1 pasada se aceptan) y queda
+  en rojo hasta que A lo arregle. CSV, `otpauth://` y `.skvault` esperan a que sus parsers existan en el núcleo.
 - **Escaneo diario de dependencias (PLA-6, 2026-11-19)**: `tool/escaneo-deps.ps1` junta OSV-Scanner en Podman (v2.7.0 fijada por
   digest, `pubspec.lock` y `rust/Cargo.lock` montados de solo lectura), `flutter pub outdated` y las alertas abiertas de
   Dependabot. Hallazgo = CVSS ≥ 7 con arreglo; sale 0 limpio, 2 si hay algo que contarle al dueño y 1 si un paso falla; el

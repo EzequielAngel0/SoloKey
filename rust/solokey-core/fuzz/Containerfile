@@ -1,0 +1,16 @@
+# Imagen del fuzz del nucleo (SEG-2): Rust nightly con fecha fija y cargo-fuzz fijado. La construye
+# rust/fuzz.ps1 como localhost/solokey-fuzz:<nightly>. Nada de esto va al host (ADR-0012).
+FROM docker.io/library/rust:1.91-slim-bookworm
+
+ARG NIGHTLY=nightly-2026-10-15
+ARG CARGO_FUZZ_VERSION=0.12.0
+
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends g++ make \
+ && rm -rf /var/lib/apt/lists/*
+# cargo-fuzz se compila con el Rust estable de la imagen (con nightly, sus dependencias fijadas no compilan);
+# despues nightly pasa a ser el de por defecto, que es el que cargo-fuzz necesita para instrumentar.
+RUN cargo install --locked cargo-fuzz --version ${CARGO_FUZZ_VERSION} \
+ && rm -rf /usr/local/cargo/registry
+RUN rustup toolchain install ${NIGHTLY} --profile minimal \
+ && rustup default ${NIGHTLY}

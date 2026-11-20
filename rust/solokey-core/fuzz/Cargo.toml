@@ -1,0 +1,58 @@
+# Fuzz del nucleo (SEG-2, carril E). Va aparte del workspace de rust/ (cargo-fuzz necesita nightly) y solo
+# corre en Podman: ..\..\fuzz.ps1. Objetivos: lo que llega de fuera al nucleo (AMENAZAS_V2.md).
+[package]
+name = "solokey-core-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2021"
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4"
+tempfile = "3"
+# La misma version que el nucleo: el objetivo cabecera_kdf cambia la cabecera a mano.
+rusqlite = { version = "0.32", features = ["bundled"] }
+solokey-core = { path = ".." }
+
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+
+[[bin]]
+name = "sync_trama"
+path = "fuzz_targets/sync_trama.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "sync_mensaje"
+path = "fuzz_targets/sync_mensaje.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "codigo_recuperacion"
+path = "fuzz_targets/codigo_recuperacion.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "cabecera_boveda"
+path = "fuzz_targets/cabecera_boveda.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "cabecera_kdf"
+path = "fuzz_targets/cabecera_kdf.rs"
+test = false
+doc = false
+bench = false
