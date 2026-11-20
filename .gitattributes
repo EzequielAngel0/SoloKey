@@ -2,3 +2,6 @@
 tool/ci-linux/Containerfile text eol=lf
 # Vectores de la v1 (CAL-2): bytes exactos, nunca se convierten los fines de linea.
 vectores/v1/boveda/** binary
+# Fuzz del nucleo (SEG-2): semillas binarias tal cual.
+rust/solokey-core/fuzz/semillas/** binary
+rust/solokey-core/fuzz/Containerfile text eol=lf

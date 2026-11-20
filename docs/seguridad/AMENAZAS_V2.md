@@ -41,7 +41,7 @@ Estado de la v1: ✓ cubierto · ◐ en parte · ✗ no. La columna *Requisito v
 
 | Amenaza | v1 | Requisito v2 | Carril |
 |---|---|---|---|
-| Robo del archivo: fuerza bruta de la maestra | ✓ Argon2id 64 MiB, 3, 4 | Parámetros en la cabecera versionada; nunca por debajo de los de la v1 | A (NUC-2) |
+| Robo del archivo: fuerza bruta de la maestra | ✓ Argon2id 64 MiB, 3, 4 | Parámetros en la cabecera versionada; al leerlos, rango acotado y nunca por debajo de los de la v1 (hoy no se acotan: SEC-012) | A (NUC-2) |
 | Robo del archivo: se ve qué hay y cuándo cambió | ✗ tipo, carpeta, fechas y orden en claro | Solo id y versión en claro (ADR-0009) | A (NUC-2) |
 | Manipular la BD (cambiar filas, mover un blob a otro registro) | ◐ GCM detecta cambios del blob, pero no que se cambió de fila | AES-GCM con el id del registro y la versión como datos asociados (AAD) | A (NUC-2) |
 | Restos de la v1 tras migrar | ✗ (no hay migración) | La copia previa queda cifrada como estaba; la v1 migrada se borra solo cuando el usuario lo confirma y se dice dónde queda la copia | A (NUC-2) |
@@ -66,7 +66,7 @@ Estado de la v1: ✓ cubierto · ◐ en parte · ✗ no. La columna *Requisito v
 | Repetir o reordenar mensajes viejos | ◐ LWW por fecha | Contador por sesión en el canal y versión por registro; un registro con versión vieja no pisa uno nuevo | A (NUC-3) |
 | Mezclar v1 y v2 | n/a | Versión en el primer mensaje; v1 con v2 se rechaza con un mensaje claro (ADR-0010) | A (NUC-3) |
 | Desbloqueo remoto: la clave viaja | ◐ envuelta con la llave del par | Igual, dentro de Noise, con confirmación en el celular que muestre qué equipo pide | A + C |
-| Mensaje enorme o malformado tumba al otro | ✗ sin límites | Tamaño máximo por mensaje y por registro antes de descifrar; parser cubierto por fuzz | A + E (SEG-2) |
+| Mensaje enorme o malformado tumba al otro | ✗ sin límites | Tamaño máximo por mensaje y por registro antes de descifrar; parser cubierto por fuzz (◐ `sync_trama` y `sync_mensaje`, verdes) | A + E (SEG-2) |
 
 ### Migración v1 a v2
 
@@ -80,8 +80,8 @@ Estado de la v1: ✓ cubierto · ◐ en parte · ✗ no. La columna *Requisito v
 
 | Amenaza | v1 | Requisito v2 | Carril |
 |---|---|---|---|
-| CSV, `otpauth://`, QR o `.skvault` hecho para tumbar o colgar la app | ✗ parsers en Dart sin límites | Parsers en el núcleo con tamaño máximo, sin recursión sin límite y con fuzz en Podman | A + E (SEG-2) |
-| `.skvault` con parámetros de KDF absurdos (memoria enorme) | n/a (fijos en la v1) | Si la v2 los guarda en la cabecera, aceptar solo un rango acotado | A |
+| CSV, `otpauth://`, QR o `.skvault` hecho para tumbar o colgar la app | ✗ parsers en Dart sin límites | Parsers en el núcleo con tamaño máximo, sin recursión sin límite y con fuzz en Podman (`rust/fuzz.ps1`; esperan a que A los pase al núcleo) | A + E (SEG-2) |
+| Bóveda o `.skvault` con parámetros de KDF absurdos (memoria enorme) | n/a (fijos en la v1) | Aceptar solo un rango acotado; la cabecera de la v2 ya los guarda y hoy no se acotan (SEC-012) | A |
 | Importar mete un secreto en un campo que se muestra | ◐ | La importación nunca pone secretos en el título ni en campos en claro | A |
 
 ### Recuperación y bloqueo
