@@ -167,7 +167,7 @@ abstract class AppLocalizations {
   /// No description provided for @unlockSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Introduce tu contraseña maestra'**
+  /// **'Tu bóveda está cerrada'**
   String get unlockSubtitle;
 
   /// No description provided for @unlockMasterPasswordHint.
@@ -188,16 +188,10 @@ abstract class AppLocalizations {
   /// **'Bloqueado ({time})'**
   String unlockLockedFor(String time);
 
-  /// No description provided for @unlockUseBiometrics.
-  ///
-  /// In es, this message translates to:
-  /// **'Usar biometría'**
-  String get unlockUseBiometrics;
-
   /// No description provided for @unlockWifiAvailable.
   ///
   /// In es, this message translates to:
-  /// **'Puedes desbloquear desde tu celular'**
+  /// **'Aprobar desde el celular'**
   String get unlockWifiAvailable;
 
   /// No description provided for @unlockForgotPassword.
@@ -217,12 +211,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Demasiados intentos. Reintenta en {time}.'**
   String unlockTooManyAttempts(String time);
-
-  /// No description provided for @unlockTapToEnter.
-  ///
-  /// In es, this message translates to:
-  /// **'Toca para ingresar tu contraseña'**
-  String get unlockTapToEnter;
 
   /// No description provided for @unlockRemoteFailed.
   ///
@@ -287,7 +275,7 @@ abstract class AppLocalizations {
   /// No description provided for @unlockOrUseMasterPassword.
   ///
   /// In es, this message translates to:
-  /// **'o usa tu contraseña maestra'**
+  /// **'o escribe tu contraseña maestra'**
   String get unlockOrUseMasterPassword;
 
   /// No description provided for @unlockAttemptsBeforeLockout.
@@ -722,16 +710,10 @@ abstract class AppLocalizations {
   /// **'Tu bóveda segura'**
   String get splashTagline;
 
-  /// No description provided for @setupTitle.
-  ///
-  /// In es, this message translates to:
-  /// **'Crear contraseña\nmaestra'**
-  String get setupTitle;
-
   /// No description provided for @setupSubtitle.
   ///
   /// In es, this message translates to:
-  /// **'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.'**
+  /// **'Es la llave de tu bóveda. Elige una que recuerdes: en el siguiente paso te damos un código por si algún día la olvidas.'**
   String get setupSubtitle;
 
   /// No description provided for @setupMinChars.
@@ -1535,7 +1517,7 @@ abstract class AppLocalizations {
   /// No description provided for @recoveryCodeDescription.
   ///
   /// In es, this message translates to:
-  /// **'El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.'**
+  /// **'Escribe el código que guardaste al crear tu bóveda. Con él eliges una contraseña maestra nueva.'**
   String get recoveryCodeDescription;
 
   /// No description provided for @recoveryEnterCode.
@@ -1595,7 +1577,7 @@ abstract class AppLocalizations {
   /// No description provided for @recoveryCodeWarning.
   ///
   /// In es, this message translates to:
-  /// **'¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.'**
+  /// **'Solo se muestra esta vez. Guárdalo fuera de este equipo, por ejemplo en papel.'**
   String get recoveryCodeWarning;
 
   /// No description provided for @recoveryCopyCode.
@@ -1603,12 +1585,6 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Copiar código'**
   String get recoveryCopyCode;
-
-  /// No description provided for @recoveryCodeSavedContinue.
-  ///
-  /// In es, this message translates to:
-  /// **'Ya lo guardé, continuar'**
-  String get recoveryCodeSavedContinue;
 
   /// No description provided for @accessStepOf.
   ///
@@ -1639,6 +1615,66 @@ abstract class AppLocalizations {
   /// In es, this message translates to:
   /// **'Guarda tu código de recuperación'**
   String get setupStepSaveCode;
+
+  /// No description provided for @setupStepImport.
+  ///
+  /// In es, this message translates to:
+  /// **'Trae tus contraseñas'**
+  String get setupStepImport;
+
+  /// No description provided for @setupCodeIntro.
+  ///
+  /// In es, this message translates to:
+  /// **'Si olvidas tu contraseña maestra, este código es la única forma de volver a entrar.'**
+  String get setupCodeIntro;
+
+  /// No description provided for @setupCodeConfirmLabel.
+  ///
+  /// In es, this message translates to:
+  /// **'Escribe el grupo {group} del código'**
+  String setupCodeConfirmLabel(int group);
+
+  /// No description provided for @setupCodeConfirmHelp.
+  ///
+  /// In es, this message translates to:
+  /// **'Así sabemos que lo guardaste bien.'**
+  String get setupCodeConfirmHelp;
+
+  /// No description provided for @setupCodeConfirmWrong.
+  ///
+  /// In es, this message translates to:
+  /// **'No coincide con el grupo {group}. Revisa el código.'**
+  String setupCodeConfirmWrong(int group);
+
+  /// No description provided for @setupCodeConfirmButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Confirmar y seguir'**
+  String get setupCodeConfirmButton;
+
+  /// No description provided for @setupImportBody.
+  ///
+  /// In es, this message translates to:
+  /// **'¿Usabas otro gestor de contraseñas? Puedes traerlas ahora o más tarde desde Ajustes.'**
+  String get setupImportBody;
+
+  /// No description provided for @setupImportButton.
+  ///
+  /// In es, this message translates to:
+  /// **'Importar contraseñas'**
+  String get setupImportButton;
+
+  /// No description provided for @setupImportDone.
+  ///
+  /// In es, this message translates to:
+  /// **'Entrar a mi bóveda'**
+  String get setupImportDone;
+
+  /// No description provided for @unlockUseSecureKeyboard.
+  ///
+  /// In es, this message translates to:
+  /// **'Usar el teclado seguro'**
+  String get unlockUseSecureKeyboard;
 
   /// No description provided for @autofillOnboardingTitle.
   ///

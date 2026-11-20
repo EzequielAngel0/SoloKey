@@ -42,7 +42,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get formDeleteField => 'Delete field';
 
   @override
-  String get unlockSubtitle => 'Enter your master password';
+  String get unlockSubtitle => 'Your vault is locked';
 
   @override
   String get unlockMasterPasswordHint => 'Master password';
@@ -56,10 +56,7 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get unlockUseBiometrics => 'Use biometrics';
-
-  @override
-  String get unlockWifiAvailable => 'You can unlock from your phone';
+  String get unlockWifiAvailable => 'Approve from your phone';
 
   @override
   String get unlockForgotPassword => 'Forgot your master password?';
@@ -71,9 +68,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String unlockTooManyAttempts(String time) {
     return 'Too many attempts. Retry in $time.';
   }
-
-  @override
-  String get unlockTapToEnter => 'Tap to enter your password';
 
   @override
   String unlockRemoteFailed(String msg) {
@@ -111,7 +105,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unlockWithBiometrics => 'Unlock with biometrics';
 
   @override
-  String get unlockOrUseMasterPassword => 'or use your master password';
+  String get unlockOrUseMasterPassword => 'or type your master password';
 
   @override
   String unlockAttemptsBeforeLockout(int count) {
@@ -359,11 +353,8 @@ class AppLocalizationsEn extends AppLocalizations {
   String get splashTagline => 'Your secure vault';
 
   @override
-  String get setupTitle => 'Create master\npassword';
-
-  @override
   String get setupSubtitle =>
-      'This password protects your entire vault. It cannot be recovered if you forget it.';
+      'It\'s the key to your vault. Pick one you\'ll remember: in the next step you get a code in case you ever forget it.';
 
   @override
   String get setupMinChars => 'At least 12 characters';
@@ -809,7 +800,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryCodeDescription =>
-      'The recovery code was generated when you set up your vault. If you saved it, enter it here to reset your master password.';
+      'Type the code you saved when you created your vault. With it you choose a new master password.';
 
   @override
   String get recoveryEnterCode => 'Enter the recovery code';
@@ -841,13 +832,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get recoveryCodeWarning =>
-      'Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.';
+      'It\'s shown only this once. Keep it off this device, on paper for example.';
 
   @override
   String get recoveryCopyCode => 'Copy code';
-
-  @override
-  String get recoveryCodeSavedContinue => 'I saved it, continue';
 
   @override
   String accessStepOf(int current, int total) {
@@ -865,6 +853,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupStepSaveCode => 'Save your recovery code';
+
+  @override
+  String get setupStepImport => 'Bring your passwords';
+
+  @override
+  String get setupCodeIntro =>
+      'If you forget your master password, this code is the only way back in.';
+
+  @override
+  String setupCodeConfirmLabel(int group) {
+    return 'Type group $group of the code';
+  }
+
+  @override
+  String get setupCodeConfirmHelp => 'So we know you saved it right.';
+
+  @override
+  String setupCodeConfirmWrong(int group) {
+    return 'It doesn\'t match group $group. Check the code.';
+  }
+
+  @override
+  String get setupCodeConfirmButton => 'Confirm and continue';
+
+  @override
+  String get setupImportBody =>
+      'Were you using another password manager? Bring your passwords now or later from Settings.';
+
+  @override
+  String get setupImportButton => 'Import passwords';
+
+  @override
+  String get setupImportDone => 'Go to my vault';
+
+  @override
+  String get unlockUseSecureKeyboard => 'Use the secure keyboard';
 
   @override
   String get autofillOnboardingTitle => 'Autofill';

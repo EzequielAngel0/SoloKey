@@ -1,20 +1,24 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../app/di/injection.dart';
 import '../../../core/services/recovery_service.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
-import '../../../shared/widgets/password_requirements_checklist.dart';
-import '../../../shared/widgets/password_strength_indicator.dart';
-import '../../../shared/widgets/secure_text_field.dart';
-import '../../../shared/widgets/step_indicator.dart';
-import '../../password_generator/domain/password_generator.dart';
-import '../../../theme/app_palette.dart';
+import '../../../shared/widgets/clipboard_countdown.dart';
+import '../../../shared/widgets/kit/kit.dart';
 import '../application/vault_state_provider.dart';
-import '../domain/master_password_policy.dart';
-import 'recovery_screen.dart';
+import 'widgets/access_layout.dart';
+import 'widgets/master_password_rules.dart';
 
+enum _Step { create, code, import }
+
+/// Primer uso en tres pasos (REDISENO_V2 §4): crear la contraseña maestra,
+/// guardar el código de recuperación (hay que confirmarlo) e importar, que es
+/// opcional. La bóveda se crea y queda abierta al terminar el paso 1.
 class SetupScreen extends ConsumerStatefulWidget {
   const SetupScreen({super.key});
 
@@ -23,176 +27,233 @@ class SetupScreen extends ConsumerStatefulWidget {
 }
 
 class _SetupScreenState extends ConsumerState<SetupScreen> {
+  _Step _step = _Step.create;
+
+  // Paso 1
   final _formKey = GlobalKey<FormState>();
-  final _passCtrl = TextEditingController();
-  final _confirmCtrl = TextEditingController();
-  PasswordStrength _strength = PasswordStrength.none;
+  final _passCtrl = SecretTextController();
+  final _confirmCtrl = SecretTextController();
+  bool _busy = false;
+  String? _error;
+
+  // Paso 2
+  String? _code;
+  int _group = 0; // índice del grupo que se pide para confirmar
+  final _groupCtrl = TextEditingController();
+  String? _groupError;
 
   @override
   void dispose() {
     _passCtrl.dispose();
     _confirmCtrl.dispose();
+    _groupCtrl.dispose();
     super.dispose();
   }
 
-  void _onPasswordChanged(String v) {
-    setState(() => _strength = PasswordGenerator.evaluate(v));
-  }
-
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    // SEC-003: Capturar y limpiar controladores antes del await para
-    // minimizar el tiempo que la contraseña maestra vive en la UI.
+  Future<void> _create() async {
+    if (_busy || !_formKey.currentState!.validate()) return;
+    FocusScope.of(context).unfocus();
+    final l10n = AppLocalizations.of(context);
+    // SEC-003: la maestra sale de los controladores antes del await.
     final password = _passCtrl.text;
     _passCtrl.clear();
     _confirmCtrl.clear();
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+
     await ref.read(vaultNotifierProvider.notifier).setup(password);
-    final state = ref.read(vaultNotifierProvider);
     if (!mounted) return;
-    
-    state.maybeWhen(
-      unlocked: (_) async {
-        final code = await getIt<RecoveryService>().generateRecoveryCode();
-        if (!mounted) return;
-        // SEC: Pasamos el targetRoute como String y dejamos que RecoveryCodeDisplay
-        // use su propio context para navegar, evitando el bug de context desmontado.
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (_) => RecoveryCodeDisplay(
-              code: code,
-              targetRoute: AppRoutes.home,
-            ),
-          ),
+    final ok = ref.read(vaultNotifierProvider).maybeWhen(
+          unlocked: (_) => true,
+          orElse: () => false,
         );
-      },
-      error: (kind, lockout, message) =>
-          _showError(message ?? AppLocalizations.of(context).unlockGenericError),
-      orElse: () {},
-    );
+    if (!ok) {
+      setState(() {
+        _busy = false;
+        _error = l10n.unlockGenericError;
+      });
+      return;
+    }
+
+    final code = await getIt<RecoveryService>().generateRecoveryCode();
+    if (!mounted) return;
+    setState(() {
+      _busy = false;
+      _code = code;
+      _group = Random.secure().nextInt(code.split('-').length);
+      _step = _Step.code;
+    });
   }
 
-  void _showError(String msg) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(msg),
-        backgroundColor: context.palette.danger,
-        behavior: SnackBarBehavior.floating,
-      ),
-    );
+  void _confirmCode() {
+    final l10n = AppLocalizations.of(context);
+    final want = _code!.split('-')[_group];
+    if (_groupCtrl.text.trim() != want) {
+      setState(() => _groupError = l10n.setupCodeConfirmWrong(_group + 1));
+      return;
+    }
+    FocusScope.of(context).unfocus();
+    _groupCtrl.clear();
+    setState(() {
+      _groupError = null;
+      _code = null; // ya no hace falta en memoria
+      _step = _Step.import;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    final palette = context.palette;
     final l10n = AppLocalizations.of(context);
-    final vaultState = ref.watch(vaultNotifierProvider);
-    final isLoading = vaultState is _Loading;
-
-    return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const SizedBox(height: 20),
-                Center(
-                  child: Image.asset(
-                    'assets/logo/solokey_mark.png',
-                    height: 76,
-                    width: 76,
-                    errorBuilder: (_, _, _) => Image.asset(
-                      'assets/logo/SoloKey.png',
-                      height: 76,
-                      width: 76,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 32),
-                StepIndicator(
-                  currentStep: 1,
-                  totalSteps: 2,
-                  label: '${l10n.accessStepOf(1, 2)} · ${l10n.setupStepCreate}',
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  l10n.setupTitle,
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.w800,
-                    color: palette.textPrimary,
-                    height: 1.2,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  l10n.setupSubtitle,
-                  style: TextStyle(
-                    fontSize: 14,
-                    color: palette.textMuted,
-                    height: 1.5,
-                  ),
-                ),
-                const SizedBox(height: 36),
-                SecureTextField(
-                  controller: _passCtrl,
-                  label: l10n.unlockMasterPasswordHint,
-                  hint: l10n.setupMinChars,
-                  autofocus: true,
-                  onChanged: _onPasswordChanged,
-                  validator: _validatePassword,
-                  textInputAction: TextInputAction.next,
-                  onSubmitted: (_) => FocusScope.of(context).nextFocus(),
-                ),
-                const SizedBox(height: 8),
-                PasswordStrengthIndicator(strength: _strength),
-                const SizedBox(height: 20),
-                SecureTextField(
-                  controller: _confirmCtrl,
-                  label: l10n.setupConfirmLabel,
-                  textInputAction: TextInputAction.done,
-                  validator: (v) => v != _passCtrl.text
-                      ? l10n.setupPasswordsMismatch
-                      : null,
-                  onSubmitted: (_) => _submit(),
-                ),
-                const SizedBox(height: 12),
-                PasswordRequirementsChecklist(password: _passCtrl.text),
-                const SizedBox(height: 36),
-                AnimatedSwitcher(
-                  duration: const Duration(milliseconds: 200),
-                  child: isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                            color: palette.accent,
-                          ),
-                        )
-                      : ElevatedButton(
-                          onPressed: _submit,
-                          child: Text(l10n.setupCreateButton),
-                        ),
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
+    return AccessLayout(
+      children: switch (_step) {
+        _Step.create => _createStep(l10n),
+        _Step.code => _codeStep(l10n),
+        _Step.import => _importStep(l10n),
+      },
     );
   }
 
-  String? _validatePassword(String? v) {
-    final l10n = AppLocalizations.of(context);
-    final value = v ?? '';
-    if (!MasterPasswordPolicy.hasMinLength(value)) return l10n.setupMinChars;
-    if (!MasterPasswordPolicy.hasUppercase(value)) return l10n.setupNeedUppercase;
-    if (!MasterPasswordPolicy.hasNumber(value)) return l10n.setupNeedNumber;
-    if (!MasterPasswordPolicy.hasSymbol(value)) return l10n.setupNeedSymbol;
-    return null;
-  }
-}
+  String _stepLabel(AppLocalizations l10n, int n) => l10n.accessStepOf(n, 3);
 
-// ignore: unused_element
-class _Loading {}
+  List<Widget> _createStep(AppLocalizations l10n) {
+    return [
+      AccessHeader(
+        step: _stepLabel(l10n, 1),
+        title: l10n.setupStepCreate,
+        subtitle: l10n.setupSubtitle,
+      ),
+      const SizedBox(height: AppSpace.xl),
+      Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            SecretField(
+              controller: _passCtrl,
+              label: l10n.unlockMasterPasswordHint,
+              revealTooltip: l10n.commonShowPassword,
+              hideTooltip: l10n.commonHidePassword,
+              autofocus: true,
+              textInputAction: TextInputAction.next,
+              autofillHints: const [AutofillHints.newPassword],
+              onChanged: (_) => setState(() {}),
+              validator: (v) => masterPasswordError(l10n, v ?? ''),
+            ),
+            const SizedBox(height: AppSpace.md),
+            MasterPasswordRules(password: _passCtrl.text),
+            const SizedBox(height: AppSpace.lg),
+            SecretField(
+              controller: _confirmCtrl,
+              label: l10n.setupConfirmLabel,
+              revealTooltip: l10n.commonShowPassword,
+              hideTooltip: l10n.commonHidePassword,
+              textInputAction: TextInputAction.done,
+              autofillHints: const [AutofillHints.newPassword],
+              validator: (v) =>
+                  v != _passCtrl.text ? l10n.setupPasswordsMismatch : null,
+              onSubmitted: (_) => _create(),
+            ),
+          ],
+        ),
+      ),
+      if (_error != null) ...[
+        const SizedBox(height: AppSpace.lg),
+        Notice(title: _error!, tone: SafetyTone.breach),
+      ],
+      const SizedBox(height: AppSpace.xl),
+      PaperButton(
+        label: l10n.setupCreateButton,
+        onPressed: _create,
+        busy: _busy,
+        expand: true,
+      ),
+    ];
+  }
+
+  List<Widget> _codeStep(AppLocalizations l10n) {
+    final p = context.palette;
+    final t = Theme.of(context).textTheme;
+    final code = _code!;
+    return [
+      AccessHeader(
+        step: _stepLabel(l10n, 2),
+        title: l10n.setupStepSaveCode,
+        subtitle: l10n.setupCodeIntro,
+      ),
+      const SizedBox(height: AppSpace.xl),
+      Notice(
+        title: l10n.recoveryCodeWarning,
+        tone: SafetyTone.weak,
+        icon: Icons.priority_high_rounded,
+      ),
+      const SizedBox(height: AppSpace.lg),
+      PaperCard(
+        title: l10n.recoveryCodeTitle,
+        trailing: CopyButton(
+          tooltip: l10n.recoveryCopyCode,
+          onCopy: () => showClipboardCountdownSnackBar(
+            context: context,
+            label: l10n.recoveryCodeTitle,
+            value: code,
+          ),
+        ),
+        child: SelectableText(
+          code,
+          style: AppTheme.mono(t.titleMedium)
+              .copyWith(color: p.ink, height: 1.6),
+        ),
+      ),
+      const SizedBox(height: AppSpace.xl),
+      TextField(
+        controller: _groupCtrl,
+        autocorrect: false,
+        enableSuggestions: false,
+        style: AppTheme.mono(t.bodyLarge),
+        textInputAction: TextInputAction.done,
+        onSubmitted: (_) => _confirmCode(),
+        decoration: InputDecoration(
+          labelText: l10n.setupCodeConfirmLabel(_group + 1),
+          helperText: l10n.setupCodeConfirmHelp,
+          helperMaxLines: 3,
+          errorText: _groupError,
+          errorMaxLines: 3,
+        ),
+      ),
+      const SizedBox(height: AppSpace.xl),
+      PaperButton(
+        label: l10n.setupCodeConfirmButton,
+        onPressed: _confirmCode,
+        expand: true,
+      ),
+    ];
+  }
+
+  List<Widget> _importStep(AppLocalizations l10n) {
+    return [
+      AccessHeader(
+        step: _stepLabel(l10n, 3),
+        title: l10n.setupStepImport,
+        subtitle: l10n.setupImportBody,
+      ),
+      const SizedBox(height: AppSpace.xl),
+      PaperButton.secondary(
+        label: l10n.setupImportButton,
+        icon: Icons.file_download_outlined,
+        // La bóveda ya está abierta: Transferir se apila sobre este paso y al
+        // volver se entra con el botón principal.
+        onPressed: () => context.push(AppRoutes.transfer),
+        expand: true,
+      ),
+      const SizedBox(height: AppSpace.md),
+      PaperButton(
+        label: l10n.setupImportDone,
+        icon: Icons.arrow_forward_rounded,
+        onPressed: () => context.go(AppRoutes.home),
+        expand: true,
+      ),
+    ];
+  }
+
+}

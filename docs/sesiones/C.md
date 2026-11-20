@@ -13,7 +13,6 @@ inglés, **su prueba E2E en Android y Windows** (con el harness de E) y **borra 
 
 | # | ID | Qué | Archivos de hoy | Esf. | Estado |
 |---|---|---|---|---|---|
-| 2 | PAN-1 | Acceso: splash, primer uso en 3 pasos, desbloqueo (biometría primero), recuperación | `vault_access/presentation/*` | L | ☐ |
 | 3 | PAN-2 | Bóveda: búsqueda fija, filtros con la ruta de carpetas, copiar en un toque; barra inferior de 3 | `home_screen`, `credential_card`, `favorites_view`, `folder_list_view` | L | ☐ |
 | 4 | PAN-3 | Detalle por tipo (TOTP en vivo, contraseña, SSH, nota, passkey, API key) | `credential_detail_screen`, `password_history_screen` | L | ☐ |
 | 5 | PAN-4 | Formulario crear y editar, con generador integrado y QR (cámara y pantalla) | `credential_form_screen` + `widgets/`, `qr_scanner_screen` | L | ☐ |

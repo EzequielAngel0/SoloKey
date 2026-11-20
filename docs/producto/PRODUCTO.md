@@ -40,5 +40,8 @@ casa u oficina. No hay plan de multiusuario, equipos ni cuentas.
 
 - **v2**: rediseño completo con núcleo en Rust, decidido el 2026-11-15: [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md).
   Las passkeys reales (WebAuthn) están aprobadas para después de la v2.0.0 (NUC-5, carril A).
+- **Ya en `develop` hacia la v2** (pantallas, carril C): textos en español como fuente y sin jerga técnica (PAN-10); primer
+  uso en tres pasos donde hay que confirmar un grupo del código de recuperación antes de seguir, y desbloqueo con el teclado
+  del sistema (el teclado seguro queda como opción) (PAN-1).
 - **Ideas sin aprobar** (extensión de navegador, widget de TOTP, auto-type...): [`IDEAS.md`](IDEAS.md). Una idea
   aprobada sale de ahí y entra al doc de su carril en [`../sesiones/`](../sesiones/README.md).

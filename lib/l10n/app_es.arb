@@ -13,22 +13,20 @@
   "commonHidePassword": "Ocultar contraseña",
   "formDeleteField": "Eliminar campo",
 
-  "unlockSubtitle": "Introduce tu contraseña maestra",
+  "unlockSubtitle": "Tu bóveda está cerrada",
   "unlockMasterPasswordHint": "Contraseña maestra",
   "unlockButton": "Desbloquear",
   "unlockLockedFor": "Bloqueado ({time})",
   "@unlockLockedFor": {
     "placeholders": { "time": { "type": "String" } }
   },
-  "unlockUseBiometrics": "Usar biometría",
-  "unlockWifiAvailable": "Puedes desbloquear desde tu celular",
+  "unlockWifiAvailable": "Aprobar desde el celular",
   "unlockForgotPassword": "¿Olvidaste tu contraseña maestra?",
   "unlockFromMobile": "Desbloqueando desde dispositivo móvil…",
   "unlockTooManyAttempts": "Demasiados intentos. Reintenta en {time}.",
   "@unlockTooManyAttempts": {
     "placeholders": { "time": { "type": "String" } }
   },
-  "unlockTapToEnter": "Toca para ingresar tu contraseña",
   "unlockRemoteFailed": "Desbloqueo remoto fallido: {msg}",
   "@unlockRemoteFailed": {
     "placeholders": { "msg": { "type": "String" } }
@@ -45,7 +43,7 @@
   "unlockGenericError": "No se pudo desbloquear la bóveda.",
   "unlockWithWindowsHello": "Desbloquear con Windows Hello",
   "unlockWithBiometrics": "Desbloquear con biometría",
-  "unlockOrUseMasterPassword": "o usa tu contraseña maestra",
+  "unlockOrUseMasterPassword": "o escribe tu contraseña maestra",
   "unlockAttemptsBeforeLockout": "{count, plural, one{Queda 1 intento antes del bloqueo temporal} other{Quedan {count} intentos antes del bloqueo temporal}}",
   "@unlockAttemptsBeforeLockout": {
     "placeholders": { "count": { "type": "int" } }
@@ -139,8 +137,7 @@
 
   "splashTagline": "Tu bóveda segura",
 
-  "setupTitle": "Crear contraseña\nmaestra",
-  "setupSubtitle": "Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.",
+  "setupSubtitle": "Es la llave de tu bóveda. Elige una que recuerdes: en el siguiente paso te damos un código por si algún día la olvidas.",
   "setupMinChars": "Mínimo 12 caracteres",
   "setupConfirmLabel": "Confirmar contraseña",
   "setupPasswordsMismatch": "Las contraseñas no coinciden",
@@ -327,7 +324,7 @@
 
   "recoveryTitle": "Recuperar acceso",
   "recoveryCodeTitle": "Código de recuperación",
-  "recoveryCodeDescription": "El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.",
+  "recoveryCodeDescription": "Escribe el código que guardaste al crear tu bóveda. Con él eliges una contraseña maestra nueva.",
   "recoveryEnterCode": "Ingresa el código de recuperación",
   "recoveryWrongCode": "Código incorrecto. Verifica e intenta de nuevo.",
   "recoveryVerifyButton": "Verificar código",
@@ -337,9 +334,8 @@
   "recoveryCodeVerified": "Código verificado. Ahora establece tu nueva contraseña maestra.",
   "recoveryNewPasswordLabel": "Nueva contraseña maestra",
   "recoveryResetButton": "Restablecer contraseña maestra",
-  "recoveryCodeWarning": "¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.",
+  "recoveryCodeWarning": "Solo se muestra esta vez. Guárdalo fuera de este equipo, por ejemplo en papel.",
   "recoveryCopyCode": "Copiar código",
-  "recoveryCodeSavedContinue": "Ya lo guardé, continuar",
   "accessStepOf": "Paso {current} de {total}",
   "@accessStepOf": {
     "placeholders": {
@@ -351,6 +347,18 @@
   "recoveryStepNewPassword": "Define una nueva contraseña maestra",
   "setupStepCreate": "Crea tu contraseña maestra",
   "setupStepSaveCode": "Guarda tu código de recuperación",
+  "setupStepImport": "Trae tus contraseñas",
+  "setupCodeIntro": "Si olvidas tu contraseña maestra, este código es la única forma de volver a entrar.",
+  "setupCodeConfirmLabel": "Escribe el grupo {group} del código",
+  "@setupCodeConfirmLabel": {"placeholders": {"group": {"type": "int"}}},
+  "setupCodeConfirmHelp": "Así sabemos que lo guardaste bien.",
+  "setupCodeConfirmWrong": "No coincide con el grupo {group}. Revisa el código.",
+  "@setupCodeConfirmWrong": {"placeholders": {"group": {"type": "int"}}},
+  "setupCodeConfirmButton": "Confirmar y seguir",
+  "setupImportBody": "¿Usabas otro gestor de contraseñas? Puedes traerlas ahora o más tarde desde Ajustes.",
+  "setupImportButton": "Importar contraseñas",
+  "setupImportDone": "Entrar a mi bóveda",
+  "unlockUseSecureKeyboard": "Usar el teclado seguro",
 
   "autofillOnboardingTitle": "Autocompletado",
   "autofillActiveTitle": "¡SoloKey está activo!",
