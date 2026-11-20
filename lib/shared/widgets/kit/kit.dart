@@ -19,5 +19,6 @@ export 'paper_card.dart';
 export 'safety_tone.dart';
 export 'search_and_filters.dart';
 export 'secret_field.dart';
+export 'solokey_logo.dart';
 export 'state_pill.dart';
 export 'totp_code.dart';

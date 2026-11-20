@@ -109,6 +109,12 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **Logo plano (DIS-4, 2026-11-20)**: el dueño eligió en la galería la S con cerradura de siempre, sin degradado ni azul: ficha de
+  tinta (`#15171A`) con la S en papel. `SoloKeyMark` (la marca en un color, por defecto la tinta del tema; usa
+  `solokey_mark.png` como máscara) y `SoloKeyAppIcon` en el kit. `tool/logo/generar_iconos.dart` (`flutter test` como motor de
+  pintado) regenera `solokey_icon.png`, `SoloKey.png`, `solokey_adaptive_fg.png` y los `.ico` de 16 a 256 (`SoloKey.ico` de la
+  bandeja y `windows/runner/resources/app_icon.ico` del `.exe` y el instalador); los mipmaps de Android salen de
+  `dart run flutter_launcher_icons` con el fondo adaptativo en `#15171A`. La galería muestra el icono a 128, 48, 32 y 16.
 - **Sin vibraciones ni animaciones decorativas (DIS-5, 2026-11-20, DEC-5)**: fuera las 22 llamadas a `HapticFeedback` (bloquear,
   formulario de credencial, auditoría, fila de contraseña, selector de tipo y teclado seguro), el `ShimmerLoader` de la carga de
   la bóveda (ahora un `CircularProgressIndicator` quieto en `home_screen` y `desktop_main_layout`) y `StaggeredListItem`, que ya

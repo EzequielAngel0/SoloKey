@@ -138,12 +138,12 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/logo/solokey_icon.png"
-  adaptive_icon_background: "#0E0E13"
+  adaptive_icon_background: "#15171A"
   adaptive_icon_foreground: "assets/logo/solokey_adaptive_fg.png"
   min_sdk_android: 21
-  # Windows: el .ico del runner (windows/runner/resources/app_icon.ico) se genera
-  # MANUALMENTE multi-tamano (16,24,32,48,64,128,256). El plugin con icon_size:256
-  # solo metia UN frame 256, por lo que el icono salia en blanco en la barra de
-  # titulo y la barra de tareas. Por eso aqui generate:false y no lo tocamos.
+  # Los PNG de arriba y los .ico multi-tamano (16 a 256) de Windows salen de
+  # `flutter test tool/logo/generar_iconos.dart` (DIS-4). El plugin con
+  # icon_size:256 solo metia UN frame 256 y el icono salia en blanco en la barra
+  # de titulo y la de tareas; por eso aqui generate:false.
   windows:
     generate: false
