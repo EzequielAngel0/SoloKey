@@ -27,7 +27,7 @@ flowchart LR
 | Capa | Dónde | Qué hay |
 |---|---|---|
 | Arranque y DI | `lib/main.dart`, `lib/app/` | `runZonedGuarded`, get_it + injectable (`app/di/`), puente get_it a Riverpod (`provider_overrides.dart`) |
-| Rutas | `lib/router/` | go_router 14; guard que manda a `/unlock` si la sesión está bloqueada |
+| Rutas | `lib/router/` | go_router 18; guard que manda a `/unlock` si la sesión está bloqueada |
 | Tema | `lib/theme/` | Tokens y temas de la v1 (Graphite Pro: dark, light, dim, oled) |
 | Compartido | `lib/shared/` | Widgets comunes, teclado seguro, extensiones |
 | Núcleo | `lib/core/` | `domain/`, `infrastructure/` (security, database, clipboard), `services/` (export, import, auditoría, recuperación, backups, notificaciones), `presentation/` |

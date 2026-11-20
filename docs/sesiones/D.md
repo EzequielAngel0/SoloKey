@@ -8,10 +8,9 @@ el host).
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | PLA-4 | Subir dependencias mayores (Riverpod 3, go_router 18, freezed 3, flutter_secure_storage 11, local_auth 3, `window_manager`, `tray_manager`, drift 2.35) | L | ☐ | [ver](#pla-4); **solo, sin otro carril tocando código** |
-| 2 | PLA-6 | `tool\escaneo-deps.ps1`: OSV-Scanner en Podman sobre `pubspec.lock` y `Cargo.lock` + `flutter pub outdated` + alertas de Dependabot abiertas | S | ☐ | [ver](#detalle-escaneos-pla-6-a-8) |
-| 3 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
-| 4 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
+| 1 | PLA-6 | `tool\escaneo-deps.ps1`: OSV-Scanner en Podman sobre `pubspec.lock` y `Cargo.lock` + `flutter pub outdated` + alertas de Dependabot abiertas | S | ☐ | [ver](#detalle-escaneos-pla-6-a-8) |
+| 2 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
+| 3 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
 
 ## Aprobado, sin desarrollar (el dueño dice cuándo)
 
@@ -28,6 +27,8 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 | ID | Qué | Esf. | Lo destraba |
 |---|---|---|---|
 | PLA-2 | Empaquetado macOS, Linux e iOS | XL | Hardware; diferido por el dueño |
+| PLA-9 | `flutter_secure_storage` 11 | S | Que el celular del dueño haya abierto un build con la 10 (la 11 ya no lee EncryptedSharedPreferences de la v9) |
+| PLA-10 | Mayores que piden Flutter ≥ 3.47 o AGP 9: `window_manager` 0.7, `tray_manager` 0.9, `hotkey_manager` 0.4, `desktop_drop` 0.8+, `share_plus` 13, `file_picker` 13, `flutter_local_notifications` 23, freezed 4, injectable 3 y `drift_flutter` 0.3 | M | Subir Flutter (y AGP 9 con Kotlin integrado) |
 
 ## Necesita de otros carriles
 
@@ -45,12 +46,13 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 
 ## Detalle
 
-### PLA-4
+### PLA-9 y PLA-10
 
-- Una rama, una mayor por commit, cada una con analyze y pruebas en verde. Leer el CHANGELOG de cada paquete antes.
-- Escaneo de seguridad del 2026-11-15 (OSV-Scanner v2.2.1, 203 paquetes): **sin vulnerabilidades conocidas**. Es mantenimiento.
-- `drift`, `cryptography` y `shelf*` se van con el núcleo Rust: subirlos solo si lo exige otra dependencia.
-- `flutter_secure_storage` 11: comprobar que sigue leyendo el `.dat` de la v1 (DPAPI) antes de mergear; probar con una copia.
+- Lo que quedó fuera de PLA-4 (hecho el 2026-11-19, ver `../archive/sesiones/D_HECHO.md`). `drift`, `cryptography` y `shelf*`
+  se van con el núcleo Rust: subirlos solo si lo exige otra dependencia.
+- PLA-9: con la 10 instalada, la 11 solo cambia el plugin de Android; probar la subida 9 → 10 → 11 en el emulador antes de mergear.
+- PLA-10: el CI de Windows sigue en `windows-2022`: con Visual Studio 18 (`windows-latest`) `local_auth_windows` y
+  `flutter_local_notifications_windows` no compilan (`<experimental/coroutine>`, aviso del carril E).
 
 ### PLA-3
 
