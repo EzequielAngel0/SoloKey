@@ -9,6 +9,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Galería del kit (DIS-3, 2026-11-20)**: `lib/main_galeria.dart` (solo debug; en release lanza `StateError`) abre
+  `KitGalleryApp` (`lib/shared/gallery/kit_gallery.dart`) con todo el kit y la paleta con sus hex, y controles de tema (claro,
+  oscuro, sistema), letra (100, 150, 200 %) y celular o escritorio; arranca en oscuro, 200 % y escritorio. Es un punto de entrada
+  aparte y no una ruta oculta: la build release (`lib/main.dart`) no la importa. Se abre con
+  `flutter run -d windows -t lib/main_galeria.dart`; CAL-1 puede montar `KitGalleryApp` tal cual.
 - **Kit de componentes de Tinta y papel (DIS-2, 2026-11-20)**: `lib/shared/widgets/kit/` con un solo import (`kit.dart`, que
   también exporta los tokens). `PaperButton` (principal de tinta, secundario con borde, discreto e irreversible en rojo; 48 de
   alto, texto que baja de renglón), `SecretField` y `SecretText` (Mono; al revelar, números en 700 y símbolos en 500, mismo
