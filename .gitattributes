@@ -1,4 +1,5 @@
 # Lo que se lee dentro de Linux (Podman) va siempre con LF, aunque core.autocrlf sea true.
 tool/ci-linux/Containerfile text eol=lf
+tool/build/Containerfile text eol=lf
 # Vectores de la v1 (CAL-2): bytes exactos, nunca se convierten los fines de linea.
 vectores/v1/boveda/** binary
