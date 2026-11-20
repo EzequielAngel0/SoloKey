@@ -15,9 +15,9 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|---|
 | Unit | `test/**` (espeja `lib/**`) | `flutter test` | Cripto, servicios, use cases, providers, lógica pura con tiempo inyectado. |
 | Widget | `test/**` con `test/support/widget_harness.dart` | `flutter test` | Behavioral: interactúa (tocar, escribir, revelar), no solo "renderiza". Fakes en `test/support/`. |
-| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | `vault_e2e_test` BORRA la bóveda local: solo con el runner (respalda con hash la BD, el `.dat` y `secure_files\`, y restaura en `finally`). En CI, el job `e2e-windows` (`windows-2022`, sin bóveda real) corre lo mismo en cada push. |
+| Integración | `integration_test/**` | `.\run_integration_tests.ps1` | Con datos aislados (`--dart-define=SOLOKEY_DATA_DIR=<carpeta>`, NUC-6): `vault_e2e_test` y `migracion_v1_test` (vectores de CAL-2) solo borran esa carpeta y sin la bandera se omiten. Solo con el runner, que además respalda con hash la bóveda real y la restaura en `finally`. En CI, `e2e-windows` corre lo mismo en cada push. |
 | Respaldo del runner | `tool/respaldo-boveda.psm1` | `.\tool\probar-respaldo-boveda.ps1` | Sobre una bóveda falsa en `%TEMP%`; correrla al tocar el módulo o `Runner.rc`. |
-| Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usa `cargo test` del núcleo (NUC-2). Regenerar solo si cambia lo que escribe la v1. |
+| Vectores de la v1 | [`vectores/v1/`](../../vectores/v1/LEEME.md) | `.\tool\vectores_v1\verificar.ps1` | Python en Podman, sin Dart; los usan `cargo test` del núcleo y `migracion_v1_test` (NUC-2). Se regeneran desde `main`. |
 | Núcleo Rust | `rust/solokey-core/` (`src/**` y `tests/**`) | `.\rust\cargo.ps1 test` | En Podman; las pruebas de la v1 leen `vectores/v1/`. Clippy: `.\rust\cargo.ps1 clippy --all-targets -- -D warnings` |
 | Fuzz del núcleo | `rust/solokey-core/fuzz/` | `.\rust\fuzz.ps1 [-Objetivo <o>] [-Segundos 60]` | En Podman; un fallo deja su entrada en `fuzz/artifacts/<o>/` y se repite con `-Reproducir` |
 | Dispositivos | PC + celular en la misma red | a mano | [`PRUEBAS_EN_DISPOSITIVOS.md`](PRUEBAS_EN_DISPOSITIVOS.md) |
@@ -49,9 +49,8 @@ que encender ni apagar; esperar el resultado con `gh run watch`. Por qué: [ADR-
 
 - No `pumpAndSettle` con timers vivos (el anillo de TOTP usa `Timer.periodic`): avanza con `pump(duration)`.
 - Tras `enterText` en la búsqueda, avanza más de 250 ms (debounce).
-- BD de prueba: `AppDatabase.forTesting(NativeDatabase.memory())`.
 - En Windows, `integration_test` corre **un archivo por invocación** (instancia única de la app).
-- El build de prueba de escritorio comparte el almacenamiento con la app instalada (`Documents\vault_guard_db.sqlite`, el `.dat` de `flutter_secure_storage` y `secure_files\`, en `%APPDATA%\<CompanyName>\<ProductName>` de `Runner.rc`): por eso el E2E destructivo va SOLO con `run_integration_tests.ps1`.
+- El build de prueba de escritorio comparte el almacenamiento con la app instalada (`%APPDATA%\<CompanyName>\<ProductName>` de `Runner.rc`, el `.dat` de `flutter_secure_storage` y la v1 en `Documents\vault_guard_db.sqlite`) salvo con `SOLOKEY_DATA_DIR`. **Un build de develop sin la bandera migra la bóveda v1 al desbloquear**: nunca con la del dueño.
 
 ## Dispositivos y emulador
 

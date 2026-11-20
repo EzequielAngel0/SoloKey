@@ -303,7 +303,7 @@ class VaultExportService {
         exportKey.fillRange(0, exportKey.length, 0);
       }
     } else if (headerStr == _magicV1 || headerStr == _magicLegacyVG) {
-      final sessionKey = _session.getKeyCopy();
+      final sessionKey = await _session.keyCopy();
       if (sessionKey == null) {
         throw StateError('La bóveda está bloqueada');
       }

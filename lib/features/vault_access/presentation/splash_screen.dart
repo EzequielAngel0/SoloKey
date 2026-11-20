@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
-import '../domain/repositories/i_vault_repository.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../../../app/di/injection.dart';
 import '../../../theme/app_palette.dart';
 
@@ -40,8 +40,7 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
   Future<void> _navigate() async {
     await Future.delayed(const Duration(milliseconds: 1800));
     if (!mounted) return;
-    final repo = getIt<IVaultRepository>();
-    final initialized = await repo.isVaultInitialized();
+    final initialized = await getIt<VaultStore>().exists();
     if (!mounted) return;
     context.go(initialized ? AppRoutes.unlock : AppRoutes.setup);
   }

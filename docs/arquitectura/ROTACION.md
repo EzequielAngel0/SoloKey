@@ -1,5 +1,10 @@
 # Recordatorios de Rotación de Contraseñas (Granular / Por Credencial)
 
+> **v2 (NUC-2, 2026-11-20), manda sobre lo de abajo:** el título y las fechas van cifrados en la bóveda, así que el aviso de
+> segundo plano lee `rotacion.json` (id, vencimiento y último aviso por credencial, sin secretos), que se rehace al desbloquear y
+> al guardar. El aviso es **uno agrupado y sin nombres**, "Tienes N contraseñas por cambiar" (decisión del dueño); cuáles son se
+> ve dentro de la app. "Posponer" pausa 3 días todas las del aviso.
+
 Este documento detalla la especificación técnica, el diseño de la interfaz y la arquitectura para la funcionalidad de **Recordatorios de Rotación de Contraseñas a nivel granular (individual por credencial)** y su comportamiento multiplataforma (Móvil y Escritorio).
 
 ---

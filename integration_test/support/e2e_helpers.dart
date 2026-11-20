@@ -1,18 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:path/path.dart' as p;
-import 'package:path_provider/path_provider.dart';
+import 'package:solokey/core/infrastructure/vault/data_location.dart';
 
 /// Shared engine for SoloKey E2E flows. See docs/proceso/PRUEBAS_INTEGRACION.md.
 ///
 /// Golden rules baked in here:
 ///  - **Never** `pumpAndSettle` (TOTP `Timer.periodic`, auto-lock ticker and the
 ///    desktop sync daemon never "settle"). Wait by CONDITION instead.
-///  - Clean state = a BRAND-NEW vault: wipe the local Drift DB file + the secure
-///    storage before launching the app.
+///  - Clean state = a BRAND-NEW vault: wipe the isolated data dir (NUC-6) before
+///    launching the app.
 ///  - Zero-Print: never log a revealed secret; assert against known values.
 
 /// Pumps frames until [finder] matches or [timeout] elapses. On timeout it fails
@@ -80,52 +78,22 @@ Finder fieldByLabel(String label) => find.byWidgetPredicate(
           (w.decoration?.labelText == label || w.decoration?.hintText == label),
     );
 
-/// ⚠️ DESTRUCTIVE — wipes the vault (secure storage + Drift DB) so a run starts
-/// from a known-empty state. This targets the SAME storage the real desktop app
-/// uses, so on a machine with a real vault it WILL delete the user's data.
-///
-/// For that reason it is **hard-gated**: it does nothing unless BOTH
-/// `--dart-define=E2E_ALLOW_WIPE=1` is passed AND (belt-and-suspenders) the app
-/// identity is not the shipped one. Even when allowed, it first copies every
-/// file it will delete to a timestamped `.e2e-backup` sibling. Run E2E only on a
-/// throwaway device/emulator, never on a machine that holds a real vault.
-/// Opt-in flag for the destructive path. `bool.fromEnvironment` only accepts the
-/// literal "true", so we accept both `E2E_ALLOW_WIPE=1` and `=true`.
+/// Borra la carpeta de datos AISLADA (NUC-6) para empezar con una boveda nueva. Solo actua con las dos banderas:
+/// `--dart-define=E2E_ALLOW_WIPE=1` y `--dart-define=SOLOKEY_DATA_DIR=<carpeta>` (que un release ignora). Nunca toca
+/// la boveda real del equipo ni el almacen seguro del sistema: con datos aislados la app usa un almacen en archivo
+/// dentro de esa carpeta. `bool.fromEnvironment` solo acepta "true", asi que se aceptan `=1` y `=true`.
 const bool e2eWipeAllowed =
     String.fromEnvironment('E2E_ALLOW_WIPE') == '1' ||
         String.fromEnvironment('E2E_ALLOW_WIPE') == 'true';
 
+/// Las E2E que borran solo corren con las dos banderas.
+bool get e2eCanWipe => e2eWipeAllowed && isIsolatedDataDir;
+
 Future<void> resetVault() async {
-  if (!e2eWipeAllowed) {
-    // Safe default: do NOT touch persistent storage. Tests that truly need a
-    // clean vault should be run with the define on a disposable device.
-    return;
-  }
-  final stamp = DateTime.now().millisecondsSinceEpoch;
-  try {
-    // Back up secure storage before clearing it (both known dir layouts).
-    final support = await getApplicationSupportDirectory();
-    final secure = File(p.join(support.path, 'flutter_secure_storage.dat'));
-    if (await secure.exists()) {
-      await secure.copy('${secure.path}.$stamp.e2e-backup');
-    }
-    await const FlutterSecureStorage().deleteAll();
-  } catch (_) {
-    // Best effort.
-  }
-  try {
-    // Drift stores under the Documents dir (`getApplicationDocumentsDirectory`),
-    // NOT the support dir — back up then delete there.
-    final docs = await getApplicationDocumentsDirectory();
-    for (final ext in ['sqlite', 'sqlite-wal', 'sqlite-shm']) {
-      final f = File(p.join(docs.path, 'vault_guard_db.$ext'));
-      if (await f.exists()) {
-        await f.copy('${f.path}.$stamp.e2e-backup');
-        await f.delete();
-      }
-    }
-  } catch (_) {
-    // Best effort.
+  if (!e2eCanWipe) return;
+  final dir = Directory((await resolveDataLocation()).dataDir);
+  for (final e in dir.listSync()) {
+    e.deleteSync(recursive: true);
   }
 }
 

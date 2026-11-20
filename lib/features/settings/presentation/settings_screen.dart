@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
@@ -22,6 +21,7 @@ import '../../../l10n/language_mode.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/detail_group.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
+import '../../vault_access/application/setup_vault_use_case.dart';
 import '../../vault_access/application/vault_state_provider.dart';
 import '../domain/entities/app_security_settings.dart';
 import '../domain/repositories/i_settings_repository.dart';
@@ -51,15 +51,8 @@ class SettingsNotifier extends _$SettingsNotifier {
         previous.biometricEnabled != settings.biometricEnabled) {
       final storage = getIt<FlutterSecureStorage>();
       if (settings.biometricEnabled) {
-        // Store current session key for future biometric unlocks
-        final session = getIt<SessionManager>();
-        final keyCopy = session.getKeyCopy();
-        if (keyCopy != null) {
-          await storage.write(
-            key: 'bio_master_key',
-            value: base64Encode(keyCopy),
-          );
-        }
+        // Guarda la clave de la boveda abierta para los desbloqueos biometricos.
+        await storeBiometricKey(getIt<SessionManager>(), storage);
       } else {
         // Wipe the stored biometric key
         await storage.delete(key: 'bio_master_key');

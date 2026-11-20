@@ -1,85 +1,47 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../../app/di/injection.dart';
-import 'package:uuid/uuid.dart';
-
-import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
-import '../domain/entities/master_key_config.dart';
-import '../domain/entities/vault.dart';
-import '../domain/entities/vault_session.dart';
-import '../domain/repositories/i_vault_repository.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../../../features/settings/domain/repositories/i_settings_repository.dart';
+import '../domain/entities/vault_session.dart';
 
+/// Crea la boveda v2 en el nucleo Rust (NUC-2) y la deja abierta.
 @lazySingleton
 class SetupVaultUseCase {
   const SetupVaultUseCase(
-    this._vaultRepo,
+    this._vault,
     this._settingsRepo,
-    this._security,
     this._session,
+    this._storage,
   );
 
-  final IVaultRepository _vaultRepo;
+  final VaultStore _vault;
   final ISettingsRepository _settingsRepo;
-  final ISecurityService _security;
   final SessionManager _session;
+  final FlutterSecureStorage _storage;
 
   Future<VaultSession> execute(String masterPassword) async {
-    final saltBase64 = await _security.generateSaltBase64();
-    final params = KdfParams.argon2idDefaults();
-
-    // SEC-003: Convertir a bytes inmediatamente y borrar el buffer tras el KDF
-    // para minimizar el tiempo que la contraseña en texto plano ocupa el heap.
-    final passwordBytes = Uint8List.fromList(utf8.encode(masterPassword));
-
-    late final Uint8List keyBytes;
-    try {
-      keyBytes = await _security.deriveKey(
-        password: String.fromCharCodes(passwordBytes),
-        saltBase64: saltBase64,
-        memory: params.memory,
-        iterations: params.iterations,
-        parallelism: params.parallelism,
-      );
-    } finally {
-      passwordBytes.fillRange(0, passwordBytes.length, 0);
-    }
-
-    final verificationData = await _security.createVerificationData(keyBytes);
-
-    final config = MasterKeyConfig(
-      salt: saltBase64,
-      kdfAlgorithm: KdfAlgorithm.argon2id,
-      kdfParams: params,
-      verificationData: verificationData,
-    );
-
-    final now = DateTime.now();
-    final vault = Vault(
-      id: const Uuid().v4(),
-      createdAt: now,
-      updatedAt: now,
-      isInitialized: true,
-    );
-
-    await _vaultRepo.saveMasterKeyConfig(config);
-    await _vaultRepo.saveVault(vault);
+    await _vault.create(masterPassword);
 
     final settings = await _settingsRepo.getSettings();
-    _session.storeKey(keyBytes);
-
     if (settings.biometricEnabled) {
-      await getIt<FlutterSecureStorage>()
-          .write(key: 'bio_master_key', value: base64Encode(keyBytes));
+      await storeBiometricKey(_session, _storage);
     }
+    return VaultSession.unlocked(autoLockMinutes: settings.autoLockMinutes);
+  }
+}
 
-    return VaultSession.unlocked(
-      autoLockMinutes: settings.autoLockMinutes,
-    );
+/// Guarda la clave de la boveda para la biometria y borra la copia en RAM.
+Future<void> storeBiometricKey(
+    SessionManager session, FlutterSecureStorage storage) async {
+  final key = await session.keyCopy();
+  if (key == null) return;
+  try {
+    await storage.write(key: 'bio_master_key', value: base64Encode(key));
+  } finally {
+    key.fillRange(0, key.length, 0);
   }
 }

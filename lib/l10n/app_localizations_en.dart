@@ -2320,6 +2320,18 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String notifRotationBodyCount(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other:
+          '$count passwords are due for a change. Open SoloKey to see which.',
+      one: 'A password is due for a change. Open SoloKey to see which.',
+    );
+    return '$_temp0';
+  }
+
+  @override
   String get notifActionChangePassword => 'Change password';
 
   @override

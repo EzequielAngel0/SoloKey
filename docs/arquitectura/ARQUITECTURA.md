@@ -13,7 +13,7 @@ flowchart LR
     APP --> DOM["Dominio<br/>entidades freezed + contratos"]
     APP --> INF["Infraestructura<br/>cripto, BD, almacén seguro, sync"]
   end
-  INF --> DB[("SQLite (drift)<br/>payload cifrado")]
+  INF --> DB[("Bóveda v2 (núcleo Rust)<br/>SQLite, todo cifrado")]
   INF --> KS[("Almacén seguro del SO<br/>Keystore / DPAPI")]
   INF <-->|"WebSocket en la LAN<br/>mensajes AES-GCM"| PAR["Otro dispositivo<br/>emparejado"]
 ```
@@ -44,10 +44,10 @@ Reglas: modelos inmutables (freezed); un caso de uso por acción; los widgets no
 | Cifrado | AES-256-GCM, nonce aleatorio de 12 bytes por operación; blob `nonce ‖ ciphertext ‖ tag` | Núcleo Rust (crate `aes-gcm`); lo que entra se pone a cero (`zeroize`) |
 | Puente | `SecurityServiceImpl` llama al núcleo por `flutter_rust_bridge` 2 (NUC-1); corre en el pool de hilos del puente y la interfaz no se bloquea. Lo carga `initRustCore()` desde `configureDependencies` | `security_service_impl.dart`, `rust_core.dart`, `lib/core/infrastructure/rust/` (generado) |
 | Librerías nativas | `solokey_core.dll` (cruzada con `cargo-xwin`) y `libsolokey_core.so` por ABI (`cargo-ndk`) en `rust/dist/`, sin versionar: `.\tool\build.ps1 -Nucleo -Salida rust\dist`. CMake copia la DLL junto al `.exe` y Gradle toma `jniLibs/`; los dos fallan con un aviso si falta. El puente se regenera con `.\rust\puente.ps1` | `windows/CMakeLists.txt`, `android/app/build.gradle.kts` |
-| Verificar la maestra | Se descifra un dato de prueba (`verificationData`); la contraseña ni su hash se guardan | `MasterKeyConfig` |
-| Clave en RAM | `SessionManager` la guarda en `Uint8List`, la pone a cero al bloquear; `getKeyCopy()` da copias que se borran tras usarse | `session_manager.dart` |
+| Verificar la maestra | La clave de la bóveda (DEK) va envuelta con la de la maestra: si no abre, la maestra es incorrecta. Ni la contraseña ni su hash se guardan | Núcleo: `vault.rs` (§4.1) |
+| Clave en RAM | Vive en el núcleo (`Zeroizing`); `SessionManager` guarda solo el `VaultHandle` y bloquear lo cierra (el núcleo pone a cero la clave y el índice). `keyCopy()` da una copia solo para guardar la de la biometría y se borra tras usarse | `session_manager.dart`, `vault_store.dart` |
 | Doble sobre | Registros marcados se cifran otra vez con su propio Argon2id + AES-GCM; revelar pide re-autenticación | `double_envelope_service.dart` |
-| Recuperación | Código de 32 bytes mostrado una vez; se guarda su SHA-256 y la clave maestra cifrada con él | `recovery_service.dart` |
+| Recuperación | Código mostrado una vez; envuelve la DEK en la cabecera. Paso 1 lo comprueba (`vaultCheckRecovery`), paso 2 pone la maestra nueva (`vaultRecover`) sin re-cifrar nada | `recovery_service.dart`, núcleo |
 | Fuerza bruta | Retardos crecientes y borrado de la bóveda tras N intentos (configurable) | `brute_force_guard.dart` |
 
 Por qué estos parámetros: [ADR-0003](../adr/0003-cifrado-de-la-boveda.md).
@@ -56,20 +56,24 @@ Por qué estos parámetros: [ADR-0003](../adr/0003-cifrado-de-la-boveda.md).
 
 | Qué | Dónde | Cifrado |
 |---|---|---|
-| Credenciales | drift `CredentialEntries` | Todo lo sensible en un payload JSON cifrado (BLOB); en claro solo id, tipo, carpeta, favorito, oculto, orden, fechas y lo de rotación |
-| Carpetas, categorías | `FolderEntries`, `CategoryEntries` | Nombres en claro (decisión de la v1; en la v2 van cifrados, [ADR-0009](../adr/0009-formato-de-boveda-v2.md)) |
-| Historial de contraseñas | `PasswordHistoryEntries` | Cifrado |
-| Archivos seguros | `SecureFileEntries` + archivos en `getApplicationSupportDirectory()` | Cifrados en reposo; la vista previa solo en RAM |
-| Configuración de la bóveda | `flutter_secure_storage` (Keystore en Android, DPAPI en Windows) | `MasterKeyConfig`, ajustes de seguridad, `K_sync` de cada par |
+| Credenciales, carpetas, categorías, historial | Registros de la bóveda v2 (§4.1) por `VaultStore` y los repositorios | Todo cifrado con la DEK; en claro solo id y versión |
+| Archivos seguros | `blobs` de la bóveda, con el mismo id que su registro | Cifrados con la DEK; la vista previa solo en RAM |
+| Agenda de rotación | `rotacion.json` en el directorio de datos (`rotation_schedule.dart`) | Sin secretos: id, vencimiento y último aviso; la lee el aviso de fondo sin la maestra |
+| Ajustes y llaves | `flutter_secure_storage` (Keystore en Android, DPAPI en Windows) | Ajustes de seguridad, clave de la biometría (la DEK, SEC-010), `K_sync` de cada par |
 
-BD `vault_guard_db`, esquema **v10** (`app_database.dart`), con migraciones paso a paso. **Cambiar el formato exige vectores de
-prueba** que demuestren que una bóveda anterior se sigue abriendo: los de la v1 están en
+Directorio de datos (`data_location.dart`): el de soporte de la app. Con `--dart-define=SOLOKEY_DATA_DIR=<ruta>` (NUC-6; relativa =
+bajo el soporte; un release lo ignora) todo va a esa carpeta, también la v1 a migrar y un almacén en archivo (`FileSecureStorage`
+en lugar del del sistema): así las E2E no tocan la bóveda real.
+
+La v1 (drift `vault_guard_db`, esquema v10, en Documentos, más `secure_files/` en el soporte) solo se lee para migrarla; drift ya no
+está en la app. **Cambiar el formato exige vectores de prueba** que demuestren que una bóveda anterior se sigue abriendo: los de
+la v1 están en
 [`vectores/v1/`](../../vectores/v1/LEEME.md) (CAL-2), con sus rarezas (la maestra entra a Argon2id con doble codificación UTF-8). Por qué así: [ADR-0005](../adr/0005-datos-en-sqlite-con-payload-cifrado.md).
 
 ### 4.1 Formato de la bóveda v2 (núcleo Rust, NUC-2)
 
-Lo define y lo maneja `rust/solokey-core/src/vault.rs` ([ADR-0009](../adr/0009-formato-de-boveda-v2.md)). La app todavía usa la v1
-de arriba hasta que entre el puente a Dart.
+Lo define y lo maneja `rust/solokey-core/src/vault.rs` ([ADR-0009](../adr/0009-formato-de-boveda-v2.md)). La app lo usa desde
+NUC-2 por `VaultStore` (`lib/core/infrastructure/vault/`); el handle abierto vive en `SessionManager`.
 
 | Pieza | Cómo |
 |---|---|
@@ -89,6 +93,11 @@ maestra y compara cada registro y cada archivo con la v1; solo entonces la renom
 algo falla, la v1 queda intacta y no hay v2. La maestra de la v2 entra en UTF-8 simple. El código de recuperación de la v1 no sirve
 en la v2: la bóveda migrada nace sin código y la app pide generar uno.
 
+En la app, la migración corre al primer desbloqueo con la maestra (`VaultStore.open`) si hay v1 y no v2. Después borra del almacén
+seguro las claves de la v1 (config, metadatos, recuperación, biometría y la clave envuelta del desbloqueo por WiFi, que hay que
+volver a registrar) y deja `recovery_reset_needed` si la v1 tenía código. La E2E `migracion_v1_test.dart` lo prueba con los
+vectores de CAL-2.
+
 ## 5. Sincronización P2P
 
 | Paso | Cómo |
@@ -97,8 +106,8 @@ en la v2: la bóveda migrada nace sin código y la app pide generar uno.
 | Acordar la llave | ECDH X25519 autenticado con HMAC-SHA256 sobre el token: `K_sync` por dispositivo, guardada en el almacén seguro |
 | Transporte | `ws://` en la LAN; **cada mensaje va cifrado con AES-256-GCM y `K_sync`** (el canal en sí no tiene TLS) |
 | Reconectar | Sin QR: reto HMAC con la `K_sync` guardada; latido y reconexión automática |
-| Delta | Intercambio de estado; gana la última escritura (fecha, desempate por UUID); credenciales, carpetas y archivos seguros (re-cifrados por dispositivo) |
-| Desbloqueo remoto | El celular aprueba y envía la clave maestra envuelta por el canal; la contraseña nunca viaja |
+| Delta | Manifiesto por carril (credenciales, carpetas, archivos) con id, fecha y lápida; gana la última escritura (fecha, desempate por UUID). Desde NUC-2 viajan los registros v2 tal cual (`{data}` y el contenido de los archivos) con su fecha, y cada equipo los guarda con su DEK; lo de una v1 se ignora (`delta_sync_manager.dart`) |
+| Desbloqueo remoto | El escritorio guarda su clave envuelta con un token (DUK) que tiene el celular; el celular lo manda por el canal y el escritorio abre con `vaultOpenWithKey`. La contraseña nunca viaja |
 
 Diseño original con diagramas: [`SYNC_P2P.md`](SYNC_P2P.md) (plan de junio; donde difiera, por ejemplo el TLS con certificado
 fijado que no se construyó, manda esta tabla). Por qué así: [ADR-0006](../adr/0006-sync-p2p-en-la-lan.md).

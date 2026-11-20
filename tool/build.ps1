@@ -136,7 +136,7 @@ adb logcat -c
 fallo=0
 for f in integration_test/*_test.dart; do
   adb install -g build/app/outputs/flutter-apk/app-debug.apk > /dev/null
-  timeout 900 flutter test "$f" -d emulator-5554 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=TEST_DISABLE_BIOMETRIC=1 || fallo=1
+  timeout 900 flutter test "$f" -d emulator-5554 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=SOLOKEY_DATA_DIR=e2e || fallo=1
 done
 if [ "$fallo" -ne 0 ]; then adb logcat -d > "$SALIDA/logcat.txt"; echo "logcat del emulador en <Salida>/logcat.txt"; exit 1; fi
 '@

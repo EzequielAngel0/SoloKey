@@ -261,6 +261,27 @@ fn to_key(bytes: &[u8]) -> Result<SecretKey, CoreError> {
     Ok(k)
 }
 
+/// Desenvuelve la DEK con el codigo de recuperacion.
+fn unwrap_by_recovery(
+    conn: &Connection,
+    header: &Header,
+    code: &str,
+) -> Result<SecretKey, CoreError> {
+    let rk = crate::v1::recovery_code_key(code).map_err(|_| CoreError::WrongPassword)?;
+    let wrapped: Option<Vec<u8>> =
+        conn.query_row("SELECT key_by_recovery FROM header WHERE id = 1", [], |r| {
+            r.get(0)
+        })?;
+    let wrapped = wrapped.ok_or(CoreError::NoRecovery)?;
+    let dek = crypto::decrypt_with_aad(
+        &wrapped,
+        rk.as_ref(),
+        &aad_dek(&header.vault_id, "recovery"),
+    )
+    .map_err(|_| CoreError::WrongPassword)?;
+    to_key(&dek)
+}
+
 impl Vault {
     /// Crea una boveda nueva en `path` (no debe existir). Devuelve la boveda abierta y el codigo de recuperacion,
     /// que se muestra UNA vez y no se guarda en ningun lado.
@@ -390,21 +411,16 @@ impl Vault {
         kdf: KdfParams,
     ) -> Result<Vault, CoreError> {
         let (conn, header) = Self::connect(path)?;
-        let rk = crate::v1::recovery_code_key(code).map_err(|_| CoreError::WrongPassword)?;
-        let wrapped: Option<Vec<u8>> =
-            conn.query_row("SELECT key_by_recovery FROM header WHERE id = 1", [], |r| {
-                r.get(0)
-            })?;
-        let wrapped = wrapped.ok_or(CoreError::NoRecovery)?;
-        let dek = crypto::decrypt_with_aad(
-            &wrapped,
-            rk.as_ref(),
-            &aad_dek(&header.vault_id, "recovery"),
-        )
-        .map_err(|_| CoreError::WrongPassword)?;
-        let mut v = Self::finish_open(path, conn, header, to_key(&dek)?)?;
+        let dek = unwrap_by_recovery(&conn, &header, code)?;
+        let mut v = Self::finish_open(path, conn, header, dek)?;
         v.change_password(new_password, kdf)?;
         Ok(v)
+    }
+
+    /// Comprueba el codigo de recuperacion sin abrir ni cambiar nada (paso 1 de la pantalla de recuperacion).
+    pub fn check_recovery(path: &Path, code: &str) -> Result<(), CoreError> {
+        let (conn, header) = Self::connect(path)?;
+        unwrap_by_recovery(&conn, &header, code).map(drop)
     }
 
     fn connect(path: &Path) -> Result<(Connection, Header), CoreError> {
@@ -818,6 +834,19 @@ mod tests {
             Vault::open(&p, b"olvidada").err(),
             Some(CoreError::WrongPassword)
         );
+    }
+
+    #[test]
+    fn comprobar_el_codigo_no_cambia_nada() {
+        let (_d, p) = tmp();
+        let (v, code) = Vault::create(&p, b"m", fast()).unwrap();
+        drop(v);
+        assert_eq!(Vault::check_recovery(&p, &code), Ok(()));
+        assert_eq!(
+            Vault::check_recovery(&p, "AAAA-BBBB").err(),
+            Some(CoreError::WrongPassword)
+        );
+        assert!(Vault::open(&p, b"m").is_ok());
     }
 
     #[test]

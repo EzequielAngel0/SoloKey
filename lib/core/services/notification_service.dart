@@ -10,8 +10,8 @@ import 'package:local_notifier/local_notifier.dart';
 import 'package:window_manager/window_manager.dart';
 
 import '../../l10n/app_localizations.dart';
-import '../infrastructure/database/app_database.dart';
 import 'notification_navigation.dart';
+import 'rotation_schedule.dart';
 
 // ── Notification copy & channel constants ─────────────────────────────────────
 
@@ -26,66 +26,9 @@ Future<AppLocalizations> _loadNotifL10n() {
   return AppLocalizations.delegate.load(Locale(supported ? lang : 'en'));
 }
 
-/// Minimum gap between two reminders for the SAME credential, to avoid spamming
-/// the user when a background check runs often.
-const Duration _kRepromptCooldown = Duration(hours: 24);
-
 bool get _isDesktop =>
     !kIsWeb && (Platform.isWindows || Platform.isMacOS || Platform.isLinux);
 bool get _isMobile => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
-
-// ── Shared rotation logic (also reused by the background isolate) ─────────────
-
-/// Days threshold for a rotation [interval] string.
-/// Returns 0 when the credential should never trigger a reminder.
-int rotationDaysForInterval(String interval, int? customDays) => switch (interval) {
-      'monthly' => 30,
-      'quarterly' => 90,
-      'semiAnnually' => 180,
-      'custom' => customDays ?? 30,
-      _ => 0,
-    };
-
-/// A credential whose password is overdue for rotation and not muted by the
-/// 24h re-prompt cooldown.
-class DueRotation {
-  const DueRotation(this.id, this.title, this.daysOverdue);
-  final String id;
-  final String title;
-  final int daysOverdue;
-}
-
-/// Scans the local SQLite vault for credentials whose rotation window has
-/// elapsed. Reads ONLY plain (non-encrypted) columns, so it works without the
-/// master key — safe to call from a background isolate.
-/// [now] is injectable so tests can pin the clock deterministically; it
-/// defaults to the wall clock in production. No behavioural change.
-Future<List<DueRotation>> findDueRotations(AppDatabase db, {DateTime? now}) async {
-  final at = now ?? DateTime.now();
-  final entries = await db.credentialDao.getAll();
-  final due = <DueRotation>[];
-
-  for (final e in entries) {
-    if (e.rotationInterval == 'none') continue;
-
-    final days = rotationDaysForInterval(e.rotationInterval, e.customRotationDays);
-    if (days <= 0) continue;
-
-    final updatedAt = DateTime.fromMillisecondsSinceEpoch(e.updatedAt);
-    final daysSinceUpdate = at.difference(updatedAt).inDays;
-    if (daysSinceUpdate < days) continue; // still within rotation window
-
-    // Skip if we already prompted recently (prevents notification fatigue).
-    final last = e.lastRotationPromptedAt;
-    if (last != null) {
-      final lastDt = DateTime.fromMillisecondsSinceEpoch(last);
-      if (at.difference(lastDt) < _kRepromptCooldown) continue;
-    }
-
-    due.add(DueRotation(e.id, e.title, daysSinceUpdate - days));
-  }
-  return due;
-}
 
 /// Creates/updates the Android channel so [Importance.high] is honoured.
 Future<void> _ensureAndroidChannel(
@@ -109,6 +52,9 @@ const String _kActionChangePassword = 'change_password';
 const String _kActionSnooze3d = 'snooze_3d';
 const Duration _kSnoozeDuration = Duration(days: 3);
 
+// Aviso de rotacion agrupado (NUC-2): id fijo; el payload son los ids de las credenciales, separados por coma.
+const int _kRotationNotificationId = 990003;
+
 // Login-approval notification (M3): fixed id + payload sentinel.
 const int _kApprovalNotificationId = 990001;
 const String _kApprovalPayload = '__approve_login__';
@@ -120,7 +66,7 @@ const String _kSyncPayload = '__synced__';
 
 // ── Tap routing (pure, shared by foreground tap and cold start) ───────────────
 
-enum NotificationTapKind { none, openSync, snooze, openCredential }
+enum NotificationTapKind { none, openSync, snooze, openCredential, openApp }
 
 /// Pure routing decision for a notification tap: sentinel payloads open the
 /// Sync screen, the snooze action mutes a rotation reminder, anything else
@@ -141,12 +87,16 @@ enum NotificationTapKind { none, openSync, snooze, openCredential }
   if (actionId == _kActionSnooze3d) {
     return (kind: NotificationTapKind.snooze, credentialId: payload);
   }
+  // Varias credenciales en un aviso: abrir la app (cuales son se ve dentro, tras desbloquear).
+  if (payload.contains(',')) {
+    return (kind: NotificationTapKind.openApp, credentialId: null);
+  }
   return (kind: NotificationTapKind.openCredential, credentialId: payload);
 }
 
 Future<void> _showMobileRotation(
   FlutterLocalNotificationsPlugin plugin,
-  DueRotation item,
+  List<DueRotation> due,
   AppLocalizations l10n,
 ) async {
   final details = NotificationDetails(
@@ -168,12 +118,18 @@ Future<void> _showMobileRotation(
     iOS: const DarwinNotificationDetails(),
   );
   await plugin.show(
-    id: item.id.hashCode,
+    id: _kRotationNotificationId,
     title: l10n.notifRotationTitle,
-    body: l10n.notifRotationBody(item.title),
+    body: l10n.notifRotationBodyCount(due.length),
     notificationDetails: details,
-    payload: item.id,
+    payload: due.map((d) => d.id).join(','),
   );
+}
+
+/// Pospone 3 dias los avisos de las credenciales del [payload].
+Future<void> _snooze(String payload) async {
+  final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
+  markRotationPrompted(await rotationFile(), payload.split(','), until);
 }
 
 /// Handles a notification ACTION tapped while the app is in the background or
@@ -183,14 +139,10 @@ Future<void> _showMobileRotation(
 @pragma('vm:entry-point')
 Future<void> notificationActionBackground(NotificationResponse response) async {
   if (response.actionId == _kActionSnooze3d && response.payload != null) {
-    final db = AppDatabase();
     try {
-      final until = DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
-      await db.credentialDao.markRotationPrompted(response.payload!, until);
+      await _snooze(response.payload!);
     } catch (_) {
       // Silent — background work must not throw.
-    } finally {
-      await db.close();
     }
   }
 }
@@ -199,9 +151,9 @@ Future<void> notificationActionBackground(NotificationResponse response) async {
 /// GetIt, no master key). Opens its own DB handle, notifies, then closes it.
 @pragma('vm:entry-point')
 Future<void> runBackgroundRotationCheck() async {
-  final db = AppDatabase();
   try {
-    final due = await findDueRotations(db);
+    final file = await rotationFile();
+    final due = findDueRotations(file);
     if (due.isEmpty) return;
 
     final plugin = FlutterLocalNotificationsPlugin();
@@ -211,16 +163,11 @@ Future<void> runBackgroundRotationCheck() async {
     await plugin.initialize(settings: init);
     final l10n = await _loadNotifL10n();
     await _ensureAndroidChannel(plugin, l10n);
-
-    final stampedAt = DateTime.now().millisecondsSinceEpoch;
-    for (final item in due) {
-      await _showMobileRotation(plugin, item, l10n);
-      await db.credentialDao.markRotationPrompted(item.id, stampedAt);
-    }
+    await _showMobileRotation(plugin, due, l10n);
+    markRotationPrompted(
+        file, due.map((d) => d.id), DateTime.now().millisecondsSinceEpoch);
   } catch (_) {
     // Background work must never throw — failures stay silent by design.
-  } finally {
-    await db.close();
   }
 }
 
@@ -232,9 +179,9 @@ Future<void> runBackgroundRotationCheck() async {
 /// the system tray.
 @lazySingleton
 class NotificationService {
-  NotificationService(this._db);
+  NotificationService(this._rotation);
 
-  final AppDatabase _db;
+  final RotationSchedule _rotation;
   final FlutterLocalNotificationsPlugin _mobilePlugin =
       FlutterLocalNotificationsPlugin();
 
@@ -276,9 +223,7 @@ class NotificationService {
           );
           switch (action.kind) {
             case NotificationTapKind.snooze:
-              final until =
-                  DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
-              await _db.credentialDao.markRotationPrompted(payload, until);
+              await _snooze(payload);
             case NotificationTapKind.openSync:
               WidgetsBinding.instance.addPostFrameCallback(
                 (_) => NotificationNavigation.openSync(),
@@ -288,6 +233,7 @@ class NotificationService {
                 (_) => NotificationNavigation.openCredential(payload),
               );
             case NotificationTapKind.none:
+            case NotificationTapKind.openApp:
               break;
           }
         }
@@ -366,23 +312,21 @@ class NotificationService {
     }
   }
 
-  /// Scans the vault and fires native reminders for every overdue credential.
+  /// Lee la agenda de rotacion y, si hay vencidas, lanza UN aviso agrupado sin nombres (NUC-2).
   Future<void> checkAndNotify() async {
     await initialize();
     try {
-      final due = await findDueRotations(_db);
+      final due = await _rotation.due();
       if (due.isEmpty) return;
 
       final l10n = await _loadNotifL10n();
-      final stampedAt = DateTime.now().millisecondsSinceEpoch;
-      for (final item in due) {
-        if (_isDesktop) {
-          await _showDesktopRotation(item, l10n);
-        } else if (_isMobile) {
-          await _showMobileRotation(_mobilePlugin, item, l10n);
-        }
-        await _db.credentialDao.markRotationPrompted(item.id, stampedAt);
+      if (_isDesktop) {
+        await _showDesktopRotation(due, l10n);
+      } else if (_isMobile) {
+        await _showMobileRotation(_mobilePlugin, due, l10n);
       }
+      await _rotation.markPrompted(
+          due.map((d) => d.id), DateTime.now().millisecondsSinceEpoch);
     } catch (_) {
       // Best-effort.
     }
@@ -401,15 +345,15 @@ class NotificationService {
   }
 
   Future<void> _showDesktopRotation(
-      DueRotation item, AppLocalizations l10n) async {
+      List<DueRotation> due, AppLocalizations l10n) async {
     final notification = LocalNotification(
       title: l10n.notifRotationTitle,
-      body: l10n.notifRotationBody(item.title),
+      body: l10n.notifRotationBodyCount(due.length),
     );
     notification.onClick = () {
       windowManager.show();
       windowManager.focus();
-      NotificationNavigation.openCredential(item.id);
+      if (due.length == 1) NotificationNavigation.openCredential(due.single.id);
     };
     await notification.show();
   }
@@ -421,17 +365,15 @@ class NotificationService {
     );
     switch (action.kind) {
       case NotificationTapKind.none:
+      case NotificationTapKind.openApp:
         return;
       case NotificationTapKind.openSync:
         // Aprobacion de login (M3) o "N cambios sincronizados".
         NotificationNavigation.openSync();
       case NotificationTapKind.snooze:
-        // Posponer 3 dias: empuja lastRotationPromptedAt al futuro para silenciar.
-        final id = action.credentialId!;
-        final until =
-            DateTime.now().add(_kSnoozeDuration).millisecondsSinceEpoch;
-        unawaited(_db.credentialDao.markRotationPrompted(id, until));
-        unawaited(_mobilePlugin.cancel(id: id.hashCode));
+        // Posponer 3 dias: empuja el ultimo aviso al futuro en la agenda.
+        unawaited(_snooze(action.credentialId!));
+        unawaited(_mobilePlugin.cancel(id: _kRotationNotificationId));
       case NotificationTapKind.openCredential:
         // Toque normal o [Cambiar contraseña] → abre el detalle de la credencial.
         NotificationNavigation.openCredential(action.credentialId!);
