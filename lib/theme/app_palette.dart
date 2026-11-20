@@ -258,12 +258,6 @@ class AppPalette extends ThemeExtension<AppPalette> {
   /// v1: usar [inkSoft].
   Color get typeSshKey => inkSoft;
 
-  /// v1: el shimmer sale en DIS-5.
-  Color get shimmerBase => inset;
-
-  /// v1: el shimmer sale en DIS-5.
-  Color get shimmerHighlight => sheet;
-
   @override
   AppPalette copyWith({
     Color? paper,

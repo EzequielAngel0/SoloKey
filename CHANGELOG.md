@@ -109,6 +109,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **Sin vibraciones ni animaciones decorativas (DIS-5, 2026-11-20, DEC-5)**: fuera las 22 llamadas a `HapticFeedback` (bloquear,
+  formulario de credencial, auditoría, fila de contraseña, selector de tipo y teclado seguro), el `ShimmerLoader` de la carga de
+  la bóveda (ahora un `CircularProgressIndicator` quieto en `home_screen` y `desktop_main_layout`) y `StaggeredListItem`, que ya
+  no se usaba. Se borran `shimmer_loader.dart`, `staggered_list_item.dart`, los alias `shimmerBase` y `shimmerHighlight` de
+  `AppPalette` y la prueba del shimmer de `mobile_home_screen_test.dart` (ADR-0011).
 - **Tinta y papel (DIS-1, 2026-11-20)**: `AppPalette` reescrita con tokens por rol (papel, hoja, elevada, hundida; tinta en cuatro
   niveles; bordes estándar, suave, de control y foco; comprometida, débil y sana con su letra y su fondo de aviso; velo y sombra),
   clara y oscura, AA comprobado (débil `#94600F` y sana `#2A7449` en claro, más oscuros que REDISENO_V2 §3 para pasar 4.5:1).

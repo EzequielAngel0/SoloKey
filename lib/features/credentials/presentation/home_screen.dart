@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -9,7 +8,6 @@ import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
 import '../../../shared/widgets/vault_app_bar.dart';
 import '../../../shared/widgets/empty_state.dart';
-import '../../../shared/widgets/shimmer_loader.dart';
 import '../../../shared/widgets/solo_filter_chip.dart';
 import '../../../shared/widgets/score_ring.dart';
 import '../../../shared/widgets/status_chip.dart';
@@ -74,7 +72,9 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         ref.read(credentialSearchNotifierProvider.notifier).update(value);
       }
     });
-    setState(() {}); // refresh clear-button / empty-state affordances immediately
+    setState(
+      () {},
+    ); // refresh clear-button / empty-state affordances immediately
   }
 
   void _clearSearch() {
@@ -92,11 +92,11 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   }
 
   String _titleFor(AppLocalizations l10n) => switch (_currentIndex) {
-        1 => l10n.navFolders,
-        2 => l10n.navSecurity,
-        3 => l10n.navSettings,
-        _ => l10n.navVault,
-      };
+    1 => l10n.navFolders,
+    2 => l10n.navSecurity,
+    3 => l10n.navSettings,
+    _ => l10n.navVault,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +112,6 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
             icon: Icon(Icons.lock_rounded, color: palette.danger),
             tooltip: l10n.homeLockTooltip,
             onPressed: () {
-              HapticFeedback.heavyImpact();
               ref.read(vaultNotifierProvider.notifier).lock();
               context.go(AppRoutes.unlock);
             },
@@ -121,15 +120,15 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       ),
       floatingActionButton: switch (_currentIndex) {
         0 => FloatingActionButton.extended(
-            onPressed: () => context.push(AppRoutes.credentialCreate),
-            icon: const Icon(Icons.add_rounded),
-            label: Text(l10n.homeFabNew),
-          ),
+          onPressed: () => context.push(AppRoutes.credentialCreate),
+          icon: const Icon(Icons.add_rounded),
+          label: Text(l10n.homeFabNew),
+        ),
         1 => FloatingActionButton.extended(
-            onPressed: () => _createRootFolder(context, ref),
-            icon: const Icon(Icons.create_new_folder_rounded),
-            label: Text(l10n.homeFabFolder),
-          ),
+          onPressed: () => _createRootFolder(context, ref),
+          icon: const Icon(Icons.create_new_folder_rounded),
+          label: Text(l10n.homeFabFolder),
+        ),
         _ => null,
       },
       bottomNavigationBar: NavigationBar(
@@ -172,7 +171,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
     final sort = ref.watch(vaultSortProvider);
     final filter = ref.watch(vaultFilterProvider);
     final reorderMode = ref.watch(vaultReorderModeProvider);
-    final canReorder = sort == VaultSort.manual &&
+    final canReorder =
+        sort == VaultSort.manual &&
         filter == VaultFilter.all &&
         _searchCtrl.text.isEmpty &&
         !_showHidden;
@@ -216,15 +216,21 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
   }
 
   PopupMenuItem<VaultSort> _sortMenuItem(
-      VaultSort value, String label, VaultSort current) {
+    VaultSort value,
+    String label,
+    VaultSort current,
+  ) {
     final palette = context.palette;
     final selected = value == current;
     return PopupMenuItem<VaultSort>(
       value: value,
       child: Row(
         children: [
-          Icon(vaultSortIcon(value),
-              size: 18, color: selected ? palette.primary : palette.textMuted),
+          Icon(
+            vaultSortIcon(value),
+            size: 18,
+            color: selected ? palette.primary : palette.textMuted,
+          ),
           const SizedBox(width: 12),
           Text(
             label,
@@ -253,7 +259,7 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         await ref.read(foldersNotifierProvider.notifier).refresh();
       },
       child: credentialsAsync.isLoading
-          ? const ShimmerLoader()
+          ? const Center(child: CircularProgressIndicator())
           : FolderListView(
               folders: foldersAsync.value ?? [],
               credentials: credentialsAsync.value ?? [],
@@ -276,7 +282,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       sort,
     );
 
-    final canReorder = sort == VaultSort.manual &&
+    final canReorder =
+        sort == VaultSort.manual &&
         filter == VaultFilter.all &&
         _searchCtrl.text.isEmpty &&
         !_showHidden;
@@ -353,24 +360,24 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
               await ref.read(foldersNotifierProvider.notifier).refresh();
             },
             child: credentialsAsync.isLoading
-                ? const ShimmerLoader()
+                ? const Center(child: CircularProgressIndicator())
                 : credentialsAsync.hasError
-                    ? Center(
-                        child: Text(
-                          l10n.homeLoadError('${credentialsAsync.error}'),
-                          style: TextStyle(color: palette.danger),
-                        ),
-                      )
-                    : filtered.isEmpty
-                        ? _buildEmpty(context, l10n)
-                        : CredentialListWidget(
-                            credentials: filtered,
-                            reorderMode: reorderActive,
-                            sectioned: sort == VaultSort.titleAsc,
-                            onReorder: canReorder
-                                ? (o, n) => _onReorder(filtered, o, n)
-                                : null,
-                          ),
+                ? Center(
+                    child: Text(
+                      l10n.homeLoadError('${credentialsAsync.error}'),
+                      style: TextStyle(color: palette.danger),
+                    ),
+                  )
+                : filtered.isEmpty
+                ? _buildEmpty(context, l10n)
+                : CredentialListWidget(
+                    credentials: filtered,
+                    reorderMode: reorderActive,
+                    sectioned: sort == VaultSort.titleAsc,
+                    onReorder: canReorder
+                        ? (o, n) => _onReorder(filtered, o, n)
+                        : null,
+                  ),
           ),
         ),
       ],
@@ -386,7 +393,8 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         title: l10n.homeNoHidden,
       );
     }
-    final filtering = _searchCtrl.text.isNotEmpty ||
+    final filtering =
+        _searchCtrl.text.isNotEmpty ||
         ref.read(vaultFilterProvider) != VaultFilter.all;
     if (filtering) {
       return EmptyState(
@@ -408,8 +416,10 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
       context: context,
       builder: (_) => AlertDialog(
         backgroundColor: palette.drawer,
-        title: Text(l10n.folderDialogTitle,
-            style: TextStyle(color: palette.textPrimary)),
+        title: Text(
+          l10n.folderDialogTitle,
+          style: TextStyle(color: palette.textPrimary),
+        ),
         content: TextField(
           controller: ctrl,
           autofocus: true,
@@ -421,16 +431,20 @@ class _MobileHomeScreenState extends ConsumerState<MobileHomeScreen> {
         ),
         actions: [
           TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: Text(l10n.commonCancel)),
+            onPressed: () => Navigator.pop(context),
+            child: Text(l10n.commonCancel),
+          ),
           TextButton(
-              onPressed: () => Navigator.pop(context, ctrl.text.trim()),
-              child: Text(l10n.commonCreate)),
+            onPressed: () => Navigator.pop(context, ctrl.text.trim()),
+            child: Text(l10n.commonCreate),
+          ),
         ],
       ),
     );
     if (name != null && name.isNotEmpty) {
-      await ref.read(foldersNotifierProvider.notifier).createFolder(name: name, parentId: null);
+      await ref
+          .read(foldersNotifierProvider.notifier)
+          .createFolder(name: name, parentId: null);
     }
   }
 }
@@ -601,8 +615,10 @@ class _SearchField extends StatelessWidget {
         ),
         filled: true,
         fillColor: p.card,
-        contentPadding:
-            const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 12,
+        ),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(999),
           borderSide: BorderSide(color: p.divider),
