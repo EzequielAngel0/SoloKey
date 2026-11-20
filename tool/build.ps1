@@ -134,6 +134,14 @@ $runArgs = @('run', '--rm',
   '-v', 'solokey-xwin:/xwin-cache',
   '-v', 'solokey-build-target:/cargo-target')
 if ($E2e) { $runArgs += @('--device', '/dev/kvm') }
+# La llave debug del host (solo lectura): sin ella cada contenedor crea una nueva y el APK no
+# se puede instalar encima del que ya tiene el celular (habria que desinstalar: borra la boveda).
+$debugKs = Join-Path $env:USERPROFILE '.android\debug.keystore'
+if (Test-Path $debugKs) {
+  $runArgs += @('-v', "$(($debugKs -replace '\\', '/')):/root/.android/debug.keystore:ro")
+} elseif (-not $E2e) {
+  Write-Warning "No existe $debugKs`: el APK sale firmado con una llave debug nueva y no se instala encima de otro build."
+}
 $runArgs += @($image, 'bash', '/build.sh')
 
 Write-Host "[build] $image -> $salidaAbs" -ForegroundColor Cyan
