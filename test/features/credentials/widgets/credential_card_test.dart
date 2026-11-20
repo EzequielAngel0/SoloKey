@@ -135,7 +135,7 @@ void main() {
       expect(find.byIcon(Icons.chevron_right_rounded), findsNothing);
       // TOTP rows have no username → the subtitle falls back to a type badge.
       expect(find.byType(TypeBadge), findsOneWidget);
-      expect(find.text('TOTP'), findsOneWidget);
+      expect(find.text('Authenticator'), findsOneWidget);
     });
 
     testWidgets('invalid secret shows the "Invalid" label, not a code',

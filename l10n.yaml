@@ -3,7 +3,11 @@
 # a ellos (lib/l10n/app_localizations.dart). En Flutter 3.38+ el paquete
 # sintético ya no existe, así que los .dart generados se versionan en el repo.
 arb-dir: lib/l10n
-template-arb-file: app_en.arb
+template-arb-file: app_es.arb
 output-localization-file: app_localizations.dart
 output-class: AppLocalizations
 nullable-getter: false
+# El español es el idioma fuente (ADR-0013, PAN-10): app_es.arb es la plantilla
+# y lleva los metadatos (@clave); app_en.arb solo trae los valores. Con un idioma
+# del sistema que la app no tiene, se cae al inglés (primero de la lista).
+preferred-supported-locales: [en]

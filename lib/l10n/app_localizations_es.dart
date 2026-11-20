@@ -59,7 +59,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get unlockUseBiometrics => 'Usar biometría';
 
   @override
-  String get unlockWifiAvailable => 'Desbloqueo WiFi disponible';
+  String get unlockWifiAvailable => 'Puedes desbloquear desde tu celular';
 
   @override
   String get unlockForgotPassword => '¿Olvidaste tu contraseña maestra?';
@@ -244,7 +244,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsWipeSubtitle =>
-      'Protección anti fuerza bruta (irreversible)';
+      'Si alguien prueba muchas contraseñas, se borra todo (no se deshace)';
 
   @override
   String get settingsSyncComputerTitle => 'Sincronizar computadora';
@@ -258,7 +258,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get settingsExportImportSubtitle =>
-      'Haz backups cifrados de tu bóveda';
+      'Haz copias de respaldo cifradas de tu bóveda';
 
   @override
   String get settingsAutofillTitle => 'Autocompletado del sistema';
@@ -273,7 +273,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsPasskeysSubtitle => 'Guarda tus respaldos de passkey';
 
   @override
-  String get settingsBackupTitle => 'Backup automático';
+  String get settingsBackupTitle => 'Respaldo automático';
 
   @override
   String get settingsBackupDaily => 'Diario';
@@ -299,11 +299,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get settingsBackupChooseFolder => 'Elegir carpeta destino';
 
   @override
-  String get settingsBackupPassword => 'Contraseña del backup';
+  String get settingsBackupPassword => 'Contraseña del respaldo';
 
   @override
   String get settingsBackupPasswordKeep =>
-      'Contraseña del backup (dejar vacío = mantener)';
+      'Contraseña del respaldo (vacía para no cambiarla)';
 
   @override
   String get settingsLockNowTitle => 'Bloquear ahora';
@@ -484,7 +484,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get detailAdvanced => 'Avanzado';
 
   @override
-  String get detailTotpSecret => 'Secreto (semilla)';
+  String get detailTotpSecret => 'Clave secreta';
 
   @override
   String get detailCopyCode => 'Copiar código';
@@ -553,7 +553,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get homeGreetingEvening => 'Buenas noches';
 
   @override
-  String get homeHealthTooltip => 'Salud de la boveda: toca para ver detalles';
+  String get homeHealthTooltip => 'Salud de la bóveda: toca para ver detalles';
 
   @override
   String get homeSortTooltip => 'Ordenar';
@@ -657,7 +657,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get detailTotpExportQrAuthReason =>
-      'Autentifícate para mostrar el QR del TOTP';
+      'Confirma que eres tú para mostrar el QR del autenticador';
 
   @override
   String get detailTotpExportQrTitle => 'Escanea en otro dispositivo';
@@ -694,13 +694,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get typePassword => 'Contraseña';
 
   @override
-  String get typeApiKey => 'API Key';
+  String get typeApiKey => 'Clave de API';
 
   @override
   String get typeSecureNote => 'Nota segura';
 
   @override
-  String get typeTotp => 'TOTP / 2FA';
+  String get typeTotp => 'Autenticador (2FA)';
 
   @override
   String get typePasskey => 'Respaldo de Passkey';
@@ -757,13 +757,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get pinDialogTitle => 'Ingresa PIN secundario';
 
   @override
-  String get pinDialogLabel => 'PIN de sobre cifrado';
+  String get pinDialogLabel => 'PIN secundario';
 
   @override
   String get totpTitle => 'Código de verificación (2FA)';
 
   @override
-  String get totpClipboardLabel => 'Código TOTP';
+  String get totpClipboardLabel => 'Código de verificación';
 
   @override
   String get totpInvalid => 'Inválido';
@@ -899,7 +899,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get autofillFeatureDetection =>
-      'Detección automática de formularios de login';
+      'Detecta solo los formularios de inicio de sesión';
 
   @override
   String get autofillFeatureBiometric =>
@@ -979,7 +979,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get auditBreachDesc =>
-      'Usa k-Anonymity (HaveIBeenPwned) para buscar contraseñas expuestas sin revelar tu contraseña real.';
+      'Revisa en HaveIBeenPwned si tus contraseñas aparecen en filtraciones, sin enviar nunca tu contraseña.';
 
   @override
   String get auditAllGoodTitle => '¡Todo en orden!';
@@ -1102,7 +1102,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Ingresa el PIN secundario para desactivar el cifrado doble';
 
   @override
-  String get formQrNotTotp => 'El código QR no es un TOTP válido.';
+  String get formQrNotTotp => 'El código QR no es de un autenticador.';
 
   @override
   String get formQrScanned => 'Código QR escaneado con éxito';
@@ -1114,7 +1114,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formQrReadError => 'Error al leer el código QR.';
 
   @override
-  String get formSshGenerated => 'Par de llaves Ed25519 generado';
+  String get formSshGenerated => 'Llaves SSH generadas (Ed25519)';
 
   @override
   String get formSshGenError => 'Error al generar la llave SSH.';
@@ -1208,7 +1208,8 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formHintApiKey => 'ej. OpenAI, Stripe, AWS';
 
   @override
-  String get formHintSecureNote => 'ej. Llaves del servidor, Seeds';
+  String get formHintSecureNote =>
+      'ej. Llaves del servidor, frase de recuperación';
 
   @override
   String get formHintTotp => 'ej. GitHub 2FA, Google';
@@ -1217,7 +1218,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formHintPasskey => 'ej. google.com Passkey';
 
   @override
-  String get formHintSshKey => 'ej. Servidor Produccion, GitHub SSH Key';
+  String get formHintSshKey => 'ej. Servidor de producción, GitHub';
 
   @override
   String get formSectionLogin => 'Credenciales de acceso';
@@ -1244,10 +1245,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formServiceNameHint => 'ej. OpenAI, Stripe, Supabase';
 
   @override
-  String get formApiKeyLabel => 'API Key / Token';
+  String get formApiKeyLabel => 'Clave de API';
 
   @override
-  String get formEndpointLabel => 'Endpoint URL';
+  String get formEndpointLabel => 'Dirección del servicio (URL)';
 
   @override
   String get formScopesLabel => 'Permisos / Scopes';
@@ -1257,7 +1258,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get formTotpDesc =>
-      'Ingresa la clave secreta TOTP (Base32) de tu cuenta. La encontrarás al activar 2FA en el sitio web, o puedes escanear el código QR directamente.';
+      'Escribe la clave secreta que te da el sitio al activar la verificación en dos pasos, o escanea su código QR.';
 
   @override
   String get formScanQr => 'Escanear código QR';
@@ -1273,7 +1274,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get formTotpNonStandard =>
-      'TOTP detectado, pero con parámetros no estándar (SoloKey genera SHA1, 6 dígitos, 30s); el código podría no coincidir.';
+      'Este autenticador usa una configuración poco común; el código que muestre SoloKey podría no coincidir.';
 
   @override
   String get formOrManually => 'o ingresa manualmente';
@@ -1285,24 +1286,24 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formAccountIssuerHint => 'ej. GitHub, Google, AWS';
 
   @override
-  String get formTotpSecretLabel => 'Clave secreta TOTP (Base32)';
+  String get formTotpSecretLabel => 'Clave secreta';
 
   @override
-  String get formSectionPasskey => 'Passkey (FIDO2)';
+  String get formSectionPasskey => 'Passkey';
 
   @override
   String get formPasskeyDesc =>
-      'Las Passkeys se registran directamente con la plataforma FIDO2 del dispositivo.';
+      'Las passkeys se crean en cada sitio web, desde tu celular o tu computadora.';
 
   @override
   String get formPasskeyHint =>
       'Usa la pantalla de Passkeys en Ajustes para registrar o gestionar tus passkeys.';
 
   @override
-  String get formSectionSsh => 'Configuracion de Llave SSH';
+  String get formSectionSsh => 'Llave SSH';
 
   @override
-  String get formGenerateSsh => 'Generar par de llaves Ed25519';
+  String get formGenerateSsh => 'Generar llaves SSH (Ed25519)';
 
   @override
   String get formPrivateKeyRequired => 'La llave privada es requerida';
@@ -1314,18 +1315,18 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formKeyPassphraseOptional => 'Passphrase de la Llave (Opcional)';
 
   @override
-  String get formSectionDoubleEnc => 'Cifrado de Sobre Doble';
+  String get formSectionDoubleEnc => 'Cifrado doble';
 
   @override
-  String get formEnableDoubleEnc => 'Activar Cifrado Doble';
+  String get formEnableDoubleEnc => 'Activar cifrado doble';
 
   @override
   String get formDoubleEncDesc =>
-      'Protege los secretos de este registro con un PIN secundario. Se cifraran adicionalmente.';
+      'Pide un PIN extra para ver los secretos de este registro.';
 
   @override
   String get formPinSecondaryEditLabel =>
-      'PIN Secundario (Dejar vacio para mantener actual o ingresar para cambiar)';
+      'PIN secundario (vacío para no cambiarlo)';
 
   @override
   String get formPinSecondaryLabel => 'PIN Secundario';
@@ -1334,11 +1335,11 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formPinSecondaryRequired => 'El PIN secundario es requerido';
 
   @override
-  String get formBiometricUnlock => 'Desbloqueo biometrico';
+  String get formBiometricUnlock => 'Desbloqueo con huella o rostro';
 
   @override
   String get formBiometricUnlockSub =>
-      'Guardar el PIN cifrado para desbloquear rapidamente con huella/rostro.';
+      'Guarda el PIN cifrado para abrirlo rápido con tu huella o tu rostro.';
 
   @override
   String get formSectionRotation => 'Recordatorio de Rotación';
@@ -1378,20 +1379,21 @@ class AppLocalizationsEs extends AppLocalizations {
   String get formDiscardLeave => 'Descartar';
 
   @override
-  String get formErrInvalidUrl => 'Ingresa una URL valida';
+  String get formErrInvalidUrl => 'Escribe una dirección web válida';
 
   @override
-  String get formErrInvalidTotp => 'Secreto Base32 invalido (solo A-Z y 2-7)';
+  String get formErrInvalidTotp =>
+      'Clave secreta no válida: solo letras de la A a la Z y números del 2 al 7';
 
   @override
-  String get formPasteTotp => 'Pegar enlace otpauth';
+  String get formPasteTotp => 'Pegar enlace del autenticador';
 
   @override
-  String get formPasteApplied => 'TOTP rellenado desde el portapapeles';
+  String get formPasteApplied => 'Autenticador rellenado desde el portapapeles';
 
   @override
   String get formPasteNoOtpauth =>
-      'No hay un enlace otpauth:// valido en el portapapeles';
+      'El portapapeles no tiene un enlace de autenticador (otpauth://)';
 
   @override
   String get formDupTitle => 'Posible duplicado';
@@ -1542,7 +1544,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get typeSelNote => 'Nota';
 
   @override
-  String get typeSelTotp => 'TOTP';
+  String get typeSelTotp => 'Autenticador';
 
   @override
   String get typeSelPasskey => 'Passkey';
@@ -1600,13 +1602,13 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transferTypePasswords => 'Contraseñas';
 
   @override
-  String get transferTypeApiKeys => 'API Keys';
+  String get transferTypeApiKeys => 'Claves de API';
 
   @override
   String get transferTypeSecureNotes => 'Notas seguras';
 
   @override
-  String get transferTypeTotp => 'Autenticadores (TOTP)';
+  String get transferTypeTotp => 'Autenticadores';
 
   @override
   String get transferTypePasskeys => 'Passkeys';
@@ -1657,17 +1659,17 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get transferExportPasswordInfo =>
-      'Crea una contraseña para proteger este backup. Necesitarás ingresarla al importar en cualquier dispositivo.';
+      'Crea una contraseña para proteger este respaldo. La necesitarás al importarlo en cualquier equipo.';
 
   @override
-  String get transferExportPasswordHint => 'Ej: \"mi-clave-backup-2025\"';
+  String get transferExportPasswordHint => 'Ej: \"mi-clave-de-respaldo\"';
 
   @override
   String get transferSelectWhatToExport => 'Selecciona qué exportar';
 
   @override
   String get transferEncryptionInfo =>
-      'El archivo se cifra con AES-256-GCM + Argon2id. Solo quién conozca la contraseña de exportación puede abrirlo.';
+      'El archivo va cifrado: solo quien conozca la contraseña de exportación puede abrirlo.';
 
   @override
   String get transferExportButton => 'Exportar bóveda';
@@ -1690,15 +1692,15 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
-  String get transferBackupPasswordLabel => 'Contraseña del backup';
+  String get transferBackupPasswordLabel => 'Contraseña del respaldo';
 
   @override
   String get transferImportPasswordInfo =>
-      'Ingresa la contraseña que usaste al exportar el backup. Si importas un backup tuyo del mismo dispositivo puedes dejar este campo vacío.';
+      'Escribe la contraseña que usaste al exportar. Si el respaldo es de este mismo equipo, puedes dejarla vacía.';
 
   @override
   String get transferImportPasswordHint =>
-      'Déjala vacía para backups del mismo dispositivo';
+      'Vacía si el respaldo es de este equipo';
 
   @override
   String get transferImportModeLabel => 'Modo de importación';
@@ -1721,18 +1723,19 @@ class AppLocalizationsEs extends AppLocalizations {
   String get transferSelectFile => 'Seleccionar archivo (.skvault)';
 
   @override
-  String get transferImportCsv => 'Importar desde CSV (Bitwarden/Chrome/1Pass)';
+  String get transferImportCsv =>
+      'Importar desde CSV (Bitwarden, Chrome, 1Password)';
 
   @override
-  String get transferImportOtpauth => 'Importar autenticadores (otpauth)';
+  String get transferImportOtpauth => 'Importar autenticadores';
 
   @override
   String get transferOtpauthNone =>
-      'No se encontraron enlaces otpauth:// en ese archivo';
+      'Ese archivo no tiene autenticadores (enlaces otpauth://)';
 
   @override
   String get transferOtpauthMigrationUnsupported =>
-      'Los QR de exportación de Google Authenticator no son compatibles. Exporta enlaces otpauth:// individuales.';
+      'Los QR de exportación de Google Authenticator no son compatibles. Exporta cada cuenta por separado.';
 
   @override
   String transferDuplicatesWarning(int count) {
@@ -1864,7 +1867,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get secureFilesEmptyDesc =>
-      'Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu clave maestra.';
+      'Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu contraseña maestra.';
 
   @override
   String get secureFilesAdd => 'Añadir archivo';
@@ -1955,7 +1958,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String secureFilesTooLarge(String name, String limit) {
-    return '\"$name\" supera el limite de $limit y se omitio';
+    return '\"$name\" supera el límite de $limit y se omitió';
   }
 
   @override
@@ -2086,7 +2089,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncComparing => 'Comparando datos locales con celular...';
 
   @override
-  String get syncBidirOk => '¡Sincronización bidireccional exitosa!';
+  String get syncBidirOk => '¡Listo! Los dos equipos quedaron sincronizados';
 
   @override
   String get syncErrorGeneric => 'Error durante la sincronización.';
@@ -2145,7 +2148,7 @@ class AppLocalizationsEs extends AppLocalizations {
       'Esta computadora está emparejada de forma segura. Puedes conectar varios dispositivos a la vez escaneando el mismo QR.';
 
   @override
-  String get syncServerE2eeActive => 'Servidor local E2EE Activo';
+  String get syncServerE2eeActive => 'Conexión cifrada activa';
 
   @override
   String get syncRemoveLink => 'Eliminar Vínculo';
@@ -2208,7 +2211,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncScanQrButton => 'Escanear Código QR';
 
   @override
-  String get syncNegotiating => 'Negociando claves de encriptación...';
+  String get syncNegotiating => 'Conectando de forma segura…';
 
   @override
   String get syncComputerLinkedExcl => '¡Computadora Vinculada!';
@@ -2224,7 +2227,7 @@ class AppLocalizationsEs extends AppLocalizations {
   String get syncCouldNotConnect => 'No se pudo conectar con la computadora.';
 
   @override
-  String get syncRetryButton => 'Volver a Intentar';
+  String get syncRetryButton => 'Volver a intentar';
 
   @override
   String get syncRemoteUnlockTitle => 'Desbloqueo Remoto';
@@ -2259,7 +2262,7 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get syncNotPairedYet =>
-      'Aun no has vinculado. Escanea el QR del escritorio.';
+      'Aún no has vinculado. Escanea el QR de la computadora.';
 
   @override
   String get syncConnectingComputer => 'Conectando con la computadora...';

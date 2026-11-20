@@ -222,7 +222,7 @@ void main() {
 
       // The selection sheet previews the decrypted backup.
       expect(find.text('Select what to import'), findsOneWidget);
-      expect(find.text('Authenticators (TOTP)'), findsOneWidget);
+      expect(find.text('Authenticators'), findsOneWidget);
 
       await tester.tap(find.text('Import selection'));
       await tester.pumpAndSettle();

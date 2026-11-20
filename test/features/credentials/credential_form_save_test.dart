@@ -289,7 +289,7 @@ void main() {
       await _enter(tester, 'Service name', 'stripe-prod');
       await tester.enterText(find.byType(SecureTextField), 'sk_live_123');
       await tester.pump();
-      await _enter(tester, 'Endpoint URL', 'https://api.stripe.com');
+      await _enter(tester, 'Service address (URL)', 'https://api.stripe.com');
       await _enter(tester, 'Permissions / Scopes', 'read,write');
 
       await _tapSave(tester);
@@ -308,7 +308,7 @@ void main() {
     testWidgets('totp: secret→password and issuer becomes a custom field',
         (tester) async {
       final repo = await pumpCreateForm(tester);
-      await _selectType(tester, 'TOTP');
+      await _selectType(tester, 'Authenticator');
 
       await tester.enterText(find.byType(TextFormField).first, 'Google');
       await tester.pump();
@@ -432,7 +432,7 @@ void main() {
       await tester.pump();
 
       final deSwitch = find.ancestor(
-        of: find.text('Enable double encryption'),
+        of: find.text('Turn on double encryption'),
         matching: find.byType(SwitchListTile),
       );
       await tester.ensureVisible(deSwitch);
@@ -442,7 +442,7 @@ void main() {
       await _enter(tester, 'Secondary PIN', '1234');
 
       final bioSwitch = find.ancestor(
-        of: find.text('Biometric unlock'),
+        of: find.text('Unlock with fingerprint or face'),
         matching: find.byType(SwitchListTile),
       );
       await tester.ensureVisible(bioSwitch);
@@ -467,7 +467,7 @@ void main() {
       await tester.pump();
 
       final deSwitch = find.ancestor(
-        of: find.text('Enable double encryption'),
+        of: find.text('Turn on double encryption'),
         matching: find.byType(SwitchListTile),
       );
       await tester.ensureVisible(deSwitch);
@@ -552,7 +552,7 @@ void main() {
       await tester.enterText(find.byType(TextFormField).first, 'gen-server');
       await tester.pump();
 
-      final genBtn = find.text('Generate Ed25519 key pair');
+      final genBtn = find.text('Generate SSH keys (Ed25519)');
       await tester.ensureVisible(genBtn);
       await tester.tap(genBtn);
       await tester.pump();

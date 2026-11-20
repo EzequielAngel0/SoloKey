@@ -100,4310 +100,4310 @@ abstract class AppLocalizations {
 
   /// No description provided for @commonCancel.
   ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
+  /// In es, this message translates to:
+  /// **'Cancelar'**
   String get commonCancel;
 
   /// No description provided for @commonSave.
   ///
-  /// In en, this message translates to:
-  /// **'Save'**
+  /// In es, this message translates to:
+  /// **'Guardar'**
   String get commonSave;
 
   /// No description provided for @commonClose.
   ///
-  /// In en, this message translates to:
-  /// **'Close'**
+  /// In es, this message translates to:
+  /// **'Cerrar'**
   String get commonClose;
 
   /// No description provided for @commonDelete.
   ///
-  /// In en, this message translates to:
-  /// **'Delete'**
+  /// In es, this message translates to:
+  /// **'Eliminar'**
   String get commonDelete;
 
   /// No description provided for @commonRetry.
   ///
-  /// In en, this message translates to:
-  /// **'Retry'**
+  /// In es, this message translates to:
+  /// **'Reintentar'**
   String get commonRetry;
 
   /// No description provided for @commonClear.
   ///
-  /// In en, this message translates to:
-  /// **'Clear'**
+  /// In es, this message translates to:
+  /// **'Limpiar'**
   String get commonClear;
 
   /// No description provided for @commonExpand.
   ///
-  /// In en, this message translates to:
-  /// **'Expand'**
+  /// In es, this message translates to:
+  /// **'Expandir'**
   String get commonExpand;
 
   /// No description provided for @commonCollapse.
   ///
-  /// In en, this message translates to:
-  /// **'Collapse'**
+  /// In es, this message translates to:
+  /// **'Contraer'**
   String get commonCollapse;
 
   /// No description provided for @commonShowPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Show password'**
+  /// In es, this message translates to:
+  /// **'Mostrar contraseña'**
   String get commonShowPassword;
 
   /// No description provided for @commonHidePassword.
   ///
-  /// In en, this message translates to:
-  /// **'Hide password'**
+  /// In es, this message translates to:
+  /// **'Ocultar contraseña'**
   String get commonHidePassword;
 
   /// No description provided for @formDeleteField.
   ///
-  /// In en, this message translates to:
-  /// **'Delete field'**
+  /// In es, this message translates to:
+  /// **'Eliminar campo'**
   String get formDeleteField;
 
   /// No description provided for @unlockSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Enter your master password'**
+  /// In es, this message translates to:
+  /// **'Introduce tu contraseña maestra'**
   String get unlockSubtitle;
 
   /// No description provided for @unlockMasterPasswordHint.
   ///
-  /// In en, this message translates to:
-  /// **'Master password'**
+  /// In es, this message translates to:
+  /// **'Contraseña maestra'**
   String get unlockMasterPasswordHint;
 
   /// No description provided for @unlockButton.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock'**
+  /// In es, this message translates to:
+  /// **'Desbloquear'**
   String get unlockButton;
 
   /// No description provided for @unlockLockedFor.
   ///
-  /// In en, this message translates to:
-  /// **'Locked ({time})'**
+  /// In es, this message translates to:
+  /// **'Bloqueado ({time})'**
   String unlockLockedFor(String time);
 
   /// No description provided for @unlockUseBiometrics.
   ///
-  /// In en, this message translates to:
-  /// **'Use biometrics'**
+  /// In es, this message translates to:
+  /// **'Usar biometría'**
   String get unlockUseBiometrics;
 
   /// No description provided for @unlockWifiAvailable.
   ///
-  /// In en, this message translates to:
-  /// **'WiFi unlock available'**
+  /// In es, this message translates to:
+  /// **'Puedes desbloquear desde tu celular'**
   String get unlockWifiAvailable;
 
   /// No description provided for @unlockForgotPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Forgot your master password?'**
+  /// In es, this message translates to:
+  /// **'¿Olvidaste tu contraseña maestra?'**
   String get unlockForgotPassword;
 
   /// No description provided for @unlockFromMobile.
   ///
-  /// In en, this message translates to:
-  /// **'Unlocking from mobile device…'**
+  /// In es, this message translates to:
+  /// **'Desbloqueando desde dispositivo móvil…'**
   String get unlockFromMobile;
 
   /// No description provided for @unlockTooManyAttempts.
   ///
-  /// In en, this message translates to:
-  /// **'Too many attempts. Retry in {time}.'**
+  /// In es, this message translates to:
+  /// **'Demasiados intentos. Reintenta en {time}.'**
   String unlockTooManyAttempts(String time);
 
   /// No description provided for @unlockTapToEnter.
   ///
-  /// In en, this message translates to:
-  /// **'Tap to enter your password'**
+  /// In es, this message translates to:
+  /// **'Toca para ingresar tu contraseña'**
   String get unlockTapToEnter;
 
   /// No description provided for @unlockRemoteFailed.
   ///
-  /// In en, this message translates to:
-  /// **'Remote unlock failed: {msg}'**
+  /// In es, this message translates to:
+  /// **'Desbloqueo remoto fallido: {msg}'**
   String unlockRemoteFailed(String msg);
 
   /// No description provided for @unlockRemoteError.
   ///
-  /// In en, this message translates to:
-  /// **'Remote unlock error'**
+  /// In es, this message translates to:
+  /// **'Error en desbloqueo remoto'**
   String get unlockRemoteError;
 
   /// No description provided for @unlockBiometricReason.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock your vault'**
+  /// In es, this message translates to:
+  /// **'Desbloquea tu bóveda'**
   String get unlockBiometricReason;
 
   /// No description provided for @unlockWrongPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Incorrect master password'**
+  /// In es, this message translates to:
+  /// **'Contraseña maestra incorrecta'**
   String get unlockWrongPassword;
 
   /// No description provided for @unlockWrongPasswordLocked.
   ///
-  /// In en, this message translates to:
-  /// **'Incorrect password. Locked for {time}.'**
+  /// In es, this message translates to:
+  /// **'Contraseña incorrecta. Bloqueado {time}.'**
   String unlockWrongPasswordLocked(String time);
 
   /// No description provided for @unlockVaultWiped.
   ///
-  /// In en, this message translates to:
-  /// **'Vault wiped after too many failed attempts.'**
+  /// In es, this message translates to:
+  /// **'Bóveda borrada por demasiados intentos fallidos.'**
   String get unlockVaultWiped;
 
   /// No description provided for @unlockBiometricFailed.
   ///
-  /// In en, this message translates to:
-  /// **'Biometric authentication failed or not configured.'**
+  /// In es, this message translates to:
+  /// **'Autenticación biométrica fallida o no configurada.'**
   String get unlockBiometricFailed;
 
   /// No description provided for @unlockGenericError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not unlock the vault.'**
+  /// In es, this message translates to:
+  /// **'No se pudo desbloquear la bóveda.'**
   String get unlockGenericError;
 
   /// No description provided for @unlockWithWindowsHello.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock with Windows Hello'**
+  /// In es, this message translates to:
+  /// **'Desbloquear con Windows Hello'**
   String get unlockWithWindowsHello;
 
   /// No description provided for @unlockWithBiometrics.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock with biometrics'**
+  /// In es, this message translates to:
+  /// **'Desbloquear con biometría'**
   String get unlockWithBiometrics;
 
   /// No description provided for @unlockOrUseMasterPassword.
   ///
-  /// In en, this message translates to:
-  /// **'or use your master password'**
+  /// In es, this message translates to:
+  /// **'o usa tu contraseña maestra'**
   String get unlockOrUseMasterPassword;
 
   /// No description provided for @unlockAttemptsBeforeLockout.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, one{1 attempt left before a temporary lock} other{{count} attempts left before a temporary lock}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, one{Queda 1 intento antes del bloqueo temporal} other{Quedan {count} intentos antes del bloqueo temporal}}'**
   String unlockAttemptsBeforeLockout(int count);
 
   /// No description provided for @unlockAttemptsBeforeWipe.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, one{1 attempt left before the vault is wiped} other{{count} attempts left before the vault is wiped}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, one{Queda 1 intento antes de borrar la bóveda} other{Quedan {count} intentos antes de borrar la bóveda}}'**
   String unlockAttemptsBeforeWipe(int count);
 
   /// No description provided for @settingsSectionAppearance.
   ///
-  /// In en, this message translates to:
-  /// **'Appearance'**
+  /// In es, this message translates to:
+  /// **'Apariencia'**
   String get settingsSectionAppearance;
 
   /// No description provided for @settingsSectionLanguage.
   ///
-  /// In en, this message translates to:
-  /// **'Language'**
+  /// In es, this message translates to:
+  /// **'Idioma'**
   String get settingsSectionLanguage;
 
   /// No description provided for @settingsSectionAutoLock.
   ///
-  /// In en, this message translates to:
-  /// **'Auto-lock'**
+  /// In es, this message translates to:
+  /// **'Bloqueo automático'**
   String get settingsSectionAutoLock;
 
   /// No description provided for @settingsSectionClipboard.
   ///
-  /// In en, this message translates to:
-  /// **'Clipboard'**
+  /// In es, this message translates to:
+  /// **'Portapapeles'**
   String get settingsSectionClipboard;
 
   /// No description provided for @settingsSectionPrivacy.
   ///
-  /// In en, this message translates to:
-  /// **'Privacy'**
+  /// In es, this message translates to:
+  /// **'Privacidad'**
   String get settingsSectionPrivacy;
 
   /// No description provided for @settingsSectionQuickFill.
   ///
-  /// In en, this message translates to:
-  /// **'Quick-Fill'**
+  /// In es, this message translates to:
+  /// **'Autocompletado rápido'**
   String get settingsSectionQuickFill;
 
   /// No description provided for @settingsAutoLockLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Lock on inactivity'**
+  /// In es, this message translates to:
+  /// **'Bloqueo por inactividad'**
   String get settingsAutoLockLabel;
 
   /// No description provided for @settingsAutoLockValue.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'{minutes} min'**
   String settingsAutoLockValue(int minutes);
 
   /// No description provided for @settingsClearClipboardLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Clear clipboard'**
+  /// In es, this message translates to:
+  /// **'Limpiar portapapeles'**
   String get settingsClearClipboardLabel;
 
   /// No description provided for @settingsClearClipboardValue.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'{seconds}s'**
   String settingsClearClipboardValue(int seconds);
 
   /// No description provided for @settingsBiometricLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Biometric unlock'**
+  /// In es, this message translates to:
+  /// **'Desbloqueo biométrico'**
   String get settingsBiometricLabel;
 
   /// No description provided for @settingsBiometricSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Use fingerprint or face'**
+  /// In es, this message translates to:
+  /// **'Usa huella dactilar o rostro'**
   String get settingsBiometricSubtitle;
 
   /// No description provided for @settingsObscureLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Hide in background'**
+  /// In es, this message translates to:
+  /// **'Ocultar en segundo plano'**
   String get settingsObscureLabel;
 
   /// No description provided for @settingsObscureSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Apply a privacy screen when switching apps'**
+  /// In es, this message translates to:
+  /// **'Aplica pantalla de privacidad al cambiar de app'**
   String get settingsObscureSubtitle;
 
   /// No description provided for @settingsAutostartLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Start with the system'**
+  /// In es, this message translates to:
+  /// **'Iniciar con el sistema'**
   String get settingsAutostartLabel;
 
   /// No description provided for @settingsAutostartSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Starts minimised in the tray when the device boots'**
+  /// In es, this message translates to:
+  /// **'Arranca minimizado en la bandeja al encender el equipo'**
   String get settingsAutostartSubtitle;
 
   /// No description provided for @settingsQuickFillDescription.
   ///
-  /// In en, this message translates to:
-  /// **'Press the shortcut from any app to open SoloKey and copy the username/password to the clipboard (it clears itself).'**
+  /// In es, this message translates to:
+  /// **'Pulsa el atajo desde cualquier app para abrir SoloKey y copiar usuario/contraseña al portapapeles (se limpia solo).'**
   String get settingsQuickFillDescription;
 
   /// No description provided for @settingsQuickFillTryNow.
   ///
-  /// In en, this message translates to:
-  /// **'Try now'**
+  /// In es, this message translates to:
+  /// **'Probar ahora'**
   String get settingsQuickFillTryNow;
 
   /// No description provided for @commonDisabled.
   ///
-  /// In en, this message translates to:
-  /// **'Disabled'**
+  /// In es, this message translates to:
+  /// **'Desactivado'**
   String get commonDisabled;
 
   /// No description provided for @settingsSectionSecurity.
   ///
-  /// In en, this message translates to:
-  /// **'Security'**
+  /// In es, this message translates to:
+  /// **'Seguridad'**
   String get settingsSectionSecurity;
 
   /// No description provided for @settingsSectionData.
   ///
-  /// In en, this message translates to:
-  /// **'Data'**
+  /// In es, this message translates to:
+  /// **'Datos'**
   String get settingsSectionData;
 
   /// No description provided for @settingsSectionAbout.
   ///
-  /// In en, this message translates to:
-  /// **'About'**
+  /// In es, this message translates to:
+  /// **'Acerca de'**
   String get settingsSectionAbout;
 
   /// No description provided for @settingsSectionDanger.
   ///
-  /// In en, this message translates to:
-  /// **'Danger zone'**
+  /// In es, this message translates to:
+  /// **'Zona peligrosa'**
   String get settingsSectionDanger;
 
   /// No description provided for @settingsThemeTitle.
   ///
-  /// In en, this message translates to:
-  /// **'App theme'**
+  /// In es, this message translates to:
+  /// **'Tema de la aplicación'**
   String get settingsThemeTitle;
 
   /// No description provided for @settingsDensityTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Density'**
+  /// In es, this message translates to:
+  /// **'Densidad'**
   String get settingsDensityTitle;
 
   /// No description provided for @densityComfortable.
   ///
-  /// In en, this message translates to:
-  /// **'Comfortable'**
+  /// In es, this message translates to:
+  /// **'Cómoda'**
   String get densityComfortable;
 
   /// No description provided for @densityCompact.
   ///
-  /// In en, this message translates to:
-  /// **'Compact'**
+  /// In es, this message translates to:
+  /// **'Compacta'**
   String get densityCompact;
 
   /// No description provided for @themeSystem.
   ///
-  /// In en, this message translates to:
-  /// **'System'**
+  /// In es, this message translates to:
+  /// **'Sistema'**
   String get themeSystem;
 
   /// No description provided for @themeLight.
   ///
-  /// In en, this message translates to:
-  /// **'Light'**
+  /// In es, this message translates to:
+  /// **'Claro'**
   String get themeLight;
 
   /// No description provided for @themeDark.
   ///
-  /// In en, this message translates to:
-  /// **'Dark'**
+  /// In es, this message translates to:
+  /// **'Oscuro'**
   String get themeDark;
 
   /// No description provided for @themeDim.
   ///
-  /// In en, this message translates to:
-  /// **'Dim'**
+  /// In es, this message translates to:
+  /// **'Tenue'**
   String get themeDim;
 
   /// No description provided for @themeOled.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'OLED'**
   String get themeOled;
 
   /// No description provided for @settingsWipeTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Wipe vault after failed attempts'**
+  /// In es, this message translates to:
+  /// **'Borrar bóveda tras intentos fallidos'**
   String get settingsWipeTitle;
 
   /// No description provided for @settingsWipeSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Anti brute-force protection (irreversible)'**
+  /// In es, this message translates to:
+  /// **'Si alguien prueba muchas contraseñas, se borra todo (no se deshace)'**
   String get settingsWipeSubtitle;
 
   /// No description provided for @settingsSyncComputerTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Sync computer'**
+  /// In es, this message translates to:
+  /// **'Sincronizar computadora'**
   String get settingsSyncComputerTitle;
 
   /// No description provided for @settingsSyncComputerSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Pair with desktop SoloKey'**
+  /// In es, this message translates to:
+  /// **'Vincula con SoloKey de escritorio'**
   String get settingsSyncComputerSubtitle;
 
   /// No description provided for @settingsExportImportTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Export / Import'**
+  /// In es, this message translates to:
+  /// **'Exportar / Importar'**
   String get settingsExportImportTitle;
 
   /// No description provided for @settingsExportImportSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Make encrypted backups of your vault'**
+  /// In es, this message translates to:
+  /// **'Haz copias de respaldo cifradas de tu bóveda'**
   String get settingsExportImportSubtitle;
 
   /// No description provided for @settingsAutofillTitle.
   ///
-  /// In en, this message translates to:
-  /// **'System autofill'**
+  /// In es, this message translates to:
+  /// **'Autocompletado del sistema'**
   String get settingsAutofillTitle;
 
   /// No description provided for @settingsAutofillSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Fill passwords in other apps'**
+  /// In es, this message translates to:
+  /// **'Completa contraseñas en otras apps'**
   String get settingsAutofillSubtitle;
 
   /// No description provided for @settingsPasskeysTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Passkey backup'**
+  /// In es, this message translates to:
+  /// **'Respaldo de Passkeys'**
   String get settingsPasskeysTitle;
 
   /// No description provided for @settingsPasskeysSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Store your passkey backups'**
+  /// In es, this message translates to:
+  /// **'Guarda tus respaldos de passkey'**
   String get settingsPasskeysSubtitle;
 
   /// No description provided for @settingsBackupTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Automatic backup'**
+  /// In es, this message translates to:
+  /// **'Respaldo automático'**
   String get settingsBackupTitle;
 
   /// No description provided for @settingsBackupDaily.
   ///
-  /// In en, this message translates to:
-  /// **'Daily'**
+  /// In es, this message translates to:
+  /// **'Diario'**
   String get settingsBackupDaily;
 
   /// No description provided for @settingsBackupWeekly.
   ///
-  /// In en, this message translates to:
-  /// **'Weekly'**
+  /// In es, this message translates to:
+  /// **'Semanal'**
   String get settingsBackupWeekly;
 
   /// No description provided for @settingsBackupMonthly.
   ///
-  /// In en, this message translates to:
-  /// **'Monthly'**
+  /// In es, this message translates to:
+  /// **'Mensual'**
   String get settingsBackupMonthly;
 
   /// No description provided for @settingsBackupEveryNDays.
   ///
-  /// In en, this message translates to:
-  /// **'Every {days} days'**
+  /// In es, this message translates to:
+  /// **'Cada {days} días'**
   String settingsBackupEveryNDays(int days);
 
   /// No description provided for @settingsBackupNoFolder.
   ///
-  /// In en, this message translates to:
-  /// **'no folder'**
+  /// In es, this message translates to:
+  /// **'sin carpeta'**
   String get settingsBackupNoFolder;
 
   /// No description provided for @settingsBackupFrequency.
   ///
-  /// In en, this message translates to:
-  /// **'Frequency'**
+  /// In es, this message translates to:
+  /// **'Frecuencia'**
   String get settingsBackupFrequency;
 
   /// No description provided for @settingsBackupChooseFolder.
   ///
-  /// In en, this message translates to:
-  /// **'Choose destination folder'**
+  /// In es, this message translates to:
+  /// **'Elegir carpeta destino'**
   String get settingsBackupChooseFolder;
 
   /// No description provided for @settingsBackupPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Backup password'**
+  /// In es, this message translates to:
+  /// **'Contraseña del respaldo'**
   String get settingsBackupPassword;
 
   /// No description provided for @settingsBackupPasswordKeep.
   ///
-  /// In en, this message translates to:
-  /// **'Backup password (leave empty = keep)'**
+  /// In es, this message translates to:
+  /// **'Contraseña del respaldo (vacía para no cambiarla)'**
   String get settingsBackupPasswordKeep;
 
   /// No description provided for @settingsLockNowTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Lock now'**
+  /// In es, this message translates to:
+  /// **'Bloquear ahora'**
   String get settingsLockNowTitle;
 
   /// No description provided for @settingsLockNowSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Close the session immediately'**
+  /// In es, this message translates to:
+  /// **'Cierra la sesión inmediatamente'**
   String get settingsLockNowSubtitle;
 
   /// No description provided for @settingsVersionLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Version'**
+  /// In es, this message translates to:
+  /// **'Versión'**
   String get settingsVersionLabel;
 
   /// No description provided for @settingsAboutTagline.
   ///
-  /// In en, this message translates to:
-  /// **'Local-first password manager'**
+  /// In es, this message translates to:
+  /// **'Gestor de contraseñas local-first'**
   String get settingsAboutTagline;
 
   /// No description provided for @settingsSectionShortcuts.
   ///
-  /// In en, this message translates to:
-  /// **'Keyboard shortcuts'**
+  /// In es, this message translates to:
+  /// **'Atajos de teclado'**
   String get settingsSectionShortcuts;
 
   /// No description provided for @shortcutCommandPalette.
   ///
-  /// In en, this message translates to:
-  /// **'Command palette'**
+  /// In es, this message translates to:
+  /// **'Paleta de comandos'**
   String get shortcutCommandPalette;
 
   /// No description provided for @shortcutNewCredential.
   ///
-  /// In en, this message translates to:
-  /// **'New credential'**
+  /// In es, this message translates to:
+  /// **'Nueva credencial'**
   String get shortcutNewCredential;
 
   /// No description provided for @shortcutEditCredential.
   ///
-  /// In en, this message translates to:
-  /// **'Edit selected'**
+  /// In es, this message translates to:
+  /// **'Editar seleccionada'**
   String get shortcutEditCredential;
 
   /// No description provided for @shortcutLock.
   ///
-  /// In en, this message translates to:
-  /// **'Lock vault'**
+  /// In es, this message translates to:
+  /// **'Bloquear bóveda'**
   String get shortcutLock;
 
   /// No description provided for @shortcutReset.
   ///
-  /// In en, this message translates to:
-  /// **'Reset to defaults'**
+  /// In es, this message translates to:
+  /// **'Restablecer atajos'**
   String get shortcutReset;
 
   /// No description provided for @shortcutEditTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Set shortcut'**
+  /// In es, this message translates to:
+  /// **'Asignar atajo'**
   String get shortcutEditTitle;
 
   /// No description provided for @shortcutCapturePrompt.
   ///
-  /// In en, this message translates to:
-  /// **'Press the key combination…'**
+  /// In es, this message translates to:
+  /// **'Pulsa la combinación de teclas…'**
   String get shortcutCapturePrompt;
 
   /// No description provided for @shortcutNeedsModifier.
   ///
-  /// In en, this message translates to:
-  /// **'Add a modifier (Ctrl, Alt or Shift)'**
+  /// In es, this message translates to:
+  /// **'Añade un modificador (Ctrl, Alt o Shift)'**
   String get shortcutNeedsModifier;
 
   /// No description provided for @shortcutConflict.
   ///
-  /// In en, this message translates to:
-  /// **'That combination is already used by another shortcut'**
+  /// In es, this message translates to:
+  /// **'Esa combinación ya la usa otro atajo'**
   String get shortcutConflict;
 
   /// No description provided for @languageSystem.
   ///
-  /// In en, this message translates to:
-  /// **'Follow system'**
+  /// In es, this message translates to:
+  /// **'Seguir el sistema'**
   String get languageSystem;
 
   /// No description provided for @languageSpanish.
   ///
-  /// In en, this message translates to:
-  /// **'Spanish'**
+  /// In es, this message translates to:
+  /// **'Español'**
   String get languageSpanish;
 
   /// No description provided for @languageEnglish.
   ///
-  /// In en, this message translates to:
-  /// **'English'**
+  /// In es, this message translates to:
+  /// **'Inglés'**
   String get languageEnglish;
 
   /// No description provided for @splashTagline.
   ///
-  /// In en, this message translates to:
-  /// **'Your secure vault'**
+  /// In es, this message translates to:
+  /// **'Tu bóveda segura'**
   String get splashTagline;
 
   /// No description provided for @setupTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Create master\npassword'**
+  /// In es, this message translates to:
+  /// **'Crear contraseña\nmaestra'**
   String get setupTitle;
 
   /// No description provided for @setupSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'This password protects your entire vault. It cannot be recovered if you forget it.'**
+  /// In es, this message translates to:
+  /// **'Esta contraseña protege toda tu bóveda. No se puede recuperar si la olvidas.'**
   String get setupSubtitle;
 
   /// No description provided for @setupMinChars.
   ///
-  /// In en, this message translates to:
-  /// **'At least 12 characters'**
+  /// In es, this message translates to:
+  /// **'Mínimo 12 caracteres'**
   String get setupMinChars;
 
   /// No description provided for @setupConfirmLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Confirm password'**
+  /// In es, this message translates to:
+  /// **'Confirmar contraseña'**
   String get setupConfirmLabel;
 
   /// No description provided for @setupPasswordsMismatch.
   ///
-  /// In en, this message translates to:
-  /// **'Passwords do not match'**
+  /// In es, this message translates to:
+  /// **'Las contraseñas no coinciden'**
   String get setupPasswordsMismatch;
 
   /// No description provided for @setupCreateButton.
   ///
-  /// In en, this message translates to:
-  /// **'Create vault'**
+  /// In es, this message translates to:
+  /// **'Crear bóveda'**
   String get setupCreateButton;
 
   /// No description provided for @setupNeedUppercase.
   ///
-  /// In en, this message translates to:
-  /// **'Include at least one uppercase letter'**
+  /// In es, this message translates to:
+  /// **'Incluye al menos una mayúscula'**
   String get setupNeedUppercase;
 
   /// No description provided for @setupNeedNumber.
   ///
-  /// In en, this message translates to:
-  /// **'Include at least one number'**
+  /// In es, this message translates to:
+  /// **'Incluye al menos un número'**
   String get setupNeedNumber;
 
   /// No description provided for @setupNeedSymbol.
   ///
-  /// In en, this message translates to:
-  /// **'Include at least one symbol'**
+  /// In es, this message translates to:
+  /// **'Incluye al menos un símbolo'**
   String get setupNeedSymbol;
 
   /// No description provided for @setupReqChars.
   ///
-  /// In en, this message translates to:
-  /// **'12+ characters'**
+  /// In es, this message translates to:
+  /// **'12+ caracteres'**
   String get setupReqChars;
 
   /// No description provided for @setupReqUppercase.
   ///
-  /// In en, this message translates to:
-  /// **'Uppercase'**
+  /// In es, this message translates to:
+  /// **'Mayúscula'**
   String get setupReqUppercase;
 
   /// No description provided for @setupReqNumber.
   ///
-  /// In en, this message translates to:
-  /// **'Number'**
+  /// In es, this message translates to:
+  /// **'Número'**
   String get setupReqNumber;
 
   /// No description provided for @setupReqSymbol.
   ///
-  /// In en, this message translates to:
-  /// **'Symbol'**
+  /// In es, this message translates to:
+  /// **'Símbolo'**
   String get setupReqSymbol;
 
   /// No description provided for @commonCreate.
   ///
-  /// In en, this message translates to:
-  /// **'Create'**
+  /// In es, this message translates to:
+  /// **'Crear'**
   String get commonCreate;
 
   /// No description provided for @navAudit.
   ///
-  /// In en, this message translates to:
-  /// **'Audit'**
+  /// In es, this message translates to:
+  /// **'Auditoría'**
   String get navAudit;
 
   /// No description provided for @navSettings.
   ///
-  /// In en, this message translates to:
-  /// **'Settings'**
+  /// In es, this message translates to:
+  /// **'Ajustes'**
   String get navSettings;
 
   /// No description provided for @navCredentials.
   ///
-  /// In en, this message translates to:
-  /// **'Credentials'**
+  /// In es, this message translates to:
+  /// **'Credenciales'**
   String get navCredentials;
 
   /// No description provided for @navFolders.
   ///
-  /// In en, this message translates to:
-  /// **'Folders'**
+  /// In es, this message translates to:
+  /// **'Carpetas'**
   String get navFolders;
 
   /// No description provided for @navFavorites.
   ///
-  /// In en, this message translates to:
-  /// **'Favourites'**
+  /// In es, this message translates to:
+  /// **'Favoritas'**
   String get navFavorites;
 
   /// No description provided for @navVault.
   ///
-  /// In en, this message translates to:
-  /// **'Vault'**
+  /// In es, this message translates to:
+  /// **'Bóveda'**
   String get navVault;
 
   /// No description provided for @navSecurity.
   ///
-  /// In en, this message translates to:
-  /// **'Security'**
+  /// In es, this message translates to:
+  /// **'Seguridad'**
   String get navSecurity;
 
   /// No description provided for @filterAll.
   ///
-  /// In en, this message translates to:
-  /// **'All'**
+  /// In es, this message translates to:
+  /// **'Todos'**
   String get filterAll;
 
   /// No description provided for @filterPasswords.
   ///
-  /// In en, this message translates to:
-  /// **'Passwords'**
+  /// In es, this message translates to:
+  /// **'Contraseñas'**
   String get filterPasswords;
 
   /// No description provided for @securityHubSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Tools to keep your vault healthy'**
+  /// In es, this message translates to:
+  /// **'Herramientas para mantener tu bóveda sana'**
   String get securityHubSubtitle;
 
   /// No description provided for @securityHubAuditDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Weak, reused and breached passwords'**
+  /// In es, this message translates to:
+  /// **'Contraseñas débiles, repetidas y filtradas'**
   String get securityHubAuditDesc;
 
   /// No description provided for @securityHubGenerator.
   ///
-  /// In en, this message translates to:
-  /// **'Password generator'**
+  /// In es, this message translates to:
+  /// **'Generador de contraseñas'**
   String get securityHubGenerator;
 
   /// No description provided for @securityHubGeneratorDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Create strong, unique passwords'**
+  /// In es, this message translates to:
+  /// **'Crea contraseñas fuertes y únicas'**
   String get securityHubGeneratorDesc;
 
   /// No description provided for @securityHubTransferDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Export or import your vault'**
+  /// In es, this message translates to:
+  /// **'Exporta o importa tu bóveda'**
   String get securityHubTransferDesc;
 
   /// No description provided for @securityHubSecureFilesDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Encrypted documents and images'**
+  /// In es, this message translates to:
+  /// **'Documentos e imágenes cifradas'**
   String get securityHubSecureFilesDesc;
 
   /// No description provided for @securityHubPasskeysDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Manage your encrypted passkey backups'**
+  /// In es, this message translates to:
+  /// **'Gestiona tus respaldos de passkey cifrados'**
   String get securityHubPasskeysDesc;
 
   /// No description provided for @securityHubSyncDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Pair this device over your network'**
+  /// In es, this message translates to:
+  /// **'Vincula este dispositivo en tu red'**
   String get securityHubSyncDesc;
 
   /// No description provided for @securityHubRecoveryDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Reset your master password'**
+  /// In es, this message translates to:
+  /// **'Restablece tu contraseña maestra'**
   String get securityHubRecoveryDesc;
 
   /// No description provided for @generatorSheetTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Generate password'**
+  /// In es, this message translates to:
+  /// **'Generar contraseña'**
   String get generatorSheetTitle;
 
   /// No description provided for @commandNoResults.
   ///
-  /// In en, this message translates to:
-  /// **'No results'**
+  /// In es, this message translates to:
+  /// **'Sin resultados'**
   String get commandNoResults;
 
   /// No description provided for @commandActionsGroup.
   ///
-  /// In en, this message translates to:
-  /// **'Actions'**
+  /// In es, this message translates to:
+  /// **'Acciones'**
   String get commandActionsGroup;
 
   /// No description provided for @commandCredentialsGroup.
   ///
-  /// In en, this message translates to:
-  /// **'Credentials'**
+  /// In es, this message translates to:
+  /// **'Credenciales'**
   String get commandCredentialsGroup;
 
   /// No description provided for @commandHintNavigate.
   ///
-  /// In en, this message translates to:
-  /// **'Navigate'**
+  /// In es, this message translates to:
+  /// **'Navegar'**
   String get commandHintNavigate;
 
   /// No description provided for @commandHintSelect.
   ///
-  /// In en, this message translates to:
-  /// **'Open'**
+  /// In es, this message translates to:
+  /// **'Abrir'**
   String get commandHintSelect;
 
   /// No description provided for @commandHintClose.
   ///
-  /// In en, this message translates to:
-  /// **'Close'**
+  /// In es, this message translates to:
+  /// **'Cerrar'**
   String get commandHintClose;
 
   /// No description provided for @detailAdvanced.
   ///
-  /// In en, this message translates to:
-  /// **'Advanced'**
+  /// In es, this message translates to:
+  /// **'Avanzado'**
   String get detailAdvanced;
 
   /// No description provided for @detailTotpSecret.
   ///
-  /// In en, this message translates to:
-  /// **'Secret (seed)'**
+  /// In es, this message translates to:
+  /// **'Clave secreta'**
   String get detailTotpSecret;
 
   /// No description provided for @detailCopyCode.
   ///
-  /// In en, this message translates to:
-  /// **'Copy code'**
+  /// In es, this message translates to:
+  /// **'Copiar código'**
   String get detailCopyCode;
 
   /// No description provided for @healthReused.
   ///
-  /// In en, this message translates to:
-  /// **'Reused'**
+  /// In es, this message translates to:
+  /// **'Repetida'**
   String get healthReused;
 
   /// No description provided for @auditScoreTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Vault health'**
+  /// In es, this message translates to:
+  /// **'Salud de la bóveda'**
   String get auditScoreTitle;
 
   /// No description provided for @auditScoreIssues.
   ///
-  /// In en, this message translates to:
-  /// **'{count} issues to review'**
+  /// In es, this message translates to:
+  /// **'{count} problemas por revisar'**
   String auditScoreIssues(int count);
 
   /// No description provided for @homeSearchHint.
   ///
-  /// In en, this message translates to:
-  /// **'Search credentials…'**
+  /// In es, this message translates to:
+  /// **'Buscar credenciales…'**
   String get homeSearchHint;
 
   /// No description provided for @homeLockTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Lock'**
+  /// In es, this message translates to:
+  /// **'Bloquear'**
   String get homeLockTooltip;
 
   /// No description provided for @homeFabNew.
   ///
-  /// In en, this message translates to:
-  /// **'New'**
+  /// In es, this message translates to:
+  /// **'Nueva'**
   String get homeFabNew;
 
   /// No description provided for @homeFabFolder.
   ///
-  /// In en, this message translates to:
-  /// **'Folder'**
+  /// In es, this message translates to:
+  /// **'Carpeta'**
   String get homeFabFolder;
 
   /// No description provided for @homeLoadError.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Error: {msg}'**
   String homeLoadError(String msg);
 
   /// No description provided for @homeEmptyVault.
   ///
-  /// In en, this message translates to:
-  /// **'Your vault is empty'**
+  /// In es, this message translates to:
+  /// **'Tu bóveda está vacía'**
   String get homeEmptyVault;
 
   /// No description provided for @homeCredentialCount.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{No credentials} =1{1 credential} other{{count} credentials}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Sin credenciales} =1{1 credencial} other{{count} credenciales}}'**
   String homeCredentialCount(int count);
 
   /// No description provided for @homeIssuesChip.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 issue} other{{count} issues}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 aviso} other{{count} avisos}}'**
   String homeIssuesChip(int count);
 
   /// No description provided for @homeGreetingMorning.
   ///
-  /// In en, this message translates to:
-  /// **'Good morning'**
+  /// In es, this message translates to:
+  /// **'Buenos dias'**
   String get homeGreetingMorning;
 
   /// No description provided for @homeGreetingAfternoon.
   ///
-  /// In en, this message translates to:
-  /// **'Good afternoon'**
+  /// In es, this message translates to:
+  /// **'Buenas tardes'**
   String get homeGreetingAfternoon;
 
   /// No description provided for @homeGreetingEvening.
   ///
-  /// In en, this message translates to:
-  /// **'Good evening'**
+  /// In es, this message translates to:
+  /// **'Buenas noches'**
   String get homeGreetingEvening;
 
   /// No description provided for @homeHealthTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Vault health — tap for details'**
+  /// In es, this message translates to:
+  /// **'Salud de la bóveda: toca para ver detalles'**
   String get homeHealthTooltip;
 
   /// No description provided for @homeSortTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Sort'**
+  /// In es, this message translates to:
+  /// **'Ordenar'**
   String get homeSortTooltip;
 
   /// No description provided for @sortManual.
   ///
-  /// In en, this message translates to:
-  /// **'Manual order'**
+  /// In es, this message translates to:
+  /// **'Orden manual'**
   String get sortManual;
 
   /// No description provided for @sortTitleAsc.
   ///
-  /// In en, this message translates to:
-  /// **'Name (A–Z)'**
+  /// In es, this message translates to:
+  /// **'Nombre (A–Z)'**
   String get sortTitleAsc;
 
   /// No description provided for @sortUpdatedDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Recently updated'**
+  /// In es, this message translates to:
+  /// **'Modificadas recientemente'**
   String get sortUpdatedDesc;
 
   /// No description provided for @homeReorderStart.
   ///
-  /// In en, this message translates to:
-  /// **'Reorder'**
+  /// In es, this message translates to:
+  /// **'Reordenar'**
   String get homeReorderStart;
 
   /// No description provided for @homeReorderDone.
   ///
-  /// In en, this message translates to:
-  /// **'Done'**
+  /// In es, this message translates to:
+  /// **'Listo'**
   String get homeReorderDone;
 
   /// No description provided for @homeReorderHint.
   ///
-  /// In en, this message translates to:
-  /// **'Drag the handle to reorder'**
+  /// In es, this message translates to:
+  /// **'Arrastra desde el asa para reordenar'**
   String get homeReorderHint;
 
   /// No description provided for @emptyAddFirst.
   ///
-  /// In en, this message translates to:
-  /// **'Add your first credential'**
+  /// In es, this message translates to:
+  /// **'Añade tu primera credencial'**
   String get emptyAddFirst;
 
   /// No description provided for @emptyAddCredential.
   ///
-  /// In en, this message translates to:
-  /// **'Add credential'**
+  /// In es, this message translates to:
+  /// **'Añadir credencial'**
   String get emptyAddCredential;
 
   /// No description provided for @folderDialogTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Folder'**
+  /// In es, this message translates to:
+  /// **'Carpeta'**
   String get folderDialogTitle;
 
   /// No description provided for @folderNameLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Folder name'**
+  /// In es, this message translates to:
+  /// **'Nombre de la carpeta'**
   String get folderNameLabel;
 
   /// No description provided for @folderNameHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. Work, Social…'**
+  /// In es, this message translates to:
+  /// **'ej. Trabajo, Sociales…'**
   String get folderNameHint;
 
   /// No description provided for @commonAccept.
   ///
-  /// In en, this message translates to:
-  /// **'Accept'**
+  /// In es, this message translates to:
+  /// **'Aceptar'**
   String get commonAccept;
 
   /// No description provided for @commonErrorDetail.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Error: {msg}'**
   String commonErrorDetail(String msg);
 
   /// No description provided for @detailNotFound.
   ///
-  /// In en, this message translates to:
-  /// **'Credential not found'**
+  /// In es, this message translates to:
+  /// **'Credencial no encontrada'**
   String get detailNotFound;
 
   /// No description provided for @detailRemoveFavorite.
   ///
-  /// In en, this message translates to:
-  /// **'Remove from favourites'**
+  /// In es, this message translates to:
+  /// **'Quitar de favoritas'**
   String get detailRemoveFavorite;
 
   /// No description provided for @detailAddFavorite.
   ///
-  /// In en, this message translates to:
-  /// **'Add to favourites'**
+  /// In es, this message translates to:
+  /// **'Añadir a favoritas'**
   String get detailAddFavorite;
 
   /// No description provided for @detailViewHistory.
   ///
-  /// In en, this message translates to:
-  /// **'View password history'**
+  /// In es, this message translates to:
+  /// **'Ver historial de contraseñas'**
   String get detailViewHistory;
 
   /// No description provided for @detailDeleteTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Delete credential'**
+  /// In es, this message translates to:
+  /// **'Eliminar credencial'**
   String get detailDeleteTitle;
 
   /// No description provided for @detailDeleteBody.
   ///
-  /// In en, this message translates to:
-  /// **'Delete \"{title}\"? This action cannot be undone.'**
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{title}\"? Esta acción no se puede deshacer.'**
   String detailDeleteBody(String title);
 
   /// No description provided for @detailDeleteAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Verify to delete this credential'**
+  /// In es, this message translates to:
+  /// **'Verifica para eliminar esta credencial'**
   String get detailDeleteAuthReason;
 
   /// No description provided for @detailRevealAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticate to reveal this secret'**
+  /// In es, this message translates to:
+  /// **'Autentifícate para revelar este secreto'**
   String get detailRevealAuthReason;
 
   /// No description provided for @detailRevealSecret.
   ///
-  /// In en, this message translates to:
-  /// **'Reveal secret'**
+  /// In es, this message translates to:
+  /// **'Revelar secreto'**
   String get detailRevealSecret;
 
   /// No description provided for @detailHideSecret.
   ///
-  /// In en, this message translates to:
-  /// **'Hide secret'**
+  /// In es, this message translates to:
+  /// **'Ocultar secreto'**
   String get detailHideSecret;
 
   /// No description provided for @detailCopyField.
   ///
-  /// In en, this message translates to:
-  /// **'Copy {field}'**
+  /// In es, this message translates to:
+  /// **'Copiar {field}'**
   String detailCopyField(String field);
 
   /// No description provided for @detailHideCountdown.
   ///
-  /// In en, this message translates to:
-  /// **'Auto-hides in {seconds}s'**
+  /// In es, this message translates to:
+  /// **'Se oculta en {seconds}s'**
   String detailHideCountdown(int seconds);
 
   /// No description provided for @detailOpenSite.
   ///
-  /// In en, this message translates to:
-  /// **'Open site'**
+  /// In es, this message translates to:
+  /// **'Abrir sitio'**
   String get detailOpenSite;
 
   /// No description provided for @detailOpenSiteError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not open the site'**
+  /// In es, this message translates to:
+  /// **'No se pudo abrir el sitio'**
   String get detailOpenSiteError;
 
   /// No description provided for @detailPasskeyHandleNote.
   ///
-  /// In en, this message translates to:
-  /// **'The private key handle stays encrypted in your vault.'**
+  /// In es, this message translates to:
+  /// **'El identificador de la clave privada permanece cifrado en tu bóveda.'**
   String get detailPasskeyHandleNote;
 
   /// No description provided for @detailTotpExportQr.
   ///
-  /// In en, this message translates to:
-  /// **'Export as QR'**
+  /// In es, this message translates to:
+  /// **'Exportar como QR'**
   String get detailTotpExportQr;
 
   /// No description provided for @detailTotpExportQrAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticate to show the TOTP QR'**
+  /// In es, this message translates to:
+  /// **'Confirma que eres tú para mostrar el QR del autenticador'**
   String get detailTotpExportQrAuthReason;
 
   /// No description provided for @detailTotpExportQrTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Scan on another device'**
+  /// In es, this message translates to:
+  /// **'Escanea en otro dispositivo'**
   String get detailTotpExportQrTitle;
 
   /// No description provided for @detailTotpExportQrWarning.
   ///
-  /// In en, this message translates to:
-  /// **'Anyone who scans this can generate your codes. Keep it private.'**
+  /// In es, this message translates to:
+  /// **'Quien escanee esto podrá generar tus códigos. Manténlo privado.'**
   String get detailTotpExportQrWarning;
 
   /// No description provided for @fieldUsername.
   ///
-  /// In en, this message translates to:
-  /// **'Username'**
+  /// In es, this message translates to:
+  /// **'Usuario'**
   String get fieldUsername;
 
   /// No description provided for @fieldPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Password'**
+  /// In es, this message translates to:
+  /// **'Contraseña'**
   String get fieldPassword;
 
   /// No description provided for @fieldWebsite.
   ///
-  /// In en, this message translates to:
-  /// **'Website'**
+  /// In es, this message translates to:
+  /// **'Sitio web'**
   String get fieldWebsite;
 
   /// No description provided for @fieldNotes.
   ///
-  /// In en, this message translates to:
-  /// **'Notes'**
+  /// In es, this message translates to:
+  /// **'Notas'**
   String get fieldNotes;
 
   /// No description provided for @fieldKeyType.
   ///
-  /// In en, this message translates to:
-  /// **'Key type'**
+  /// In es, this message translates to:
+  /// **'Tipo de llave'**
   String get fieldKeyType;
 
   /// No description provided for @fieldPrivateKey.
   ///
-  /// In en, this message translates to:
-  /// **'Private key'**
+  /// In es, this message translates to:
+  /// **'Llave privada'**
   String get fieldPrivateKey;
 
   /// No description provided for @fieldPublicKey.
   ///
-  /// In en, this message translates to:
-  /// **'Public key'**
+  /// In es, this message translates to:
+  /// **'Llave pública'**
   String get fieldPublicKey;
 
   /// No description provided for @fieldKeyPassphrase.
   ///
-  /// In en, this message translates to:
-  /// **'Key passphrase'**
+  /// In es, this message translates to:
+  /// **'Passphrase de la llave'**
   String get fieldKeyPassphrase;
 
   /// No description provided for @typePassword.
   ///
-  /// In en, this message translates to:
-  /// **'Password'**
+  /// In es, this message translates to:
+  /// **'Contraseña'**
   String get typePassword;
 
   /// No description provided for @typeApiKey.
   ///
-  /// In en, this message translates to:
-  /// **'API key'**
+  /// In es, this message translates to:
+  /// **'Clave de API'**
   String get typeApiKey;
 
   /// No description provided for @typeSecureNote.
   ///
-  /// In en, this message translates to:
-  /// **'Secure note'**
+  /// In es, this message translates to:
+  /// **'Nota segura'**
   String get typeSecureNote;
 
   /// No description provided for @typeTotp.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP / 2FA'**
+  /// In es, this message translates to:
+  /// **'Autenticador (2FA)'**
   String get typeTotp;
 
   /// No description provided for @typePasskey.
   ///
-  /// In en, this message translates to:
-  /// **'Passkey backup'**
+  /// In es, this message translates to:
+  /// **'Respaldo de Passkey'**
   String get typePasskey;
 
   /// No description provided for @typeSshKey.
   ///
-  /// In en, this message translates to:
-  /// **'SSH key'**
+  /// In es, this message translates to:
+  /// **'Llave SSH'**
   String get typeSshKey;
 
   /// No description provided for @rotationMonthly.
   ///
-  /// In en, this message translates to:
-  /// **'Monthly'**
+  /// In es, this message translates to:
+  /// **'Mensual'**
   String get rotationMonthly;
 
   /// No description provided for @rotationQuarterly.
   ///
-  /// In en, this message translates to:
-  /// **'Every 3 months'**
+  /// In es, this message translates to:
+  /// **'Cada 3 meses'**
   String get rotationQuarterly;
 
   /// No description provided for @rotationSemiAnnually.
   ///
-  /// In en, this message translates to:
-  /// **'Every 6 months'**
+  /// In es, this message translates to:
+  /// **'Cada 6 meses'**
   String get rotationSemiAnnually;
 
   /// No description provided for @rotationCustom.
   ///
-  /// In en, this message translates to:
-  /// **'Custom ({days} days)'**
+  /// In es, this message translates to:
+  /// **'Personalizado ({days} días)'**
   String rotationCustom(int days);
 
   /// No description provided for @rotationNone.
   ///
-  /// In en, this message translates to:
-  /// **'None'**
+  /// In es, this message translates to:
+  /// **'Ninguno'**
   String get rotationNone;
 
   /// No description provided for @rotationOverdueTitle.
   ///
-  /// In en, this message translates to:
-  /// **'PASSWORD ROTATION OVERDUE'**
+  /// In es, this message translates to:
+  /// **'ROTACIÓN DE CONTRASEÑA VENCIDA'**
   String get rotationOverdueTitle;
 
   /// No description provided for @rotationReminderTitle.
   ///
-  /// In en, this message translates to:
-  /// **'ROTATION REMINDER'**
+  /// In es, this message translates to:
+  /// **'RECORDATORIO DE ROTACIÓN'**
   String get rotationReminderTitle;
 
   /// No description provided for @rotationOverdueBody.
   ///
-  /// In en, this message translates to:
-  /// **'You should change this password. More than {days} days have passed since the last update.'**
+  /// In es, this message translates to:
+  /// **'Debes cambiar esta contraseña. Han pasado más de {days} días desde la última actualización.'**
   String rotationOverdueBody(int days);
 
   /// No description provided for @rotationReminderBody.
   ///
-  /// In en, this message translates to:
-  /// **'Next change required in {days} days ({interval}).'**
+  /// In es, this message translates to:
+  /// **'Próximo cambio requerido en {days} días ({interval}).'**
   String rotationReminderBody(int days, String interval);
 
   /// No description provided for @secretDecrypting.
   ///
-  /// In en, this message translates to:
-  /// **'Decrypting…'**
+  /// In es, this message translates to:
+  /// **'Descifrando…'**
   String get secretDecrypting;
 
   /// No description provided for @secretDecryptAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticate to decrypt this secret'**
+  /// In es, this message translates to:
+  /// **'Autentícate para descifrar este secreto'**
   String get secretDecryptAuthReason;
 
   /// No description provided for @secretDecryptError.
   ///
-  /// In en, this message translates to:
-  /// **'Decryption error: {msg}'**
+  /// In es, this message translates to:
+  /// **'Error al descifrar: {msg}'**
   String secretDecryptError(String msg);
 
   /// No description provided for @pinDialogTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Enter secondary PIN'**
+  /// In es, this message translates to:
+  /// **'Ingresa PIN secundario'**
   String get pinDialogTitle;
 
   /// No description provided for @pinDialogLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Double-envelope PIN'**
+  /// In es, this message translates to:
+  /// **'PIN secundario'**
   String get pinDialogLabel;
 
   /// No description provided for @totpTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Verification code (2FA)'**
+  /// In es, this message translates to:
+  /// **'Código de verificación (2FA)'**
   String get totpTitle;
 
   /// No description provided for @totpClipboardLabel.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP code'**
+  /// In es, this message translates to:
+  /// **'Código de verificación'**
   String get totpClipboardLabel;
 
   /// No description provided for @totpInvalid.
   ///
-  /// In en, this message translates to:
-  /// **'Invalid'**
+  /// In es, this message translates to:
+  /// **'Inválido'**
   String get totpInvalid;
 
   /// No description provided for @a11yFavorite.
   ///
-  /// In en, this message translates to:
-  /// **'Favourite'**
+  /// In es, this message translates to:
+  /// **'Favorito'**
   String get a11yFavorite;
 
   /// No description provided for @a11yDoubleEncrypted.
   ///
-  /// In en, this message translates to:
-  /// **'Double-encrypted'**
+  /// In es, this message translates to:
+  /// **'Con doble cifrado'**
   String get a11yDoubleEncrypted;
 
   /// No description provided for @historyTitle.
   ///
-  /// In en, this message translates to:
-  /// **'History'**
+  /// In es, this message translates to:
+  /// **'Historial'**
   String get historyTitle;
 
   /// No description provided for @historyEmpty.
   ///
-  /// In en, this message translates to:
-  /// **'No old passwords.'**
+  /// In es, this message translates to:
+  /// **'No hay contraseñas antiguas.'**
   String get historyEmpty;
 
   /// No description provided for @historyCopyTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Copy password'**
+  /// In es, this message translates to:
+  /// **'Copiar contraseña'**
   String get historyCopyTooltip;
 
   /// No description provided for @historyClipboardLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Historical password'**
+  /// In es, this message translates to:
+  /// **'Contraseña histórica'**
   String get historyClipboardLabel;
 
   /// No description provided for @historyRestoreTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Restore password'**
+  /// In es, this message translates to:
+  /// **'Restaurar contraseña'**
   String get historyRestoreTooltip;
 
   /// No description provided for @historyRestoreTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Restore password?'**
+  /// In es, this message translates to:
+  /// **'¿Restaurar contraseña?'**
   String get historyRestoreTitle;
 
   /// No description provided for @historyRestoreBody.
   ///
-  /// In en, this message translates to:
-  /// **'This will replace the credential\'s current password with this historical one. Continue?'**
+  /// In es, this message translates to:
+  /// **'Esta acción reemplazará la contraseña actual de la credencial con esta contraseña histórica. ¿Deseas continuar?'**
   String get historyRestoreBody;
 
   /// No description provided for @historyRestoreConfirm.
   ///
-  /// In en, this message translates to:
-  /// **'Restore'**
+  /// In es, this message translates to:
+  /// **'Restaurar'**
   String get historyRestoreConfirm;
 
   /// No description provided for @historyRestoreSuccess.
   ///
-  /// In en, this message translates to:
-  /// **'Password restored successfully'**
+  /// In es, this message translates to:
+  /// **'Contraseña restaurada con éxito'**
   String get historyRestoreSuccess;
 
   /// No description provided for @historyRestoreError.
   ///
-  /// In en, this message translates to:
-  /// **'Error restoring the password: {msg}'**
+  /// In es, this message translates to:
+  /// **'Error al restaurar la contraseña: {msg}'**
   String historyRestoreError(String msg);
 
   /// No description provided for @recoveryTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Recover access'**
+  /// In es, this message translates to:
+  /// **'Recuperar acceso'**
   String get recoveryTitle;
 
   /// No description provided for @recoveryCodeTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Recovery code'**
+  /// In es, this message translates to:
+  /// **'Código de recuperación'**
   String get recoveryCodeTitle;
 
   /// No description provided for @recoveryCodeDescription.
   ///
-  /// In en, this message translates to:
-  /// **'The recovery code was generated when you set up your vault. If you saved it, enter it here to reset your master password.'**
+  /// In es, this message translates to:
+  /// **'El código de recuperación fue generado al configurar tu bóveda. Si lo guardaste, introdúcelo aquí para restablecer tu contraseña maestra.'**
   String get recoveryCodeDescription;
 
   /// No description provided for @recoveryEnterCode.
   ///
-  /// In en, this message translates to:
-  /// **'Enter the recovery code'**
+  /// In es, this message translates to:
+  /// **'Ingresa el código de recuperación'**
   String get recoveryEnterCode;
 
   /// No description provided for @recoveryWrongCode.
   ///
-  /// In en, this message translates to:
-  /// **'Incorrect code. Check it and try again.'**
+  /// In es, this message translates to:
+  /// **'Código incorrecto. Verifica e intenta de nuevo.'**
   String get recoveryWrongCode;
 
   /// No description provided for @recoveryVerifyButton.
   ///
-  /// In en, this message translates to:
-  /// **'Verify code'**
+  /// In es, this message translates to:
+  /// **'Verificar código'**
   String get recoveryVerifyButton;
 
   /// No description provided for @recoveryEnterNewPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Enter the new master password'**
+  /// In es, this message translates to:
+  /// **'Ingresa la nueva contraseña maestra'**
   String get recoveryEnterNewPassword;
 
   /// No description provided for @recoveryMin8.
   ///
-  /// In en, this message translates to:
-  /// **'The password must be at least 8 characters'**
+  /// In es, this message translates to:
+  /// **'La contraseña debe tener al menos 8 caracteres'**
   String get recoveryMin8;
 
   /// No description provided for @recoveryPasswordUpdated.
   ///
-  /// In en, this message translates to:
-  /// **'Master password updated successfully'**
+  /// In es, this message translates to:
+  /// **'Contraseña maestra actualizada exitosamente'**
   String get recoveryPasswordUpdated;
 
   /// No description provided for @recoveryCodeVerified.
   ///
-  /// In en, this message translates to:
-  /// **'Code verified. Now set your new master password.'**
+  /// In es, this message translates to:
+  /// **'Código verificado. Ahora establece tu nueva contraseña maestra.'**
   String get recoveryCodeVerified;
 
   /// No description provided for @recoveryNewPasswordLabel.
   ///
-  /// In en, this message translates to:
-  /// **'New master password'**
+  /// In es, this message translates to:
+  /// **'Nueva contraseña maestra'**
   String get recoveryNewPasswordLabel;
 
   /// No description provided for @recoveryResetButton.
   ///
-  /// In en, this message translates to:
-  /// **'Reset master password'**
+  /// In es, this message translates to:
+  /// **'Restablecer contraseña maestra'**
   String get recoveryResetButton;
 
   /// No description provided for @recoveryCodeWarning.
   ///
-  /// In en, this message translates to:
-  /// **'Save this code somewhere safe! It is shown ONLY ONCE and cannot be recovered.'**
+  /// In es, this message translates to:
+  /// **'¡Guarda este código en un lugar seguro! Solo se muestra UNA VEZ y no se puede recuperar.'**
   String get recoveryCodeWarning;
 
   /// No description provided for @recoveryCopyCode.
   ///
-  /// In en, this message translates to:
-  /// **'Copy code'**
+  /// In es, this message translates to:
+  /// **'Copiar código'**
   String get recoveryCopyCode;
 
   /// No description provided for @recoveryCodeSavedContinue.
   ///
-  /// In en, this message translates to:
-  /// **'I saved it, continue'**
+  /// In es, this message translates to:
+  /// **'Ya lo guardé, continuar'**
   String get recoveryCodeSavedContinue;
 
   /// No description provided for @accessStepOf.
   ///
-  /// In en, this message translates to:
-  /// **'Step {current} of {total}'**
+  /// In es, this message translates to:
+  /// **'Paso {current} de {total}'**
   String accessStepOf(int current, int total);
 
   /// No description provided for @recoveryStepEnterCode.
   ///
-  /// In en, this message translates to:
-  /// **'Enter your recovery code'**
+  /// In es, this message translates to:
+  /// **'Ingresa tu código de recuperación'**
   String get recoveryStepEnterCode;
 
   /// No description provided for @recoveryStepNewPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Set a new master password'**
+  /// In es, this message translates to:
+  /// **'Define una nueva contraseña maestra'**
   String get recoveryStepNewPassword;
 
   /// No description provided for @setupStepCreate.
   ///
-  /// In en, this message translates to:
-  /// **'Create your master password'**
+  /// In es, this message translates to:
+  /// **'Crea tu contraseña maestra'**
   String get setupStepCreate;
 
   /// No description provided for @setupStepSaveCode.
   ///
-  /// In en, this message translates to:
-  /// **'Save your recovery code'**
+  /// In es, this message translates to:
+  /// **'Guarda tu código de recuperación'**
   String get setupStepSaveCode;
 
   /// No description provided for @autofillOnboardingTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Autofill'**
+  /// In es, this message translates to:
+  /// **'Autocompletado'**
   String get autofillOnboardingTitle;
 
   /// No description provided for @autofillActiveTitle.
   ///
-  /// In en, this message translates to:
-  /// **'SoloKey is active!'**
+  /// In es, this message translates to:
+  /// **'¡SoloKey está activo!'**
   String get autofillActiveTitle;
 
   /// No description provided for @autofillEnableTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Enable autofill'**
+  /// In es, this message translates to:
+  /// **'Activa el autocompletado'**
   String get autofillEnableTitle;
 
   /// No description provided for @autofillActiveDesc.
   ///
-  /// In en, this message translates to:
-  /// **'SoloKey will automatically fill your passwords in any app or browser on your device.'**
+  /// In es, this message translates to:
+  /// **'SoloKey completará automáticamente tus contraseñas en cualquier app o navegador de tu dispositivo.'**
   String get autofillActiveDesc;
 
   /// No description provided for @autofillEnableDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Let SoloKey fill your passwords automatically in apps and browsers.'**
+  /// In es, this message translates to:
+  /// **'Permite que SoloKey complete tus contraseñas automáticamente en apps y navegadores.'**
   String get autofillEnableDesc;
 
   /// No description provided for @autofillOpenSettings.
   ///
-  /// In en, this message translates to:
-  /// **'Open Autofill settings'**
+  /// In es, this message translates to:
+  /// **'Abrir ajustes de Autocompletado'**
   String get autofillOpenSettings;
 
   /// No description provided for @autofillVerifyStatus.
   ///
-  /// In en, this message translates to:
-  /// **'I enabled it, check status'**
+  /// In es, this message translates to:
+  /// **'Ya lo activé, verificar estado'**
   String get autofillVerifyStatus;
 
   /// No description provided for @autofillFeatureDetection.
   ///
-  /// In en, this message translates to:
-  /// **'Automatic login form detection'**
+  /// In es, this message translates to:
+  /// **'Detecta solo los formularios de inicio de sesión'**
   String get autofillFeatureDetection;
 
   /// No description provided for @autofillFeatureBiometric.
   ///
-  /// In en, this message translates to:
-  /// **'Asks for your fingerprint before filling (biometrics)'**
+  /// In es, this message translates to:
+  /// **'Pide tu huella antes de rellenar (biometría)'**
   String get autofillFeatureBiometric;
 
   /// No description provided for @autofillFeatureNeverExposed.
   ///
-  /// In en, this message translates to:
-  /// **'Credentials never exposed to the OS'**
+  /// In es, this message translates to:
+  /// **'Credenciales nunca expuestas al SO'**
   String get autofillFeatureNeverExposed;
 
   /// No description provided for @autofillStatusActive.
   ///
-  /// In en, this message translates to:
-  /// **'Active'**
+  /// In es, this message translates to:
+  /// **'Activo'**
   String get autofillStatusActive;
 
   /// No description provided for @autofillStatusInactive.
   ///
-  /// In en, this message translates to:
-  /// **'Inactive'**
+  /// In es, this message translates to:
+  /// **'Inactivo'**
   String get autofillStatusInactive;
 
   /// No description provided for @autofillStep1Title.
   ///
-  /// In en, this message translates to:
-  /// **'Tap \"Open Autofill settings\"'**
+  /// In es, this message translates to:
+  /// **'Toca \"Abrir ajustes de Autocompletado\"'**
   String get autofillStep1Title;
 
   /// No description provided for @autofillStep1Sub.
   ///
-  /// In en, this message translates to:
-  /// **'The system settings will open'**
+  /// In es, this message translates to:
+  /// **'Se abrirá la configuración del sistema'**
   String get autofillStep1Sub;
 
   /// No description provided for @autofillStep2Title.
   ///
-  /// In en, this message translates to:
-  /// **'Select \"SoloKey\" as the provider'**
+  /// In es, this message translates to:
+  /// **'Selecciona \"SoloKey\" como proveedor'**
   String get autofillStep2Title;
 
   /// No description provided for @autofillStep2Sub.
   ///
-  /// In en, this message translates to:
-  /// **'Find SoloKey in the list of apps'**
+  /// In es, this message translates to:
+  /// **'Busca SoloKey en la lista de apps'**
   String get autofillStep2Sub;
 
   /// No description provided for @autofillStep3Title.
   ///
-  /// In en, this message translates to:
-  /// **'Confirm and return to the app'**
+  /// In es, this message translates to:
+  /// **'Confirma y regresa a la app'**
   String get autofillStep3Title;
 
   /// No description provided for @autofillStep3Sub.
   ///
-  /// In en, this message translates to:
-  /// **'Autofill will be enabled'**
+  /// In es, this message translates to:
+  /// **'El autocompletado quedará activado'**
   String get autofillStep3Sub;
 
   /// No description provided for @quickFillTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Quick-Fill'**
+  /// In es, this message translates to:
+  /// **'Autocompletado rápido'**
   String get quickFillTitle;
 
   /// No description provided for @quickFillCloseTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Close (Esc)'**
+  /// In es, this message translates to:
+  /// **'Cerrar (Esc)'**
   String get quickFillCloseTooltip;
 
   /// No description provided for @quickFillSearchHint.
   ///
-  /// In en, this message translates to:
-  /// **'Search credential…'**
+  /// In es, this message translates to:
+  /// **'Buscar credencial…'**
   String get quickFillSearchHint;
 
   /// No description provided for @quickFillLoadError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not load credentials'**
+  /// In es, this message translates to:
+  /// **'No se pudieron cargar las credenciales'**
   String get quickFillLoadError;
 
   /// No description provided for @quickFillNoMatches.
   ///
-  /// In en, this message translates to:
-  /// **'No matches'**
+  /// In es, this message translates to:
+  /// **'Sin coincidencias'**
   String get quickFillNoMatches;
 
   /// No description provided for @quickFillFooter.
   ///
-  /// In en, this message translates to:
-  /// **'Copy the value and paste it (Ctrl+V) into the field · it clears itself from the clipboard'**
+  /// In es, this message translates to:
+  /// **'Copia el dato y pégalo (Ctrl+V) en el campo · se limpia solo del portapapeles'**
   String get quickFillFooter;
 
   /// No description provided for @quickFillCopyUser.
   ///
-  /// In en, this message translates to:
-  /// **'Copy username'**
+  /// In es, this message translates to:
+  /// **'Copiar usuario'**
   String get quickFillCopyUser;
 
   /// No description provided for @quickFillCopyPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Copy password'**
+  /// In es, this message translates to:
+  /// **'Copiar contraseña'**
   String get quickFillCopyPassword;
 
   /// No description provided for @commonGotIt.
   ///
-  /// In en, this message translates to:
-  /// **'Got it'**
+  /// In es, this message translates to:
+  /// **'Entendido'**
   String get commonGotIt;
 
   /// No description provided for @auditTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Security Audit'**
+  /// In es, this message translates to:
+  /// **'Auditoría de Seguridad'**
   String get auditTitle;
 
   /// No description provided for @auditAnalysisTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Security Analysis'**
+  /// In es, this message translates to:
+  /// **'Análisis de Seguridad'**
   String get auditAnalysisTitle;
 
   /// No description provided for @auditAnalysisDesc.
   ///
-  /// In en, this message translates to:
-  /// **'SoloKey analyses your credentials locally to identify weak, short, reused or old passwords.'**
+  /// In es, this message translates to:
+  /// **'SoloKey analiza tus credenciales localmente para identificar contraseñas débiles, cortas, reutilizadas o antiguas.'**
   String get auditAnalysisDesc;
 
   /// No description provided for @auditBreachCheck.
   ///
-  /// In en, this message translates to:
-  /// **'Check breaches (online)'**
+  /// In es, this message translates to:
+  /// **'Verificar filtraciones (online)'**
   String get auditBreachCheck;
 
   /// No description provided for @auditPrivateBadge.
   ///
-  /// In en, this message translates to:
-  /// **'PRIVATE'**
+  /// In es, this message translates to:
+  /// **'PRIVADO'**
   String get auditPrivateBadge;
 
   /// No description provided for @auditBreachDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Uses k-Anonymity (HaveIBeenPwned) to look up exposed passwords without revealing your real password.'**
+  /// In es, this message translates to:
+  /// **'Revisa en HaveIBeenPwned si tus contraseñas aparecen en filtraciones, sin enviar nunca tu contraseña.'**
   String get auditBreachDesc;
 
   /// No description provided for @auditAllGoodTitle.
   ///
-  /// In en, this message translates to:
-  /// **'All good!'**
+  /// In es, this message translates to:
+  /// **'¡Todo en orden!'**
   String get auditAllGoodTitle;
 
   /// No description provided for @auditAllGoodDesc.
   ///
-  /// In en, this message translates to:
-  /// **'No problems were found in your vault.'**
+  /// In es, this message translates to:
+  /// **'No se encontraron problemas en tu bóveda.'**
   String get auditAllGoodDesc;
 
   /// No description provided for @auditSeverityCritical.
   ///
-  /// In en, this message translates to:
-  /// **'Critical'**
+  /// In es, this message translates to:
+  /// **'Crítico'**
   String get auditSeverityCritical;
 
   /// No description provided for @auditSeverityWarning.
   ///
-  /// In en, this message translates to:
-  /// **'Warning'**
+  /// In es, this message translates to:
+  /// **'Advertencia'**
   String get auditSeverityWarning;
 
   /// No description provided for @auditSeverityInfo.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Info'**
   String get auditSeverityInfo;
 
   /// No description provided for @passkeysTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Passkey backups'**
+  /// In es, this message translates to:
+  /// **'Respaldos de Passkey'**
   String get passkeysTitle;
 
   /// No description provided for @passkeysAdd.
   ///
-  /// In en, this message translates to:
-  /// **'Add passkey'**
+  /// In es, this message translates to:
+  /// **'Añadir Passkey'**
   String get passkeysAdd;
 
   /// No description provided for @passkeysHowToTitle.
   ///
-  /// In en, this message translates to:
-  /// **'How to register a passkey?'**
+  /// In es, this message translates to:
+  /// **'¿Cómo registrar una Passkey?'**
   String get passkeysHowToTitle;
 
   /// No description provided for @passkeysHowToBody.
   ///
-  /// In en, this message translates to:
-  /// **'Passkeys are registered directly on each web service (e.g. Google, GitHub, Apple).\n\n1. Go to the service\'s website\n2. Look for \"Passkeys\" under Security\n3. The system will register and sync the passkey automatically\n\nSoloKey will store the passkey information in your vault, encrypted, so you can manage it.'**
+  /// In es, this message translates to:
+  /// **'Las Passkeys se registran directamente en cada servicio web (ej. Google, GitHub, Apple).\n\n1. Ve al sitio web del servicio\n2. Busca \"Passkeys\" o \"Llaves de acceso\" en Seguridad\n3. El sistema registrará y sincronizará la passkey automáticamente\n\nSoloKey almacenará la información de la passkey en tu bóveda de forma cifrada para que puedas gestionarla.'**
   String get passkeysHowToBody;
 
   /// No description provided for @passkeysEmptyTitle.
   ///
-  /// In en, this message translates to:
-  /// **'No passkey backups'**
+  /// In es, this message translates to:
+  /// **'Sin respaldos de passkey'**
   String get passkeysEmptyTitle;
 
   /// No description provided for @passkeysEmptyDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Passkeys are the future of authentication: passwordless, safer and faster. Register them on your favourite services and SoloKey will keep an encrypted backup here.'**
+  /// In es, this message translates to:
+  /// **'Las Passkeys son el futuro de la autenticación: sin contraseñas, más seguras y más rápidas. Regístralas en tus servicios favoritos y SoloKey guardará aquí un respaldo cifrado.'**
   String get passkeysEmptyDesc;
 
   /// No description provided for @passkeysEncryptedBadge.
   ///
-  /// In en, this message translates to:
-  /// **'Encrypted backup in your vault'**
+  /// In es, this message translates to:
+  /// **'Respaldo cifrado en tu bóveda'**
   String get passkeysEncryptedBadge;
 
   /// No description provided for @passkeysUpdated.
   ///
-  /// In en, this message translates to:
-  /// **'Updated: {date}'**
+  /// In es, this message translates to:
+  /// **'Actualizado: {date}'**
   String passkeysUpdated(String date);
 
   /// No description provided for @passkeysViewDetails.
   ///
-  /// In en, this message translates to:
-  /// **'View details'**
+  /// In es, this message translates to:
+  /// **'Ver detalles'**
   String get passkeysViewDetails;
 
   /// No description provided for @passkeyDomain.
   ///
-  /// In en, this message translates to:
-  /// **'Domain (RP ID)'**
+  /// In es, this message translates to:
+  /// **'Dominio (RP ID)'**
   String get passkeyDomain;
 
   /// No description provided for @passkeyService.
   ///
-  /// In en, this message translates to:
-  /// **'Service'**
+  /// In es, this message translates to:
+  /// **'Servicio'**
   String get passkeyService;
 
   /// No description provided for @passkeyVerification.
   ///
-  /// In en, this message translates to:
-  /// **'Verification'**
+  /// In es, this message translates to:
+  /// **'Verificación'**
   String get passkeyVerification;
 
   /// No description provided for @passkeyVerificationRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Required (Biometric / PIN)'**
+  /// In es, this message translates to:
+  /// **'Requerida (Biométrico / PIN)'**
   String get passkeyVerificationRequired;
 
   /// No description provided for @passkeyVerificationOptional.
   ///
-  /// In en, this message translates to:
-  /// **'Optional'**
+  /// In es, this message translates to:
+  /// **'Opcional'**
   String get passkeyVerificationOptional;
 
   /// No description provided for @passkeyCredentialId.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Credential ID'**
   String get passkeyCredentialId;
 
   /// No description provided for @passkeyCredentialIdCopied.
   ///
-  /// In en, this message translates to:
-  /// **'Credential ID copied'**
+  /// In es, this message translates to:
+  /// **'Credential ID copiado'**
   String get passkeyCredentialIdCopied;
 
   /// No description provided for @passkeyIconLabel.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Passkey'**
   String get passkeyIconLabel;
 
   /// No description provided for @passkeyRegistered.
   ///
-  /// In en, this message translates to:
-  /// **'Registered'**
+  /// In es, this message translates to:
+  /// **'Registrada'**
   String get passkeyRegistered;
 
   /// No description provided for @passkeyPrivateKeyNote.
   ///
-  /// In en, this message translates to:
-  /// **'The private key never leaves the device. Only the identifying information is stored.'**
+  /// In es, this message translates to:
+  /// **'La clave privada nunca sale del dispositivo. Solo la información de identificación está almacenada.'**
   String get passkeyPrivateKeyNote;
 
   /// No description provided for @passkeysDeleteTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Delete passkey'**
+  /// In es, this message translates to:
+  /// **'Eliminar Passkey'**
   String get passkeysDeleteTitle;
 
   /// No description provided for @passkeysDeleteBody.
   ///
-  /// In en, this message translates to:
-  /// **'Delete the passkey \"{title}\"?\n\nNote: you must also remove it from the corresponding web service ({service}).'**
+  /// In es, this message translates to:
+  /// **'¿Eliminar la passkey \"{title}\"?\n\nNota: también deberás eliminarla del servicio web correspondiente ({service}).'**
   String passkeysDeleteBody(String title, String service);
 
   /// No description provided for @passkeysSiteFallback.
   ///
-  /// In en, this message translates to:
-  /// **'the site'**
+  /// In es, this message translates to:
+  /// **'el sitio'**
   String get passkeysSiteFallback;
 
   /// No description provided for @passkeysDeleteAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Verify to delete this passkey'**
+  /// In es, this message translates to:
+  /// **'Verifica para eliminar esta passkey'**
   String get passkeysDeleteAuthReason;
 
   /// No description provided for @formNewTitle.
   ///
-  /// In en, this message translates to:
-  /// **'New credential'**
+  /// In es, this message translates to:
+  /// **'Nueva credencial'**
   String get formNewTitle;
 
   /// No description provided for @formEditTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Edit credential'**
+  /// In es, this message translates to:
+  /// **'Editar credencial'**
   String get formEditTitle;
 
   /// No description provided for @formCreated.
   ///
-  /// In en, this message translates to:
-  /// **'Credential created'**
+  /// In es, this message translates to:
+  /// **'Credencial creada'**
   String get formCreated;
 
   /// No description provided for @formSaved.
   ///
-  /// In en, this message translates to:
-  /// **'Changes saved'**
+  /// In es, this message translates to:
+  /// **'Cambios guardados'**
   String get formSaved;
 
   /// No description provided for @formSaveChanges.
   ///
-  /// In en, this message translates to:
-  /// **'Save changes'**
+  /// In es, this message translates to:
+  /// **'Guardar cambios'**
   String get formSaveChanges;
 
   /// No description provided for @formCreateCredential.
   ///
-  /// In en, this message translates to:
-  /// **'Create credential'**
+  /// In es, this message translates to:
+  /// **'Crear credencial'**
   String get formCreateCredential;
 
   /// No description provided for @formFieldRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Required field'**
+  /// In es, this message translates to:
+  /// **'Campo requerido'**
   String get formFieldRequired;
 
   /// No description provided for @formErrPinRequiredEnable.
   ///
-  /// In en, this message translates to:
-  /// **'You must enter a secondary PIN for double encryption'**
+  /// In es, this message translates to:
+  /// **'Debes ingresar un PIN secundario para el cifrado doble'**
   String get formErrPinRequiredEnable;
 
   /// No description provided for @formErrPinRequiredDisable.
   ///
-  /// In en, this message translates to:
-  /// **'Enter the secondary PIN to disable double encryption'**
+  /// In es, this message translates to:
+  /// **'Ingresa el PIN secundario para desactivar el cifrado doble'**
   String get formErrPinRequiredDisable;
 
   /// No description provided for @formQrNotTotp.
   ///
-  /// In en, this message translates to:
-  /// **'The QR code is not a valid TOTP.'**
+  /// In es, this message translates to:
+  /// **'El código QR no es de un autenticador.'**
   String get formQrNotTotp;
 
   /// No description provided for @formQrScanned.
   ///
-  /// In en, this message translates to:
-  /// **'QR code scanned successfully'**
+  /// In es, this message translates to:
+  /// **'Código QR escaneado con éxito'**
   String get formQrScanned;
 
   /// No description provided for @formQrNoSecret.
   ///
-  /// In en, this message translates to:
-  /// **'No secret key was found in the QR.'**
+  /// In es, this message translates to:
+  /// **'No se encontró una clave secreta en el QR.'**
   String get formQrNoSecret;
 
   /// No description provided for @formQrReadError.
   ///
-  /// In en, this message translates to:
-  /// **'Error reading the QR code.'**
+  /// In es, this message translates to:
+  /// **'Error al leer el código QR.'**
   String get formQrReadError;
 
   /// No description provided for @formSshGenerated.
   ///
-  /// In en, this message translates to:
-  /// **'Ed25519 key pair generated'**
+  /// In es, this message translates to:
+  /// **'Llaves SSH generadas (Ed25519)'**
   String get formSshGenerated;
 
   /// No description provided for @formSshGenError.
   ///
-  /// In en, this message translates to:
-  /// **'Error generating the SSH key.'**
+  /// In es, this message translates to:
+  /// **'Error al generar la llave SSH.'**
   String get formSshGenError;
 
   /// No description provided for @formCustomFieldsTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Custom fields'**
+  /// In es, this message translates to:
+  /// **'Campos Personalizados'**
   String get formCustomFieldsTitle;
 
   /// No description provided for @formNoCustomFields.
   ///
-  /// In en, this message translates to:
-  /// **'No custom fields.'**
+  /// In es, this message translates to:
+  /// **'No hay campos personalizados.'**
   String get formNoCustomFields;
 
   /// No description provided for @formAddField.
   ///
-  /// In en, this message translates to:
-  /// **'Add field'**
+  /// In es, this message translates to:
+  /// **'Añadir campo'**
   String get formAddField;
 
   /// No description provided for @formEditField.
   ///
-  /// In en, this message translates to:
-  /// **'Edit field'**
+  /// In es, this message translates to:
+  /// **'Editar campo'**
   String get formEditField;
 
   /// No description provided for @formNewCustomField.
   ///
-  /// In en, this message translates to:
-  /// **'New custom field'**
+  /// In es, this message translates to:
+  /// **'Nuevo campo personalizado'**
   String get formNewCustomField;
 
   /// No description provided for @formFieldNameLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Field name'**
+  /// In es, this message translates to:
+  /// **'Nombre del campo'**
   String get formFieldNameLabel;
 
   /// No description provided for @formFieldNameHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. PIN, Security question'**
+  /// In es, this message translates to:
+  /// **'ej. PIN, Pregunta de Seguridad'**
   String get formFieldNameHint;
 
   /// No description provided for @formNameRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Name required'**
+  /// In es, this message translates to:
+  /// **'Nombre requerido'**
   String get formNameRequired;
 
   /// No description provided for @formFieldValueLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Field value'**
+  /// In es, this message translates to:
+  /// **'Valor del campo'**
   String get formFieldValueLabel;
 
   /// No description provided for @formFieldValueHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. 1234, Home town'**
+  /// In es, this message translates to:
+  /// **'ej. 1234, Ciudad natal'**
   String get formFieldValueHint;
 
   /// No description provided for @formValueRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Value required'**
+  /// In es, this message translates to:
+  /// **'Valor requerido'**
   String get formValueRequired;
 
   /// No description provided for @formSecretField.
   ///
-  /// In en, this message translates to:
-  /// **'Secret field'**
+  /// In es, this message translates to:
+  /// **'Campo secreto'**
   String get formSecretField;
 
   /// No description provided for @formSecretBadge.
   ///
-  /// In en, this message translates to:
-  /// **'SECRET'**
+  /// In es, this message translates to:
+  /// **'SECRETO'**
   String get formSecretBadge;
 
   /// No description provided for @formSecretFieldSub.
   ///
-  /// In en, this message translates to:
-  /// **'Hides the value by default in the details.'**
+  /// In es, this message translates to:
+  /// **'Ocultará el valor por defecto en los detalles.'**
   String get formSecretFieldSub;
 
   /// No description provided for @formAdd.
   ///
-  /// In en, this message translates to:
-  /// **'Add'**
+  /// In es, this message translates to:
+  /// **'Agregar'**
   String get formAdd;
 
   /// No description provided for @formSectionIdentification.
   ///
-  /// In en, this message translates to:
-  /// **'Identification'**
+  /// In es, this message translates to:
+  /// **'Identificación'**
   String get formSectionIdentification;
 
   /// No description provided for @formTitleLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Title'**
+  /// In es, this message translates to:
+  /// **'Título'**
   String get formTitleLabel;
 
   /// No description provided for @formSectionContent.
   ///
-  /// In en, this message translates to:
-  /// **'Content'**
+  /// In es, this message translates to:
+  /// **'Contenido'**
   String get formSectionContent;
 
   /// No description provided for @formSectionNotes.
   ///
-  /// In en, this message translates to:
-  /// **'Notes'**
+  /// In es, this message translates to:
+  /// **'Notas'**
   String get formSectionNotes;
 
   /// No description provided for @formSecureContentLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Secure content'**
+  /// In es, this message translates to:
+  /// **'Contenido seguro'**
   String get formSecureContentLabel;
 
   /// No description provided for @formNotesLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Additional notes'**
+  /// In es, this message translates to:
+  /// **'Notas adicionales'**
   String get formNotesLabel;
 
   /// No description provided for @formSecureContentHint.
   ///
-  /// In en, this message translates to:
-  /// **'Write your private note here…'**
+  /// In es, this message translates to:
+  /// **'Escribe tu nota privada aquí…'**
   String get formSecureContentHint;
 
   /// No description provided for @formNotesHint.
   ///
-  /// In en, this message translates to:
-  /// **'Optional — add context or reminders'**
+  /// In es, this message translates to:
+  /// **'Opcional — agregar contexto o recordatorios'**
   String get formNotesHint;
 
   /// No description provided for @formContentRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Content is required'**
+  /// In es, this message translates to:
+  /// **'El contenido es requerido'**
   String get formContentRequired;
 
   /// No description provided for @formSectionOrganization.
   ///
-  /// In en, this message translates to:
-  /// **'Organisation'**
+  /// In es, this message translates to:
+  /// **'Organización'**
   String get formSectionOrganization;
 
   /// No description provided for @formFolderLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Folder'**
+  /// In es, this message translates to:
+  /// **'Carpeta'**
   String get formFolderLabel;
 
   /// No description provided for @formMainVault.
   ///
-  /// In en, this message translates to:
-  /// **'Main vault'**
+  /// In es, this message translates to:
+  /// **'Bóveda principal'**
   String get formMainVault;
 
   /// No description provided for @formHintPassword.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. Netflix, GitHub, Gmail'**
+  /// In es, this message translates to:
+  /// **'ej. Netflix, GitHub, Gmail'**
   String get formHintPassword;
 
   /// No description provided for @formHintApiKey.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. OpenAI, Stripe, AWS'**
+  /// In es, this message translates to:
+  /// **'ej. OpenAI, Stripe, AWS'**
   String get formHintApiKey;
 
   /// No description provided for @formHintSecureNote.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. Server keys, Seeds'**
+  /// In es, this message translates to:
+  /// **'ej. Llaves del servidor, frase de recuperación'**
   String get formHintSecureNote;
 
   /// No description provided for @formHintTotp.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. GitHub 2FA, Google'**
+  /// In es, this message translates to:
+  /// **'ej. GitHub 2FA, Google'**
   String get formHintTotp;
 
   /// No description provided for @formHintPasskey.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. google.com Passkey'**
+  /// In es, this message translates to:
+  /// **'ej. google.com Passkey'**
   String get formHintPasskey;
 
   /// No description provided for @formHintSshKey.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. Production Server, GitHub SSH Key'**
+  /// In es, this message translates to:
+  /// **'ej. Servidor de producción, GitHub'**
   String get formHintSshKey;
 
   /// No description provided for @formSectionLogin.
   ///
-  /// In en, this message translates to:
-  /// **'Login credentials'**
+  /// In es, this message translates to:
+  /// **'Credenciales de acceso'**
   String get formSectionLogin;
 
   /// No description provided for @formUserEmailLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Username / Email'**
+  /// In es, this message translates to:
+  /// **'Usuario / Email'**
   String get formUserEmailLabel;
 
   /// No description provided for @formUserEmailHint.
   ///
-  /// In en, this message translates to:
-  /// **'user@example.com'**
+  /// In es, this message translates to:
+  /// **'usuario@ejemplo.com'**
   String get formUserEmailHint;
 
   /// No description provided for @formWebsiteLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Website / URL'**
+  /// In es, this message translates to:
+  /// **'Sitio web / URL'**
   String get formWebsiteLabel;
 
   /// No description provided for @formWebsiteHint.
   ///
-  /// In en, this message translates to:
-  /// **'https://example.com'**
+  /// In es, this message translates to:
+  /// **'https://ejemplo.com'**
   String get formWebsiteHint;
 
   /// No description provided for @formSectionApi.
   ///
-  /// In en, this message translates to:
-  /// **'API details'**
+  /// In es, this message translates to:
+  /// **'Detalles de la API'**
   String get formSectionApi;
 
   /// No description provided for @formServiceNameLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Service name'**
+  /// In es, this message translates to:
+  /// **'Nombre del servicio'**
   String get formServiceNameLabel;
 
   /// No description provided for @formServiceNameHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. OpenAI, Stripe, Supabase'**
+  /// In es, this message translates to:
+  /// **'ej. OpenAI, Stripe, Supabase'**
   String get formServiceNameHint;
 
   /// No description provided for @formApiKeyLabel.
   ///
-  /// In en, this message translates to:
-  /// **'API Key / Token'**
+  /// In es, this message translates to:
+  /// **'Clave de API'**
   String get formApiKeyLabel;
 
   /// No description provided for @formEndpointLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Endpoint URL'**
+  /// In es, this message translates to:
+  /// **'Dirección del servicio (URL)'**
   String get formEndpointLabel;
 
   /// No description provided for @formScopesLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Permissions / Scopes'**
+  /// In es, this message translates to:
+  /// **'Permisos / Scopes'**
   String get formScopesLabel;
 
   /// No description provided for @formSection2fa.
   ///
-  /// In en, this message translates to:
-  /// **'2FA setup'**
+  /// In es, this message translates to:
+  /// **'Configuración 2FA'**
   String get formSection2fa;
 
   /// No description provided for @formTotpDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Enter the TOTP secret key (Base32) of your account. You\'ll find it when enabling 2FA on the website, or you can scan the QR code directly.'**
+  /// In es, this message translates to:
+  /// **'Escribe la clave secreta que te da el sitio al activar la verificación en dos pasos, o escanea su código QR.'**
   String get formTotpDesc;
 
   /// No description provided for @formScanQr.
   ///
-  /// In en, this message translates to:
-  /// **'Scan QR code'**
+  /// In es, this message translates to:
+  /// **'Escanear código QR'**
   String get formScanQr;
 
   /// No description provided for @formScanQrScreen.
   ///
-  /// In en, this message translates to:
-  /// **'Scan QR from screen'**
+  /// In es, this message translates to:
+  /// **'Escanear QR de la pantalla'**
   String get formScanQrScreen;
 
   /// No description provided for @formQrScreenNoQr.
   ///
-  /// In en, this message translates to:
-  /// **'No QR code was found in the capture.'**
+  /// In es, this message translates to:
+  /// **'No se encontró un código QR en la captura.'**
   String get formQrScreenNoQr;
 
   /// No description provided for @formQrScreenError.
   ///
-  /// In en, this message translates to:
-  /// **'Couldn\'t capture the screen.'**
+  /// In es, this message translates to:
+  /// **'No se pudo capturar la pantalla.'**
   String get formQrScreenError;
 
   /// No description provided for @formTotpNonStandard.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP detected, but with non-standard parameters (SoloKey generates SHA1, 6 digits, 30s); the code may not match.'**
+  /// In es, this message translates to:
+  /// **'Este autenticador usa una configuración poco común; el código que muestre SoloKey podría no coincidir.'**
   String get formTotpNonStandard;
 
   /// No description provided for @formOrManually.
   ///
-  /// In en, this message translates to:
-  /// **'or enter manually'**
+  /// In es, this message translates to:
+  /// **'o ingresa manualmente'**
   String get formOrManually;
 
   /// No description provided for @formAccountIssuerLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Account / Issuer'**
+  /// In es, this message translates to:
+  /// **'Cuenta / Emisor'**
   String get formAccountIssuerLabel;
 
   /// No description provided for @formAccountIssuerHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g. GitHub, Google, AWS'**
+  /// In es, this message translates to:
+  /// **'ej. GitHub, Google, AWS'**
   String get formAccountIssuerHint;
 
   /// No description provided for @formTotpSecretLabel.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP secret key (Base32)'**
+  /// In es, this message translates to:
+  /// **'Clave secreta'**
   String get formTotpSecretLabel;
 
   /// No description provided for @formSectionPasskey.
   ///
-  /// In en, this message translates to:
-  /// **'Passkey (FIDO2)'**
+  /// In es, this message translates to:
+  /// **'Passkey'**
   String get formSectionPasskey;
 
   /// No description provided for @formPasskeyDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Passkeys are registered directly with the device\'s FIDO2 platform.'**
+  /// In es, this message translates to:
+  /// **'Las passkeys se crean en cada sitio web, desde tu celular o tu computadora.'**
   String get formPasskeyDesc;
 
   /// No description provided for @formPasskeyHint.
   ///
-  /// In en, this message translates to:
-  /// **'Use the Passkeys screen in Settings to register or manage your passkeys.'**
+  /// In es, this message translates to:
+  /// **'Usa la pantalla de Passkeys en Ajustes para registrar o gestionar tus passkeys.'**
   String get formPasskeyHint;
 
   /// No description provided for @formSectionSsh.
   ///
-  /// In en, this message translates to:
-  /// **'SSH key configuration'**
+  /// In es, this message translates to:
+  /// **'Llave SSH'**
   String get formSectionSsh;
 
   /// No description provided for @formGenerateSsh.
   ///
-  /// In en, this message translates to:
-  /// **'Generate Ed25519 key pair'**
+  /// In es, this message translates to:
+  /// **'Generar llaves SSH (Ed25519)'**
   String get formGenerateSsh;
 
   /// No description provided for @formPrivateKeyRequired.
   ///
-  /// In en, this message translates to:
-  /// **'The private key is required'**
+  /// In es, this message translates to:
+  /// **'La llave privada es requerida'**
   String get formPrivateKeyRequired;
 
   /// No description provided for @formPublicKeyOptional.
   ///
-  /// In en, this message translates to:
-  /// **'Public key (Optional)'**
+  /// In es, this message translates to:
+  /// **'Llave Publica (Opcional)'**
   String get formPublicKeyOptional;
 
   /// No description provided for @formKeyPassphraseOptional.
   ///
-  /// In en, this message translates to:
-  /// **'Key passphrase (Optional)'**
+  /// In es, this message translates to:
+  /// **'Passphrase de la Llave (Opcional)'**
   String get formKeyPassphraseOptional;
 
   /// No description provided for @formSectionDoubleEnc.
   ///
-  /// In en, this message translates to:
-  /// **'Double-envelope encryption'**
+  /// In es, this message translates to:
+  /// **'Cifrado doble'**
   String get formSectionDoubleEnc;
 
   /// No description provided for @formEnableDoubleEnc.
   ///
-  /// In en, this message translates to:
-  /// **'Enable double encryption'**
+  /// In es, this message translates to:
+  /// **'Activar cifrado doble'**
   String get formEnableDoubleEnc;
 
   /// No description provided for @formDoubleEncDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Protects this entry\'s secrets with a secondary PIN. They will be encrypted additionally.'**
+  /// In es, this message translates to:
+  /// **'Pide un PIN extra para ver los secretos de este registro.'**
   String get formDoubleEncDesc;
 
   /// No description provided for @formPinSecondaryEditLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Secondary PIN (Leave empty to keep current, or enter to change)'**
+  /// In es, this message translates to:
+  /// **'PIN secundario (vacío para no cambiarlo)'**
   String get formPinSecondaryEditLabel;
 
   /// No description provided for @formPinSecondaryLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Secondary PIN'**
+  /// In es, this message translates to:
+  /// **'PIN Secundario'**
   String get formPinSecondaryLabel;
 
   /// No description provided for @formPinSecondaryRequired.
   ///
-  /// In en, this message translates to:
-  /// **'The secondary PIN is required'**
+  /// In es, this message translates to:
+  /// **'El PIN secundario es requerido'**
   String get formPinSecondaryRequired;
 
   /// No description provided for @formBiometricUnlock.
   ///
-  /// In en, this message translates to:
-  /// **'Biometric unlock'**
+  /// In es, this message translates to:
+  /// **'Desbloqueo con huella o rostro'**
   String get formBiometricUnlock;
 
   /// No description provided for @formBiometricUnlockSub.
   ///
-  /// In en, this message translates to:
-  /// **'Store the encrypted PIN to unlock quickly with fingerprint/face.'**
+  /// In es, this message translates to:
+  /// **'Guarda el PIN cifrado para abrirlo rápido con tu huella o tu rostro.'**
   String get formBiometricUnlockSub;
 
   /// No description provided for @formSectionRotation.
   ///
-  /// In en, this message translates to:
-  /// **'Rotation reminder'**
+  /// In es, this message translates to:
+  /// **'Recordatorio de Rotación'**
   String get formSectionRotation;
 
   /// No description provided for @formRotationLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Remind to change password'**
+  /// In es, this message translates to:
+  /// **'Recordar cambiar contraseña'**
   String get formRotationLabel;
 
   /// No description provided for @formRotNone.
   ///
-  /// In en, this message translates to:
-  /// **'Don\'t remind'**
+  /// In es, this message translates to:
+  /// **'No recordar'**
   String get formRotNone;
 
   /// No description provided for @formRotMonthly.
   ///
-  /// In en, this message translates to:
-  /// **'Every month'**
+  /// In es, this message translates to:
+  /// **'Cada mes'**
   String get formRotMonthly;
 
   /// No description provided for @formRotCustom.
   ///
-  /// In en, this message translates to:
-  /// **'Custom (days)'**
+  /// In es, this message translates to:
+  /// **'Personalizado (días)'**
   String get formRotCustom;
 
   /// No description provided for @formCustomDaysLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Days to remind'**
+  /// In es, this message translates to:
+  /// **'Días para recordar'**
   String get formCustomDaysLabel;
 
   /// No description provided for @formCustomDaysRequired.
   ///
-  /// In en, this message translates to:
-  /// **'You must enter the number of days'**
+  /// In es, this message translates to:
+  /// **'Debe ingresar el número de días'**
   String get formCustomDaysRequired;
 
   /// No description provided for @formCustomDaysInvalid.
   ///
-  /// In en, this message translates to:
-  /// **'Enter a valid number of days'**
+  /// In es, this message translates to:
+  /// **'Ingrese un número válido de días'**
   String get formCustomDaysInvalid;
 
   /// No description provided for @formDiscardTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Discard changes?'**
+  /// In es, this message translates to:
+  /// **'¿Descartar cambios?'**
   String get formDiscardTitle;
 
   /// No description provided for @formDiscardMessage.
   ///
-  /// In en, this message translates to:
-  /// **'You have unsaved changes. If you leave now they will be lost.'**
+  /// In es, this message translates to:
+  /// **'Tienes cambios sin guardar. Si sales ahora se perderan.'**
   String get formDiscardMessage;
 
   /// No description provided for @formDiscardKeep.
   ///
-  /// In en, this message translates to:
-  /// **'Keep editing'**
+  /// In es, this message translates to:
+  /// **'Seguir editando'**
   String get formDiscardKeep;
 
   /// No description provided for @formDiscardLeave.
   ///
-  /// In en, this message translates to:
-  /// **'Discard'**
+  /// In es, this message translates to:
+  /// **'Descartar'**
   String get formDiscardLeave;
 
   /// No description provided for @formErrInvalidUrl.
   ///
-  /// In en, this message translates to:
-  /// **'Enter a valid URL'**
+  /// In es, this message translates to:
+  /// **'Escribe una dirección web válida'**
   String get formErrInvalidUrl;
 
   /// No description provided for @formErrInvalidTotp.
   ///
-  /// In en, this message translates to:
-  /// **'Invalid Base32 secret (only A–Z and 2–7)'**
+  /// In es, this message translates to:
+  /// **'Clave secreta no válida: solo letras de la A a la Z y números del 2 al 7'**
   String get formErrInvalidTotp;
 
   /// No description provided for @formPasteTotp.
   ///
-  /// In en, this message translates to:
-  /// **'Paste otpauth link'**
+  /// In es, this message translates to:
+  /// **'Pegar enlace del autenticador'**
   String get formPasteTotp;
 
   /// No description provided for @formPasteApplied.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP filled from clipboard'**
+  /// In es, this message translates to:
+  /// **'Autenticador rellenado desde el portapapeles'**
   String get formPasteApplied;
 
   /// No description provided for @formPasteNoOtpauth.
   ///
-  /// In en, this message translates to:
-  /// **'No valid otpauth:// link in the clipboard'**
+  /// In es, this message translates to:
+  /// **'El portapapeles no tiene un enlace de autenticador (otpauth://)'**
   String get formPasteNoOtpauth;
 
   /// No description provided for @formDupTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Possible duplicate'**
+  /// In es, this message translates to:
+  /// **'Posible duplicado'**
   String get formDupTitle;
 
   /// No description provided for @formDupMessage.
   ///
-  /// In en, this message translates to:
-  /// **'\"{title}\" already uses this username. Save anyway?'**
+  /// In es, this message translates to:
+  /// **'\"{title}\" ya usa este usuario. ¿Guardar de todos modos?'**
   String formDupMessage(String title);
 
   /// No description provided for @formDupReview.
   ///
-  /// In en, this message translates to:
-  /// **'Review'**
+  /// In es, this message translates to:
+  /// **'Revisar'**
   String get formDupReview;
 
   /// No description provided for @formDupSaveAnyway.
   ///
-  /// In en, this message translates to:
-  /// **'Save anyway'**
+  /// In es, this message translates to:
+  /// **'Guardar de todos modos'**
   String get formDupSaveAnyway;
 
   /// No description provided for @commonLoading.
   ///
-  /// In en, this message translates to:
-  /// **'Loading…'**
+  /// In es, this message translates to:
+  /// **'Cargando…'**
   String get commonLoading;
 
   /// No description provided for @folderNewSubfolder.
   ///
-  /// In en, this message translates to:
-  /// **'New subfolder'**
+  /// In es, this message translates to:
+  /// **'Nueva subcarpeta'**
   String get folderNewSubfolder;
 
   /// No description provided for @folderDeleteTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Delete folder'**
+  /// In es, this message translates to:
+  /// **'Eliminar carpeta'**
   String get folderDeleteTitle;
 
   /// No description provided for @folderDeleteKeepBody.
   ///
-  /// In en, this message translates to:
-  /// **'Remove \"{name}\"? Its subfolders and credentials are kept — choose where to move them. Nothing is deleted.'**
+  /// In es, this message translates to:
+  /// **'¿Quitar \"{name}\"? Sus subcarpetas y credenciales se conservan: elige a dónde moverlas. No se elimina nada.'**
   String folderDeleteKeepBody(String name);
 
   /// No description provided for @folderDeleteMoveToParent.
   ///
-  /// In en, this message translates to:
-  /// **'Move contents to parent folder'**
+  /// In es, this message translates to:
+  /// **'Mover contenido a la carpeta padre'**
   String get folderDeleteMoveToParent;
 
   /// No description provided for @folderDeleteMoveToVault.
   ///
-  /// In en, this message translates to:
-  /// **'Move contents to vault root'**
+  /// In es, this message translates to:
+  /// **'Mover contenido a la raíz'**
   String get folderDeleteMoveToVault;
 
   /// No description provided for @folderDeleted.
   ///
-  /// In en, this message translates to:
-  /// **'Folder deleted'**
+  /// In es, this message translates to:
+  /// **'Carpeta eliminada'**
   String get folderDeleted;
 
   /// No description provided for @folderRename.
   ///
-  /// In en, this message translates to:
-  /// **'Rename'**
+  /// In es, this message translates to:
+  /// **'Renombrar'**
   String get folderRename;
 
   /// No description provided for @folderRenameTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Rename folder'**
+  /// In es, this message translates to:
+  /// **'Renombrar carpeta'**
   String get folderRenameTitle;
 
   /// No description provided for @folderNewNameLabel.
   ///
-  /// In en, this message translates to:
-  /// **'New name'**
+  /// In es, this message translates to:
+  /// **'Nuevo nombre'**
   String get folderNewNameLabel;
 
   /// No description provided for @folderCreateSubfolder.
   ///
-  /// In en, this message translates to:
-  /// **'Create subfolder'**
+  /// In es, this message translates to:
+  /// **'Crear subcarpeta'**
   String get folderCreateSubfolder;
 
   /// No description provided for @folderEmptyTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Empty folder'**
+  /// In es, this message translates to:
+  /// **'Carpeta Vacía'**
   String get folderEmptyTitle;
 
   /// No description provided for @folderEmptyDesc.
   ///
-  /// In en, this message translates to:
-  /// **'There are no subfolders or credentials here.'**
+  /// In es, this message translates to:
+  /// **'No hay subcarpetas ni credenciales aquí.'**
   String get folderEmptyDesc;
 
   /// No description provided for @folderNoFolders.
   ///
-  /// In en, this message translates to:
-  /// **'No folders'**
+  /// In es, this message translates to:
+  /// **'Sin carpetas'**
   String get folderNoFolders;
 
   /// No description provided for @folderOrganize.
   ///
-  /// In en, this message translates to:
-  /// **'Organise your credentials'**
+  /// In es, this message translates to:
+  /// **'Organiza tus credenciales'**
   String get folderOrganize;
 
   /// No description provided for @folderCreateRoot.
   ///
-  /// In en, this message translates to:
-  /// **'Create root folder'**
+  /// In es, this message translates to:
+  /// **'Crear carpeta raíz'**
   String get folderCreateRoot;
 
   /// No description provided for @folderNewRoot.
   ///
-  /// In en, this message translates to:
-  /// **'New root folder'**
+  /// In es, this message translates to:
+  /// **'Nueva carpeta raíz'**
   String get folderNewRoot;
 
   /// No description provided for @folderUnassigned.
   ///
-  /// In en, this message translates to:
-  /// **'No folder assigned'**
+  /// In es, this message translates to:
+  /// **'Sin carpeta asignada'**
   String get folderUnassigned;
 
   /// No description provided for @folderNew.
   ///
-  /// In en, this message translates to:
-  /// **'New folder'**
+  /// In es, this message translates to:
+  /// **'Nueva carpeta'**
   String get folderNew;
 
   /// No description provided for @folderAddSubfolder.
   ///
-  /// In en, this message translates to:
-  /// **'Add subfolder'**
+  /// In es, this message translates to:
+  /// **'Añadir subcarpeta'**
   String get folderAddSubfolder;
 
   /// No description provided for @folderItemCount.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{No items} =1{1 item} other{{count} items}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{Sin elementos} =1{1 elemento} other{{count} elementos}}'**
   String folderItemCount(int count);
 
   /// No description provided for @folderColorTitle.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Color'**
   String get folderColorTitle;
 
   /// No description provided for @folderEditTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Edit folder'**
+  /// In es, this message translates to:
+  /// **'Editar carpeta'**
   String get folderEditTitle;
 
   /// No description provided for @folderTreeHint.
   ///
-  /// In en, this message translates to:
-  /// **'Use the arrow keys to browse folders; press the menu button for actions.'**
+  /// In es, this message translates to:
+  /// **'Usa las flechas para navegar por las carpetas; pulsa el botón de menú para acciones.'**
   String get folderTreeHint;
 
   /// No description provided for @folderSelectTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Select folder'**
+  /// In es, this message translates to:
+  /// **'Seleccionar Carpeta'**
   String get folderSelectTitle;
 
   /// No description provided for @folderNewRootShort.
   ///
-  /// In en, this message translates to:
-  /// **'New root'**
+  /// In es, this message translates to:
+  /// **'Nueva raíz'**
   String get folderNewRootShort;
 
   /// No description provided for @folderNoneMainVault.
   ///
-  /// In en, this message translates to:
-  /// **'None (Main vault)'**
+  /// In es, this message translates to:
+  /// **'Ninguna (Bóveda principal)'**
   String get folderNoneMainVault;
 
   /// No description provided for @favoritesEmptyTitle.
   ///
-  /// In en, this message translates to:
-  /// **'No favourites yet'**
+  /// In es, this message translates to:
+  /// **'No tienes favoritos'**
   String get favoritesEmptyTitle;
 
   /// No description provided for @favoritesEmptyDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Star folders or credentials'**
+  /// In es, this message translates to:
+  /// **'Marca carpetas o credenciales con una estrella'**
   String get favoritesEmptyDesc;
 
   /// No description provided for @favoritesFoldersHeader.
   ///
-  /// In en, this message translates to:
-  /// **'Favourite folders'**
+  /// In es, this message translates to:
+  /// **'Carpetas Favoritas'**
   String get favoritesFoldersHeader;
 
   /// No description provided for @favoritesCredentialsHeader.
   ///
-  /// In en, this message translates to:
-  /// **'Favourite credentials'**
+  /// In es, this message translates to:
+  /// **'Credenciales Favoritas'**
   String get favoritesCredentialsHeader;
 
   /// No description provided for @favoriteToggleLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Mark as favourite'**
+  /// In es, this message translates to:
+  /// **'Marcar como favorita'**
   String get favoriteToggleLabel;
 
   /// No description provided for @commonEdit.
   ///
-  /// In en, this message translates to:
-  /// **'Edit'**
+  /// In es, this message translates to:
+  /// **'Editar'**
   String get commonEdit;
 
   /// No description provided for @cardCopyUser.
   ///
-  /// In en, this message translates to:
-  /// **'Copy username'**
+  /// In es, this message translates to:
+  /// **'Copiar Usuario'**
   String get cardCopyUser;
 
   /// No description provided for @cardCopyPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Copy password'**
+  /// In es, this message translates to:
+  /// **'Copiar Contraseña'**
   String get cardCopyPassword;
 
   /// No description provided for @cardCopyPasswordAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticate to copy the password'**
+  /// In es, this message translates to:
+  /// **'Autentícate para copiar la contraseña'**
   String get cardCopyPasswordAuthReason;
 
   /// No description provided for @cardMoveToFolder.
   ///
-  /// In en, this message translates to:
-  /// **'Move to folder'**
+  /// In es, this message translates to:
+  /// **'Mover a carpeta'**
   String get cardMoveToFolder;
 
   /// No description provided for @cardNoFolder.
   ///
-  /// In en, this message translates to:
-  /// **'No folder'**
+  /// In es, this message translates to:
+  /// **'Sin carpeta'**
   String get cardNoFolder;
 
   /// No description provided for @cardMovedSuccess.
   ///
-  /// In en, this message translates to:
-  /// **'Credential moved successfully'**
+  /// In es, this message translates to:
+  /// **'Credencial movida con éxito'**
   String get cardMovedSuccess;
 
   /// No description provided for @typeSelNote.
   ///
-  /// In en, this message translates to:
-  /// **'Note'**
+  /// In es, this message translates to:
+  /// **'Nota'**
   String get typeSelNote;
 
   /// No description provided for @typeSelTotp.
   ///
-  /// In en, this message translates to:
-  /// **'TOTP'**
+  /// In es, this message translates to:
+  /// **'Autenticador'**
   String get typeSelTotp;
 
   /// No description provided for @typeSelPasskey.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Passkey'**
   String get typeSelPasskey;
 
   /// No description provided for @genRegenerate.
   ///
-  /// In en, this message translates to:
-  /// **'Regenerate'**
+  /// In es, this message translates to:
+  /// **'Regenerar'**
   String get genRegenerate;
 
   /// No description provided for @genLength.
   ///
-  /// In en, this message translates to:
-  /// **'Length: {n}'**
+  /// In es, this message translates to:
+  /// **'Longitud: {n}'**
   String genLength(int n);
 
   /// No description provided for @genGeneratedPassword.
   ///
-  /// In en, this message translates to:
-  /// **'Generated password'**
+  /// In es, this message translates to:
+  /// **'Contraseña generada'**
   String get genGeneratedPassword;
 
   /// No description provided for @genUseAndCopy.
   ///
-  /// In en, this message translates to:
-  /// **'Use & copy'**
+  /// In es, this message translates to:
+  /// **'Usar y Copiar'**
   String get genUseAndCopy;
 
   /// No description provided for @strengthWeak.
   ///
-  /// In en, this message translates to:
-  /// **'Weak'**
+  /// In es, this message translates to:
+  /// **'Débil'**
   String get strengthWeak;
 
   /// No description provided for @strengthFair.
   ///
-  /// In en, this message translates to:
-  /// **'Fair'**
+  /// In es, this message translates to:
+  /// **'Regular'**
   String get strengthFair;
 
   /// No description provided for @strengthGood.
   ///
-  /// In en, this message translates to:
-  /// **'Good'**
+  /// In es, this message translates to:
+  /// **'Buena'**
   String get strengthGood;
 
   /// No description provided for @strengthStrong.
   ///
-  /// In en, this message translates to:
-  /// **'Strong'**
+  /// In es, this message translates to:
+  /// **'Fuerte'**
   String get strengthStrong;
 
   /// No description provided for @clipboardCopiedClears.
   ///
-  /// In en, this message translates to:
-  /// **'{label} copied · clears in {seconds}s'**
+  /// In es, this message translates to:
+  /// **'{label} copiado · se limpia en {seconds}s'**
   String clipboardCopiedClears(String label, int seconds);
 
   /// No description provided for @passwordRowGeneratorTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'Key generator'**
+  /// In es, this message translates to:
+  /// **'Generador de claves'**
   String get passwordRowGeneratorTooltip;
 
   /// No description provided for @keyboardSpace.
   ///
-  /// In en, this message translates to:
-  /// **'Space'**
+  /// In es, this message translates to:
+  /// **'Espacio'**
   String get keyboardSpace;
 
   /// No description provided for @transferTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Transfer data'**
+  /// In es, this message translates to:
+  /// **'Transferir datos'**
   String get transferTitle;
 
   /// No description provided for @transferTabExport.
   ///
-  /// In en, this message translates to:
-  /// **'Export'**
+  /// In es, this message translates to:
+  /// **'Exportar'**
   String get transferTabExport;
 
   /// No description provided for @transferTabImport.
   ///
-  /// In en, this message translates to:
-  /// **'Import'**
+  /// In es, this message translates to:
+  /// **'Importar'**
   String get transferTabImport;
 
   /// No description provided for @transferErrorTitle.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Error'**
   String get transferErrorTitle;
 
   /// No description provided for @transferTypePasswords.
   ///
-  /// In en, this message translates to:
-  /// **'Passwords'**
+  /// In es, this message translates to:
+  /// **'Contraseñas'**
   String get transferTypePasswords;
 
   /// No description provided for @transferTypeApiKeys.
   ///
-  /// In en, this message translates to:
-  /// **'API Keys'**
+  /// In es, this message translates to:
+  /// **'Claves de API'**
   String get transferTypeApiKeys;
 
   /// No description provided for @transferTypeSecureNotes.
   ///
-  /// In en, this message translates to:
-  /// **'Secure notes'**
+  /// In es, this message translates to:
+  /// **'Notas seguras'**
   String get transferTypeSecureNotes;
 
   /// No description provided for @transferTypeTotp.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticators (TOTP)'**
+  /// In es, this message translates to:
+  /// **'Autenticadores'**
   String get transferTypeTotp;
 
   /// No description provided for @transferTypePasskeys.
   ///
-  /// In en, this message translates to:
+  /// In es, this message translates to:
   /// **'Passkeys'**
   String get transferTypePasskeys;
 
   /// No description provided for @transferTypeSshKeys.
   ///
-  /// In en, this message translates to:
-  /// **'SSH keys'**
+  /// In es, this message translates to:
+  /// **'Llaves SSH'**
   String get transferTypeSshKeys;
 
   /// No description provided for @transferExportPasswordRequired.
   ///
-  /// In en, this message translates to:
-  /// **'Enter an export password'**
+  /// In es, this message translates to:
+  /// **'Ingresa una contraseña de exportación'**
   String get transferExportPasswordRequired;
 
   /// No description provided for @transferSelectAtLeastOneType.
   ///
-  /// In en, this message translates to:
-  /// **'Select at least one credential type'**
+  /// In es, this message translates to:
+  /// **'Selecciona al menos un tipo de credencial'**
   String get transferSelectAtLeastOneType;
 
   /// No description provided for @transferExportedSummary.
   ///
-  /// In en, this message translates to:
-  /// **'Exported {creds} credentials · {folders} folders'**
+  /// In es, this message translates to:
+  /// **'Exportadas {creds} credenciales · {folders} carpetas'**
   String transferExportedSummary(int creds, int folders);
 
   /// No description provided for @transferExportError.
   ///
-  /// In en, this message translates to:
-  /// **'Export error: {msg}'**
+  /// In es, this message translates to:
+  /// **'Error al exportar: {msg}'**
   String transferExportError(String msg);
 
   /// No description provided for @transferImportError.
   ///
-  /// In en, this message translates to:
-  /// **'Import error: {msg}'**
+  /// In es, this message translates to:
+  /// **'Error al importar: {msg}'**
   String transferImportError(String msg);
 
   /// No description provided for @transferImportCsvError.
   ///
-  /// In en, this message translates to:
-  /// **'CSV import error: {msg}'**
+  /// In es, this message translates to:
+  /// **'Error al importar CSV: {msg}'**
   String transferImportCsvError(String msg);
 
   /// No description provided for @transferOverwriteTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Overwrite vault?'**
+  /// In es, this message translates to:
+  /// **'¿Sobrescribir bóveda?'**
   String get transferOverwriteTitle;
 
   /// No description provided for @transferOverwriteBody.
   ///
-  /// In en, this message translates to:
-  /// **'This will delete ALL current credentials and replace them with those from the file. This operation cannot be undone.'**
+  /// In es, this message translates to:
+  /// **'Esta acción eliminará TODAS las credenciales actuales y las reemplazará con las del archivo. Esta operación no se puede deshacer.'**
   String get transferOverwriteBody;
 
   /// No description provided for @transferOverwriteConfirm.
   ///
-  /// In en, this message translates to:
-  /// **'Overwrite'**
+  /// In es, this message translates to:
+  /// **'Sobrescribir'**
   String get transferOverwriteConfirm;
 
   /// No description provided for @transferExportPasswordLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Export password'**
+  /// In es, this message translates to:
+  /// **'Contraseña de exportación'**
   String get transferExportPasswordLabel;
 
   /// No description provided for @transferExportPasswordInfo.
   ///
-  /// In en, this message translates to:
-  /// **'Create a password to protect this backup. You\'ll need it when importing on any device.'**
+  /// In es, this message translates to:
+  /// **'Crea una contraseña para proteger este respaldo. La necesitarás al importarlo en cualquier equipo.'**
   String get transferExportPasswordInfo;
 
   /// No description provided for @transferExportPasswordHint.
   ///
-  /// In en, this message translates to:
-  /// **'e.g.: \"my-backup-key-2025\"'**
+  /// In es, this message translates to:
+  /// **'Ej: \"mi-clave-de-respaldo\"'**
   String get transferExportPasswordHint;
 
   /// No description provided for @transferSelectWhatToExport.
   ///
-  /// In en, this message translates to:
-  /// **'Choose what to export'**
+  /// In es, this message translates to:
+  /// **'Selecciona qué exportar'**
   String get transferSelectWhatToExport;
 
   /// No description provided for @transferEncryptionInfo.
   ///
-  /// In en, this message translates to:
-  /// **'The file is encrypted with AES-256-GCM + Argon2id. Only someone who knows the export password can open it.'**
+  /// In es, this message translates to:
+  /// **'El archivo va cifrado: solo quien conozca la contraseña de exportación puede abrirlo.'**
   String get transferEncryptionInfo;
 
   /// No description provided for @transferExportButton.
   ///
-  /// In en, this message translates to:
-  /// **'Export vault'**
+  /// In es, this message translates to:
+  /// **'Exportar bóveda'**
   String get transferExportButton;
 
   /// No description provided for @transferExportDone.
   ///
-  /// In en, this message translates to:
-  /// **'Export completed'**
+  /// In es, this message translates to:
+  /// **'Exportación completada'**
   String get transferExportDone;
 
   /// No description provided for @transferBackupReminder.
   ///
-  /// In en, this message translates to:
-  /// **'It\'s been a while since your last backup. Export an encrypted copy and keep it somewhere safe.'**
+  /// In es, this message translates to:
+  /// **'Hace tiempo que no haces un respaldo. Exporta una copia cifrada y guárdala en un lugar seguro.'**
   String get transferBackupReminder;
 
   /// No description provided for @transferSavedTo.
   ///
-  /// In en, this message translates to:
-  /// **'Saved to: {path}'**
+  /// In es, this message translates to:
+  /// **'Guardado en: {path}'**
   String transferSavedTo(String path);
 
   /// No description provided for @transferSummary.
   ///
-  /// In en, this message translates to:
-  /// **'{creds} credentials · {folders} folders'**
+  /// In es, this message translates to:
+  /// **'{creds} credenciales · {folders} carpetas'**
   String transferSummary(int creds, int folders);
 
   /// No description provided for @transferBackupPasswordLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Backup password'**
+  /// In es, this message translates to:
+  /// **'Contraseña del respaldo'**
   String get transferBackupPasswordLabel;
 
   /// No description provided for @transferImportPasswordInfo.
   ///
-  /// In en, this message translates to:
-  /// **'Enter the password you used when exporting the backup. If you import a backup of your own from the same device you can leave this field empty.'**
+  /// In es, this message translates to:
+  /// **'Escribe la contraseña que usaste al exportar. Si el respaldo es de este mismo equipo, puedes dejarla vacía.'**
   String get transferImportPasswordInfo;
 
   /// No description provided for @transferImportPasswordHint.
   ///
-  /// In en, this message translates to:
-  /// **'Leave empty for same-device backups'**
+  /// In es, this message translates to:
+  /// **'Vacía si el respaldo es de este equipo'**
   String get transferImportPasswordHint;
 
   /// No description provided for @transferImportModeLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Import mode'**
+  /// In es, this message translates to:
+  /// **'Modo de importación'**
   String get transferImportModeLabel;
 
   /// No description provided for @transferModeMerge.
   ///
-  /// In en, this message translates to:
-  /// **'Merge'**
+  /// In es, this message translates to:
+  /// **'Combinar'**
   String get transferModeMerge;
 
   /// No description provided for @transferModeMergeSub.
   ///
-  /// In en, this message translates to:
-  /// **'Add without deleting your current credentials'**
+  /// In es, this message translates to:
+  /// **'Añadir sin borrar tus credenciales actuales'**
   String get transferModeMergeSub;
 
   /// No description provided for @transferModeOverwrite.
   ///
-  /// In en, this message translates to:
-  /// **'Overwrite'**
+  /// In es, this message translates to:
+  /// **'Sobrescribir'**
   String get transferModeOverwrite;
 
   /// No description provided for @transferModeOverwriteSub.
   ///
-  /// In en, this message translates to:
-  /// **'Will delete everything and replace with the file'**
+  /// In es, this message translates to:
+  /// **'Borrará todo y reemplazará con el archivo'**
   String get transferModeOverwriteSub;
 
   /// No description provided for @transferSelectFile.
   ///
-  /// In en, this message translates to:
-  /// **'Select file (.skvault)'**
+  /// In es, this message translates to:
+  /// **'Seleccionar archivo (.skvault)'**
   String get transferSelectFile;
 
   /// No description provided for @transferImportCsv.
   ///
-  /// In en, this message translates to:
-  /// **'Import from CSV (Bitwarden/Chrome/1Pass)'**
+  /// In es, this message translates to:
+  /// **'Importar desde CSV (Bitwarden, Chrome, 1Password)'**
   String get transferImportCsv;
 
   /// No description provided for @transferImportOtpauth.
   ///
-  /// In en, this message translates to:
-  /// **'Import authenticators (otpauth)'**
+  /// In es, this message translates to:
+  /// **'Importar autenticadores'**
   String get transferImportOtpauth;
 
   /// No description provided for @transferOtpauthNone.
   ///
-  /// In en, this message translates to:
-  /// **'No otpauth:// links found in that file'**
+  /// In es, this message translates to:
+  /// **'Ese archivo no tiene autenticadores (enlaces otpauth://)'**
   String get transferOtpauthNone;
 
   /// No description provided for @transferOtpauthMigrationUnsupported.
   ///
-  /// In en, this message translates to:
-  /// **'Google Authenticator export QRs aren\'t supported. Export individual otpauth:// links instead.'**
+  /// In es, this message translates to:
+  /// **'Los QR de exportación de Google Authenticator no son compatibles. Exporta cada cuenta por separado.'**
   String get transferOtpauthMigrationUnsupported;
 
   /// No description provided for @transferDuplicatesWarning.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 selected item already exists in your vault} other{{count} selected items already exist in your vault}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 elemento seleccionado ya existe en tu bóveda} other{{count} elementos seleccionados ya existen en tu bóveda}}'**
   String transferDuplicatesWarning(int count);
 
   /// No description provided for @transferImportDone.
   ///
-  /// In en, this message translates to:
-  /// **'Import completed'**
+  /// In es, this message translates to:
+  /// **'Importación completada'**
   String get transferImportDone;
 
   /// No description provided for @transferExportSelectFolders.
   ///
-  /// In en, this message translates to:
-  /// **'Folders to export'**
+  /// In es, this message translates to:
+  /// **'Carpetas a exportar'**
   String get transferExportSelectFolders;
 
   /// No description provided for @transferNoFolder.
   ///
-  /// In en, this message translates to:
-  /// **'No folder'**
+  /// In es, this message translates to:
+  /// **'Sin carpeta'**
   String get transferNoFolder;
 
   /// No description provided for @transferImportSelectTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Select what to import'**
+  /// In es, this message translates to:
+  /// **'Selecciona qué importar'**
   String get transferImportSelectTitle;
 
   /// No description provided for @transferSectionTypes.
   ///
-  /// In en, this message translates to:
-  /// **'Credential types'**
+  /// In es, this message translates to:
+  /// **'Tipos de credencial'**
   String get transferSectionTypes;
 
   /// No description provided for @transferSectionFolders.
   ///
-  /// In en, this message translates to:
-  /// **'Folders'**
+  /// In es, this message translates to:
+  /// **'Carpetas'**
   String get transferSectionFolders;
 
   /// No description provided for @transferImportConfirm.
   ///
-  /// In en, this message translates to:
-  /// **'Import selection'**
+  /// In es, this message translates to:
+  /// **'Importar selección'**
   String get transferImportConfirm;
 
   /// No description provided for @transferNothingSelected.
   ///
-  /// In en, this message translates to:
-  /// **'Select at least one item to import'**
+  /// In es, this message translates to:
+  /// **'Selecciona al menos un elemento para importar'**
   String get transferNothingSelected;
 
   /// No description provided for @transferSelectAll.
   ///
-  /// In en, this message translates to:
-  /// **'Select all'**
+  /// In es, this message translates to:
+  /// **'Seleccionar todo'**
   String get transferSelectAll;
 
   /// No description provided for @transferSelectCredentials.
   ///
-  /// In en, this message translates to:
-  /// **'Select what to export'**
+  /// In es, this message translates to:
+  /// **'Selecciona qué exportar'**
   String get transferSelectCredentials;
 
   /// No description provided for @transferSelectAtLeastOneCredential.
   ///
-  /// In en, this message translates to:
-  /// **'Select at least one credential'**
+  /// In es, this message translates to:
+  /// **'Selecciona al menos una credencial'**
   String get transferSelectAtLeastOneCredential;
 
   /// No description provided for @commonSearch.
   ///
-  /// In en, this message translates to:
-  /// **'Search…'**
+  /// In es, this message translates to:
+  /// **'Buscar…'**
   String get commonSearch;
 
   /// No description provided for @navSync.
   ///
-  /// In en, this message translates to:
-  /// **'Sync'**
+  /// In es, this message translates to:
+  /// **'Sincronizar'**
   String get navSync;
 
   /// No description provided for @desktopEmptyVault.
   ///
-  /// In en, this message translates to:
-  /// **'Empty vault'**
+  /// In es, this message translates to:
+  /// **'Bóveda vacía'**
   String get desktopEmptyVault;
 
   /// No description provided for @desktopCreateFolder.
   ///
-  /// In en, this message translates to:
-  /// **'Create folder'**
+  /// In es, this message translates to:
+  /// **'Crear carpeta'**
   String get desktopCreateFolder;
 
   /// No description provided for @desktopNoCredentials.
   ///
-  /// In en, this message translates to:
-  /// **'No credentials'**
+  /// In es, this message translates to:
+  /// **'Sin credenciales'**
   String get desktopNoCredentials;
 
   /// No description provided for @desktopNoFavorites.
   ///
-  /// In en, this message translates to:
-  /// **'No favourites'**
+  /// In es, this message translates to:
+  /// **'Sin favoritas'**
   String get desktopNoFavorites;
 
   /// No description provided for @desktopSelectFolderTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Select a folder'**
+  /// In es, this message translates to:
+  /// **'Selecciona una carpeta'**
   String get desktopSelectFolderTitle;
 
   /// No description provided for @desktopSelectFolderSub.
   ///
-  /// In en, this message translates to:
-  /// **'Click a folder in the list to see its contents here.'**
+  /// In es, this message translates to:
+  /// **'Haz clic en una carpeta de la lista para ver su contenido aquí.'**
   String get desktopSelectFolderSub;
 
   /// No description provided for @desktopSecureVaultTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Secure Vault'**
+  /// In es, this message translates to:
+  /// **'Bóveda Segura'**
   String get desktopSecureVaultTitle;
 
   /// No description provided for @desktopSelectCredentialSub.
   ///
-  /// In en, this message translates to:
-  /// **'Select a credential from the list to view or edit its details.'**
+  /// In es, this message translates to:
+  /// **'Selecciona una credencial de la lista para ver o editar sus detalles.'**
   String get desktopSelectCredentialSub;
 
   /// No description provided for @desktopNewFolderTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'New folder'**
+  /// In es, this message translates to:
+  /// **'Nueva carpeta'**
   String get desktopNewFolderTooltip;
 
   /// No description provided for @desktopNewCredentialTooltip.
   ///
-  /// In en, this message translates to:
-  /// **'New credential'**
+  /// In es, this message translates to:
+  /// **'Nueva credencial'**
   String get desktopNewCredentialTooltip;
 
   /// No description provided for @desktopLockVault.
   ///
-  /// In en, this message translates to:
-  /// **'Lock vault'**
+  /// In es, this message translates to:
+  /// **'Bloquear Bóveda'**
   String get desktopLockVault;
 
   /// No description provided for @desktopSectionVault.
   ///
-  /// In en, this message translates to:
-  /// **'Vault'**
+  /// In es, this message translates to:
+  /// **'Bóveda'**
   String get desktopSectionVault;
 
   /// No description provided for @desktopSectionSecurity.
   ///
-  /// In en, this message translates to:
-  /// **'Security'**
+  /// In es, this message translates to:
+  /// **'Seguridad'**
   String get desktopSectionSecurity;
 
   /// No description provided for @desktopSectionDevices.
   ///
-  /// In en, this message translates to:
-  /// **'Devices'**
+  /// In es, this message translates to:
+  /// **'Dispositivos'**
   String get desktopSectionDevices;
 
   /// No description provided for @desktopCollapseSidebar.
   ///
-  /// In en, this message translates to:
-  /// **'Collapse sidebar'**
+  /// In es, this message translates to:
+  /// **'Colapsar barra lateral'**
   String get desktopCollapseSidebar;
 
   /// No description provided for @desktopExpandSidebar.
   ///
-  /// In en, this message translates to:
-  /// **'Expand sidebar'**
+  /// In es, this message translates to:
+  /// **'Expandir barra lateral'**
   String get desktopExpandSidebar;
 
   /// No description provided for @desktopWatchtowerBadge.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, one{{count} item needs attention} other{{count} items need attention}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, one{{count} elemento requiere atención} other{{count} elementos requieren atención}}'**
   String desktopWatchtowerBadge(int count);
 
   /// No description provided for @trayShowVault.
   ///
-  /// In en, this message translates to:
-  /// **'Show vault'**
+  /// In es, this message translates to:
+  /// **'Mostrar bóveda'**
   String get trayShowVault;
 
   /// No description provided for @trayExit.
   ///
-  /// In en, this message translates to:
-  /// **'Exit'**
+  /// In es, this message translates to:
+  /// **'Salir'**
   String get trayExit;
 
   /// No description provided for @navSecureFiles.
   ///
-  /// In en, this message translates to:
-  /// **'Secure files'**
+  /// In es, this message translates to:
+  /// **'Archivos seguros'**
   String get navSecureFiles;
 
   /// No description provided for @secureFilesTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Secure files'**
+  /// In es, this message translates to:
+  /// **'Archivos seguros'**
   String get secureFilesTitle;
 
   /// No description provided for @secureFilesEmptyTitle.
   ///
-  /// In en, this message translates to:
-  /// **'No files yet'**
+  /// In es, this message translates to:
+  /// **'Sin archivos'**
   String get secureFilesEmptyTitle;
 
   /// No description provided for @secureFilesEmptyDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Store SSH private keys, credentials.json or any other file, encrypted with your master key.'**
+  /// In es, this message translates to:
+  /// **'Guarda llaves SSH privadas, credentials.json o cualquier otro archivo, cifrado con tu contraseña maestra.'**
   String get secureFilesEmptyDesc;
 
   /// No description provided for @secureFilesAdd.
   ///
-  /// In en, this message translates to:
-  /// **'Add file'**
+  /// In es, this message translates to:
+  /// **'Añadir archivo'**
   String get secureFilesAdd;
 
   /// No description provided for @secureFilesExport.
   ///
-  /// In en, this message translates to:
-  /// **'Export / Save'**
+  /// In es, this message translates to:
+  /// **'Exportar / Guardar'**
   String get secureFilesExport;
 
   /// No description provided for @secureFilesDelete.
   ///
-  /// In en, this message translates to:
-  /// **'Delete'**
+  /// In es, this message translates to:
+  /// **'Eliminar'**
   String get secureFilesDelete;
 
   /// No description provided for @secureFilesAuthReason.
   ///
-  /// In en, this message translates to:
-  /// **'Verify your identity to access the file'**
+  /// In es, this message translates to:
+  /// **'Verifica tu identidad para acceder al archivo'**
   String get secureFilesAuthReason;
 
   /// No description provided for @secureFilesDeleteConfirmTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Delete file?'**
+  /// In es, this message translates to:
+  /// **'¿Eliminar archivo?'**
   String get secureFilesDeleteConfirmTitle;
 
   /// No description provided for @secureFilesDeleteConfirmBody.
   ///
-  /// In en, this message translates to:
-  /// **'Delete \"{name}\"? This permanently removes the encrypted file.'**
+  /// In es, this message translates to:
+  /// **'¿Eliminar \"{name}\"? Esto borra permanentemente el archivo cifrado.'**
   String secureFilesDeleteConfirmBody(String name);
 
   /// No description provided for @secureFilesDeleted.
   ///
-  /// In en, this message translates to:
-  /// **'File deleted'**
+  /// In es, this message translates to:
+  /// **'Archivo eliminado'**
   String get secureFilesDeleted;
 
   /// No description provided for @secureFilesSaved.
   ///
-  /// In en, this message translates to:
-  /// **'File saved'**
+  /// In es, this message translates to:
+  /// **'Archivo guardado'**
   String get secureFilesSaved;
 
   /// No description provided for @secureFilesAddedSummary.
   ///
-  /// In en, this message translates to:
-  /// **'Added {name}'**
+  /// In es, this message translates to:
+  /// **'Añadido {name}'**
   String secureFilesAddedSummary(String name);
 
   /// No description provided for @secureFilesAddError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not add file: {msg}'**
+  /// In es, this message translates to:
+  /// **'No se pudo añadir el archivo: {msg}'**
   String secureFilesAddError(String msg);
 
   /// No description provided for @secureFilesExportError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not export file: {msg}'**
+  /// In es, this message translates to:
+  /// **'No se pudo exportar el archivo: {msg}'**
   String secureFilesExportError(String msg);
 
   /// No description provided for @secureFilesRename.
   ///
-  /// In en, this message translates to:
-  /// **'Rename'**
+  /// In es, this message translates to:
+  /// **'Renombrar'**
   String get secureFilesRename;
 
   /// No description provided for @secureFilesRenameTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Rename file'**
+  /// In es, this message translates to:
+  /// **'Renombrar archivo'**
   String get secureFilesRenameTitle;
 
   /// No description provided for @secureFilesSearchHint.
   ///
-  /// In en, this message translates to:
-  /// **'Search files…'**
+  /// In es, this message translates to:
+  /// **'Buscar archivos…'**
   String get secureFilesSearchHint;
 
   /// No description provided for @secureFilesSortRecent.
   ///
-  /// In en, this message translates to:
-  /// **'Recent'**
+  /// In es, this message translates to:
+  /// **'Recientes'**
   String get secureFilesSortRecent;
 
   /// No description provided for @secureFilesSortName.
   ///
-  /// In en, this message translates to:
-  /// **'Name'**
+  /// In es, this message translates to:
+  /// **'Nombre'**
   String get secureFilesSortName;
 
   /// No description provided for @secureFilesSortSize.
   ///
-  /// In en, this message translates to:
-  /// **'Size'**
+  /// In es, this message translates to:
+  /// **'Tamaño'**
   String get secureFilesSortSize;
 
   /// No description provided for @secureFilesEditNote.
   ///
-  /// In en, this message translates to:
-  /// **'Edit note'**
+  /// In es, this message translates to:
+  /// **'Editar nota'**
   String get secureFilesEditNote;
 
   /// No description provided for @secureFilesNoteHint.
   ///
-  /// In en, this message translates to:
-  /// **'Note (not encrypted; do not put secrets here)'**
+  /// In es, this message translates to:
+  /// **'Nota (no cifrada; no pongas secretos aquí)'**
   String get secureFilesNoteHint;
 
   /// No description provided for @secureFilesNoResults.
   ///
-  /// In en, this message translates to:
-  /// **'No results for your search'**
+  /// In es, this message translates to:
+  /// **'Sin resultados para tu búsqueda'**
   String get secureFilesNoResults;
 
   /// No description provided for @secureFilesMove.
   ///
-  /// In en, this message translates to:
-  /// **'Move to folder'**
+  /// In es, this message translates to:
+  /// **'Mover a carpeta'**
   String get secureFilesMove;
 
   /// No description provided for @secureFilesMoveTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Move to folder'**
+  /// In es, this message translates to:
+  /// **'Mover a carpeta'**
   String get secureFilesMoveTitle;
 
   /// No description provided for @secureFilesFavorite.
   ///
-  /// In en, this message translates to:
-  /// **'Favourite'**
+  /// In es, this message translates to:
+  /// **'Favorito'**
   String get secureFilesFavorite;
 
   /// No description provided for @secureFilesDropHint.
   ///
-  /// In en, this message translates to:
-  /// **'Drop files here to add them'**
+  /// In es, this message translates to:
+  /// **'Suelta archivos aqui para agregarlos'**
   String get secureFilesDropHint;
 
   /// No description provided for @secureFilesAddedCount.
   ///
-  /// In en, this message translates to:
-  /// **'Added {count} file(s)'**
+  /// In es, this message translates to:
+  /// **'Agregados {count} archivo(s)'**
   String secureFilesAddedCount(int count);
 
   /// No description provided for @secureFilesTooLarge.
   ///
-  /// In en, this message translates to:
-  /// **'\"{name}\" exceeds the {limit} limit and was skipped'**
+  /// In es, this message translates to:
+  /// **'\"{name}\" supera el límite de {limit} y se omitió'**
   String secureFilesTooLarge(String name, String limit);
 
   /// No description provided for @secureFilesSkippedLarge.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 file skipped (too large)} other{{count} files skipped (too large)}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 archivo omitido (muy grande)} other{{count} archivos omitidos (muy grandes)}}'**
   String secureFilesSkippedLarge(int count);
 
   /// No description provided for @secureFilesProcessing.
   ///
-  /// In en, this message translates to:
-  /// **'Encrypting {done} of {total}…'**
+  /// In es, this message translates to:
+  /// **'Cifrando {done} de {total}…'**
   String secureFilesProcessing(int done, int total);
 
   /// No description provided for @secureFilesOptions.
   ///
-  /// In en, this message translates to:
-  /// **'Options'**
+  /// In es, this message translates to:
+  /// **'Opciones'**
   String get secureFilesOptions;
 
   /// No description provided for @secureFilesPreview.
   ///
-  /// In en, this message translates to:
-  /// **'Preview'**
+  /// In es, this message translates to:
+  /// **'Previsualizar'**
   String get secureFilesPreview;
 
   /// No description provided for @secureFilesPreviewError.
   ///
-  /// In en, this message translates to:
-  /// **'Could not preview file: {msg}'**
+  /// In es, this message translates to:
+  /// **'No se pudo previsualizar el archivo: {msg}'**
   String secureFilesPreviewError(String msg);
 
   /// No description provided for @secureFilesPreviewUnsupported.
   ///
-  /// In en, this message translates to:
-  /// **'This file can\'t be shown as an image.'**
+  /// In es, this message translates to:
+  /// **'Este archivo no se puede mostrar como imagen.'**
   String get secureFilesPreviewUnsupported;
 
   /// No description provided for @secureFilesFileTypeLabel.
   ///
-  /// In en, this message translates to:
-  /// **'{type} file'**
+  /// In es, this message translates to:
+  /// **'Archivo {type}'**
   String secureFilesFileTypeLabel(String type);
 
   /// No description provided for @secureFilesFileGeneric.
   ///
-  /// In en, this message translates to:
-  /// **'File'**
+  /// In es, this message translates to:
+  /// **'Archivo'**
   String get secureFilesFileGeneric;
 
   /// No description provided for @relativeNow.
   ///
-  /// In en, this message translates to:
-  /// **'just now'**
+  /// In es, this message translates to:
+  /// **'hace un momento'**
   String get relativeNow;
 
   /// No description provided for @relativeMinutes.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 min} other{hace {count} min}}'**
   String relativeMinutes(int count);
 
   /// No description provided for @relativeHours.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 h ago} other{{count} h ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 h} other{hace {count} h}}'**
   String relativeHours(int count);
 
   /// No description provided for @relativeDays.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 d ago} other{{count} d ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 d} other{hace {count} d}}'**
   String relativeDays(int count);
 
   /// No description provided for @homeShowHidden.
   ///
-  /// In en, this message translates to:
-  /// **'Show hidden'**
+  /// In es, this message translates to:
+  /// **'Ver ocultas'**
   String get homeShowHidden;
 
   /// No description provided for @homeShowActive.
   ///
-  /// In en, this message translates to:
-  /// **'Show active'**
+  /// In es, this message translates to:
+  /// **'Ver activas'**
   String get homeShowActive;
 
   /// No description provided for @homeNoHidden.
   ///
-  /// In en, this message translates to:
-  /// **'You have no hidden credentials'**
+  /// In es, this message translates to:
+  /// **'No tienes credenciales ocultas'**
   String get homeNoHidden;
 
   /// No description provided for @detailHide.
   ///
-  /// In en, this message translates to:
-  /// **'Hide'**
+  /// In es, this message translates to:
+  /// **'Ocultar'**
   String get detailHide;
 
   /// No description provided for @detailUnhide.
   ///
-  /// In en, this message translates to:
-  /// **'Show in list'**
+  /// In es, this message translates to:
+  /// **'Mostrar en la lista'**
   String get detailUnhide;
 
   /// No description provided for @detailHidden.
   ///
-  /// In en, this message translates to:
-  /// **'Credential hidden from the main list'**
+  /// In es, this message translates to:
+  /// **'Credencial oculta de la lista principal'**
   String get detailHidden;
 
   /// No description provided for @detailUnhidden.
   ///
-  /// In en, this message translates to:
-  /// **'Credential visible again'**
+  /// In es, this message translates to:
+  /// **'Credencial visible de nuevo'**
   String get detailUnhidden;
 
   /// No description provided for @unlockApprovalSent.
   ///
-  /// In en, this message translates to:
-  /// **'Request sent to your phone. Approve it there to unlock.'**
+  /// In es, this message translates to:
+  /// **'Solicitud enviada a tu celular. Apruebala alli para desbloquear.'**
   String get unlockApprovalSent;
 
   /// No description provided for @unlockApprovalNoDevice.
   ///
-  /// In en, this message translates to:
-  /// **'No phone connected. Open SoloKey on your phone on the same Wi-Fi network.'**
+  /// In es, this message translates to:
+  /// **'No hay un celular conectado. Abre SoloKey en tu celular en la misma red Wi-Fi.'**
   String get unlockApprovalNoDevice;
 
   /// No description provided for @syncTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Sync device'**
+  /// In es, this message translates to:
+  /// **'Sincronizar Dispositivo'**
   String get syncTitle;
 
   /// No description provided for @syncServerActive.
   ///
-  /// In en, this message translates to:
-  /// **'Server active. Waiting for the phone to connect…'**
+  /// In es, this message translates to:
+  /// **'Servidor activo. Esperando conexión del celular...'**
   String get syncServerActive;
 
   /// No description provided for @syncServerOff.
   ///
-  /// In en, this message translates to:
-  /// **'Server off.'**
+  /// In es, this message translates to:
+  /// **'Servidor apagado.'**
   String get syncServerOff;
 
   /// No description provided for @syncClientConnecting.
   ///
-  /// In en, this message translates to:
-  /// **'Phone connecting…'**
+  /// In es, this message translates to:
+  /// **'Celular conectándose...'**
   String get syncClientConnecting;
 
   /// No description provided for @syncClientDisconnected.
   ///
-  /// In en, this message translates to:
-  /// **'Phone disconnected. Server waiting…'**
+  /// In es, this message translates to:
+  /// **'Celular desconectado. Servidor en espera...'**
   String get syncClientDisconnected;
 
   /// No description provided for @syncPairedOk.
   ///
-  /// In en, this message translates to:
-  /// **'Pairing completed successfully!'**
+  /// In es, this message translates to:
+  /// **'¡Vinculación completada con éxito!'**
   String get syncPairedOk;
 
   /// No description provided for @syncComparing.
   ///
-  /// In en, this message translates to:
-  /// **'Comparing local data with the phone…'**
+  /// In es, this message translates to:
+  /// **'Comparando datos locales con celular...'**
   String get syncComparing;
 
   /// No description provided for @syncBidirOk.
   ///
-  /// In en, this message translates to:
-  /// **'Two-way sync successful!'**
+  /// In es, this message translates to:
+  /// **'¡Listo! Los dos equipos quedaron sincronizados'**
   String get syncBidirOk;
 
   /// No description provided for @syncErrorGeneric.
   ///
-  /// In en, this message translates to:
-  /// **'Error during sync.'**
+  /// In es, this message translates to:
+  /// **'Error durante la sincronización.'**
   String get syncErrorGeneric;
 
   /// No description provided for @syncRemoteUnlockReceived.
   ///
-  /// In en, this message translates to:
-  /// **'Remote unlock request received.'**
+  /// In es, this message translates to:
+  /// **'Recibida solicitud de desbloqueo remoto.'**
   String get syncRemoteUnlockReceived;
 
   /// No description provided for @syncPairTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Pair with mobile app'**
+  /// In es, this message translates to:
+  /// **'Vincular con App Móvil'**
   String get syncPairTitle;
 
   /// No description provided for @syncPairSubtitle.
   ///
-  /// In en, this message translates to:
-  /// **'Sync your passwords in real time securely and unlock this vault using your phone\'s biometrics.'**
+  /// In es, this message translates to:
+  /// **'Sincroniza tus contraseñas en tiempo real de forma segura y desbloquea esta bóveda usando la biometría de tu celular.'**
   String get syncPairSubtitle;
 
   /// No description provided for @syncGenerateQr.
   ///
-  /// In en, this message translates to:
-  /// **'Generate QR code'**
+  /// In es, this message translates to:
+  /// **'Generar Código QR'**
   String get syncGenerateQr;
 
   /// No description provided for @syncStartingServer.
   ///
-  /// In en, this message translates to:
-  /// **'Starting local server…'**
+  /// In es, this message translates to:
+  /// **'Iniciando servidor local...'**
   String get syncStartingServer;
 
   /// No description provided for @syncScanThisQr.
   ///
-  /// In en, this message translates to:
-  /// **'Scan this QR code'**
+  /// In es, this message translates to:
+  /// **'Escanea este código QR'**
   String get syncScanThisQr;
 
   /// No description provided for @syncScanThisQrSub.
   ///
-  /// In en, this message translates to:
-  /// **'Open SoloKey on your phone, go to Sync and scan this code.'**
+  /// In es, this message translates to:
+  /// **'Abre SoloKey en tu móvil, ve a Sincronizar y escanea este código.'**
   String get syncScanThisQrSub;
 
   /// No description provided for @syncConnectingDevice.
   ///
-  /// In en, this message translates to:
-  /// **'Connecting to the mobile device…'**
+  /// In es, this message translates to:
+  /// **'Conectando con el dispositivo móvil...'**
   String get syncConnectingDevice;
 
   /// No description provided for @syncLinkedTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Linked successfully!'**
+  /// In es, this message translates to:
+  /// **'¡Vinculado Exitosamente!'**
   String get syncLinkedTitle;
 
   /// No description provided for @syncLinkedSub.
   ///
-  /// In en, this message translates to:
-  /// **'The devices are now securely linked.'**
+  /// In es, this message translates to:
+  /// **'Los dispositivos ahora están enlazados de forma segura.'**
   String get syncLinkedSub;
 
   /// No description provided for @syncUnderstood.
   ///
-  /// In en, this message translates to:
-  /// **'Got it'**
+  /// In es, this message translates to:
+  /// **'Entendido'**
   String get syncUnderstood;
 
   /// No description provided for @syncErrorTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Pairing error'**
+  /// In es, this message translates to:
+  /// **'Error de Vinculación'**
   String get syncErrorTitle;
 
   /// No description provided for @syncUnexpectedError.
   ///
-  /// In en, this message translates to:
-  /// **'An unexpected error occurred.'**
+  /// In es, this message translates to:
+  /// **'Ocurrió un error inesperado.'**
   String get syncUnexpectedError;
 
   /// No description provided for @syncRetry.
   ///
-  /// In en, this message translates to:
-  /// **'Retry'**
+  /// In es, this message translates to:
+  /// **'Reintentar'**
   String get syncRetry;
 
   /// No description provided for @syncComputerLinked.
   ///
-  /// In en, this message translates to:
-  /// **'Computer linked'**
+  /// In es, this message translates to:
+  /// **'Computadora Vinculada'**
   String get syncComputerLinked;
 
   /// No description provided for @syncComputerLinkedSub.
   ///
-  /// In en, this message translates to:
-  /// **'This computer is securely paired. You can connect several devices at once by scanning the same QR.'**
+  /// In es, this message translates to:
+  /// **'Esta computadora está emparejada de forma segura. Puedes conectar varios dispositivos a la vez escaneando el mismo QR.'**
   String get syncComputerLinkedSub;
 
   /// No description provided for @syncServerE2eeActive.
   ///
-  /// In en, this message translates to:
-  /// **'Local E2EE server active'**
+  /// In es, this message translates to:
+  /// **'Conexión cifrada activa'**
   String get syncServerE2eeActive;
 
   /// No description provided for @syncRemoveLink.
   ///
-  /// In en, this message translates to:
-  /// **'Remove link'**
+  /// In es, this message translates to:
+  /// **'Eliminar Vínculo'**
   String get syncRemoveLink;
 
   /// No description provided for @syncShowQr.
   ///
-  /// In en, this message translates to:
-  /// **'Show QR'**
+  /// In es, this message translates to:
+  /// **'Mostrar QR'**
   String get syncShowQr;
 
   /// No description provided for @syncNowButton.
   ///
-  /// In en, this message translates to:
-  /// **'Sync now'**
+  /// In es, this message translates to:
+  /// **'Sincronizar ahora'**
   String get syncNowButton;
 
   /// No description provided for @syncNowRequested.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{Sync requested from 1 device} other{Sync requested from {count} devices}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Sincronización pedida a 1 dispositivo} other{Sincronización pedida a {count} dispositivos}}'**
   String syncNowRequested(int count);
 
   /// No description provided for @syncNowNoDevices.
   ///
-  /// In en, this message translates to:
-  /// **'No devices connected'**
+  /// In es, this message translates to:
+  /// **'No hay dispositivos conectados'**
   String get syncNowNoDevices;
 
   /// No description provided for @syncWaitingDevices.
   ///
-  /// In en, this message translates to:
-  /// **'Waiting for devices…'**
+  /// In es, this message translates to:
+  /// **'Esperando dispositivos…'**
   String get syncWaitingDevices;
 
   /// No description provided for @syncStatusSyncing.
   ///
-  /// In en, this message translates to:
-  /// **'Syncing…'**
+  /// In es, this message translates to:
+  /// **'Sincronizando…'**
   String get syncStatusSyncing;
 
   /// No description provided for @syncStatusSynced.
   ///
-  /// In en, this message translates to:
-  /// **'Synced'**
+  /// In es, this message translates to:
+  /// **'Sincronizado'**
   String get syncStatusSynced;
 
   /// No description provided for @syncStatusConnected.
   ///
-  /// In en, this message translates to:
-  /// **'Connected'**
+  /// In es, this message translates to:
+  /// **'Conectado'**
   String get syncStatusConnected;
 
   /// No description provided for @syncStarting.
   ///
-  /// In en, this message translates to:
-  /// **'Starting sync…'**
+  /// In es, this message translates to:
+  /// **'Iniciando sincronización...'**
   String get syncStarting;
 
   /// No description provided for @syncSendingLocal.
   ///
-  /// In en, this message translates to:
-  /// **'Sending local changes…'**
+  /// In es, this message translates to:
+  /// **'Enviando cambios locales...'**
   String get syncSendingLocal;
 
   /// No description provided for @syncSuccessStats.
   ///
-  /// In en, this message translates to:
-  /// **'Sync successful! ({stats})'**
+  /// In es, this message translates to:
+  /// **'¡Sincronización exitosa! ({stats})'**
   String syncSuccessStats(String stats);
 
   /// No description provided for @syncBiometricReason.
   ///
-  /// In en, this message translates to:
-  /// **'Authenticate to unlock your computer'**
+  /// In es, this message translates to:
+  /// **'Autentícate para desbloquear tu computadora'**
   String get syncBiometricReason;
 
   /// No description provided for @syncLinkComputer.
   ///
-  /// In en, this message translates to:
-  /// **'Pair computer'**
+  /// In es, this message translates to:
+  /// **'Vincular Computadora'**
   String get syncLinkComputer;
 
   /// No description provided for @syncLinkComputerSub.
   ///
-  /// In en, this message translates to:
-  /// **'Scan the QR code generated by the SoloKey app on your computer to sync local data.'**
+  /// In es, this message translates to:
+  /// **'Escanea el código QR generado por la aplicación SoloKey en tu computadora para sincronizar los datos locales.'**
   String get syncLinkComputerSub;
 
   /// No description provided for @syncScanQrButton.
   ///
-  /// In en, this message translates to:
-  /// **'Scan QR code'**
+  /// In es, this message translates to:
+  /// **'Escanear Código QR'**
   String get syncScanQrButton;
 
   /// No description provided for @syncNegotiating.
   ///
-  /// In en, this message translates to:
-  /// **'Negotiating encryption keys…'**
+  /// In es, this message translates to:
+  /// **'Conectando de forma segura…'**
   String get syncNegotiating;
 
   /// No description provided for @syncComputerLinkedExcl.
   ///
-  /// In en, this message translates to:
-  /// **'Computer linked!'**
+  /// In es, this message translates to:
+  /// **'¡Computadora Vinculada!'**
   String get syncComputerLinkedExcl;
 
   /// No description provided for @syncComputerLinkedExclSub.
   ///
-  /// In en, this message translates to:
-  /// **'Data will now sync securely between devices.'**
+  /// In es, this message translates to:
+  /// **'Los datos ahora se sincronizarán de forma segura entre dispositivos.'**
   String get syncComputerLinkedExclSub;
 
   /// No description provided for @syncBack.
   ///
-  /// In en, this message translates to:
-  /// **'Back'**
+  /// In es, this message translates to:
+  /// **'Volver'**
   String get syncBack;
 
   /// No description provided for @syncCouldNotConnect.
   ///
-  /// In en, this message translates to:
-  /// **'Could not connect to the computer.'**
+  /// In es, this message translates to:
+  /// **'No se pudo conectar con la computadora.'**
   String get syncCouldNotConnect;
 
   /// No description provided for @syncRetryButton.
   ///
-  /// In en, this message translates to:
-  /// **'Try again'**
+  /// In es, this message translates to:
+  /// **'Volver a intentar'**
   String get syncRetryButton;
 
   /// No description provided for @syncRemoteUnlockTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Remote unlock'**
+  /// In es, this message translates to:
+  /// **'Desbloqueo Remoto'**
   String get syncRemoteUnlockTitle;
 
   /// No description provided for @syncRemoteUnlockSub.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock your computer\'s vault using this device\'s biometrics.'**
+  /// In es, this message translates to:
+  /// **'Desbloquea la bóveda de tu computadora usando la biometría de este dispositivo.'**
   String get syncRemoteUnlockSub;
 
   /// No description provided for @syncSending.
   ///
-  /// In en, this message translates to:
-  /// **'Sending…'**
+  /// In es, this message translates to:
+  /// **'Enviando...'**
   String get syncSending;
 
   /// No description provided for @syncUnlockComputer.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock computer'**
+  /// In es, this message translates to:
+  /// **'Desbloquear Computadora'**
   String get syncUnlockComputer;
 
   /// No description provided for @syncUnlockSentBanner.
   ///
-  /// In en, this message translates to:
-  /// **'Request sent! The vault should unlock.'**
+  /// In es, this message translates to:
+  /// **'¡Solicitud enviada! La bóveda debería desbloquearse.'**
   String get syncUnlockSentBanner;
 
   /// No description provided for @syncAuthCancelled.
   ///
-  /// In en, this message translates to:
-  /// **'Biometric authentication cancelled.'**
+  /// In es, this message translates to:
+  /// **'Autenticación biométrica cancelada.'**
   String get syncAuthCancelled;
 
   /// No description provided for @syncNoToken.
   ///
-  /// In en, this message translates to:
-  /// **'Pair again with the desktop UNLOCKED to enable remote unlock.'**
+  /// In es, this message translates to:
+  /// **'Vincula de nuevo con el escritorio DESBLOQUEADO para habilitar el desbloqueo remoto.'**
   String get syncNoToken;
 
   /// No description provided for @syncVaultTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Sync vault'**
+  /// In es, this message translates to:
+  /// **'Sincronizar Bóveda'**
   String get syncVaultTitle;
 
   /// No description provided for @syncVaultSub.
   ///
-  /// In en, this message translates to:
-  /// **'Exchange and update your credentials both ways on the local network.'**
+  /// In es, this message translates to:
+  /// **'Intercambia y actualiza tus credenciales bidireccionalmente en red local.'**
   String get syncVaultSub;
 
   /// No description provided for @syncNotPairedYet.
   ///
-  /// In en, this message translates to:
-  /// **'You haven\'t paired yet. Scan the QR on the desktop.'**
+  /// In es, this message translates to:
+  /// **'Aún no has vinculado. Escanea el QR de la computadora.'**
   String get syncNotPairedYet;
 
   /// No description provided for @syncConnectingComputer.
   ///
-  /// In en, this message translates to:
-  /// **'Connecting to the computer…'**
+  /// In es, this message translates to:
+  /// **'Conectando con la computadora...'**
   String get syncConnectingComputer;
 
   /// No description provided for @syncConnectFailCheck.
   ///
-  /// In en, this message translates to:
-  /// **'Could not connect. Make sure the PC is on and on the same Wi-Fi network.'**
+  /// In es, this message translates to:
+  /// **'No se pudo conectar. Verifica que el PC este encendido y en la misma red Wi-Fi.'**
   String get syncConnectFailCheck;
 
   /// No description provided for @auditIssueTooShortTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Password too short'**
+  /// In es, this message translates to:
+  /// **'Contraseña demasiado corta'**
   String get auditIssueTooShortTitle;
 
   /// No description provided for @auditIssueTooShortDesc.
   ///
-  /// In en, this message translates to:
-  /// **'It has fewer than 8 characters.'**
+  /// In es, this message translates to:
+  /// **'Tiene menos de 8 caracteres.'**
   String get auditIssueTooShortDesc;
 
   /// No description provided for @auditIssueWeakTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Weak password'**
+  /// In es, this message translates to:
+  /// **'Contraseña débil'**
   String get auditIssueWeakTitle;
 
   /// No description provided for @auditIssueWeakLettersDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Only letters, no numbers or symbols.'**
+  /// In es, this message translates to:
+  /// **'Solo letras, sin números ni símbolos.'**
   String get auditIssueWeakLettersDesc;
 
   /// No description provided for @auditIssueWeakNumbersDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Only numbers.'**
+  /// In es, this message translates to:
+  /// **'Solo números.'**
   String get auditIssueWeakNumbersDesc;
 
   /// No description provided for @auditIssueReusedTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Reused password'**
+  /// In es, this message translates to:
+  /// **'Contraseña reutilizada'**
   String get auditIssueReusedTitle;
 
   /// No description provided for @auditIssueReusedDesc.
   ///
-  /// In en, this message translates to:
-  /// **'This password is used on multiple accounts.'**
+  /// In es, this message translates to:
+  /// **'Esta contraseña está usada en múltiples cuentas.'**
   String get auditIssueReusedDesc;
 
   /// No description provided for @auditIssueBreachedTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Leaked password'**
+  /// In es, this message translates to:
+  /// **'Contraseña filtrada'**
   String get auditIssueBreachedTitle;
 
   /// No description provided for @auditIssueBreachedDesc.
   ///
-  /// In en, this message translates to:
-  /// **'This password appears in {count} data breaches online. Change it now!'**
+  /// In es, this message translates to:
+  /// **'Esta contraseña aparece en {count} filtraciones de datos en internet. ¡Cámbiala de inmediato!'**
   String auditIssueBreachedDesc(int count);
 
   /// No description provided for @auditIssueNoPasswordTitle.
   ///
-  /// In en, this message translates to:
-  /// **'No password saved'**
+  /// In es, this message translates to:
+  /// **'Sin contraseña guardada'**
   String get auditIssueNoPasswordTitle;
 
   /// No description provided for @auditIssueNoPasswordDesc.
   ///
-  /// In en, this message translates to:
-  /// **'This credential has no password stored.'**
+  /// In es, this message translates to:
+  /// **'Esta credencial no tiene contraseña registrada.'**
   String get auditIssueNoPasswordDesc;
 
   /// No description provided for @auditIssueRotationTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Rotation required'**
+  /// In es, this message translates to:
+  /// **'Rotación requerida'**
   String get auditIssueRotationTitle;
 
   /// No description provided for @auditIssueRotationDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Expired {days} days ago (set every {interval} days).'**
+  /// In es, this message translates to:
+  /// **'Expiró hace {days} días (establecido cada {interval} días).'**
   String auditIssueRotationDesc(int days, int interval);
 
   /// No description provided for @auditIssueStaleTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Old password'**
+  /// In es, this message translates to:
+  /// **'Contraseña antigua'**
   String get auditIssueStaleTitle;
 
   /// No description provided for @auditIssueStaleDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Not updated in over 6 months ({days} days).'**
+  /// In es, this message translates to:
+  /// **'No se ha actualizado en más de 6 meses ({days} días).'**
   String auditIssueStaleDesc(int days);
 
   /// No description provided for @notifRotationChannelName.
   ///
-  /// In en, this message translates to:
-  /// **'Rotation reminders'**
+  /// In es, this message translates to:
+  /// **'Recordatorios de rotación'**
   String get notifRotationChannelName;
 
   /// No description provided for @notifRotationChannelDesc.
   ///
-  /// In en, this message translates to:
-  /// **'Alerts when a password should be rotated for security.'**
+  /// In es, this message translates to:
+  /// **'Alertas cuando una contraseña debe rotarse por seguridad.'**
   String get notifRotationChannelDesc;
 
   /// No description provided for @notifRotationTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Password rotation required'**
+  /// In es, this message translates to:
+  /// **'Rotación de contraseña requerida'**
   String get notifRotationTitle;
 
   /// No description provided for @notifRotationBody.
   ///
-  /// In en, this message translates to:
-  /// **'Your password for \"{title}\" has expired. Change it now for security.'**
+  /// In es, this message translates to:
+  /// **'Tu contraseña para \"{title}\" ha expirado. Cámbiala ahora por seguridad.'**
   String notifRotationBody(String title);
 
   /// No description provided for @notifActionChangePassword.
   ///
-  /// In en, this message translates to:
-  /// **'Change password'**
+  /// In es, this message translates to:
+  /// **'Cambiar contraseña'**
   String get notifActionChangePassword;
 
   /// No description provided for @notifActionSnooze3d.
   ///
-  /// In en, this message translates to:
-  /// **'Snooze 3 days'**
+  /// In es, this message translates to:
+  /// **'Posponer 3 días'**
   String get notifActionSnooze3d;
 
   /// No description provided for @notifApprovalTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Approve sign-in'**
+  /// In es, this message translates to:
+  /// **'Aprobar inicio de sesión'**
   String get notifApprovalTitle;
 
   /// No description provided for @notifApprovalBody.
   ///
-  /// In en, this message translates to:
-  /// **'Your computer is asking to unlock. Tap to approve.'**
+  /// In es, this message translates to:
+  /// **'Tu computadora pide desbloquearse. Toca para aprobar.'**
   String get notifApprovalBody;
 
   /// No description provided for @notifApprovalBodyNamed.
   ///
-  /// In en, this message translates to:
-  /// **'Unlock \"{name}\"? Tap to approve.'**
+  /// In es, this message translates to:
+  /// **'¿Desbloquear \"{name}\"? Toca para aprobar.'**
   String notifApprovalBodyNamed(String name);
 
   /// No description provided for @syncSummaryTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Last sync'**
+  /// In es, this message translates to:
+  /// **'Última sincronización'**
   String get syncSummaryTitle;
 
   /// No description provided for @syncSummaryNoChanges.
   ///
-  /// In en, this message translates to:
-  /// **'No changes — everything was already up to date'**
+  /// In es, this message translates to:
+  /// **'Sin cambios — ya estaba todo al día'**
   String get syncSummaryNoChanges;
 
   /// No description provided for @syncSummaryFrom.
   ///
-  /// In en, this message translates to:
-  /// **'from {device}'**
+  /// In es, this message translates to:
+  /// **'desde {device}'**
   String syncSummaryFrom(String device);
 
   /// No description provided for @syncOtherDevice.
   ///
-  /// In en, this message translates to:
-  /// **'the other device'**
+  /// In es, this message translates to:
+  /// **'el otro dispositivo'**
   String get syncOtherDevice;
 
   /// No description provided for @syncCredentialsLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Credentials'**
+  /// In es, this message translates to:
+  /// **'Credenciales'**
   String get syncCredentialsLabel;
 
   /// No description provided for @syncFoldersLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Folders'**
+  /// In es, this message translates to:
+  /// **'Carpetas'**
   String get syncFoldersLabel;
 
   /// No description provided for @syncFilesLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Files'**
+  /// In es, this message translates to:
+  /// **'Archivos'**
   String get syncFilesLabel;
 
   /// No description provided for @syncCountAdded.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{0 new} =1{1 new} other{{count} new}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{0 nuevas} =1{1 nueva} other{{count} nuevas}}'**
   String syncCountAdded(int count);
 
   /// No description provided for @syncCountUpdated.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{0 updated} =1{1 updated} other{{count} updated}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{0 actualizadas} =1{1 actualizada} other{{count} actualizadas}}'**
   String syncCountUpdated(int count);
 
   /// No description provided for @syncCountRemoved.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =0{0 removed} =1{1 removed} other{{count} removed}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =0{0 eliminadas} =1{1 eliminada} other{{count} eliminadas}}'**
   String syncCountRemoved(int count);
 
   /// No description provided for @syncItemsShow.
   ///
-  /// In en, this message translates to:
-  /// **'Show items'**
+  /// In es, this message translates to:
+  /// **'Ver elementos'**
   String get syncItemsShow;
 
   /// No description provided for @syncItemsHide.
   ///
-  /// In en, this message translates to:
-  /// **'Hide items'**
+  /// In es, this message translates to:
+  /// **'Ocultar elementos'**
   String get syncItemsHide;
 
   /// No description provided for @syncActionAdded.
   ///
-  /// In en, this message translates to:
-  /// **'Added'**
+  /// In es, this message translates to:
+  /// **'Añadida'**
   String get syncActionAdded;
 
   /// No description provided for @syncActionUpdated.
   ///
-  /// In en, this message translates to:
-  /// **'Updated'**
+  /// In es, this message translates to:
+  /// **'Actualizada'**
   String get syncActionUpdated;
 
   /// No description provided for @syncActionRemoved.
   ///
-  /// In en, this message translates to:
-  /// **'Removed'**
+  /// In es, this message translates to:
+  /// **'Eliminada'**
   String get syncActionRemoved;
 
   /// No description provided for @syncHistoryTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Recent syncs'**
+  /// In es, this message translates to:
+  /// **'Sincronizaciones recientes'**
   String get syncHistoryTitle;
 
   /// No description provided for @syncHistoryEmpty.
   ///
-  /// In en, this message translates to:
-  /// **'No syncs recorded yet'**
+  /// In es, this message translates to:
+  /// **'Aún no hay sincronizaciones'**
   String get syncHistoryEmpty;
 
   /// No description provided for @syncRelativeNow.
   ///
-  /// In en, this message translates to:
-  /// **'just now'**
+  /// In es, this message translates to:
+  /// **'hace un momento'**
   String get syncRelativeNow;
 
   /// No description provided for @syncRelativeMinutes.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 min ago} other{{count} min ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 min} other{hace {count} min}}'**
   String syncRelativeMinutes(int count);
 
   /// No description provided for @syncRelativeHours.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 h ago} other{{count} h ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 h} other{hace {count} h}}'**
   String syncRelativeHours(int count);
 
   /// No description provided for @syncRelativeDays.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 d ago} other{{count} d ago}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{hace 1 d} other{hace {count} d}}'**
   String syncRelativeDays(int count);
 
   /// No description provided for @syncBadgeSyncing.
   ///
-  /// In en, this message translates to:
-  /// **'Syncing…'**
+  /// In es, this message translates to:
+  /// **'Sincronizando…'**
   String get syncBadgeSyncing;
 
   /// No description provided for @syncBadgeSynced.
   ///
-  /// In en, this message translates to:
-  /// **'In sync'**
+  /// In es, this message translates to:
+  /// **'Al día'**
   String get syncBadgeSynced;
 
   /// No description provided for @syncBadgeError.
   ///
-  /// In en, this message translates to:
-  /// **'Sync error'**
+  /// In es, this message translates to:
+  /// **'Error de sync'**
   String get syncBadgeError;
 
   /// No description provided for @syncPairedDevicesTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Linked devices'**
+  /// In es, this message translates to:
+  /// **'Dispositivos vinculados'**
   String get syncPairedDevicesTitle;
 
   /// No description provided for @syncNeverSynced.
   ///
-  /// In en, this message translates to:
-  /// **'Never synced'**
+  /// In es, this message translates to:
+  /// **'Nunca sincronizado'**
   String get syncNeverSynced;
 
   /// No description provided for @syncLastSyncLabel.
   ///
-  /// In en, this message translates to:
-  /// **'Last sync: {when}'**
+  /// In es, this message translates to:
+  /// **'Última sync: {when}'**
   String syncLastSyncLabel(String when);
 
   /// No description provided for @syncUnlinkDevice.
   ///
-  /// In en, this message translates to:
-  /// **'Unlink'**
+  /// In es, this message translates to:
+  /// **'Desvincular'**
   String get syncUnlinkDevice;
 
   /// No description provided for @notifSyncTitle.
   ///
-  /// In en, this message translates to:
-  /// **'Vault synced'**
+  /// In es, this message translates to:
+  /// **'Bóveda sincronizada'**
   String get notifSyncTitle;
 
   /// No description provided for @notifSyncBody.
   ///
-  /// In en, this message translates to:
-  /// **'{count, plural, =1{1 change synced} other{{count} changes synced}}'**
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{1 cambio sincronizado} other{{count} cambios sincronizados}}'**
   String notifSyncBody(int count);
 }
 

@@ -73,6 +73,13 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **Español como idioma fuente (PAN-10, 2026-11-20)**: `l10n.yaml` toma `app_es.arb` como plantilla, con los 67 metadatos
+  (`@clave`); `app_en.arb` queda solo con valores. `preferred-supported-locales: [en]`: un idioma del sistema sin traducción
+  sigue cayendo al inglés. 59 textos sin jerga en los dos idiomas (fuera AES-256-GCM, Argon2id, k-Anonymity, FIDO2, E2EE,
+  Base32, "TOTP" como nombre de tipo, que pasa a "Autenticador", "backup" en español, "sobre doble") y acentos que faltaban.
+  `integration_test/app_boot_test.dart` comprueba además el idioma de la pantalla de acceso (sistema en español, en inglés y en
+  francés, que cae al inglés; vista en rojo con el respaldo en español); si el usuario fijó un idioma en Ajustes, solo
+  comprueba ese. Las pruebas viejas que buscaban los textos cambiados se ajustaron.
 - **PLA-4 (2026-11-19)**: dependencias mayores, una por commit. go_router 18; local_auth 3 (parámetros sueltos y
   `LocalAuthException`); flutter_secure_storage 10 con `migrateOnAlgorithmChange` y `resetOnError: false` (migra sola lo que la v9
   guardó con EncryptedSharedPreferences; `migrateWithBackup` se salta esa migración en 10.3.4); Riverpod 3 con riverpod_generator 4

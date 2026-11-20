@@ -32,7 +32,7 @@ flowchart LR
 | Compartido | `lib/shared/` | Widgets comunes, teclado seguro, extensiones |
 | Núcleo | `lib/core/` | `domain/`, `infrastructure/` (security, database, clipboard), `services/` (export, import, auditoría, recuperación, backups, notificaciones), `presentation/` |
 | Funciones | `lib/features/<f>/{domain,application,infrastructure,presentation}` | autofill, credentials, folders, passkeys, password_generator, secure_files, settings, sync, vault_access, vault_transfer |
-| Idiomas | `lib/l10n/` | ARB es/en, plantilla `app_en.arb` |
+| Idiomas | `lib/l10n/` | ARB es/en, plantilla `app_es.arb` (español fuente, PAN-10); sin traducción, cae al inglés |
 
 Reglas: modelos inmutables (freezed); un caso de uso por acción; los widgets no llaman a get_it salvo en el arranque.
 
