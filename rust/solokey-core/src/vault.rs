@@ -29,6 +29,16 @@ pub const FORMAT_VERSION: i64 = 2;
 pub const ENVELOPE_VERSION: i64 = 1;
 /// `PRAGMA application_id` del archivo: "SKV2".
 pub const APPLICATION_ID: i64 = 0x534B_5632;
+/// Lo minimo que se acepta al crear, abrir o cambiar la maestra: los de la v1 (SEC-012). Las pruebas unitarias
+/// usan uno barato; las de `tests/` y el fuzz compilan sin `cfg(test)` y ven el real.
+#[cfg(not(test))]
+pub const KDF_MIN: KdfParams = KdfParams::VAULT;
+#[cfg(test)]
+pub const KDF_MIN: KdfParams = KdfParams {
+    memory_kib: 64,
+    iterations: 1,
+    parallelism: 1,
+};
 /// Nombre del archivo dentro del directorio de datos.
 pub const FILE_NAME: &str = "solokey.vault";
 /// Texto que prueba la DEK al abrir con la clave (biometria) en vez de la maestra.
@@ -221,14 +231,17 @@ fn read_header_conn(conn: &Connection) -> Result<Option<Header>, CoreError> {
     if format_version > FORMAT_VERSION {
         return Err(CoreError::NewerFormat);
     }
+    let kdf = KdfParams {
+        memory_kib: m,
+        iterations: t,
+        parallelism: p,
+    };
+    // Una cabecera alterada no decide cuanta memoria o tiempo gasta abrir, ni abarata la fuerza bruta (SEC-012).
+    kdf.check(KDF_MIN).map_err(|_| CoreError::Format)?;
     Ok(Some(Header {
         format_version,
         vault_id,
-        kdf: KdfParams {
-            memory_kib: m,
-            iterations: t,
-            parallelism: p,
-        },
+        kdf,
         salt,
         has_recovery,
     }))
@@ -274,6 +287,7 @@ impl Vault {
         if let Some(dir) = path.parent() {
             std::fs::create_dir_all(dir).map_err(|e| CoreError::Io(e.to_string()))?;
         }
+        kdf.check(KDF_MIN)?;
         let salt = crypto::generate_salt();
         let kek = crypto::derive_key(password, &salt, kdf)?;
         let recovery = crypto::generate_key();
@@ -585,6 +599,7 @@ impl Vault {
         new_password: &[u8],
         kdf: KdfParams,
     ) -> Result<(), CoreError> {
+        kdf.check(KDF_MIN)?;
         let salt = crypto::generate_salt();
         let kek = crypto::derive_key(new_password, &salt, kdf)?;
         let wrapped = crypto::encrypt_with_aad(

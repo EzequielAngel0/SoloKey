@@ -65,6 +65,13 @@ versión viven en la página de Releases de GitHub.
 - **Firma del APK hecho en Podman (PLA-3, 2026-11-20)**: cada contenedor firmaba con una llave debug nueva y el APK no se
   podía instalar encima del del celular. `tool/build.ps1` monta la llave debug del host en solo lectura; comprobado que el
   certificado del APK es el de esa llave.
+
+- **Parámetros de Argon2id acotados en el núcleo (SEC-012, 2026-11-20)**: `KdfParams::check` con techo de 256 MiB, 8 pasadas y 8
+  hilos (`derive_key` lo aplica siempre) y piso de los de la v1 al leer la cabecera (archivo dañado si no cumple), al crear y al
+  cambiar la maestra (`vault::KDF_MIN`; las pruebas unitarias usan uno barato con `cfg(test)`). Prueba `tests/cabecera_kdf.rs` con
+  los casos del fuzz (vista en rojo sin el control); el fuzz `cabecera_kdf` pasa a verde y `sync_mensaje` crea su bóveda con los
+  parámetros reales.
+
 - **Respaldo del runner de integración (CAL-4, 2026-11-15)**: `run_integration_tests.ps1` no respaldaba `secure_files\` ni el
   `flutter_secure_storage.dat` de la identidad actual (la regex de `Runner.rc` no leía el formato `"valor" "\0"` y solo quedaba la
   ruta vieja `com.vaultguard`). El snapshot pasa a `tool/respaldo-boveda.psm1`: carpeta entera con hash por archivo, falla cerrado si

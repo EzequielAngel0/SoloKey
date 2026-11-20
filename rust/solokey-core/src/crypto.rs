@@ -47,6 +47,29 @@ impl KdfParams {
         iterations: 2,
         parallelism: 2,
     };
+    /// Techo para lo que llega de fuera (la cabecera de un archivo, Dart): 256 MiB, 8 pasadas, 8 hilos, unas 10 veces
+    /// el costo de la v1 como mucho. Sin techo, una cabecera alterada aborta el proceso o lo cuelga (SEC-012).
+    pub const MAX: KdfParams = KdfParams {
+        memory_kib: 262_144,
+        iterations: 8,
+        parallelism: 8,
+    };
+
+    /// `Ok` si no pasa de [`KdfParams::MAX`] y no baja de `min` en memoria ni en pasadas (el paralelismo no abarata
+    /// la fuerza bruta: solo se exige que sea al menos 1).
+    pub fn check(self, min: KdfParams) -> Result<(), CoreError> {
+        let ok = self.memory_kib >= min.memory_kib
+            && self.iterations >= min.iterations
+            && self.parallelism >= 1
+            && self.memory_kib <= Self::MAX.memory_kib
+            && self.iterations <= Self::MAX.iterations
+            && self.parallelism <= Self::MAX.parallelism;
+        if ok {
+            Ok(())
+        } else {
+            Err(CoreError::KdfParams)
+        }
+    }
 }
 
 /// Deriva una clave de 32 bytes con Argon2id v1.3.
@@ -54,6 +77,12 @@ impl KdfParams {
 /// `password` son los bytes exactos que entran al KDF; quien llama decide la codificacion (la maestra de la
 /// v1 entra con doble UTF-8, ver `formato::v1`).
 pub fn derive_key(password: &[u8], salt: &[u8], params: KdfParams) -> Result<SecretKey, CoreError> {
+    // Sin piso aqui (el doble sobre de la v1 usa 32 MiB), pero nunca por encima del techo (SEC-012).
+    params.check(KdfParams {
+        memory_kib: 0,
+        iterations: 0,
+        parallelism: 1,
+    })?;
     let p = Params::new(
         params.memory_kib,
         params.iterations,
