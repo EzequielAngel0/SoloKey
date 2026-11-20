@@ -945,8 +945,6 @@ class _ThemeModeTile extends StatelessWidget {
   static AppPalette _previewPalette(AppThemeMode m) => switch (m) {
         AppThemeMode.light => AppPalette.light,
         AppThemeMode.dark => AppPalette.dark,
-        AppThemeMode.dim => AppPalette.dim,
-        AppThemeMode.oled => AppPalette.oled,
         AppThemeMode.system => AppPalette.dark,
       };
 
@@ -955,8 +953,6 @@ class _ThemeModeTile extends StatelessWidget {
         AppThemeMode.system => l10n.themeSystem,
         AppThemeMode.light => l10n.themeLight,
         AppThemeMode.dark => l10n.themeDark,
-        AppThemeMode.dim => l10n.themeDim,
-        AppThemeMode.oled => l10n.themeOled,
       };
 
   @override
@@ -1062,8 +1058,8 @@ class _ThemeSwatch extends StatelessWidget {
                       padding: const EdgeInsets.all(2),
                       decoration:
                           BoxDecoration(color: accent, shape: BoxShape.circle),
-                      child: const Icon(Icons.check_rounded,
-                          size: 10, color: Colors.white),
+                      child: Icon(Icons.check_rounded,
+                          size: 10, color: palette.onInk),
                     ),
                   ),
               ],

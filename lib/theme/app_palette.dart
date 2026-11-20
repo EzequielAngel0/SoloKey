@@ -1,336 +1,360 @@
 import 'package:flutter/material.dart';
 
-/// Single source of truth for every semantic color in SoloKey, exposed as a
-/// [ThemeExtension] so the whole UI can switch between light / dark / dim / oled
-/// palettes at runtime.
+/// Tokens de color de **Tinta y papel** (ADR-0013, DIS-1).
 ///
-/// Read it from a widget with `context.palette.<role>` (see [AppPaletteX]).
-/// During the migration phase the values mirror the legacy `AppColors` dark
-/// constants exactly, so the look is unchanged until the extra themes are wired.
+/// La interfaz es neutra, como una libreta: tinta casi negra sobre papel
+/// cálido. **El único color es el estado de seguridad**: comprometida (y lo que
+/// no se deshace), débil y sana. Los tipos de credencial se distinguen por
+/// icono, nunca por color.
+///
+/// Se lee con `context.palette.<rol>` (ver [AppPaletteX]). Los nombres son
+/// roles del mundo de la app, no grados de gris.
+///
+/// Los contrastes de texto cumplen AA (4.5:1) sobre `paper`, `sheet` e `inset`
+/// en los dos temas; `inkGhost` es solo para deshabilitado y marcadores.
 @immutable
 class AppPalette extends ThemeExtension<AppPalette> {
   const AppPalette({
-    // Branding
-    required this.primary,
-    required this.accent,
-    required this.secondary,
-    required this.onPrimary,
-    // Surfaces
-    required this.background,
-    required this.surface,
-    required this.card,
-    required this.cardDark,
-    required this.drawer,
-    required this.divider,
-    // Text
-    required this.textPrimary,
-    required this.textBody,
-    required this.textMuted,
-    required this.textDisabled,
-    required this.textEmpty,
-    // Semantic
-    required this.danger,
-    required this.error,
-    required this.warning,
-    required this.success,
-    required this.info,
-    // Credential types
-    required this.typePassword,
-    required this.typeApiKey,
-    required this.typeNote,
-    required this.typeTotp,
-    required this.typePasskey,
-    required this.typeSshKey,
-    // Overlays
+    required this.paper,
+    required this.sheet,
+    required this.raised,
+    required this.inset,
+    required this.ink,
+    required this.onInk,
+    required this.inkSoft,
+    required this.inkFaint,
+    required this.inkGhost,
+    required this.rule,
+    required this.ruleSoft,
+    required this.ruleStrong,
+    required this.focus,
+    required this.breach,
+    required this.onBreach,
+    required this.breachWash,
+    required this.weak,
+    required this.onWeak,
+    required this.weakWash,
+    required this.sound,
+    required this.onSound,
+    required this.soundWash,
     required this.scrim,
-    required this.shimmerBase,
-    required this.shimmerHighlight,
+    required this.shadow,
   });
 
-  // ── Branding ────────────────────────────────────────────────────────────────
-  final Color primary;
-  final Color accent;
-  final Color secondary;
-  final Color onPrimary;
+  // ── Superficies (de abajo hacia arriba) ───────────────────────────────────
+  /// El papel: fondo de cada pantalla.
+  final Color paper;
 
-  // ── Surfaces ────────────────────────────────────────────────────────────────
-  final Color background;
-  final Color surface;
-  final Color card;
-  final Color cardDark;
-  final Color drawer;
-  final Color divider;
+  /// Una hoja sobre el papel: tarjetas, paneles, barras.
+  final Color sheet;
 
-  // ── Text / Labels ─────────────────────────────────────────────────────────--
-  final Color textPrimary;
-  final Color textBody;
-  final Color textMuted;
-  final Color textDisabled;
-  final Color textEmpty;
+  /// Lo que flota sobre una hoja: diálogos, menús, hojas inferiores.
+  final Color raised;
 
-  // ── Semantic ────────────────────────────────────────────────────────────────
-  final Color danger;
-  final Color error;
-  final Color warning;
-  final Color success;
-  final Color info;
+  /// Hundido: campos de texto y controles que reciben algo.
+  final Color inset;
 
-  // ── Credential types ────────────────────────────────────────────────────────
-  final Color typePassword;
-  final Color typeApiKey;
-  final Color typeNote;
-  final Color typeTotp;
-  final Color typePasskey;
-  final Color typeSshKey;
+  // ── Tinta (cuatro niveles de texto) ───────────────────────────────────────
+  /// Texto principal **y botón principal**.
+  final Color ink;
 
-  // ── Overlays ────────────────────────────────────────────────────────────────
+  /// Letra sobre tinta (la del botón principal).
+  final Color onInk;
+
+  /// Texto secundario: subtítulos, usuario de una credencial.
+  final Color inkSoft;
+
+  /// Texto terciario: metadatos, fechas, ayudas.
+  final Color inkFaint;
+
+  /// Deshabilitado y marcadores de posición (no pasa AA a propósito).
+  final Color inkGhost;
+
+  // ── Bordes ────────────────────────────────────────────────────────────────
+  /// Borde fino estándar: contorno de tarjetas y separadores.
+  final Color rule;
+
+  /// Separación suave entre filas de una misma lista.
+  final Color ruleSoft;
+
+  /// Contorno de controles (campos, casillas, botón con borde).
+  final Color ruleStrong;
+
+  /// Anillo de foco del teclado.
+  final Color focus;
+
+  // ── Estado de seguridad (el único color) ──────────────────────────────────
+  /// Comprometida, brecha, y lo que no se deshace (borrar, cerrar sesión).
+  final Color breach;
+
+  /// Letra sobre [breach].
+  final Color onBreach;
+
+  /// Fondo liso de un aviso de [breach].
+  final Color breachWash;
+
+  /// Débil, repetida, vieja, por vencer.
+  final Color weak;
+
+  /// Letra sobre [weak].
+  final Color onWeak;
+
+  /// Fondo liso de un aviso de [weak].
+  final Color weakWash;
+
+  /// Sana: auditoría sin problemas, sincronizado.
+  final Color sound;
+
+  /// Letra sobre [sound].
+  final Color onSound;
+
+  /// Fondo liso de un aviso de [sound].
+  final Color soundWash;
+
+  // ── Capas ─────────────────────────────────────────────────────────────────
+  /// Velo detrás de diálogos y hojas.
   final Color scrim;
-  final Color shimmerBase;
-  final Color shimmerHighlight;
 
-  /// Dark palette (default) — "Graphite Pro": neutral graphite surfaces, a single
-  /// confident blue accent (`#3B82F6`) and emerald for success. Flat, no neon, no
-  /// glassmorphism: depth comes only from hairline dividers and soft shadows.
-  static const AppPalette dark = AppPalette(
-    primary: Color(0xFF3B82F6),
-    accent: Color(0xFF3B82F6),
-    secondary: Color(0xFF10B981),
-    onPrimary: Color(0xFFFFFFFF),
-    background: Color(0xFF0B0B0F),
-    surface: Color(0xFF121218),
-    card: Color(0xFF17171F),
-    cardDark: Color(0xFF0F0F14),
-    drawer: Color(0xFF121218),
-    divider: Color(0xFF262630),
-    textPrimary: Color(0xFFF3F4F7),
-    textBody: Color(0xFFC7C8D1),
-    textMuted: Color(0xFF8A8B97),
-    textDisabled: Color(0xFF56575F),
-    textEmpty: Color(0xFF262630),
-    danger: Color(0xFFF26D6D),
-    error: Color(0xFFEF4444),
-    warning: Color(0xFFF5A524),
-    success: Color(0xFF10B981),
-    info: Color(0xFF38BDF8),
-    typePassword: Color(0xFF3B82F6),
-    typeApiKey: Color(0xFF10B981),
-    typeNote: Color(0xFFF5A524),
-    typeTotp: Color(0xFF8B5CF6),
-    typePasskey: Color(0xFF14B8A6),
-    typeSshKey: Color(0xFF0EA5E9),
-    scrim: Color(0x88000000),
-    shimmerBase: Color(0xFF17171F),
-    shimmerHighlight: Color(0xFF262630),
-  );
+  /// Color de la sombra suave de las tarjetas.
+  final Color shadow;
 
-  /// Light palette — "Graphite Pro" claro: alto contraste, plano, sin neón. Dark
-  /// es la referencia de QA; light se mantiene correcto y legible.
+  /// Claro: papel cálido, tinta casi negra.
   static const AppPalette light = AppPalette(
-    primary: Color(0xFF2563EB),
-    accent: Color(0xFF2563EB),
-    secondary: Color(0xFF059669),
-    onPrimary: Color(0xFFFFFFFF),
-    background: Color(0xFFF7F7F9),
-    surface: Color(0xFFFFFFFF),
-    card: Color(0xFFFFFFFF),
-    cardDark: Color(0xFFF1F1F7),
-    drawer: Color(0xFFFFFFFF),
-    divider: Color(0xFFE6E6EC),
-    textPrimary: Color(0xFF15161A),
-    textBody: Color(0xFF3A3B42),
-    textMuted: Color(0xFF6B6C77),
-    textDisabled: Color(0xFFA6A7B0),
-    textEmpty: Color(0xFFE6E6EC),
-    danger: Color(0xFFE5484D),
-    error: Color(0xFFDC2626),
-    warning: Color(0xFFB45309),
-    success: Color(0xFF059669),
-    info: Color(0xFF0284C7),
-    typePassword: Color(0xFF2563EB),
-    typeApiKey: Color(0xFF059669),
-    typeNote: Color(0xFFB45309),
-    typeTotp: Color(0xFF7C3AED),
-    typePasskey: Color(0xFF0D9488),
-    typeSshKey: Color(0xFF0284C7),
-    scrim: Color(0x33000000),
-    shimmerBase: Color(0xFFE9E9F0),
-    shimmerHighlight: Color(0xFFF7F7F9),
+    paper: Color(0xFFF7F6F2),
+    sheet: Color(0xFFFFFFFF),
+    raised: Color(0xFFFFFFFF),
+    inset: Color(0xFFF1EFEA),
+    ink: Color(0xFF15171A),
+    onInk: Color(0xFFFBFAF7),
+    inkSoft: Color(0xFF5B6068),
+    inkFaint: Color(0xFF6B7078),
+    inkGhost: Color(0xFFA3A7AD),
+    rule: Color(0xFFE4E2DC),
+    ruleSoft: Color(0xFFEEECE7),
+    ruleStrong: Color(0xFFCFCCC4),
+    focus: Color(0xFF15171A),
+    breach: Color(0xFFB4322A),
+    onBreach: Color(0xFFFFFFFF),
+    breachWash: Color(0xFFFBECEA),
+    weak: Color(0xFF94600F),
+    onWeak: Color(0xFFFFFFFF),
+    weakWash: Color(0xFFFAF0DF),
+    sound: Color(0xFF2A7449),
+    onSound: Color(0xFFFFFFFF),
+    soundWash: Color(0xFFE9F3ED),
+    scrim: Color(0x5215171A),
+    shadow: Color(0x1415171A),
   );
 
-  /// Dim palette — un oscuro suave (gris-azulado), menos contraste que dark.
-  /// Graphite Pro con un azul algo más claro (`#4C8DF5`): suave pero con
-  /// contraste WCAG AA suficiente para etiquetas blancas sobre el acento.
-  static const AppPalette dim = AppPalette(
-    primary: Color(0xFF4C8DF5),
-    accent: Color(0xFF4C8DF5),
-    secondary: Color(0xFF10B981),
-    onPrimary: Color(0xFFFFFFFF),
-    background: Color(0xFF14151A),
-    surface: Color(0xFF1B1C22),
-    card: Color(0xFF1F2027),
-    cardDark: Color(0xFF15161B),
-    drawer: Color(0xFF1B1C22),
-    divider: Color(0xFF2C2D36),
-    textPrimary: Color(0xFFE7E8EE),
-    textBody: Color(0xFFBFC1CB),
-    textMuted: Color(0xFF909199),
-    textDisabled: Color(0xFF56575F),
-    textEmpty: Color(0xFF2C2D36),
-    danger: Color(0xFFF26D6D),
-    error: Color(0xFFEF4444),
-    warning: Color(0xFFF5A524),
-    success: Color(0xFF10B981),
-    info: Color(0xFF38BDF8),
-    typePassword: Color(0xFF4C8DF5),
-    typeApiKey: Color(0xFF10B981),
-    typeNote: Color(0xFFF5A524),
-    typeTotp: Color(0xFF8B5CF6),
-    typePasskey: Color(0xFF14B8A6),
-    typeSshKey: Color(0xFF0EA5E9),
-    scrim: Color(0x88000000),
-    shimmerBase: Color(0xFF1F2027),
-    shimmerHighlight: Color(0xFF2C2D36),
-  );
-
-  /// OLED palette — negro puro para ahorro de batería en pantallas OLED.
-  /// Graphite Pro sobre negro absoluto, mismo azul `#3B82F6` que dark.
-  static const AppPalette oled = AppPalette(
-    primary: Color(0xFF3B82F6),
-    accent: Color(0xFF3B82F6),
-    secondary: Color(0xFF10B981),
-    onPrimary: Color(0xFFFFFFFF),
-    background: Color(0xFF000000),
-    surface: Color(0xFF08080B),
-    card: Color(0xFF0C0C10),
-    cardDark: Color(0xFF050507),
-    drawer: Color(0xFF0C0C10),
-    divider: Color(0xFF1C1C24),
-    textPrimary: Color(0xFFF3F4F7),
-    textBody: Color(0xFFC7C8D1),
-    textMuted: Color(0xFF8A8B97),
-    textDisabled: Color(0xFF56575F),
-    textEmpty: Color(0xFF1C1C24),
-    danger: Color(0xFFF26D6D),
-    error: Color(0xFFEF4444),
-    warning: Color(0xFFF5A524),
-    success: Color(0xFF10B981),
-    info: Color(0xFF38BDF8),
-    typePassword: Color(0xFF3B82F6),
-    typeApiKey: Color(0xFF10B981),
-    typeNote: Color(0xFFF5A524),
-    typeTotp: Color(0xFF8B5CF6),
-    typePasskey: Color(0xFF14B8A6),
-    typeSshKey: Color(0xFF0EA5E9),
+  /// Oscuro: papel de noche, tinta clara. Los estados, algo más claros para
+  /// que se lean sobre el fondo oscuro.
+  static const AppPalette dark = AppPalette(
+    paper: Color(0xFF121316),
+    sheet: Color(0xFF1A1C20),
+    raised: Color(0xFF22252A),
+    inset: Color(0xFF0E0F12),
+    ink: Color(0xFFECEDEF),
+    onInk: Color(0xFF121316),
+    inkSoft: Color(0xFFA2A6AD),
+    inkFaint: Color(0xFF8A8E96),
+    inkGhost: Color(0xFF4F535A),
+    rule: Color(0xFF2A2D33),
+    ruleSoft: Color(0xFF222429),
+    ruleStrong: Color(0xFF3A3E45),
+    focus: Color(0xFFECEDEF),
+    breach: Color(0xFFF0625A),
+    onBreach: Color(0xFF121316),
+    breachWash: Color(0xFF2C1917),
+    weak: Color(0xFFE8B14A),
+    onWeak: Color(0xFF121316),
+    weakWash: Color(0xFF2A2317),
+    sound: Color(0xFF5CBF85),
+    onSound: Color(0xFF121316),
+    soundWash: Color(0xFF16261D),
     scrim: Color(0x99000000),
-    shimmerBase: Color(0xFF0C0C10),
-    shimmerHighlight: Color(0xFF1C1C24),
+    shadow: Color(0x66000000),
   );
+
+  // ── Alias de la v1 ────────────────────────────────────────────────────────
+  // Las pantallas de la v1 (carril C) todavía leen estos nombres. Apuntan a los
+  // tokens de Tinta y papel para que la v1 se vea con el sistema nuevo mientras
+  // C la reescribe; cada PAN deja de usarlos. No usar en código nuevo.
+
+  /// v1: usar [ink].
+  Color get primary => ink;
+
+  /// v1: usar [ink].
+  Color get accent => ink;
+
+  /// v1: usar [ink].
+  Color get secondary => ink;
+
+  /// v1: usar [onInk].
+  Color get onPrimary => onInk;
+
+  /// v1: usar [paper].
+  Color get background => paper;
+
+  /// v1: usar [sheet].
+  Color get surface => sheet;
+
+  /// v1: usar [sheet].
+  Color get card => sheet;
+
+  /// v1: usar [inset].
+  Color get cardDark => inset;
+
+  /// v1: usar [raised].
+  Color get drawer => raised;
+
+  /// v1: usar [rule].
+  Color get divider => rule;
+
+  /// v1: usar [ink].
+  Color get textPrimary => ink;
+
+  /// v1: usar [ink].
+  Color get textBody => ink;
+
+  /// v1: usar [inkSoft].
+  Color get textMuted => inkSoft;
+
+  /// v1: usar [inkGhost].
+  Color get textDisabled => inkGhost;
+
+  /// v1: usar [rule].
+  Color get textEmpty => rule;
+
+  /// v1: usar [breach].
+  Color get danger => breach;
+
+  /// v1: usar [breach].
+  Color get error => breach;
+
+  /// v1: usar [weak].
+  Color get warning => weak;
+
+  /// v1: usar [sound].
+  Color get success => sound;
+
+  /// v1: informativo no es un estado de seguridad; usar [inkSoft].
+  Color get info => inkSoft;
+
+  /// v1: los tipos van por icono, no por color; usar [inkSoft].
+  Color get typePassword => inkSoft;
+
+  /// v1: usar [inkSoft].
+  Color get typeApiKey => inkSoft;
+
+  /// v1: usar [inkSoft].
+  Color get typeNote => inkSoft;
+
+  /// v1: usar [inkSoft].
+  Color get typeTotp => inkSoft;
+
+  /// v1: usar [inkSoft].
+  Color get typePasskey => inkSoft;
+
+  /// v1: usar [inkSoft].
+  Color get typeSshKey => inkSoft;
+
+  /// v1: el shimmer sale en DIS-5.
+  Color get shimmerBase => inset;
+
+  /// v1: el shimmer sale en DIS-5.
+  Color get shimmerHighlight => sheet;
 
   @override
   AppPalette copyWith({
-    Color? primary,
-    Color? accent,
-    Color? secondary,
-    Color? onPrimary,
-    Color? background,
-    Color? surface,
-    Color? card,
-    Color? cardDark,
-    Color? drawer,
-    Color? divider,
-    Color? textPrimary,
-    Color? textBody,
-    Color? textMuted,
-    Color? textDisabled,
-    Color? textEmpty,
-    Color? danger,
-    Color? error,
-    Color? warning,
-    Color? success,
-    Color? info,
-    Color? typePassword,
-    Color? typeApiKey,
-    Color? typeNote,
-    Color? typeTotp,
-    Color? typePasskey,
-    Color? typeSshKey,
+    Color? paper,
+    Color? sheet,
+    Color? raised,
+    Color? inset,
+    Color? ink,
+    Color? onInk,
+    Color? inkSoft,
+    Color? inkFaint,
+    Color? inkGhost,
+    Color? rule,
+    Color? ruleSoft,
+    Color? ruleStrong,
+    Color? focus,
+    Color? breach,
+    Color? onBreach,
+    Color? breachWash,
+    Color? weak,
+    Color? onWeak,
+    Color? weakWash,
+    Color? sound,
+    Color? onSound,
+    Color? soundWash,
     Color? scrim,
-    Color? shimmerBase,
-    Color? shimmerHighlight,
+    Color? shadow,
   }) {
     return AppPalette(
-      primary: primary ?? this.primary,
-      accent: accent ?? this.accent,
-      secondary: secondary ?? this.secondary,
-      onPrimary: onPrimary ?? this.onPrimary,
-      background: background ?? this.background,
-      surface: surface ?? this.surface,
-      card: card ?? this.card,
-      cardDark: cardDark ?? this.cardDark,
-      drawer: drawer ?? this.drawer,
-      divider: divider ?? this.divider,
-      textPrimary: textPrimary ?? this.textPrimary,
-      textBody: textBody ?? this.textBody,
-      textMuted: textMuted ?? this.textMuted,
-      textDisabled: textDisabled ?? this.textDisabled,
-      textEmpty: textEmpty ?? this.textEmpty,
-      danger: danger ?? this.danger,
-      error: error ?? this.error,
-      warning: warning ?? this.warning,
-      success: success ?? this.success,
-      info: info ?? this.info,
-      typePassword: typePassword ?? this.typePassword,
-      typeApiKey: typeApiKey ?? this.typeApiKey,
-      typeNote: typeNote ?? this.typeNote,
-      typeTotp: typeTotp ?? this.typeTotp,
-      typePasskey: typePasskey ?? this.typePasskey,
-      typeSshKey: typeSshKey ?? this.typeSshKey,
+      paper: paper ?? this.paper,
+      sheet: sheet ?? this.sheet,
+      raised: raised ?? this.raised,
+      inset: inset ?? this.inset,
+      ink: ink ?? this.ink,
+      onInk: onInk ?? this.onInk,
+      inkSoft: inkSoft ?? this.inkSoft,
+      inkFaint: inkFaint ?? this.inkFaint,
+      inkGhost: inkGhost ?? this.inkGhost,
+      rule: rule ?? this.rule,
+      ruleSoft: ruleSoft ?? this.ruleSoft,
+      ruleStrong: ruleStrong ?? this.ruleStrong,
+      focus: focus ?? this.focus,
+      breach: breach ?? this.breach,
+      onBreach: onBreach ?? this.onBreach,
+      breachWash: breachWash ?? this.breachWash,
+      weak: weak ?? this.weak,
+      onWeak: onWeak ?? this.onWeak,
+      weakWash: weakWash ?? this.weakWash,
+      sound: sound ?? this.sound,
+      onSound: onSound ?? this.onSound,
+      soundWash: soundWash ?? this.soundWash,
       scrim: scrim ?? this.scrim,
-      shimmerBase: shimmerBase ?? this.shimmerBase,
-      shimmerHighlight: shimmerHighlight ?? this.shimmerHighlight,
+      shadow: shadow ?? this.shadow,
     );
   }
 
   @override
   AppPalette lerp(ThemeExtension<AppPalette>? other, double t) {
     if (other is! AppPalette) return this;
+    Color m(Color a, Color b) => Color.lerp(a, b, t)!;
     return AppPalette(
-      primary: Color.lerp(primary, other.primary, t)!,
-      accent: Color.lerp(accent, other.accent, t)!,
-      secondary: Color.lerp(secondary, other.secondary, t)!,
-      onPrimary: Color.lerp(onPrimary, other.onPrimary, t)!,
-      background: Color.lerp(background, other.background, t)!,
-      surface: Color.lerp(surface, other.surface, t)!,
-      card: Color.lerp(card, other.card, t)!,
-      cardDark: Color.lerp(cardDark, other.cardDark, t)!,
-      drawer: Color.lerp(drawer, other.drawer, t)!,
-      divider: Color.lerp(divider, other.divider, t)!,
-      textPrimary: Color.lerp(textPrimary, other.textPrimary, t)!,
-      textBody: Color.lerp(textBody, other.textBody, t)!,
-      textMuted: Color.lerp(textMuted, other.textMuted, t)!,
-      textDisabled: Color.lerp(textDisabled, other.textDisabled, t)!,
-      textEmpty: Color.lerp(textEmpty, other.textEmpty, t)!,
-      danger: Color.lerp(danger, other.danger, t)!,
-      error: Color.lerp(error, other.error, t)!,
-      warning: Color.lerp(warning, other.warning, t)!,
-      success: Color.lerp(success, other.success, t)!,
-      info: Color.lerp(info, other.info, t)!,
-      typePassword: Color.lerp(typePassword, other.typePassword, t)!,
-      typeApiKey: Color.lerp(typeApiKey, other.typeApiKey, t)!,
-      typeNote: Color.lerp(typeNote, other.typeNote, t)!,
-      typeTotp: Color.lerp(typeTotp, other.typeTotp, t)!,
-      typePasskey: Color.lerp(typePasskey, other.typePasskey, t)!,
-      typeSshKey: Color.lerp(typeSshKey, other.typeSshKey, t)!,
-      scrim: Color.lerp(scrim, other.scrim, t)!,
-      shimmerBase: Color.lerp(shimmerBase, other.shimmerBase, t)!,
-      shimmerHighlight: Color.lerp(shimmerHighlight, other.shimmerHighlight, t)!,
+      paper: m(paper, other.paper),
+      sheet: m(sheet, other.sheet),
+      raised: m(raised, other.raised),
+      inset: m(inset, other.inset),
+      ink: m(ink, other.ink),
+      onInk: m(onInk, other.onInk),
+      inkSoft: m(inkSoft, other.inkSoft),
+      inkFaint: m(inkFaint, other.inkFaint),
+      inkGhost: m(inkGhost, other.inkGhost),
+      rule: m(rule, other.rule),
+      ruleSoft: m(ruleSoft, other.ruleSoft),
+      ruleStrong: m(ruleStrong, other.ruleStrong),
+      focus: m(focus, other.focus),
+      breach: m(breach, other.breach),
+      onBreach: m(onBreach, other.onBreach),
+      breachWash: m(breachWash, other.breachWash),
+      weak: m(weak, other.weak),
+      onWeak: m(onWeak, other.onWeak),
+      weakWash: m(weakWash, other.weakWash),
+      sound: m(sound, other.sound),
+      onSound: m(onSound, other.onSound),
+      soundWash: m(soundWash, other.soundWash),
+      scrim: m(scrim, other.scrim),
+      shadow: m(shadow, other.shadow),
     );
   }
 }
 
-/// Ergonomic access: `context.palette.card`, `context.palette.textMuted`, etc.
-/// Falls back to [AppPalette.dark] if no extension is registered (defensive).
+/// Acceso corto: `context.palette.ink`, `context.palette.breach`...
+/// Si no hay extensión registrada (no debería pasar), usa la clara.
 extension AppPaletteX on BuildContext {
   AppPalette get palette =>
-      Theme.of(this).extension<AppPalette>() ?? AppPalette.dark;
+      Theme.of(this).extension<AppPalette>() ?? AppPalette.light;
 }

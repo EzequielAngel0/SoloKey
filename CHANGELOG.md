@@ -70,6 +70,18 @@ versión viven en la página de Releases de GitHub.
 
 ### Cambiado
 
+- **Tinta y papel (DIS-1, 2026-11-20)**: `AppPalette` reescrita con tokens por rol (papel, hoja, elevada, hundida; tinta en cuatro
+  niveles; bordes estándar, suave, de control y foco; comprometida, débil y sana con su letra y su fondo de aviso; velo y sombra),
+  clara y oscura, AA comprobado (débil `#94600F` y sana `#2A7449` en claro, más oscuros que REDISENO_V2 §3 para pasar 4.5:1).
+  `AppTheme` reescrito sobre esos tokens: liso (sin onda al tocar), botón principal de tinta, esquinas de 12, borde fino y sombra
+  suave, cuerpo 16 en móvil y 14 en escritorio. Nuevo `app_tokens.dart` (`AppSpace`, `AppRadius`, `AppDepth`, `AppMotion`).
+  Transición de pantalla de 200 ms en todas las plataformas que respeta "reducir movimiento". Temas: claro, oscuro y sistema (por
+  defecto, también mientras cargan los ajustes); `dim` y `oled` guardados pasan a oscuro. Letra: Atkinson Hyperlegible Next y
+  Mono (OFL, `google/fonts`, variable `wght` 200-800, sha256 `5a455d1c…` y `5ce8b169…`) instanciadas a pesos fijos (400, 500,
+  600 y 700; Mono 400, 500 y 700) con fontTools 4.55.3 en Podman; fuera Inter y JetBrains Mono. Fuera `app_colors.dart`, las
+  paletas dim y OLED y los 6 colores de tipo; los nombres de la v1 (`primary`, `accent`, `typeX`...) quedan como alias de los
+  tokens nuevos hasta que C rehaga cada pantalla. Borrada `test/theme/theme_smoke_test.dart` (ADR-0011).
+
 - **PLA-4 (2026-11-19)**: dependencias mayores, una por commit. go_router 18; local_auth 3 (parámetros sueltos y
   `LocalAuthException`); flutter_secure_storage 10 con `migrateOnAlgorithmChange` y `resetOnError: false` (migra sola lo que la v9
   guardó con EncryptedSharedPreferences; `migrateWithBackup` se salta esa migración en 10.3.4); Riverpod 3 con riverpod_generator 4
