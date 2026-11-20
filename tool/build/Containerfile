@@ -1,0 +1,105 @@
+# Imagen de build de SoloKey (PLA-3, ADR-0012): APK de Android y librerias nativas del nucleo
+# Rust sin instalar nada en el host. Absorbe la de rust/Containerfile (carril A) y le suma el
+# JDK y el SDK de Android. La construye tool/build.ps1 como localhost/solokey-build:<flutter>-<receta>
+# (etapa build) y localhost/solokey-e2e:<flutter>-<receta> (etapa e2e: la de build mas el emulador).
+#   - Flutter: la misma version que .github/workflows/tests.yml (llega como FLUTTER_VERSION).
+#   - Android: JDK 17, SDK (plataforma y build-tools que pide AGP) y el NDK que fija Flutter.
+#   - Rust: toolchain fija con objetivos de Windows y Android, cargo-xwin (DLL cruzada),
+#     cargo-ndk (.so por ABI) y flutter_rust_bridge_codegen (puente Dart).
+# Rust, Flutter y el SDK son etapas independientes: podman build --jobs las construye a la vez y
+# tocar una no rehace las otras (lo mas lento, compilar las herramientas de Rust, casi nunca cambia).
+
+ARG FLUTTER_VERSION
+ARG RUST_VERSION=1.91.1
+ARG FRB_VERSION=2.11.1
+# Los de Flutter 3.44 (flutter.compileSdkVersion y flutter.ndkVersion) y AGP 8.11, mas lo que Gradle
+# bajaba en cada corrida (la plataforma 35 de algun plugin, CMake y platform-tools).
+ARG ANDROID_NDK=28.2.13676358
+ARG ANDROID_PAQUETES="platforms;android-36 platforms;android-35 build-tools;35.0.0 ndk;28.2.13676358 cmake;3.22.1 platform-tools"
+ARG CMDLINE_TOOLS=11076708
+ARG E2E_IMAGE="system-images;android-34;google_apis;x86_64"
+
+FROM docker.io/library/ubuntu:24.04 AS base
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends ca-certificates curl git unzip xz-utils \
+ && rm -rf /var/lib/apt/lists/*
+
+# --- Rust: toolchain y herramientas (compilarlas es lo mas lento) ------------------------------
+FROM base AS rust
+ARG RUST_VERSION
+ARG FRB_VERSION
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends build-essential pkg-config \
+ && rm -rf /var/lib/apt/lists/*
+ENV RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo PATH=/opt/cargo/bin:$PATH
+RUN curl -fsSL https://sh.rustup.rs | sh -s -- -y --profile minimal --default-toolchain ${RUST_VERSION} \
+ && rustup target add x86_64-pc-windows-msvc aarch64-linux-android armv7-linux-androideabi x86_64-linux-android \
+ && rustup component add clippy rustfmt
+RUN --mount=type=cache,target=/opt/cargo/registry \
+    cargo install --locked cargo-xwin cargo-ndk \
+ && cargo install --locked flutter_rust_bridge_codegen --version ${FRB_VERSION}
+
+# --- Flutter, con los artefactos de Android ya bajados -----------------------------------------
+FROM base AS flutter
+ARG FLUTTER_VERSION
+RUN test -n "$FLUTTER_VERSION" \
+ && curl -fsSL "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz" \
+      | tar -xJ -C /opt \
+ && git config --global --add safe.directory '*' \
+ && /opt/flutter/bin/flutter config --no-analytics --no-cli-animations > /dev/null \
+ && /opt/flutter/bin/flutter precache --android
+
+# --- SDK de Android (sin emulador: va en la etapa emulador) ------------------------------------
+FROM base AS sdk
+ARG CMDLINE_TOOLS
+ARG ANDROID_PAQUETES
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends openjdk-17-jre-headless \
+ && rm -rf /var/lib/apt/lists/* \
+ && mkdir -p /opt/android-sdk/cmdline-tools \
+ && curl -fsSL -o /tmp/clt.zip "https://dl.google.com/android/repository/commandlinetools-linux-${CMDLINE_TOOLS}_latest.zip" \
+ && unzip -q /tmp/clt.zip -d /opt/android-sdk/cmdline-tools && rm /tmp/clt.zip \
+ && mv /opt/android-sdk/cmdline-tools/cmdline-tools /opt/android-sdk/cmdline-tools/latest \
+ && yes | /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null \
+ && /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install ${ANDROID_PAQUETES} > /dev/null
+
+# --- Emulador e imagen de sistema (solo para la etapa e2e) -------------------------------------
+FROM sdk AS emulador
+ARG E2E_IMAGE
+RUN /opt/android-sdk/cmdline-tools/latest/bin/sdkmanager --install emulator "${E2E_IMAGE}" > /dev/null
+
+# --- Imagen de build: junta las tres --------------------------------------------------------------
+FROM base AS build
+ARG ANDROID_NDK
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      build-essential pkg-config clang lld llvm openjdk-17-jdk-headless \
+ && rm -rf /var/lib/apt/lists/*
+COPY --from=rust /opt/rustup /opt/rustup
+COPY --from=rust /opt/cargo /opt/cargo
+COPY --from=flutter /opt/flutter /opt/flutter
+COPY --from=sdk /opt/android-sdk /opt/android-sdk
+ENV ANDROID_HOME=/opt/android-sdk ANDROID_SDK_ROOT=/opt/android-sdk \
+    ANDROID_NDK_HOME=/opt/android-sdk/ndk/${ANDROID_NDK} \
+    RUSTUP_HOME=/opt/rustup CARGO_HOME=/opt/cargo \
+    PATH=/opt/cargo/bin:/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:$PATH \
+    PUB_CACHE=/pub-cache GRADLE_USER_HOME=/gradle CI=true \
+    XWIN_CACHE_DIR=/xwin-cache CARGO_TARGET_DIR=/cargo-target
+RUN git config --global --add safe.directory '*' \
+ && flutter config --no-analytics --no-cli-animations --android-sdk /opt/android-sdk > /dev/null \
+ && flutter --version
+
+# --- Etapa e2e: emulador de Android sin pantalla, desechable -------------------------------------
+# Lo arranca tool/build.ps1 -E2e con --device /dev/kvm. La imagen de sistema es la misma que usa el
+# job e2e-android del CI.
+FROM build AS e2e
+ARG E2E_IMAGE
+RUN apt-get update \
+ && apt-get install -y --no-install-recommends \
+      libgl1 libnss3 libxcomposite1 libxcursor1 libxi6 libxtst6 libxdamage1 libxrandr2 libx11-xcb1 \
+      libxkbfile1 libxkbcommon0 libdbus-1-3 libfontconfig1 libpulse0 libasound2t64 libdrm2 libgbm1 \
+ && rm -rf /var/lib/apt/lists/*
+COPY --from=emulador /opt/android-sdk/emulator /opt/android-sdk/emulator
+COPY --from=emulador /opt/android-sdk/system-images /opt/android-sdk/system-images
+RUN echo no | /opt/android-sdk/cmdline-tools/latest/bin/avdmanager create avd -n e2e -k "${E2E_IMAGE}" > /dev/null
+ENV PATH=/opt/android-sdk/emulator:/opt/android-sdk/platform-tools:$PATH

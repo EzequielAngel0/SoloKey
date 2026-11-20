@@ -15,7 +15,7 @@
 
 .PARAMETER Target
   Que compilar: android | windows | inno | all. Por defecto: all (android + inno).
-    android -> solo APKs (+ aab si -Aab)
+    android -> solo APKs (+ aab si -Aab), compilados en Podman con tool\build.ps1 (PLA-3)
     windows -> solo el .exe + portable .zip
     inno    -> windows + instalador .exe
     all     -> android + inno
@@ -123,11 +123,20 @@ function Find-Iscc {
 
 # ── Android ──────────────────────────────────────────────────────────────────────
 function Build-Android {
-    $apkSrc = Join-Path $Root 'build\app\outputs\flutter-apk'
-    $flags = Get-ReleaseFlags
+    # Android se compila en Podman (PLA-3): el SDK y el NDK no van al host. tool\build.ps1
+    # copia el arbol al contenedor y deja los APK (y el .aab y los simbolos) en build\podman.
+    $apkSrc = Join-Path $Root 'build\podman'
+    if (Test-Path $apkSrc) { Remove-Item $apkSrc -Recurse -Force -ErrorAction Stop }
+    $flags = ''
+    if ($Obfuscate) { $flags = ' --obfuscate --split-debug-info=$SALIDA/debug-symbols' }
+    $cmd = "flutter build apk --release$flags && cp build/app/outputs/flutter-apk/app-release.apk `$SALIDA/ && " +
+           "flutter build apk --release --split-per-abi$flags && cp build/app/outputs/flutter-apk/app-*-release.apk `$SALIDA/"
+    if ($Aab) { $cmd += " && flutter build appbundle --release$flags && cp build/app/outputs/bundle/release/app-release.aab `$SALIDA/" }
+    Write-Step 'Compilando Android en Podman (APK universal, split-per-abi y .aab con -Aab)'
+    & (Join-Path $Root 'tool\build.ps1') -Comando $cmd -Salida $apkSrc
+    if ($LASTEXITCODE -ne 0) { throw "Fallo el build de Android en Podman (exit $LASTEXITCODE). Detalle arriba y en dist\build-$Version.log." }
 
-    # 1. APK universal (release). Se copia ANTES del split para no perderlo.
-    Invoke-Flutter (@('build', 'apk', '--release') + $flags) 'Compilando APK universal (release)'
+    # 1. APK universal (release).
     Confirm-Dir $Dist
     $universalSrc = Join-Path $apkSrc 'app-release.apk'
     if (Test-Path $universalSrc) {
@@ -135,9 +144,12 @@ function Build-Android {
     } else {
         Write-Warning "No se encontro app-release.apk en $apkSrc"
     }
+    if ($Obfuscate -and (Test-Path (Join-Path $apkSrc 'debug-symbols'))) {
+        Confirm-Dir $DebugSymbols
+        Copy-Item (Join-Path $apkSrc 'debug-symbols\*') $DebugSymbols -Recurse -Force -ErrorAction Stop
+    }
 
     # 2. APKs split-per-abi (release).
-    Invoke-Flutter (@('build', 'apk', '--release', '--split-per-abi') + $flags) 'Compilando APKs split-per-abi (release)'
     foreach ($abi in @('arm64-v8a', 'armeabi-v7a', 'x86_64')) {
         $src = Join-Path $apkSrc "app-$abi-release.apk"
         if (Test-Path $src) {
@@ -151,8 +163,7 @@ function Build-Android {
 
     # 3. App Bundle (opcional, para Play Store).
     if ($Aab) {
-        Invoke-Flutter (@('build', 'appbundle', '--release') + $flags) 'Compilando App Bundle (.aab)'
-        $aabSrc = Join-Path $Root 'build\app\outputs\bundle\release\app-release.aab'
+        $aabSrc = Join-Path $apkSrc 'app-release.aab'
         if (Test-Path $aabSrc) {
             Copy-Item $aabSrc (Join-Path $Dist "$AppName-$Version.aab") -Force -ErrorAction Stop
         } else {

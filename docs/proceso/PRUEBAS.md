@@ -28,7 +28,7 @@ integración (Windows y Android, patrones anti-flaky) está en
 |---|---|---|
 | `pre-commit` | `flutter analyze` en 0 y `flutter test` verde (solo si el commit toca `.dart`) | `.githooks/` (activar: `git config core.hooksPath .githooks`) |
 | `pre-push` | `flutter test --coverage` sobre el piso de `tool/coverage_min.txt` | `.githooks/` + `tool/check_coverage.dart` |
-| CI | analyze + test + cobertura, en `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
+| CI | analyze + test + cobertura; `cargo test` + clippy del núcleo (`rust`); `integration_test/` en Windows (`e2e-windows`) y en un emulador de Android 14 (`e2e-android`). En `main`, `develop` y PRs | `.github/workflows/tests.yml` (Flutter 3.44.4) |
 
 El piso de cobertura es un **trinquete**: se sube al cubrir más y nunca se baja para que pase un cambio.
 
@@ -92,11 +92,29 @@ Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al h
 
 | Qué | Imagen | Comando | Borrarlo |
 |---|---|---|---|
-| `cargo test`, clippy | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 <args de cargo>` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
-| Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.ustuzz.ps1` | `podman rmi localhost/solokey-fuzz:<nightly>; podman volume rm solokey-fuzz-corpus solokey-fuzz-target` |
-| Puente Dart y librerías nativas | `localhost/solokey-rust:1` (`rust/Containerfile`: Flutter, Rust, `cargo-xwin`, `cargo-ndk`, NDK, `flutter_rust_bridge_codegen`) | `podman build -t localhost/solokey-rust:1 rust` | `podman rmi localhost/solokey-rust:1` |
+| `cargo test` | `docker.io/library/rust:1.91-slim-bookworm` | `.\rust\cargo.ps1 test` | `podman volume rm solokey-cargo-registry solokey-cargo-target` |
+| Clippy (la imagen `slim` no lo trae) | `localhost/solokey-build` | `.\tool\build.ps1 -Comando 'cd rust && cargo clippy --locked --all-targets -- -D warnings'` | ver abajo |
+| `.so` por ABI y `solokey_core.dll` | `localhost/solokey-build` | `.\tool\build.ps1 -Nucleo` → `build\podman\jniLibs\` y `build\podman\solokey_core.dll` (sin símbolos exportados hasta que exista el puente de `flutter_rust_bridge`) | ver abajo |
+| Fuzz (SEG-2) | `localhost/solokey-fuzz:<nightly>` (`rust/solokey-core/fuzz/Containerfile`: nightly fijado y `cargo-fuzz`) | `.
+## Build y E2E de Android en Podman (PLA-3)
 
-El carril D puede absorber `rust/Containerfile` en `solokey-build` (PLA-3).
+Ni el SDK ni el NDK de Android ni Rust van al host ([ADR-0012](../adr/0012-todo-en-podman.md)). `tool/build.ps1` construye la
+imagen si falta, copia el árbol dentro del contenedor (como `ci-linux.ps1`) y deja lo que sale en `build\podman\`:
+
+| Para | Comando |
+|---|---|
+| APK release | `.\tool\build.ps1` → `build\podman\app-release.apk` |
+| Entregable de Android | `.\build_release.ps1 -Target android [-Aab] [-Obfuscate]` (usa `tool\build.ps1`; Windows e Inno siguen en el host) |
+| Otra cosa | `.\tool\build.ps1 -Comando '<bash>'`; lo que se copie a `$SALIDA` sale en `build\podman\` (o en `-Salida <carpeta>`) |
+| E2E de Android | `.\tool\build.ps1 -E2e`: `integration_test/` en un emulador **nuevo dentro del contenedor** (KVM de la VM de Podman), el mismo que usa el job `e2e-android` del CI. Nace vacío y muere con el contenedor: no toca el emulador ni el celular del host. Corre un archivo por vez e instala antes con `adb install -g`: la app pide el permiso de notificaciones antes de `runApp` y `flutter test` la desinstala al acabar cada archivo. Si falla, deja el logcat en `build\podman\logcat.txt` |
+| Borrarlo todo | `podman images --filter reference=localhost/solokey-e2e -q \| % { podman rmi $_ }; podman images --filter reference=localhost/solokey-build -q \| % { podman rmi $_ }; podman volume rm solokey-gradle solokey-xwin solokey-build-target` |
+
+Las imágenes salen de `tool/build/Containerfile` (etapa `build`: Ubuntu 24.04, Flutter de `tests.yml`, JDK 17, SDK y NDK de
+Android, Rust 1.91.1 con `cargo-ndk`, `cargo-xwin` y `flutter_rust_bridge_codegen`; etapa `e2e`: la de build más el emulador y
+la imagen de sistema de Android 14). La etiqueta es `<flutter>-<hash de la receta>`: tocar el `Containerfile` construye una
+imagen nueva y la vieja queda para `podman rmi`. Cachés en volúmenes con nombre: `solokey-pub-cache` (compartido con
+`ci-linux.ps1`), `solokey-gradle`, `solokey-cargo-registry` (compartido con `rust/cargo.ps1`), `solokey-xwin` (el CRT y el SDK de
+Windows que baja `cargo-xwin`) y `solokey-build-target`.
 
 | Escaneo | Imagen | Comando | Borrarlo |
 |---|---|---|---|
