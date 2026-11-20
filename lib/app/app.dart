@@ -276,8 +276,11 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
 
   static const _pageTransitions = PageTransitionsTheme(
     builders: {
-      TargetPlatform.android: SlideUpFadeTransition(),
-      TargetPlatform.iOS: SlideUpFadeTransition(),
+      TargetPlatform.android: PaperPageTransition(),
+      TargetPlatform.iOS: PaperPageTransition(),
+      TargetPlatform.windows: PaperPageTransition(),
+      TargetPlatform.linux: PaperPageTransition(),
+      TargetPlatform.macOS: PaperPageTransition(),
     },
   );
 
@@ -294,11 +297,9 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
     });
 
     // Resolve the active theme reactively from the persisted settings. While the
-    // settings are still loading we fall back to the historical dark default.
+    // settings are still loading we follow the system (the v2 default).
     final settings = ref.watch(settingsNotifierProvider).value;
-    final mode = settings == null
-        ? AppThemeMode.dark
-        : AppThemeMode.fromKey(settings.themeMode);
+    final mode = AppThemeMode.fromKey(settings?.themeMode);
 
     // Active locale; null = follow the system language.
     final locale = settings == null
@@ -338,12 +339,6 @@ class _AppState extends ConsumerState<App> with WindowListener, TrayListener {
         themeMode = ThemeMode.light;
       case AppThemeMode.dark:
         theme = withExtras(AppTheme.dark());
-        themeMode = ThemeMode.light;
-      case AppThemeMode.dim:
-        theme = withExtras(AppTheme.dim());
-        themeMode = ThemeMode.light;
-      case AppThemeMode.oled:
-        theme = withExtras(AppTheme.oled());
         themeMode = ThemeMode.light;
     }
 

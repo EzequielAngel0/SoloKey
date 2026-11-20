@@ -28,7 +28,7 @@ flowchart LR
 |---|---|---|
 | Arranque y DI | `lib/main.dart`, `lib/app/` | `runZonedGuarded`, get_it + injectable (`app/di/`), puente get_it a Riverpod (`provider_overrides.dart`) |
 | Rutas | `lib/router/` | go_router 18; guard que manda a `/unlock` si la sesión está bloqueada |
-| Tema | `lib/theme/` | Tokens y temas de la v1 (Graphite Pro: dark, light, dim, oled) |
+| Tema | `lib/theme/` | Tinta y papel (DIS-1): `app_palette.dart` (color por rol, claro y oscuro), `app_tokens.dart` (espacio, esquinas, sombra, movimiento), `app_theme.dart` (claro, oscuro y sistema; Atkinson Hyperlegible) |
 | Compartido | `lib/shared/` | Widgets comunes, teclado seguro, extensiones |
 | Núcleo | `lib/core/` | `domain/`, `infrastructure/` (security, database, clipboard), `services/` (export, import, auditoría, recuperación, backups, notificaciones), `presentation/` |
 | Funciones | `lib/features/<f>/{domain,application,infrastructure,presentation}` | autofill, credentials, folders, passkeys, password_generator, secure_files, settings, sync, vault_access, vault_transfer |

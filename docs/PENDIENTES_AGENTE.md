@@ -13,7 +13,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 |---|---|---|---|
 | 0 | Decidir DEC-1 a DEC-10 y aprobar lo de cada carril | General | ✓ 2026-11-15 |
 | 1 | Cimientos: renombrar el paquete (PLA-5) y subir dependencias (PLA-4), **sin otro carril tocando código**. En paralelo, ligera: CAL-4 ✓ y CAL-2 ✓ | D, y E | ✓ PLA-5 (2026-11-15) y PLA-4 (2026-11-19): **la fase 2 puede arrancar** |
-| 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ◐ PLA-6 y PLA-3 hechos (2026-11-19); falta DIS de B |
+| 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ◐ PLA-6 y PLA-3 hechos (2026-11-19); DIS-1 hecho (2026-11-20); faltan DIS-2, 3 y 5 |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ☐ puede arrancar: imagen `solokey-build` lista (PLA-3, 2026-11-19) |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5 ◐: CI de Windows ✓; CAL-3 ✓) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
 | 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1), 200% y fuzz (CAL-1, SEG-2 ◐; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4; SEG-2 ◐ (2026-11-19): fuzz de sync, recuperación y cabecera; encontró SEC-012 (✓ arreglado por A, 2026-11-20) |

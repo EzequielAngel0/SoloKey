@@ -46,7 +46,7 @@ compila en Podman, la DLL de Windows de forma cruzada ([ADR-0012](../adr/0012-to
 | Por qué sí | El color significa algo (sana, débil, comprometida); se lee de un vistazo; no se parece a todos los demás gestores azules | Lo más barato | Más "marca" |
 | Por qué no | Requiere disciplina: nada de colorear "por adornar" | El dueño ya dijo que el resultado de julio no le gustó | El color de marca compite con los de estado |
 
-### Tokens de A (punto de partida, se afinan en DIS-1)
+### Tokens de A (punto de partida; los vigentes, en `lib/theme/app_palette.dart` desde DIS-1)
 
 | Rol | Claro | Oscuro | Uso |
 |---|---|---|---|

@@ -111,14 +111,25 @@ flutter:
     - assets/logo/
 
   # Tipografia bundleada offline (sin red, coherente con local-first).
-  # Variable fonts: Flutter mapea fontWeight al eje `wght` del .ttf.
+  # Tinta y papel (DIS-1): Atkinson Hyperlegible Next y Mono (OFL), un .ttf fijo
+  # por peso, sacados de la variable de google/fonts (ver CHANGELOG).
   fonts:
-    - family: Inter
+    - family: Atkinson Hyperlegible Next
       fonts:
-        - asset: assets/fonts/Inter.ttf
-    - family: JetBrains Mono
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-400.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-500.ttf
+          weight: 500
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-600.ttf
+          weight: 600
+        - asset: assets/fonts/AtkinsonHyperlegibleNext-700.ttf
+          weight: 700
+    - family: Atkinson Hyperlegible Mono
       fonts:
-        - asset: assets/fonts/JetBrainsMono.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleMono-400.ttf
+        - asset: assets/fonts/AtkinsonHyperlegibleMono-500.ttf
+          weight: 500
+        - asset: assets/fonts/AtkinsonHyperlegibleMono-700.ttf
+          weight: 700
 
 flutter_launcher_icons:
   android: true

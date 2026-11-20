@@ -16,7 +16,7 @@ se sincroniza entre ellos por la red local. Código abierto, licencia MIT. Decis
 | Entre equipos | Sync P2P cifrada en la LAN, reconexión sin QR, "Sincronizar ahora", desbloquear o aprobar el PC desde el celular |
 | Android | Autofill del sistema, capturas bloqueadas |
 | Windows | Bandeja, instancia única, autoarranque, atajos globales, Quick-Fill, paleta de comandos, captura de QR de la pantalla, instalador |
-| General | Español e inglés, temas oscuro, claro, tenue y OLED, accesibilidad (Semantics, foco por teclado) |
+| General | Español e inglés, temas claro, oscuro y seguir al sistema, accesibilidad (Semantics, foco por teclado) |
 
 Lo que cambió versión por versión: [`../../CHANGELOG.md`](../../CHANGELOG.md).
 

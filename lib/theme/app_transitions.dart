@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 
-/// Custom page transition: slide from bottom + fade.
-/// Applied globally via [ThemeData.pageTransitionsTheme].
-class SlideUpFadeTransition extends PageTransitionsBuilder {
-  const SlideUpFadeTransition();
+import 'app_tokens.dart';
+
+/// Transición de pantalla de Tinta y papel: la hoja nueva aparece con un
+/// fundido y sube apenas, en 200 ms. Sin escala ni rebote. Con "reducir
+/// movimiento" del sistema, cambia sin animación.
+class PaperPageTransition extends PageTransitionsBuilder {
+  const PaperPageTransition();
+
+  @override
+  Duration get transitionDuration => AppMotion.standard;
 
   @override
   Widget buildTransitions<T>(
@@ -13,23 +19,17 @@ class SlideUpFadeTransition extends PageTransitionsBuilder {
     Animation<double> secondaryAnimation,
     Widget child,
   ) {
-    // Graphite Pro motion: subtle, "pro" — not a show-off slide.
-    final slide = Tween<Offset>(
-      begin: const Offset(0, 0.03),
-      end: Offset.zero,
-    ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOutCubic));
+    if (MediaQuery.maybeDisableAnimationsOf(context) ?? false) return child;
 
-    final fade = CurvedAnimation(parent: animation, curve: Curves.easeIn);
-
-    final secondaryFade = Tween<double>(begin: 1.0, end: 0.96).animate(
-      CurvedAnimation(parent: secondaryAnimation, curve: Curves.easeIn),
-    );
-
+    final curved = CurvedAnimation(parent: animation, curve: AppMotion.curve);
     return FadeTransition(
-      opacity: secondaryFade,
+      opacity: curved,
       child: SlideTransition(
-        position: slide,
-        child: FadeTransition(opacity: fade, child: child),
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.015),
+          end: Offset.zero,
+        ).animate(curved),
+        child: child,
       ),
     );
   }
