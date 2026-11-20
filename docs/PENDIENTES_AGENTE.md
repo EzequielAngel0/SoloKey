@@ -13,7 +13,7 @@ Estado: `main` = v1.1.0 (2026-07-18). `develop` = integración de la **v2**, con
 |---|---|---|---|
 | 0 | Decidir DEC-1 a DEC-10 y aprobar lo de cada carril | General | ✓ 2026-11-15 |
 | 1 | Cimientos: renombrar el paquete (PLA-5) y subir dependencias (PLA-4), **sin otro carril tocando código**. En paralelo, ligera: CAL-4 ✓ y CAL-2 ✓ | D, y E | ✓ PLA-5 (2026-11-15) y PLA-4 (2026-11-19): **la fase 2 puede arrancar** |
-| 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ☐ se puede abrir |
+| 2 | Sistema de diseño (DIS-1, 2, 3, 5) + imagen de build en Podman y escaneo (PLA-3, PLA-6) | B y D | ◐ PLA-6 hecho (2026-11-19) |
 | 3 | Núcleo cripto en Rust (NUC-1), con la imagen de PLA-3 | A | ⊘ espera a PLA-3 |
 | 4 | Pantallas (PAN-10, luego PAN-1 a 9) + formato v2 y migración (NUC-2, NUC-6) + harness E2E (CAL-5; CAL-3 ✓) | C, A y E | ⊘ espera a DIS-2 y NUC-1 |
 | 5 | Sync v2 (NUC-3), logo (DIS-4), firma (PLA-1), 200% y fuzz (CAL-1, SEG-2; amenazas SEG-1 ✓) | A, B, D y E | ⊘ espera a 4 |
@@ -40,8 +40,8 @@ dueno, verificas y publicas con su permiso.
 Carga la skill solokey. ListAgents (el emulador y el celular los comparten otras sesiones).
 1. RAMAS: git fetch; git worktree list y git log origin/develop.. en cada worktree: mergear lo terminado y verificado o
    preguntarle. Quitar worktrees solo con .\tool\quitar-worktree.ps1.
-2. DEPENDENCIAS: flutter pub outdated y los escaneos PLA-6 a 8 de docs/sesiones/D.md cuando existan (.\tool\escaneo-deps.ps1,
-   Dependabot, .\tool\escaneo-ramas.ps1); mientras, OSV-Scanner en Podman como dice D.md. Lo de seguridad, contarselo.
+2. DEPENDENCIAS: .\tool\escaneo-deps.ps1 (OSV en Podman, pub outdated y Dependabot; 0 limpio, 2 contarselo al dueno, 1 error)
+   y, cuando exista, .\tool\escaneo-ramas.ps1 (PLA-8). Lo de seguridad, contarselo.
 3. DECISIONES: docs/PENDIENTES_DUENO.md y lo marcado ◇ en docs/sesiones/*.md, con AskUserQuestion y la recomendada primero. Lo
    aprobado pasa a "Aprobado, para desarrollar" de su carril, con orden; una decision de fondo, ademas, a docs/adr/ (siguiente
    libre en docs/adr/README.md).
@@ -168,5 +168,5 @@ Resumen AL FINAL, con el CI terminado (gh run watch).
 | A · Núcleo | [`sesiones/A.md`](sesiones/A.md) | NUC-1, NUC-2, NUC-3, NUC-6; NUC-5 después de la v2.0.0 |
 | B · Diseño | [`sesiones/B.md`](sesiones/B.md) | DIS-1, DIS-2, DIS-3, DIS-5, DIS-4 |
 | C · Pantallas | [`sesiones/C.md`](sesiones/C.md) | PAN-10, PAN-1 a PAN-9 |
-| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-6, PLA-3, PLA-1; PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |
+| D · Plataforma y entrega | [`sesiones/D.md`](sesiones/D.md) | PLA-3, PLA-1; PLA-7 y 8 aprobados, el dueño dice cuándo; PLA-9 y 10 en espera |
 | E · Calidad y seguridad | [`sesiones/E.md`](sesiones/E.md) | CAL-5, CAL-1, SEG-2 (CAL-4, CAL-3, CAL-2 y SEG-1 ✓); SEC-003 y SEC-008 los cierra la v2 |
