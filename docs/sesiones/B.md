@@ -8,8 +8,6 @@ de partida en [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §3. Antes 
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | DIS-5 | Quitar las 22 vibraciones, el shimmer y la animación escalonada | S | ☐ | DEC-5 aprobado |
-| 2 | DIS-4 | Logo e iconos redibujados planos (app, bandeja, instalador, adaptativo de Android, `.ico` multi-tamaño) | M | ☐ | Skills `logo-design-guide` y `svg-logo-designer` |
 
 ## Necesita de otros carriles
 
@@ -19,6 +17,7 @@ de partida en [`../diseno/REDISENO_V2.md`](../diseno/REDISENO_V2.md) §3. Antes 
 | C | Al rehacer cada pantalla, dejar los alias de la v1 (`palette.primary`, `accent`, `typeX`, `AppTheme.rCard`...) por los tokens de DIS-1; cuando no quede ninguno, B los borra | Quitar los alias |
 | C | `Colors.white` sobre `accent` (botón guardar, formulario de credencial, archivos, emparejar) no se lee en oscuro: el principal ahora es tinta clara; usar `onInk` | Pantallas en oscuro |
 | C | Claves `themeDim` y `themeOled` de los `.arb` quedaron sin uso (DEC-3) | Limpiar textos |
+| C | Cambiar `Image.asset('assets/logo/solokey_mark.png')` y `SoloKey.png` (arranque, crear bóveda, desbloqueo, menú de escritorio, vacío) por `SoloKeyMark`: sin teñir sale la S azul de la v1 | Logo plano en la app |
 
 ## No reabre
 

@@ -735,6 +735,7 @@
   "notifRotationChannelDesc": "Alerts when a password should be rotated for security.",
   "notifRotationTitle": "Password rotation required",
   "notifRotationBody": "Your password for \"{title}\" has expired. Change it now for security.",
+  "notifRotationBodyCount": "{count, plural, =1{A password is due for a change. Open SoloKey to see which.} other{{count} passwords are due for a change. Open SoloKey to see which.}}",
   "notifActionChangePassword": "Change password",
   "notifActionSnooze3d": "Snooze 3 days",
   "notifApprovalTitle": "Approve sign-in",

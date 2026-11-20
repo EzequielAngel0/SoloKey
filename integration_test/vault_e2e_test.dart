@@ -89,7 +89,7 @@ void main() {
     expect(find.byType(UnlockScreen), findsNothing);
   },
       // Never runs by accident: only on a disposable device with the opt-in.
-      skip: !e2eWipeAllowed);
+      skip: !e2eCanWipe);
 }
 
 /// Types [text] in the field labelled [label] and presses the keyboard's Done

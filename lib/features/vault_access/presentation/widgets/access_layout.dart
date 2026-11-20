@@ -102,27 +102,3 @@ class AccessHeader extends StatelessWidget {
     );
   }
 }
-
-/// El monograma de SoloKey (decorativo: el nombre lo dice el texto de al lado).
-/// Lo redibuja B en DIS-4; aquí solo se coloca.
-class SoloKeyMark extends StatelessWidget {
-  const SoloKeyMark({super.key, required this.size});
-
-  final double size;
-
-  @override
-  Widget build(BuildContext context) {
-    return ExcludeSemantics(
-      child: Image.asset(
-        'assets/logo/solokey_mark.png',
-        height: size,
-        width: size,
-        errorBuilder: (_, _, _) => Image.asset(
-          'assets/logo/SoloKey.png',
-          height: size,
-          width: size,
-        ),
-      ),
-    );
-  }
-}

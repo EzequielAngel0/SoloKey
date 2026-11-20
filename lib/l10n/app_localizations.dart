@@ -4232,6 +4232,12 @@ abstract class AppLocalizations {
   /// **'Tu contraseña para \"{title}\" ha expirado. Cámbiala ahora por seguridad.'**
   String notifRotationBody(String title);
 
+  /// Aviso de rotación en segundo plano: sin el nombre de la credencial, que va cifrado (NUC-2).
+  ///
+  /// In es, this message translates to:
+  /// **'{count, plural, =1{Una contraseña toca cambiarse. Abre SoloKey para ver cuál.} other{{count} contraseñas tocan cambiarse. Abre SoloKey para ver cuáles.}}'**
+  String notifRotationBodyCount(int count);
+
   /// No description provided for @notifActionChangePassword.
   ///
   /// In es, this message translates to:

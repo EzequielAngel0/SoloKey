@@ -4,9 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../app/di/injection.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../router/app_router.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../../../shared/widgets/kit/kit.dart';
-import '../domain/repositories/i_vault_repository.dart';
-import 'widgets/access_layout.dart';
 
 /// Arranque: la marca quieta mientras se averigua si ya hay bóveda, y de ahí al
 /// primer uso o al desbloqueo. Sin esperas de adorno ni animación (ADR-0013).
@@ -25,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _navigate() async {
-    final initialized = await getIt<IVaultRepository>().isVaultInitialized();
+    final initialized = await getIt<VaultStore>().exists();
     if (!mounted) return;
     context.go(initialized ? AppRoutes.unlock : AppRoutes.setup);
   }

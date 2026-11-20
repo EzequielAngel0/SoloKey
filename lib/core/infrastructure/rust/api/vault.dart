@@ -56,6 +56,15 @@ Future<VaultHandle> vaultRecover({
   kdf: kdf,
 );
 
+/// Comprueba el codigo de recuperacion sin cambiar nada; `wrongPassword` si no sirve, `noRecovery` si no hay.
+Future<void> vaultCheckRecovery({
+  required String dataDir,
+  required String recoveryCode,
+}) => RustLib.instance.api.crateApiVaultVaultCheckRecovery(
+  dataDir: dataDir,
+  recoveryCode: recoveryCode,
+);
+
 /// Borra la boveda del directorio (el archivo y sus diarios).
 Future<void> vaultWipe({required String dataDir}) =>
     RustLib.instance.api.crateApiVaultVaultWipe(dataDir: dataDir);

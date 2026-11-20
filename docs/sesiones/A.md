@@ -9,17 +9,18 @@ Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`]
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | NUC-2 | Formato de bóveda v2 (SQLite con `rusqlite`, cabecera versionada, metadatos cifrados) y migración única desde la v1 con copia previa | XL | ◐ Rust hecho (formato, migración con vectores); falta Dart | [ver](#nuc-2) |
-| 2 | NUC-3 | Sync v2 en el núcleo: canal Noise con llaves fijadas en el QR, protocolo versionado, LWW, aviso claro entre v1 y v2 | XL | ◐ Rust hecho (canal IK, delta LWW); falta Dart | [ver](#nuc-3) |
-| 3 | NUC-6 | Directorio de datos configurable (bóveda aislada para E2E); la ruta real solo sin la bandera de prueba | S | ☐ | Lo pide E (CAL-5); va con NUC-2 |
-| 4 | NUC-5 | Passkeys reales (WebAuthn, proveedor de Credential Manager en Android) | XL | ⊘ después de la v2.0.0 | [`../seguridad/WEBAUTHN.md`](../seguridad/WEBAUTHN.md) |
+| 1 | NUC-3 | Sync v2 en el núcleo: canal Noise con llaves fijadas en el QR, protocolo versionado, LWW, aviso claro entre v1 y v2 | XL | ◐ Rust hecho (canal IK, delta LWW); falta Dart: hoy la app usa el canal de la v1 con el delta sobre registros v2 (NUC-2) | [ver](#nuc-3) |
+| 2 | NUC-5 | Passkeys reales (WebAuthn, proveedor de Credential Manager en Android) | XL | ⊘ después de la v2.0.0 | [`../seguridad/WEBAUTHN.md`](../seguridad/WEBAUTHN.md) |
 
 ## Necesita de otros carriles
 
 | De | Qué | Para |
 |---|---|---|
 | D | `cargo-expand` en la etapa Rust de `solokey-build`: `rust/puente.ps1` lo instala en cada corrida | Regenerar el puente rápido |
-| E | `tool/vectores_v1/generar_vectores.dart` ya usa el núcleo (no queda cripto Dart): la verdad de la v1 se regenera desde `main` | Saberlo si se rehacen los vectores |
+| C | Tras migrar, si el almacén tiene `recovery_reset_needed` (`kRecoveryResetNeeded`), pedir generar un código nuevo (`RecoveryService.generateRecoveryCode`) y borrar la marca; textos de la migración (avance, éxito, error con la v1 intacta) | Que la bóveda migrada vuelva a tener código |
+| C | El aviso agrupado de rotación abre la app (`NotificationTapKind.openApp`): mostrar dentro, tras desbloquear, cuáles toca cambiar | Decisión del dueño 2026-11-20: el aviso de fondo no lleva nombres |
+| E | Las E2E necesitan `--dart-define=SOLOKEY_DATA_DIR` (ya en el runner, `tests.yml` y `tool/build.ps1 -E2e`); sin ella, las que borran se omiten. CAL-5 puede quitar el respaldo de la bóveda real del runner | Ya no tocan la bóveda real |
+| E | Los vectores de la v1 se regeneran desde `main` (`generar_vectores.dart` salió de develop con drift) | Saberlo si se rehacen |
 
 ## No reabre
 
@@ -31,15 +32,6 @@ Reglas y plantilla: [`README.md`](README.md). Plan: [`../diseno/REDISENO_V2.md`]
 | `rustup` en el host | Todo Rust en Podman (ADR-0012) |
 
 ## Detalle
-
-### NUC-2
-
-1. Diseñar el formato (documentarlo en `arquitectura/ARQUITECTURA.md`): cabecera con versión y KDF; por registro, en claro solo
-   id y versión; tipo, carpeta, fechas, orden y payload cifrados.
-2. Migración al primer arranque de la v2: copia automática de la bóveda v1 (DB + almacén seguro + `secure_files/`), conversión,
-   verificación de que todo descifra igual, y solo entonces se marca migrada. Si falla, la v1 queda intacta y se avisa.
-3. Probar con los vectores de CAL-2 y con una **copia** de una bóveda real; nunca con la real.
-4. Drift y sus pruebas se van cuando el núcleo maneje la BD.
 
 ### NUC-3
 

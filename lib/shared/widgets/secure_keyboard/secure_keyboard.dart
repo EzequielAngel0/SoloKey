@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 import '../../../l10n/app_localizations.dart';
 import '../../../theme/app_palette.dart';
@@ -135,7 +134,6 @@ class _SecureKeyboardState extends State<SecureKeyboard>
 
   void _onKey(String key) {
     if (_buffer.length >= widget.maxLength) return;
-    HapticFeedback.lightImpact();
     setState(() {
       _buffer.add(key);
       _lastPressedKey = key;
@@ -145,7 +143,6 @@ class _SecureKeyboardState extends State<SecureKeyboard>
 
   void _onDelete() {
     if (_buffer.isEmpty) return;
-    HapticFeedback.lightImpact();
     setState(() {
       _buffer.last = '\x00';
       _buffer.removeLast();
@@ -436,7 +433,6 @@ class _SecureKeyboardState extends State<SecureKeyboard>
             child: GestureDetector(
               onTap: _onDelete,
               onLongPress: () {
-                HapticFeedback.heavyImpact();
                 setState(() {
                   for (var i = 0; i < _buffer.length; i++) {
                     _buffer[i] = '\x00';

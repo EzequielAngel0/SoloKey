@@ -1,9 +1,8 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:injectable/injectable.dart';
 
-import '../../core/infrastructure/database/app_database.dart';
-import '../../core/infrastructure/database/daos/category_dao.dart';
-import '../../core/infrastructure/database/daos/credential_dao.dart';
+import '../../core/infrastructure/vault/data_location.dart';
+import '../../core/infrastructure/vault/file_secure_storage.dart';
 import '../../features/sync/domain/i_sync_service.dart';
 import '../../features/sync/infrastructure/sync_service.dart';
 
@@ -17,18 +16,17 @@ abstract class RegisterModule {
   /// NO usar `migrateWithBackup: true`: en 10.3.4 se salta la migración de
   /// EncryptedSharedPreferences y la app arranca como bóveda nueva (probado
   /// en el emulador el 2026-11-15).
-  FlutterSecureStorage get secureStorage => const FlutterSecureStorage(
-        aOptions: AndroidOptions(
-          resetOnError: false,
-          migrateOnAlgorithmChange: true,
-        ),
-      );
-
-  @lazySingleton
-  CredentialDao credentialDao(AppDatabase db) => db.credentialDao;
-
-  @lazySingleton
-  CategoryDao categoryDao(AppDatabase db) => db.categoryDao;
+  ///
+  /// Con datos aislados (NUC-6, `SOLOKEY_DATA_DIR`, nunca en release) el almacen es un JSON en esa carpeta: las
+  /// pruebas no tocan el almacen real del sistema.
+  FlutterSecureStorage get secureStorage => isIsolatedDataDir
+      ? FileSecureStorage()
+      : const FlutterSecureStorage(
+          aOptions: AndroidOptions(
+            resetOnError: false,
+            migrateOnAlgorithmChange: true,
+          ),
+        );
 
   /// Registers the concrete [SyncService] singleton ALSO under its UI-facing
   /// interface, so the pairing screen/notifier can resolve `getIt<ISyncService>()`

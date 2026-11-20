@@ -85,14 +85,18 @@ jobs:
           cargo build --release --locked -p solokey-core
           mkdir -p dist && cp target/release/solokey_core.dll dist/
 
+      # Datos aislados (NUC-6): la app y resetVault solo tocan esta carpeta.
       - name: E2E app_boot_test (no destructivo)
-        run: flutter test integration_test/app_boot_test.dart -d windows
+        run: flutter test integration_test/app_boot_test.dart -d windows --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e
+
+      - name: E2E migracion_v1_test (boveda de prueba de vectores/v1)
+        run: flutter test integration_test/migracion_v1_test.dart -d windows --dart-define=E2E_ALLOW_WIPE=1 --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e --dart-define=SOLOKEY_V1_VECTORS=${{ github.workspace }}\vectores\v1
 
       - name: E2E vault_e2e_test (corrida 1 de 2)
-        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1
+        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e
 
       - name: E2E vault_e2e_test (corrida 2 de 2, sobre la boveda que dejo la 1)
-        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1
+        run: flutter test integration_test/vault_e2e_test.dart -d windows --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=SOLOKEY_DATA_DIR=${{ runner.temp }}\solokey-e2e
 
   # Nucleo Rust (ADR-0008): pruebas y clippy. La misma toolchain que tool/build/Containerfile.
   rust:
@@ -173,4 +177,4 @@ jobs:
           # El runner corre cada linea por separado, por eso el bucle va en una sola.
           script: |
             flutter build apk --debug
-            set -e; for f in integration_test/*_test.dart; do adb install -g build/app/outputs/flutter-apk/app-debug.apk; timeout 900 flutter test "$f" -d emulator-5554 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=TEST_DISABLE_BIOMETRIC=1; done
+            set -e; for f in integration_test/*_test.dart; do adb install -g build/app/outputs/flutter-apk/app-debug.apk; timeout 900 flutter test "$f" -d emulator-5554 --dart-define=E2E_ALLOW_WIPE=1 --dart-define=TEST_DISABLE_BIOMETRIC=1 --dart-define=SOLOKEY_DATA_DIR=e2e; done

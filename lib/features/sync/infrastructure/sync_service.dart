@@ -14,10 +14,9 @@ import 'package:shelf_web_socket/shelf_web_socket.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
 
 import '../../../core/domain/crypto_utils.dart';
-import '../../../core/infrastructure/database/app_database.dart';
 import '../../../core/infrastructure/security/i_security_service.dart';
 import '../../../core/infrastructure/security/session_manager.dart';
-import '../../secure_files/domain/repositories/i_secure_file_repository.dart';
+import '../../../core/infrastructure/vault/vault_store.dart';
 import '../domain/connected_device.dart';
 import '../domain/i_sync_service.dart';
 import '../domain/pairing_payload.dart';
@@ -27,14 +26,13 @@ import 'delta_sync_manager.dart';
 
 @lazySingleton
 class SyncService implements ISyncService {
-  SyncService(this._storage, this._db, this._securityService,
-      this._sessionManager, this._secureFileRepository);
+  SyncService(
+      this._storage, this._vault, this._securityService, this._sessionManager);
 
   final FlutterSecureStorage _storage;
-  final AppDatabase _db;
+  final VaultStore _vault;
   final ISecurityService _securityService;
   final SessionManager _sessionManager;
-  final ISecureFileRepository _secureFileRepository;
 
   static const String _serviceType = '_solokey-sync._tcp';
   static const String _kSyncKeyName = 'solokey_sync_key';
@@ -119,9 +117,7 @@ class SyncService implements ISyncService {
   @override
   int get connectedDeviceCount => connectedDevices.length;
 
-  late final DeltaSyncManager _deltaSyncManager = DeltaSyncManager(
-      _db, _securityService, _sessionManager,
-      secureFiles: _secureFileRepository);
+  late final DeltaSyncManager _deltaSyncManager = DeltaSyncManager(_vault);
 
   // ───────────────────────────────────────────────────────────────────────────
   // DESKTOP: Server Operations
@@ -613,7 +609,7 @@ class SyncService implements ISyncService {
   /// returns the DUK (base64) to hand to the phone. Returns null if the vault is
   /// locked (nothing to wrap). The desktop never stores the DUK.
   Future<String?> _registerRemoteUnlock() async {
-    final masterKey = _sessionManager.getKeyCopy();
+    final masterKey = await _sessionManager.keyCopy();
     if (masterKey == null) return null;
     final duk = _cryptoRandomBytes(32);
     final wrapped = await _securityService.encrypt(masterKey, duk);

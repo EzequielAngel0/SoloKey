@@ -2,39 +2,41 @@ import 'dart:typed_data';
 
 import 'package:injectable/injectable.dart';
 
-import '../../domain/crypto_utils.dart';
+import '../rust/api/vault.dart';
 
-/// Holds the derived master key in memory for the duration of an unlocked session.
-/// The key is zeroed out when the vault is locked.
-///
-/// Security note: Dart's GC may keep copies of Uint8List in memory beyond the
-/// zero-fill. This minimises the exposure window but cannot guarantee full
-/// memory security — that requires native/FFI approaches (future enhancement).
+/// La sesion abierta: el `VaultHandle` del nucleo Rust (NUC-2). La clave de la boveda vive en el nucleo, no en Dart;
+/// [keyCopy] da una copia solo cuando hace falta (guardarla tras la biometria) y quien la recibe la borra.
+/// [lock] cierra el handle y el nucleo pone a cero la clave y el indice.
 @LazySingleton()
 class SessionManager {
-  Uint8List? _keyBytes;
+  VaultHandle? _handle;
 
-  bool get hasActiveKey => _keyBytes != null;
+  bool get hasActiveKey => _handle != null;
 
-  /// Stores the derived key. Call only after successful master password verification.
-  void storeKey(Uint8List keyBytes) {
-    _clearBuffer();
-    _keyBytes = Uint8List.fromList(keyBytes);
+  /// El handle abierto. Lanza [StateError] con la boveda bloqueada.
+  VaultHandle get handle {
+    final h = _handle;
+    if (h == null) throw StateError('Vault is locked');
+    return h;
   }
 
-  /// Returns a copy of the key bytes. Returns null if session is locked.
-  Uint8List? getKeyCopy() {
-    if (_keyBytes == null) return null;
-    return Uint8List.fromList(_keyBytes!);
+  /// Lo llama `VaultStore` al abrir. Cierra el anterior si lo habia.
+  void attach(VaultHandle handle) {
+    lock();
+    _handle = handle;
   }
 
-  /// Zeros the key buffer and nullifies the reference.
-  void lock() => _clearBuffer();
+  /// Copia de la clave de la boveda, o null con la boveda bloqueada. Quien la recibe la pone a cero.
+  Future<Uint8List?> keyCopy() async {
+    final h = _handle;
+    if (h == null) return null;
+    return h.keyCopy();
+  }
 
-  void _clearBuffer() {
-    if (_keyBytes != null) {
-      zeroBuffer(_keyBytes!);
-      _keyBytes = null;
-    }
+  /// Cierra el handle: el nucleo pone a cero la clave y los registros descifrados.
+  void lock() {
+    final h = _handle;
+    _handle = null;
+    if (h != null) h.close();
   }
 }
