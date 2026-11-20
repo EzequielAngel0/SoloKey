@@ -9,6 +9,11 @@
 // El almacén seguro va en memoria (canal simulado) y la BD en un archivo de una
 // carpeta temporal; path_provider apunta a esa carpeta. Al final relee todo con
 // el código de la v1 y falla si algo no vuelve igual.
+//
+// Desde NUC-1 (2026-11-20) la cripto de SecurityServiceImpl la hace el núcleo Rust
+// (byte a byte igual: lo prueban estos mismos vectores en `cargo test`) y necesita
+// rust/dist/libsolokey_core.so. Los vectores versionados salieron de la cripto Dart
+// de la v1 (c0a49a4); para regenerar la verdad de la v1, correrlo desde `main`.
 
 import 'dart:convert';
 import 'dart:io';
@@ -18,7 +23,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:solokey/core/infrastructure/database/app_database.dart';
-import 'package:solokey/core/infrastructure/security/crypto_isolate.dart';
+import 'package:solokey/core/infrastructure/rust_core.dart';
 import 'package:solokey/core/infrastructure/security/double_envelope_service.dart';
 import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 import 'package:solokey/core/infrastructure/security/session_manager.dart';
@@ -104,6 +109,7 @@ void main() {
     final store = installMemorySecureStorage();
 
     const storage = FlutterSecureStorage();
+    await initRustCore();
     final security = SecurityServiceImpl();
     final session = SessionManager();
     final dbFile = File('${boveda.path}/vault_guard_db.sqlite');
@@ -434,7 +440,7 @@ void main() {
         await envelope.decryptField(encryptedValue: doubleCred.password!, pin: doublePin),
         plainDouble.password);
     expect(
-        await decryptIsolate(DecryptParams(cipherBlob: aesBlob, keyBytes: aesKey)),
+        await security.decrypt(aesBlob, aesKey),
         aesPlain);
 
     await db.close();

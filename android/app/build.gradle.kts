@@ -5,10 +5,18 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// Nucleo Rust (ADR-0008, NUC-1): libsolokey_core.so por ABI, de .\tool\build.ps1 -Nucleo -Salida rust\dist.
+val solokeyCoreLibs = file("../../rust/dist/jniLibs")
+if (!solokeyCoreLibs.isDirectory) {
+    throw GradleException("Falta $solokeyCoreLibs: corre .\\tool\\build.ps1 -Nucleo -Salida rust\\dist")
+}
+
 android {
     namespace = "com.angelezequiel.solokey"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
+
+    sourceSets["main"].jniLibs.srcDir(solokeyCoreLibs)
 
     compileOptions {
         // Required by flutter_local_notifications (uses java.time APIs).

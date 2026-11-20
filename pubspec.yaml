@@ -36,7 +36,10 @@ dependencies:
   # ── Secure Storage (Android Keystore) ────────────────────────
   flutter_secure_storage: ^10.3.4
 
-  # ── Cryptography (AES-256-GCM + Argon2id) ────────────────────
+  # ── Nucleo Rust (ADR-0008): cripto de la boveda. Misma version que el crate ──
+  flutter_rust_bridge: 2.11.1
+
+  # ── Cryptography (solo SSH y la sync de la v1; la boveda va por el nucleo) ──
   cryptography: ^2.7.0
 
   # ── Biometrics ────────────────────────────────────────────────

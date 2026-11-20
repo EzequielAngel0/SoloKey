@@ -40,9 +40,10 @@ Reglas: modelos inmutables (freezed); un caso de uso por acción; los widgets no
 
 | Pieza | Cómo | Dónde |
 |---|---|---|
-| Derivación de la clave | Argon2id, 64 MiB, 3 iteraciones, paralelismo 4, 32 bytes; sal de 32 bytes por bóveda | `crypto_isolate.dart` |
-| Cifrado | AES-256-GCM, nonce aleatorio de 12 bytes por operación; blob `nonce ‖ ciphertext ‖ tag` | `crypto_isolate.dart` |
-| Hilo | Todo lo costoso en `Isolate.run`; la interfaz no se bloquea | `security_service_impl.dart` |
+| Derivación de la clave | Argon2id, 64 MiB, 3 iteraciones, paralelismo 4, 32 bytes; sal de 32 bytes por bóveda. Parámetros acotados (SEC-012) | Núcleo Rust: `rust/solokey-core/src/crypto.rs` (crate `argon2`) |
+| Cifrado | AES-256-GCM, nonce aleatorio de 12 bytes por operación; blob `nonce ‖ ciphertext ‖ tag` | Núcleo Rust (crate `aes-gcm`); lo que entra se pone a cero (`zeroize`) |
+| Puente | `SecurityServiceImpl` llama al núcleo por `flutter_rust_bridge` 2 (NUC-1); corre en el pool de hilos del puente y la interfaz no se bloquea. Lo carga `initRustCore()` desde `configureDependencies` | `security_service_impl.dart`, `rust_core.dart`, `lib/core/infrastructure/rust/` (generado) |
+| Librerías nativas | `solokey_core.dll` (cruzada con `cargo-xwin`) y `libsolokey_core.so` por ABI (`cargo-ndk`) en `rust/dist/`, sin versionar: `.\tool\build.ps1 -Nucleo -Salida rust\dist`. CMake copia la DLL junto al `.exe` y Gradle toma `jniLibs/`; los dos fallan con un aviso si falta. El puente se regenera con `.\rust\puente.ps1` | `windows/CMakeLists.txt`, `android/app/build.gradle.kts` |
 | Verificar la maestra | Se descifra un dato de prueba (`verificationData`); la contraseña ni su hash se guardan | `MasterKeyConfig` |
 | Clave en RAM | `SessionManager` la guarda en `Uint8List`, la pone a cero al bloquear; `getKeyCopy()` da copias que se borran tras usarse | `session_manager.dart` |
 | Doble sobre | Registros marcados se cifran otra vez con su propio Argon2id + AES-GCM; revelar pide re-autenticación | `double_envelope_service.dart` |

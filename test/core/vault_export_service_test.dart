@@ -6,6 +6,7 @@ import 'package:flutter_test/flutter_test.dart';
 // used here only to mock the FilePicker platform channel in tests.
 // ignore: depend_on_referenced_packages
 import 'package:solokey/core/infrastructure/security/i_security_service.dart';
+import 'package:solokey/core/infrastructure/rust_core.dart';
 import 'package:solokey/core/infrastructure/security/security_service_impl.dart';
 import 'package:solokey/core/infrastructure/security/session_manager.dart';
 import 'package:solokey/core/services/csv_import_service.dart';
@@ -152,6 +153,9 @@ void main() {
   late SecurityServiceImpl security;
   late SessionManager session;
   late Directory tmp;
+
+  // Cripto real del nucleo Rust: carga rust/dist/ (lo deja tool/build.ps1 -Nucleo -Salida rust/dist).
+  setUpAll(initRustCore);
 
   setUp(() async {
     security = SecurityServiceImpl();

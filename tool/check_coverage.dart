@@ -22,7 +22,9 @@ void main(List<String> args) {
         p.endsWith('.config.dart') ||
         p.endsWith('.gr.dart') ||
         // gen-l10n output (AppLocalizations delegates) is generated code.
-        p.contains('lib/l10n/app_localizations');
+        p.contains('lib/l10n/app_localizations') ||
+        // Puente de flutter_rust_bridge (rust/puente.ps1); lo prueba cargo test.
+        p.contains('lib/core/infrastructure/rust/');
   }
 
   var found = 0;

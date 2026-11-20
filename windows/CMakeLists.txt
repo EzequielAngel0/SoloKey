@@ -87,6 +87,15 @@ if(PLUGIN_BUNDLED_LIBRARIES)
     COMPONENT Runtime)
 endif()
 
+# Nucleo Rust (ADR-0008, NUC-1): solokey_core.dll, cruzada en Podman con
+# .\tool\build.ps1 -Nucleo -Salida rust\dist. Va junto al .exe.
+set(SOLOKEY_CORE_DLL "${CMAKE_CURRENT_SOURCE_DIR}/../rust/dist/solokey_core.dll")
+if(NOT EXISTS "${SOLOKEY_CORE_DLL}")
+  message(FATAL_ERROR "Falta ${SOLOKEY_CORE_DLL}: corre .\\tool\\build.ps1 -Nucleo -Salida rust\\dist")
+endif()
+install(FILES "${SOLOKEY_CORE_DLL}" DESTINATION "${INSTALL_BUNDLE_LIB_DIR}"
+  COMPONENT Runtime)
+
 # Copy the native assets provided by the build.dart from all packages.
 set(NATIVE_ASSETS_DIR "${PROJECT_BUILD_DIR}native_assets/windows/")
 install(DIRECTORY "${NATIVE_ASSETS_DIR}"
