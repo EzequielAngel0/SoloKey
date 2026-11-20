@@ -52,4 +52,6 @@ SEC-008 salió al revisar la arquitectura ese mismo día. SEC-009 a 011 salieron
 |---|---|
 | Cumplir los requisitos del modelo de amenazas | Cada carril, fila por fila: [`AMENAZAS_V2.md`](AMENAZAS_V2.md) |
 | Fuzz de lo que entra de fuera (CSV, `otpauth://`, `.skvault`, mensajes de sync) | SEG-2 |
+| Subir `libsqlite3-sys` a 0.39 o más (RUSTSEC-2026-0459, CVSS 6,8; hoy 0.30.1 por `rusqlite` 0.32) | Carril A (NUC-2) |
+| Escaneo diario de dependencias (OSV, `pub outdated`, Dependabot) | La sesión general: `tool/escaneo-deps.ps1` (PLA-6) |
 | Passkeys reales (WebAuthn) | Plan y riesgos en [`WEBAUTHN.md`](WEBAUTHN.md); sin carril todavía |

@@ -8,9 +8,8 @@ el host).
 
 | # | ID | Qué | Esf. | Estado | Detalle |
 |---|---|---|---|---|---|
-| 1 | PLA-6 | `tool\escaneo-deps.ps1`: OSV-Scanner en Podman sobre `pubspec.lock` y `Cargo.lock` + `flutter pub outdated` + alertas de Dependabot abiertas | S | ☐ | [ver](#detalle-escaneos-pla-6-a-8) |
-| 2 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
-| 3 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
+| 1 | PLA-3 | Imagen `solokey-build` en Podman (Flutter, SDK y NDK de Android, Rust, `cargo-ndk`, `cargo-xwin`); APK y DLL del núcleo salen de ahí; CI con Rust, E2E de Android y `windows-latest` | L | ☐ | [ver](#pla-3) |
+| 2 | PLA-1 | Firma de release de Android (keystore propio fuera del repo, `key.properties` ignorado; el dueño guarda el respaldo) | M | ☐ | Antes de la v2.0.0 |
 
 ## Aprobado, sin desarrollar (el dueño dice cuándo)
 
@@ -66,7 +65,8 @@ pida. Plan en [Detalle: escaneos](#detalle-escaneos-pla-6-a-8).
 Los corre **solo la sesión general**, a diario, al empezar (pasos 1 y 2 de su prompt). Los tres: solo lectura salvo `-Limpiar`,
 `.ps1` en ASCII, salida **0 = limpio, 2 = hay algo que contarle al dueño, 1 = error**.
 
-**PLA-6, `tool\escaneo-deps.ps1`**
+**PLA-6, `tool\escaneo-deps.ps1`** (hecho el 2026-11-19; imagen `ghcr.io/google/osv-scanner:v2.7.0` fijada por digest y
+`-Umbral`/`-Imagen` para ver el gate en 2 y en 1)
 1. OSV-Scanner en Podman, imagen fijada por versión y digest (`ghcr.io/google/osv-scanner`), repo montado de solo lectura:
    `scan source -r --format json`. Hallazgo = severidad alta o crítica **con versión que lo arregla**; sin arreglo, aviso.
    Probado a mano el 2026-11-15 con `ghcr.io/google/osv-scanner:v2.2.1 scan source --lockfile /src/pubspec.lock`

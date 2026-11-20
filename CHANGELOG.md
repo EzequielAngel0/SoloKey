@@ -9,6 +9,11 @@ versión viven en la página de Releases de GitHub.
 
 ### Añadido
 
+- **Escaneo diario de dependencias (PLA-6, 2026-11-19)**: `tool/escaneo-deps.ps1` junta OSV-Scanner en Podman (v2.7.0 fijada por
+  digest, `pubspec.lock` y `rust/Cargo.lock` montados de solo lectura), `flutter pub outdated` y las alertas abiertas de
+  Dependabot. Hallazgo = CVSS ≥ 7 con arreglo; sale 0 limpio, 2 si hay algo que contarle al dueño y 1 si un paso falla; el
+  resultado del día queda en `.claude\estado\escaneo-deps.json`. Primer escaneo: 303 paquetes, un aviso en el núcleo Rust
+  (`libsqlite3-sys` 0.30.1, RUSTSEC-2026-0459, CVSS 6,8, arreglado en 0.39).
 - **Teclado seguro en orden para el emulador (2026-11-19)**: `--dart-define=SECURE_KEYBOARD_ORDERED=1` deja las teclas sin
   barajar para manejar la app por `adb`; un build release lo ignora y siempre baraja (`kReleaseMode`).
 - **Modelo de amenazas de la v2 (SEG-1, 2026-11-15)**: `docs/seguridad/AMENAZAS_V2.md`, por superficie (RAM, disco,

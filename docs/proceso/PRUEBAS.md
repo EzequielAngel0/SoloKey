@@ -95,3 +95,7 @@ Para el núcleo en Rust ([ADR-0008](../adr/0008-nucleo-en-rust.md)) nada va al h
 | Puente Dart y librerías nativas | `localhost/solokey-rust:1` (`rust/Containerfile`: Flutter, Rust, `cargo-xwin`, `cargo-ndk`, NDK, `flutter_rust_bridge_codegen`) | `podman build -t localhost/solokey-rust:1 rust` | `podman rmi localhost/solokey-rust:1` |
 
 El carril D puede absorber `rust/Containerfile` en `solokey-build` (PLA-3).
+
+| Escaneo | Imagen | Comando | Borrarlo |
+|---|---|---|---|
+| Dependencias (PLA-6) | `ghcr.io/google/osv-scanner:v2.7.0` (fijada por digest en el script) | `.\tool\escaneo-deps.ps1 [-Forzar]` | `podman rmi ghcr.io/google/osv-scanner:v2.7.0` |
