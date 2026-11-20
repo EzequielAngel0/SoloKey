@@ -66,10 +66,12 @@ dependencies:
   shelf_router: ^1.1.4
   qr_flutter: ^4.1.0
   web_socket_channel: ^3.0.3
-  desktop_drop: ^0.8.4
+  # 0.8.x cambia como aplica Kotlin en Android y con AGP 8 el build release no encuentra su plugin (pla-4).
+  desktop_drop: ">=0.7.1 <0.8.0"
 
   # ── Native Notifications & Background Services ─────────────────
-  flutter_local_notifications: ^23.0.0
+  # 23 pide compileSdk 37 y AGP 9.1 (androidx.core 1.19): pla-4.
+  flutter_local_notifications: ^22.3.3
   local_notifier: ^0.1.6
   workmanager: ^0.10.0
   launch_at_startup: ^0.5.1
